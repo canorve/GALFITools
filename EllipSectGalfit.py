@@ -1,3 +1,4 @@
+#! /usr/bin/env python3
 
 
 
@@ -14,17 +15,7 @@ import os.path
 import scipy
 import matplotlib.pyplot as plt
 
-
-
-#import mgefit
-#from mgefit.find_galaxy import find_galaxy
-#from mgefit.mge_fit_1d import mge_fit_1d
-##from mgefit.sectors_photometry import sectors_photometry
-#from mgefit.mge_fit_sectors import mge_fit_sectors
-#from mgefit.mge_print_contours import mge_print_contours
-##from mgefit.mge_fit_sectors_twist import mge_fit_sectors_twist
-#from mgefit.sectors_photometry_twist import sectors_photometry_twist
-#from mgefit.mge_print_contours_twist import mge_print_contours_twist
+import mgefit as mge
 
 
 
@@ -300,17 +291,7 @@ def elipsectors(img, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0, badpixel
               n_sectors=19, mask=None, minlevel=0, plot=False, nameplt=None):
 
 
-#    file = "ngc5831_f702w_mosaic.fits"
-
-#    hdu = fits.open(file)
-#    img = hdu[0].data
-
-#    mask = img > 0   # mask before sky subtraction
     img = img - skylevel
-#    hdu.close()
-
-#    print(img)
-
 
     if badpixels is not None:
 
@@ -330,19 +311,17 @@ def elipsectors(img, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0, badpixel
         plt.clf()
         print("")
 
-
-#    print("find gal: ",f.eps,f.theta,f.xpeak,f.ypeak)
-
 ############
 # I have to switch x and y values because they are different axes for
 # numpy
+
     xtemp=xc
     xc=yc
     yc=xtemp
 
     ang=90-ang
 ######################
-#    print("minlevel ",minlevel)
+
     s = sectors_photometry(img, eps, ang, xc, yc,minlevel=minlevel,
             plot=1, badpixels=maskb, n_sectors=n_sectors)
 
@@ -361,8 +340,6 @@ def elipsectors(img, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0, badpixel
     mgeangle=s.angle[stidx]
     mgeanrad=mgeangle*np.pi/180
 
-
-
     ab=q
 
     aellab= mgerad * np.sqrt((np.sin(mgeanrad)**2)/ab**2 + np.cos(mgeanrad)**2)
@@ -370,14 +347,8 @@ def elipsectors(img, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0, badpixel
 
     aellarc=aellab*plate
 
-
 # formula according to cappellary mge manual
     mgesb= mgzpt - 2.5*np.log10(mgecount/exptime) + 2.5*np.log10(plate**2) + 0.1
-
-
-#  corrected formula for skylevel
-#    mgesb= mgzpt - 2.5*np.log10((mgecount-skylevel)/exptime) + 2.5*np.log10(plate**2) + 0.1
-
 
 
     stidxq = np.argsort(aellarc)
@@ -386,21 +357,12 @@ def elipsectors(img, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0, badpixel
     xarc = aellarc[stidxq]
     ymge = mgesb[stidxq]
 
-
-
 #############
 #############  Function
 
-#    xradq, ycntq, ycnterrq    = findrad(xarcq, ymgeq, numsectors)
 
     xrad, ysb, ysberr    = findsb(xarc, ymge, n_sectors)
 
-#    ysbq= mgzpt - 2.5*np.log10(ycntq/exptime) + 2.5*np.log10(plate**2) + 0.1
-
-
-#    ysberrq2 = ((ycnterrq**2)*(6.25) * ( np.log10(np.e) )**2)/ycntq**2
-
-#    ysberrq= np.sqrt(ysberrq2)
 ################
 ###############
 
@@ -445,9 +407,6 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,sbsky):
 
     plt.legend(loc=1)
 
-#    x1, y1 = [xran[0], xran[1]], [sbsky, sbsky]
-#    x2, y2 = [1, 10], [3, 2]
-#    plt.plot(x1, y1, marker = 'o')
 
 
     plt.pause(1)
@@ -460,19 +419,8 @@ def Mulelipsectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0
               n_sectors=19, mask=None, minlevel=0, plot=False, nameplt=None):
 
 
-#    file = "ngc5831_f702w_mosaic.fits"
-
-#    hdu = fits.open(file)
-#    img = hdu[0].data
-
-#    mask = img > 0   # mask before sky subtraction
     img = img - skylevel
     model = model - skylevel
-
-
-#    hdu.close()
-
-#    print(img)
 
     fignum=1
 
@@ -511,17 +459,8 @@ def Mulelipsectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0
             plot=1, badpixels=maskb, n_sectors=n_sectors)
 
 
-#    if plot:
-#        plt.savefig(nameplt)
-#        plt.pause(1)  # Allow plot to appear on the screen
-
-
     sm = sectors_photometry(model, eps, ang, xc, yc,minlevel=minlevel,
             plot=1, badpixels=maskb, n_sectors=n_sectors)
-
-#    if plot:
-#        plt.savefig(nameplt)
-#        plt.pause(1)  # Allow plot to appear on the screen
 
 
 ###################################################
@@ -533,9 +472,6 @@ def Mulelipsectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0
     mgecount=sg.counts[stidx]
     mgeangle=sg.angle[stidx]
     mgeanrad=mgeangle*np.pi/180
-#    ab=q
-#    aellab= mgerad * np.sqrt((np.sin(mgeanrad)**2)/ab**2 + np.cos(mgeanrad)**2)
-#    aellarc=aellab*plate
 
 # model
     stidx = np.argsort(sm.radius)
@@ -552,23 +488,6 @@ def Mulelipsectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0
 ################# Model:
     mgemodsb= mgzpt - 2.5*np.log10(mgemodcount/exptime) + 2.5*np.log10(plate**2) + 0.1
 
-### ciclo for
-#    sberr = 1 - mgemodsb / mgesb     # relative error: mgemodsb
-####
-
-#    sberr=np.array([])
-#    for idx,item in enumerate(mgerad):
-#        for idx2,item in enumerate(mgeangle):
-#            diff= mgerad[idx] -mgemodrad[idx]
-#            difang =mgeangle[idx2] - mgemodangle[idx2]
-#            if (np.abs(diff) < 0.1) and (np.abs(difang) < 0.1):
-
-#                err=1-mgemodsb[idx]/mgesb[idx]
-#                sberr=np.append(sberr,err)
-#                print(mgerad[idx],mgemodrad[idx],err)
-
-
-#    print(np.min(sberr),np.max(sberr))
 
     minrad = np.min(mgerad)
     maxrad = np.max(mgerad)
@@ -615,15 +534,10 @@ def Mulelipsectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0
 
 
         ax[row, 0].text(0.98, 0.95, txt, ha='right', va='top', transform=ax[row, 0].transAxes)
-#        ax[row, 0].loglog(r, self.gauss[w, :]*self.weights[None, :])
-
-#        ax[row, 1].semilogx(r, sberr[w]*100, 'C0o')
-#        ax[row, 1].set_ylim([-100,100])
 
         sberr=1-mgemodsb[w]/mgesb[w]
 
         ax[row, 1].plot(r, sberr*100, 'C0o')
-#        ax[row, 1].plot(r, sberr[w]*100, 'C0o')
 
         ax[row, 1].axhline(linestyle='--', color='C1', linewidth=2)
         ax[row, 1].yaxis.tick_right()
@@ -631,9 +545,6 @@ def Mulelipsectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0
         ax[row, 1].set_ylim([-19.5, 20])
 
         row += 1
-
-
-
 
 
 
@@ -855,28 +766,10 @@ def main():
         qarg = np.float(sys.argv[2])
 
 
-
-#    elipfile="tabla4.txt"
-
-#    plate=0.1 #arc/pixel
-#    mgzpt = 22.485335313591705
-#    exptime=1000
-
-#    rad, mag, magerr = np.genfromtxt(elipfile, delimiter="", unpack=True)
-
-#    radarc=rad*plate
-
-#    brillo=mag+2.5*np.log10(plate**2)
-
-###################################################
-#######################
-### mgefit
-#######################
-######################################################
-
-#####################################################
-
+##############################
 ## default values  ignore this
+##############33
+
     # These parameters are given by find_galaxy for the mosaic image
     skylevel = 13.0
     sigmapsf = 0.4  # pixels
@@ -929,12 +822,6 @@ def main():
     sbsky = mgzpt -2.5*np.log10(skylevel/exptime) + 2.5*np.log10(scale**2)
 
 
-
-#
-#    print(namepng,namesec)
-#    file_dir = path.dirname(path.realpath(mgefit.__file__))  # path of mgefit
-
-
 # hdu 1 => image   hdu 2 => model
 
     errmsg="file {} does not exist".format(file)
@@ -946,16 +833,8 @@ def main():
     model = hdu[2].data
     hdu.close()
 
-#    mask = img > 0   # mask before sky subtraction
-## ya lo hace elipsectors
-#    img = img - skylevel
-#    model -= skylevel
 
-    # Mask a nearby galaxy
-#    mask &= dist_circle(1408.09, 357.749, img.shape) > 200
-
-
-    minlevel=-100
+    minlevel=-100  # minimun value for sky
 
     xradq,ysbq,ysberrq=elipsectors(img, mgzpt, exptime, scale, xc, yc, q, ang, skylevel=skylevel,
               n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1,nameplt=namesec)
@@ -965,11 +844,8 @@ def main():
 
 
 
-
     PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,sbsky)
 
-
-#    plt.savefig("galngc5831c2.png")
 
     plt.savefig(namepng)
 
@@ -977,17 +853,7 @@ def main():
     Mulelipsectors(img, model, mgzpt, exptime, scale, xc, yc, q,
         ang, skylevel=skylevel, n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1,nameplt="SectorGalaxy.png")
 
-#    xradm,ysbm,ysberrm=Mulelipsectors(model, mgzpt, exptime, scale, xc, yc, q, ang, skylevel=skylevel,
-#              n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1,nameplt="SectorModel.png")
-
-
-    #MulPlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm)
-
-#####
-
-
-#    plt.savefig("multigalngc5831c2.png")
-    plt.savefig(namemul)
+     plt.savefig(namemul)
 
     # deleting temp mask
 
