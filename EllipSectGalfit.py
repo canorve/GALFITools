@@ -1,11 +1,6 @@
 #! /usr/bin/env python3
 
 
-
-from __future__ import print_function
-
-
-
 import numpy as np
 import sys
 import os
@@ -15,175 +10,13 @@ import os.path
 import scipy
 import matplotlib.pyplot as plt
 
-import mgefit as mge
+#import mgefit as mge
+from mgefit.sectors_photometry import sectors_photometry
 
 
 
-
-############################################
-########## SECTORS PHOTOMETRY  #############
-############################################
-
-def _biweight_mean(y, itmax=10):
-    """
-    Biweight estimate of the location (mean).
-    Implements the approach described in
-    "Understanding Robust and Exploratory Data Analysis"
-    Hoaglin, Mosteller, Tukey ed., 1983
-
-    """
-    y = np.ravel(y)
-    c = 6.
-    fracmin = 0.03*np.sqrt(0.5/(y.size - 1))
-    y0 = np.median(y)
-    mad = np.median(np.abs(y - y0))
-    if mad == 0:   # can happen when most pixels are zero
-        return np.mean(y)
-
-    for it in range(itmax):
-        u2 = ((y - y0)/(c*mad))**2
-        u2 = u2.clip(0, 1)
-        w = (1 - u2)**2
-        y0 += np.sum(w*(y - y0))/np.sum(w)
-        mad_old = mad
-        mad = np.median(np.abs(y - y0))
-        frac = np.abs(mad_old - mad)/mad
-        if frac < fracmin:
-            break
-
-    return y0
-
-#----------------------------------------------------------------------------
-
-def _coordinates(q, pos_ang, xc, yc, s):
-
-    ang = np.radians(90 - pos_ang)              # x-axis is major axis
-    x, y = np.ogrid[:s[0], :s[1]] - np.array([xc, yc])
-    x, y = x*np.cos(ang) - y*np.sin(ang), x*np.sin(ang) + y*np.cos(ang)
-    x2, y2 = x**2, y**2
-    rad = np.sqrt(x2 + y2)                      # Radius
-    rell = np.sqrt(x2 + y2/q**2)                # Elliptical radius
-    ecc = np.arctan2(np.abs(y/q), np.abs(x))    # Eccentric anomaly [0, pi/2]
-
-    return rad, rell, ecc
-
-#----------------------------------------------------------------------------
-
-
-class sectors_photometry(object):
-
-    def __init__(self, img, eps, ang, xc, yc, badpixels=None,
-                  n_sectors=19, mask=None, minlevel=0, plot=False):
-        """
-        This routine performs photometry along sectors linearly spaced
-        in eccentric anomaly between the major and minor axis of a galaxy.
-        In output it returns the three vectors RADIUS, ANGLE, CNT,
-        containing the photometric measurements in polar coordinates.
-
-        """
-        assert np.all(np.isfinite(img)), "Input image contains NaN"
-        xc, yc = int(round(xc)), int(round(yc))
-        s = img.shape
-        q = 1 - eps
-        minlevel = max(minlevel, 0)
-
-        rad, rell, ecc = _coordinates(q, ang, xc, yc, s)
-        rad[xc, yc] = 0.38  # Average radius within the central pixel
-        rell[xc, yc] = 0.38
-
-        if plot:
-            self.grid = np.zeros_like(img, dtype=bool)
-
-        # Sample radii with 24 isophotes per decade: factor 1.1 spacing.
-        # Sample eccentric anomaly with n_sectors from 0-pi/2
-
-        rell = np.round(24.2*np.log10(rell)).astype(int)
-        ecc = np.round(2*(n_sectors - 1)/np.pi*ecc).astype(int)
-
-        if mask is not None:
-            assert mask.dtype == bool, "MASK must be a boolean array"
-            assert mask.shape == img.shape, "MASK and IMG must have the same shape"
-            assert badpixels is None, "BADPIXELS and MASK cannot be used together"
-            badpixels = ~mask
-
-        if badpixels is not None:
-            assert badpixels.dtype == bool, "BADPIXELS must be a boolean array"
-            assert badpixels.shape == img.shape, "BADPIXELS and IMG must have the same shape"
-            ecc[badpixels] = -1  # Negative flag value
-
-        self.radius = self.counts = self.angle = []
-        eccGrid = np.linspace(0, np.pi/2, n_sectors)       # Eccentric anomaly
-        angGrid = np.degrees(np.arctan(np.tan(eccGrid)*q)) # Polar angle
-
-        for k, angj in enumerate(angGrid):
-            radj, cntj = self._profile(
-                    img, xc, yc, rad, rell, ecc, k, plot, minlevel)
-            self.radius = np.append(self.radius, radj)
-            self.counts = np.append(self.counts, cntj)
-            self.angle = np.append(self.angle, np.full_like(radj, angj))
-
-        if plot:
-            plt.imshow(np.log(img.clip(img[xc, yc]/1e4)), cmap='hot',
-                       origin='lower', interpolation='nearest')
-            if badpixels is not None:
-                self.grid[badpixels] = False
-            plt.imshow(self.grid, cmap='binary', alpha=0.3,
-                       origin='lower', interpolation='nearest')
-            plt.xlabel("pixels")
-            plt.ylabel("pixels")
-
-#----------------------------------------------------------------------------
-
-    def _profile(self, data, xc, yc, rad, rell, ecc, k, plot, minlevel):
-
-        if ecc[xc, yc] != -1:
-            ecc[xc, yc] = k  # Always include central pixel unless bad
-        sector = np.flatnonzero(ecc == k)
-        irad = rell.flat[sector]
-        levels = np.unique(irad)  # get unique levels within sector
-        cnt = np.empty(levels.size)
-        radius = np.empty(levels.size)
-
-        for j, lev in enumerate(levels):
-            sub = sector[irad == lev]
-            if sub.size > 9:   # Evaluate a biweight mean
-                cnt[j] = _biweight_mean(data.flat[sub])
-            else:
-                cnt[j] = np.mean(data.flat[sub])  # Usual mean
-
-            if (cnt[j] <= minlevel):   # drop last value
-                cnt = cnt[:j]
-                radius = radius[:j]
-                break
-
-            # Luminosity-weighted average radius in pixels
-            flx = data.flat[sub].clip(0)
-            radius[j] = np.sum(rad.flat[sub]*flx)/np.sum(flx)
-
-            if plot:
-                self.grid.flat[sub] = (lev + k % 2) % 2
-
-        j = np.argsort(radius)
-        cnt = cnt[j]
-        radius = radius[j]
-
-        return radius, cnt
-
-
-def dist_circle(xc, yc, s):
-    """
-    Returns an array in which the value of each element is its distance from
-    a specified center. Useful for masking inside a circular aperture.
-
-    The (xc, yc) coordinates are the ones one can read on the figure axes
-    e.g. when plotting the result of my find_galaxy() procedure.
-
-    """
-    x, y = np.ogrid[:s[0], :s[1]] - np.array([yc, xc])  # note yc before xc
-    rad = np.sqrt(x**2 + y**2)
-
-    return rad
-
+##############
+##############
 
 def findrad(xarcq, ymgeq, numsectors):
 # the xarcq array must be ordered
@@ -289,7 +122,6 @@ def coordinates(q, pos_ang, xc, yc, s):
 
 def elipsectors(img, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0, badpixels=None,
               n_sectors=19, mask=None, minlevel=0, plot=False, nameplt=None):
-
 
     img = img - skylevel
 
@@ -443,8 +275,6 @@ def Mulelipsectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0
         print("")
 
 
-#    print("find gal: ",f.eps,f.theta,f.xpeak,f.ypeak)
-
 ############
 # I have to switch x and y values because they are different axes for
 # numpy
@@ -454,7 +284,7 @@ def Mulelipsectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0
 
     ang=90-ang
 ######################
-#    print("minlevel ",minlevel)
+
     sg = sectors_photometry(img, eps, ang, xc, yc,minlevel=minlevel,
             plot=1, badpixels=maskb, n_sectors=n_sectors)
 
@@ -527,8 +357,6 @@ def Mulelipsectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0
 
         ax[row, 0].set_xlim(xran)
         ax[row, 0].set_ylim(yran)
-#        ax[row, 0].semilogx(r, mgesb[w], 'C0o')
-#        ax[row, 0].semilogx(r2, mgemodsb[w], 'C1--', linewidth=2)
         ax[row, 0].plot(r, mgesb[w], 'C0o')
         ax[row, 0].plot(r2, mgemodsb[w], 'C1-', linewidth=2)
 
@@ -768,7 +596,7 @@ def main():
 
 ##############################
 ## default values  ignore this
-##############33
+################
 
     # These parameters are given by find_galaxy for the mosaic image
     skylevel = 13.0
@@ -853,7 +681,7 @@ def main():
     Mulelipsectors(img, model, mgzpt, exptime, scale, xc, yc, q,
         ang, skylevel=skylevel, n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1,nameplt="SectorGalaxy.png")
 
-     plt.savefig(namemul)
+    plt.savefig(namemul)
 
     # deleting temp mask
 
