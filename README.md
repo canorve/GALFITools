@@ -106,4 +106,4 @@ Please send an email to canorve [at] gmail [dot] com
 These codes are under the license of **GNU**
 
 ElipSectGalfit.py uses the mgefit library which is
-described in cappellari, MNRAS, 333, 400 (2002).
+described in Cappellari, MNRAS, 333, 400 (2002).
