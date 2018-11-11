@@ -19,7 +19,7 @@ The python libraries need to be installed are:
 - astropy
 - scipy
 - matplotlib
-
+- mgefit
 
 The main programs are:
 - BorderMask.py
@@ -103,7 +103,7 @@ Do you have questions or suggestions?
 Please send an email to canorve [at] gmail [dot] com
 
 ## License
-This code is under the license of **GNU**
+These codes are under the license of **GNU**
 
-If you use ElipSectGalfit.py  for your
-publications you should cite cappellari et al. (2006) in your paper since I wrote this code using their libraries
+ElipSectGalfit.py uses the mgefit library which is
+described in cappellari, MNRAS, 333, 400 (2002).
