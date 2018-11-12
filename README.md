@@ -26,7 +26,7 @@ The main programs are:
 - BorderMask2.py
 - ElipSectGalfit.py
 - MaskBox.py
-
+- GetK.pl
 
 ## BorderMask.py
 
@@ -95,6 +95,22 @@ Where ImageFile is the mask image to edit. RegFile
 is the DS9 Region file which contains the box region
 to patch, and, Value is the flux number you want to
 establish for the pixels within the box region.
+
+
+
+## GetK.pl
+
+Perl script that gives the K constant for a
+determined Sersic index. The one that allows surface
+brightness (Ie) at Re being at the half of the light. See 
+Sersic equation.
+
+To run the code just type in the command line:
+```
+ ./usage: ./GetK.pl [SersicIndex]
+```
+Where SersicIndex is (obviously) the Sersic index.
+
 
 
 
