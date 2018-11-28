@@ -9,6 +9,7 @@ from astropy.io import fits
 import os.path
 import scipy
 import matplotlib.pyplot as plt
+import mimetypes
 
 #import mgefit as mge
 from mgefit.sectors_photometry import sectors_photometry
@@ -135,7 +136,8 @@ def elipsectors(img, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0, badpixel
         maskb=np.array(mask,dtype=bool)
         maskbt=maskb.T
         hdu.close()
-
+    else:
+        maskb=None
 
     eps=1-q
 
@@ -266,6 +268,8 @@ def Mulelipsectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0
         maskb=np.array(mask,dtype=bool)
         maskbt=maskb.T
         hdu.close()
+    else:
+        maskb=None
 
 
     eps=1-q
@@ -380,14 +384,14 @@ def Mulelipsectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0
 #    return xrad, ysb, ysberr
 
 
-
-
 def ReadGALFITout(inputf):
 
 
 #  It obtains the xc,yc,pa, q from the first components. It ignore the rest
     flagser = True
     flagexp = True
+    flagauss = True
+
 #    inputf = "fit.log"
 
 
@@ -447,7 +451,6 @@ def ReadGALFITout(inputf):
         if tmp[0] == "K)":     # plate scale
             scale=float(tmp[1])
 
-
         # first sersic component
         if tmp[0] == "0)" and tmp[1] == "sersic" and flagser == True:     # plate scale
 
@@ -483,7 +486,13 @@ def ReadGALFITout(inputf):
                 if tmp[0] == "1)":   # center
                     xcexp=float(tmp[1])
                     ycexp=float(tmp[2])
-                    dist = np.sqrt((xc-xcexp)**2+(yc-ycexp)**2)
+
+                    if flagser == False:
+                        dist = np.sqrt((xc-xcexp)**2+(yc-ycexp)**2)
+                    else:
+                        dist=0
+                        xc=xcexp
+                        yc=ycexp
 
 
                 if (tmp[0] == "9)") and (dist < 5):    # axis ratio
@@ -491,6 +500,38 @@ def ReadGALFITout(inputf):
 
                 if (tmp[0] == "10)") and (dist < 5): # position angle
                     pa=float(tmp[1])
+
+# check if a third component exists
+
+        if tmp[0] == "0)" and tmp[1] == "gaussian" and flagauss == True and flagexp == True:     # plate scale
+        #  flagexp == True forces to take the value of exp instead of gauss
+
+            flagauss=False
+            while (tmp[0] != "Z)"):
+
+                index += 1
+                line = lines[index]
+                (tmp) = line.split()
+
+                if tmp[0] == "1)":   # center
+                    xcgauss=float(tmp[1])
+                    ycgauss=float(tmp[2])
+
+                    if flagser == False:
+                        dist = np.sqrt((xc-xcgauss)**2+(yc-ycgauss)**2)
+                    else:
+                        dist=0
+                        xc=xcgauss
+                        yc=ycgauss
+
+
+                if (tmp[0] == "9)") and (dist < 5):    # axis ratio
+                    q=float(tmp[1])
+
+                if (tmp[0] == "10)") and (dist < 5): # position angle
+                    pa=float(tmp[1])
+
+
 
         if tmp[0] == "0)" and tmp[1] == "sky" :     # plate scale
 
@@ -514,6 +555,10 @@ def ReadGALFITout(inputf):
     exptime=GetExpTime(inputimage)
 
 
+    errmsg="xc and yc are unknown "
+    assert ("xc" in locals()) and ("yc" in locals())  , errmsg
+
+
     # correcting coordinates
     xc=xc-xmin+1
     yc=yc-ymin+1
@@ -521,23 +566,25 @@ def ReadGALFITout(inputf):
 ##   mask image
 
 ### checking sane values
-    errmsg="file {} does not exist".format(maskimage)
-    assert os.path.isfile(maskimage), errmsg
-
-#    flagbm=IsBinary(maskimage)
-
-#    errmsg="Sorry the mask file: {}  must be binary, not ASCII ".format(maskimage)
-#    assert flagbm is True, errmsg
-#####
 
 
-    mask="tempmask.fits"
-    GetFits(maskimage, mask, xmin, xmax, ymin, ymax)
+    if os.path.isfile(maskimage):
+        mime=mimetypes.guess_type(maskimage)
+
+        flagbm = not(mime[0] == "text/plain")
+
+        errmsg="Sorry the mask file: {}  must be binary, not ASCII ".format(maskimage)
+        assert flagbm is True, errmsg
 
 
+        mask="tempmask.fits"
+        GetFits(maskimage, mask, xmin, xmax, ymin, ymax)
 
-######
-#    print("variables: ",xc,yc,q,pa,skylevel,scale,outimage,mgzpt,exptime,maskimage)
+    else:
+        errmsg="Mask file {} does not exist".format(maskimage)
+        print(errmsg)
+        mask=None
+
     return xc,yc,q,pa,skylevel,scale,outimage,mgzpt,exptime,mask
 
 
@@ -578,9 +625,10 @@ def main():
 
     if (len(sys.argv[1:]) != 1) and (len(sys.argv[1:]) != 2):
         print ('Missing arguments')
-        print ("Usage:\n %s [GALFITOutputFile] [AxisRatio OPTIONAL]" % (sys.argv[0]))
+        print ("Usage:\n %s [GALFITOutputFile] [AxisRatio OPTIONAL] [PositionAngle OPTIONAL]" % (sys.argv[0]))
         print ("Example:\n %s galfit.01 " % (sys.argv[0]))
-        print ("Example:\n %s galfit.02 0.35" % (sys.argv[0]))
+        print ("or Example:\n %s galfit.02 0.35" % (sys.argv[0]))
+        print ("or Example:\n %s galfit.02 0.35 60" % (sys.argv[0]))
         sys.exit()
 
 #    galfile="galfit.01"
@@ -588,10 +636,18 @@ def main():
     galfile= sys.argv[1]
 
     flagq=False
+    flagpa=False
+
 
     if len(sys.argv[1:]) == 2:
         flagq =True
         qarg = np.float(sys.argv[2])
+#        parg = np.float(sys.argv[3])
+
+    if len(sys.argv[1:]) == 3:
+        flagpa =True
+        qarg = np.float(sys.argv[2])
+        parg = np.float(sys.argv[3])
 
 
 ##############################
@@ -630,8 +686,15 @@ def main():
     if flagq == True:
         q=qarg
 
+    if flagpa == True:
+        q=qarg
+        ang=parg
 
-    print("q ",q)
+    str = "q = {} is used ".format(q)
+    print(str)
+
+    str = "pa = {} is used ".format(ang)
+    print(str)
 
 
     (tmp)=file.split(".")
@@ -685,7 +748,9 @@ def main():
 
     # deleting temp mask
 
-    os.remove(mask)
+
+    if os.path.isfile(mask):
+        os.remove(mask)
 
 
 if __name__ == '__main__':
