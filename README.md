@@ -66,7 +66,7 @@ multiple plots for different angles.
 To run the code just type in the command line (or in ipython):
 
 ```
- ./EllipSectGalfit.py [GALFITOutputFile] [AxisRatio OPTIONAL]
+ ./EllipSectGalfit.py [GALFITOutputFile] [AxisRatio OPTIONAL] [PA OPTIONAL]
  ```
 
 Where GALFITOutputFile is the output GALFIT file (e.g. galfit.01). 
