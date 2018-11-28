@@ -394,6 +394,9 @@ def ReadGALFITout(inputf):
 
 #    inputf = "fit.log"
 
+#   init values
+    maskimage = ""
+
 
 
     GalfitFile = open(inputf,"r")
@@ -581,7 +584,7 @@ def ReadGALFITout(inputf):
         GetFits(maskimage, mask, xmin, xmax, ymin, ymax)
 
     else:
-        errmsg="Mask file {} does not exist".format(maskimage)
+        errmsg="Mask file does not exist"
         print(errmsg)
         mask=None
 
@@ -749,7 +752,7 @@ def main():
     # deleting temp mask
 
 
-    if os.path.isfile(mask):
+    if mask != None:
         os.remove(mask)
 
 
