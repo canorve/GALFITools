@@ -626,7 +626,7 @@ def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
 def main():
 
 
-    if (len(sys.argv[1:]) != 1) and (len(sys.argv[1:]) != 2):
+    if (len(sys.argv[1:]) != 1) and (len(sys.argv[1:]) != 2) and (len(sys.argv[1:]) != 3):
         print ('Missing arguments')
         print ("Usage:\n %s [GALFITOutputFile] [AxisRatio OPTIONAL] [PositionAngle OPTIONAL]" % (sys.argv[0]))
         print ("Example:\n %s galfit.01 " % (sys.argv[0]))
