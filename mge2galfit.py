@@ -25,12 +25,12 @@ from mgefit.mge_fit_sectors_twist import mge_fit_sectors_twist
 
 def main():
 
-    if len(sys.argv[1:]) != 3 and len(sys.argv[1:]) != 4 and len(sys.argv[1:]) != 5:
+    if len(sys.argv[1:]) != 4 and len(sys.argv[1:]) != 5 and len(sys.argv[1:]) != 6:
       print ('Missing arguments')
-      print ("Usage: %s [Image] [MagZpt] [Twist 1=yes 0=No] [Sky (Optional)] [Mask (optional)] " % (sys.argv[0]))
-      print ("Example: %s  image.fits 25" % (sys.argv[0]))
-      print ("Example: %s  image.fits 25 1 0.5 " % (sys.argv[0]))
-      print ("Example: %s  image.fits 25 1 0.5 mask.fits " % (sys.argv[0]))
+      print ("Usage: %s [Image] [MagZpt] [PSF sigma] [Twist 1=yes 0=No] [Sky (Optional)] [Mask (optional)] " % (sys.argv[0]))
+      print ("Example: %s  image.fits 25 0.494 0" % (sys.argv[0]))
+      print ("Example: %s  image.fits 25 0.494 1 0.5 " % (sys.argv[0]))
+      print ("Example: %s  image.fits 25 0.494 1 0.5 mask.fits " % (sys.argv[0]))
 
       sys.exit()
 
@@ -43,17 +43,23 @@ def main():
     mgzpt= sys.argv[2]
     mgzpt=np.float(mgzpt)
 
-    twist = np.bool(np.int(sys.argv[3]))
+    psfsig= sys.argv[3]
+    psfsig=np.float(psfsig)
+
+    twist = np.bool(np.int(sys.argv[4]))
 
 ##    print("twist: ",twist)
 
-    if len(sys.argv[1:]) == 4:
-        flagsky =True
-        sky = np.float(sys.argv[4])
-
     if len(sys.argv[1:]) == 5:
+        flagsky =True
+        sky = np.float(sys.argv[5])
+
+    if len(sys.argv[1:]) == 6:
+        flagsky =True
+        sky = np.float(sys.argv[5])
+
         flagmask =True
-        maskfile = sys.argv[5]
+        maskfile = sys.argv[6]
 
 #    exptime= sys.argv[3]
 #    exptime=np.float(exptime)
@@ -68,8 +74,10 @@ def main():
     ypos=357
     anglegass=35.8
 
+#    scale = 0.0455  # arcsec/pixel
 
-    scale = 0.0455  # arcsec/pixel
+    scale = 1  # arcsec/pixel set to default
+
 
     ###################################################
     #  Create GALFIT input file header to compute sky #
@@ -164,8 +172,11 @@ def main():
             plt.pause(2)  # Allow plot to appear on the screen
 
             plt.clf()
+#            m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, f.eps, ngauss=ngauss,
+#                                      sigmapsf=sigmapsf,normpsf=normpsf, scale=scale, plot=1)
             m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, f.eps, ngauss=ngauss,
-                                      sigmapsf=sigmapsf,normpsf=normpsf, scale=scale, plot=1)
+                                      sigmapsf=psfsig, scale=scale, plot=1)
+
 
         elif twist == False:
 
@@ -179,9 +190,15 @@ def main():
             plt.pause(2)  # Allow plot to appear on the screen
 
             plt.clf()
+#            m = mge_fit_sectors(s.radius, s.angle, s.counts, f.eps,
+#                                ngauss=ngauss, sigmapsf=sigmapsf, normpsf=normpsf,
+#                                scale=scale, plot=1, bulge_disk=0, linear=0)
+
             m = mge_fit_sectors(s.radius, s.angle, s.counts, f.eps,
-                                ngauss=ngauss, sigmapsf=sigmapsf, normpsf=normpsf,
+                                ngauss=ngauss, sigmapsf=psfsig, normpsf=normpsf,
                                 scale=scale, plot=1, bulge_disk=0, linear=0)
+
+
 
     else:
         # sextractor
@@ -212,8 +229,10 @@ def main():
             plt.pause(2)  # Allow plot to appear on the screen
 
             plt.clf()
+#            m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
+#                                      sigmapsf=sigmapsf,normpsf=normpsf, scale=scale, plot=1)
             m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
-                                      sigmapsf=sigmapsf,normpsf=normpsf, scale=scale, plot=1)
+                                      sigmapsf=psfsig, scale=scale, plot=1)
 
 
         elif twist == False:
@@ -230,40 +249,36 @@ def main():
 
     ###########################
 
+#            m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
+#                                ngauss=ngauss, sigmapsf=sigmapsf, normpsf=normpsf,
+#                                scale=scale, plot=1, bulge_disk=0, linear=0)
+
             m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
-                                ngauss=ngauss, sigmapsf=sigmapsf, normpsf=normpsf,
+                                ngauss=ngauss, sigmapsf=psfsig,
                                 scale=scale, plot=1, bulge_disk=0, linear=0)
+
 
     #    print(len(m.sol.T))
     #    print(len(m.sol))
 
-## esta mal el angulo
-
     if twist:
+
         (counts,sigma,axisrat,pa)=m.sol
         if flagsky:
             alpha1= pa - f.pa
             alphaf= 180 - alpha1
-#            alphaf= alpha1+90
 
         else:
             theta2=270 -theta
             alpha1= pa - theta2
-#            alphaf= 90-(90 - alpha1 +90)
             alphaf= alpha1 - 90
-
-#            pa = pa - 90
 
     elif twist == False:
         (counts,sigma,axisrat)=m.sol
         if flagsky:
-#            anglegass = 90 - f.theta # - 90
             anglegass = f.pa # - 90
-
-#            print("angle ",anglegass)
         else:
             anglegass = 90 - theta
-#             anglegass = theta - 90
 
 
 #    print(counts)
