@@ -66,7 +66,7 @@ def main():
 
     convbox=100
 
-    sky=0.55
+#    sky=0.55
     fit=1
     Z=0
 
@@ -195,7 +195,7 @@ def main():
 #                                scale=scale, plot=1, bulge_disk=0, linear=0)
 
             m = mge_fit_sectors(s.radius, s.angle, s.counts, f.eps,
-                                ngauss=ngauss, sigmapsf=psfsig, normpsf=normpsf,
+                                ngauss=ngauss, sigmapsf=psfsig,
                                 scale=scale, plot=1, bulge_disk=0, linear=0)
 
 
