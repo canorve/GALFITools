@@ -296,7 +296,7 @@ def main():
 
 
 
-    consfile="none"
+    consfile="constraints"
 
     T1 = "{}".format(imgname)
     T2 = outname + "-gas.fits"
@@ -622,7 +622,7 @@ def PrintGauss(hdl, ncomp, xpos, ypos, magass, fwhm, axratgass, anglegass, Z, fi
             ncomp)
     line01 = " 0)     gaussian               #  Object type                                     \n"
     line02 = " 1) {:.2f}  {:.2f}  {}  {}            #  position x, y     [pixel]                       \n".format(
-        xpos, ypos, fit, fit)
+        xpos, ypos, 0, 0)
     line03 = " 3) {:.2f}       {}              #  total magnitude                                 \n".format(
         magass, fit)
     line04 = " 4) {:.2f}       {}              #  FWHM         [Pixels]                            \n".format(
