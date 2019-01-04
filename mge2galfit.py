@@ -40,6 +40,14 @@ def main():
     flagmask=False
     maskfile="none"
 
+
+    if imgname.find(".") != -1:
+        (timg, trash) = imgname.split(".")
+    else:
+        timg=imgname
+
+    namepng=timg+".png"
+
     mgzpt= sys.argv[2]
     mgzpt=np.float(mgzpt)
 
@@ -150,7 +158,7 @@ def main():
         print("Ellipticity, Angle = ",f.eps,f.theta)
         print("Sky = ", sky)
 
-        plt.pause(2)  # Allow plot to appear on the screen
+        plt.pause(1)  # Allow plot to appear on the screen
 
     # Perform galaxy photometry
         plt.clf()
@@ -169,13 +177,19 @@ def main():
 
                 s = sectors_photometry_twist(img, f.pa, f.xpeak, f.ypeak, minlevel=minlevel, plot=1)
 
-            plt.pause(2)  # Allow plot to appear on the screen
+            plt.pause(1)  # Allow plot to appear on the screen
 
             plt.clf()
 #            m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, f.eps, ngauss=ngauss,
 #                                      sigmapsf=sigmapsf,normpsf=normpsf, scale=scale, plot=1)
             m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, f.eps, ngauss=ngauss,
                                       sigmapsf=psfsig, scale=scale, plot=1)
+
+
+            plt.savefig(namepng)
+
+
+            plt.pause(1)  # Allow plot to appear on the screen
 
 
         elif twist == False:
@@ -187,7 +201,7 @@ def main():
 
 #            s = sectors_photometry(img, f.eps, f.theta, f.xpeak, f.ypeak, minlevel=minlevel, plot=1)
 
-            plt.pause(2)  # Allow plot to appear on the screen
+            plt.pause(1)  # Allow plot to appear on the screen
 
             plt.clf()
 #            m = mge_fit_sectors(s.radius, s.angle, s.counts, f.eps,
@@ -197,6 +211,10 @@ def main():
             m = mge_fit_sectors(s.radius, s.angle, s.counts, f.eps,
                                 ngauss=ngauss, sigmapsf=psfsig,
                                 scale=scale, plot=1, bulge_disk=0, linear=0)
+
+            plt.pause(1)  # Allow plot to appear on the screen
+
+            plt.savefig(namepng)
 
 
 
@@ -226,13 +244,17 @@ def main():
             else:
                 s = sectors_photometry_twist(img, theta, xpeak, ypeak, minlevel=minlevel, plot=1)
 
-            plt.pause(2)  # Allow plot to appear on the screen
+            plt.pause(1)  # Allow plot to appear on the screen
 
             plt.clf()
 #            m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
 #                                      sigmapsf=sigmapsf,normpsf=normpsf, scale=scale, plot=1)
             m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
                                       sigmapsf=psfsig, scale=scale, plot=1)
+
+            plt.pause(1)  # Allow plot to appear on the screen
+
+            plt.savefig(namepng)
 
 
         elif twist == False:
@@ -245,7 +267,7 @@ def main():
 
 #            s = sectors_photometry(img, eps, theta, xpeak, ypeak, minlevel=minlevel, plot=1)
 
-            plt.pause(2)  # Allow plot to appear on the screen
+            plt.pause(1)  # Allow plot to appear on the screen
 
     ###########################
 
@@ -256,6 +278,9 @@ def main():
             m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
                                 ngauss=ngauss, sigmapsf=psfsig,
                                 scale=scale, plot=1, bulge_disk=0, linear=0)
+            plt.pause(1)  # Allow plot to appear on the screen
+
+            plt.savefig(namepng)
 
 
     #    print(len(m.sol.T))
