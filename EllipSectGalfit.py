@@ -15,6 +15,183 @@ import mimetypes
 from mgefit.sectors_photometry import sectors_photometry
 
 
+#from sys import argv
+#option_handle_list = ['--script', '--lira_cbt', '--eur_hedge']
+#options = {}
+#for option_handle in option_handle_list:
+#    options[option_handle[2:]] = argv[argv.index(option_handle) + 1] if option_handle in argv else None
+#if options['eur_hedge'] == None:
+    #Do x
+#else:
+    #Do y
+
+
+def main():
+
+    if (len(sys.argv[1:]) == 0):
+        print ('Missing arguments')
+        print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] " % (sys.argv[0]))
+        print ("Example:\n %s galfit.01 --logx" % (sys.argv[0]))
+        print ("or Example:\n %s galfit.02 --q 0.35 --pa 60" % (sys.argv[0]))
+        sys.exit()
+
+#    galfile="galfit.01"
+## reading arguments
+
+    flaglogx=False
+    flagq=False
+    flagpa=False
+
+
+    OptionHandleList = ['--logx', '--q', '--pa']
+    options = {}
+    for OptionHandle in OptionHandleList:
+#        options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1] if OptionHandle in sys.argv else None
+        options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
+    if options['logx'] != None:
+        flaglogx=True
+        print("X axis is logarithm")
+    if options['q'] != None:
+        flagq=True
+#        qarg = np.float(options['q'])
+    if options['pa'] != None:
+        flagpa=True
+#        parg=np.int(options['pa'])
+
+
+    if flagpa == True:
+        opt={}
+        OptionHandle="--pa"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+#        if opt['pa'] != None:
+        parg=np.int(opt['pa'])
+
+    if flagq == True:
+        opt={}
+        OptionHandle="--q"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+#        if opt['q'] != None:
+        qarg=np.float(opt['q'])
+
+
+
+
+
+
+
+
+
+    galfile= sys.argv[1]
+
+
+
+################################################
+#################################################
+##################################################
+
+##############################
+## default values  ignore this
+############################
+
+    # These parameters are given by find_galaxy for the mosaic image
+    skylevel = 13.0
+    sigmapsf = 0.4  # pixels
+    eps = 0.28
+    ang = 141.0  # major axis in the inner regions (gives a starting guess for the PA)
+    xc = 974
+    yc = 969
+    ngauss = 11
+    minlevel = 1.0
+    scale = 0.100
+
+#    numsectors=19
+    #numsectors=36
+    numsectors=15
+
+    q=1-eps
+
+    file = "ngc5831_f702w_mosaic.fits"
+
+#########################################
+#########################################
+####### Read Galfit
+
+    xc,yc,q,ang,skylevel,scale,file,mgzpt,exptime,mask=ReadGALFITout(galfile)
+
+############
+######################################
+#    print(file)
+
+    if flagq == True:
+        q=qarg
+
+    if flagpa == True:
+#        q=qarg
+        ang=parg
+
+    str = "q = {} is used ".format(q)
+    print(str)
+
+    str = "pa = {} is used ".format(ang)
+    print(str)
+
+
+    (tmp)=file.split(".")
+
+    namefile=tmp[0]
+
+#    print(namefile)
+
+# names for the different png
+    namepng=namefile + ".png"
+    namesec=namefile + "-gal.png"
+    namemod=namefile + "-mod.png"
+    namemul=namefile + "-mul.png"
+
+
+    sbsky = mgzpt -2.5*np.log10(skylevel/exptime) + 2.5*np.log10(scale**2)
+
+
+# hdu 1 => image   hdu 2 => model
+
+    errmsg="file {} does not exist".format(file)
+
+    assert os.path.isfile(file), errmsg
+
+    hdu = fits.open(file)
+    img = hdu[1].data
+    model = hdu[2].data
+    hdu.close()
+
+
+    minlevel=-100  # minimun value for sky
+
+    xradq,ysbq,ysberrq=elipsectors(img, mgzpt, exptime, scale, xc, yc, q, ang, skylevel=skylevel,
+              n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1,nameplt=namesec)
+
+    xradm,ysbm,ysberrm=elipsectors(model, mgzpt, exptime, scale, xc, yc, q, ang, skylevel=skylevel,
+              n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1,nameplt=namemod)
+
+
+
+    PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,sbsky,flaglogx)
+
+
+    plt.savefig(namepng)
+
+
+    Mulelipsectors(img, model, mgzpt, exptime, scale, xc, yc, q,
+        ang, flaglogx,  skylevel=skylevel, n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1,nameplt="SectorGalaxy.png")
+
+    plt.savefig(namemul)
+
+    # deleting temp mask
+
+
+    if mask != None:
+        os.remove(mask)
+
+
 
 ##############
 ##############
@@ -203,7 +380,7 @@ def elipsectors(img, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0, badpixel
     return xrad, ysb, ysberr
 
 
-def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,sbsky):
+def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,sbsky,flag):
 
     """
     Produces final best-fitting plot
@@ -239,6 +416,10 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,sbsky):
 
     plt.errorbar(xradm, ysbm,yerr=ysberrm,fmt='o-',capsize=2,color='green',markersize=0.7,label="Model")
 
+
+    if flag == True:
+        plt.xscale("log")
+
     plt.legend(loc=1)
 
 
@@ -249,7 +430,7 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,sbsky):
 #####################################################
 ######################################################
 
-def Mulelipsectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0, badpixels=None,
+def Mulelipsectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, flag, skylevel=0, badpixels=None,
               n_sectors=19, mask=None, minlevel=0, plot=False, nameplt=None):
 
 
@@ -361,8 +542,15 @@ def Mulelipsectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, skylevel=0
 
         ax[row, 0].set_xlim(xran)
         ax[row, 0].set_ylim(yran)
-        ax[row, 0].plot(r, mgesb[w], 'C0o')
-        ax[row, 0].plot(r2, mgemodsb[w], 'C1-', linewidth=2)
+
+        if flag == False:
+            ax[row, 0].plot(r, mgesb[w], 'C0o')
+            ax[row, 0].plot(r2, mgemodsb[w], 'C1-', linewidth=2)
+        else:
+
+            ax[row, 0].semilogx(r, mgesb[w], 'C0o')
+            ax[row, 0].semilogx(r2, mgemodsb[w], 'C1-', linewidth=2)
+
 
 
         ax[row, 0].text(0.98, 0.95, txt, ha='right', va='top', transform=ax[row, 0].transAxes)
@@ -621,139 +809,6 @@ def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
     hdu.close()
 
 
-
-
-def main():
-
-
-    if (len(sys.argv[1:]) != 1) and (len(sys.argv[1:]) != 2) and (len(sys.argv[1:]) != 3):
-        print ('Missing arguments')
-        print ("Usage:\n %s [GALFITOutputFile] [AxisRatio OPTIONAL] [PositionAngle OPTIONAL]" % (sys.argv[0]))
-        print ("Example:\n %s galfit.01 " % (sys.argv[0]))
-        print ("or Example:\n %s galfit.02 0.35" % (sys.argv[0]))
-        print ("or Example:\n %s galfit.02 0.35 60" % (sys.argv[0]))
-        sys.exit()
-
-#    galfile="galfit.01"
-
-    galfile= sys.argv[1]
-
-    flagq=False
-    flagpa=False
-
-
-    if len(sys.argv[1:]) == 2:
-        flagq =True
-        qarg = np.float(sys.argv[2])
-#        parg = np.float(sys.argv[3])
-
-    if len(sys.argv[1:]) == 3:
-        flagpa =True
-        qarg = np.float(sys.argv[2])
-        parg = np.float(sys.argv[3])
-
-
-##############################
-## default values  ignore this
-################
-
-    # These parameters are given by find_galaxy for the mosaic image
-    skylevel = 13.0
-    sigmapsf = 0.4  # pixels
-    eps = 0.28
-    ang = 141.0  # major axis in the inner regions (gives a starting guess for the PA)
-    xc = 974
-    yc = 969
-    ngauss = 11
-    minlevel = 1.0
-    scale = 0.100
-
-#    numsectors=19
-    #numsectors=36
-    numsectors=15
-
-    q=1-eps
-
-    file = "ngc5831_f702w_mosaic.fits"
-
-#########################################
-#########################################
-####### Read Galfit
-
-    xc,yc,q,ang,skylevel,scale,file,mgzpt,exptime,mask=ReadGALFITout(galfile)
-
-############
-######################################
-#    print(file)
-
-    if flagq == True:
-        q=qarg
-
-    if flagpa == True:
-        q=qarg
-        ang=parg
-
-    str = "q = {} is used ".format(q)
-    print(str)
-
-    str = "pa = {} is used ".format(ang)
-    print(str)
-
-
-    (tmp)=file.split(".")
-
-    namefile=tmp[0]
-
-#    print(namefile)
-
-# names for the different png
-    namepng=namefile + ".png"
-    namesec=namefile + "-gal.png"
-    namemod=namefile + "-mod.png"
-    namemul=namefile + "-mul.png"
-
-
-    sbsky = mgzpt -2.5*np.log10(skylevel/exptime) + 2.5*np.log10(scale**2)
-
-
-# hdu 1 => image   hdu 2 => model
-
-    errmsg="file {} does not exist".format(file)
-
-    assert os.path.isfile(file), errmsg
-
-    hdu = fits.open(file)
-    img = hdu[1].data
-    model = hdu[2].data
-    hdu.close()
-
-
-    minlevel=-100  # minimun value for sky
-
-    xradq,ysbq,ysberrq=elipsectors(img, mgzpt, exptime, scale, xc, yc, q, ang, skylevel=skylevel,
-              n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1,nameplt=namesec)
-
-    xradm,ysbm,ysberrm=elipsectors(model, mgzpt, exptime, scale, xc, yc, q, ang, skylevel=skylevel,
-              n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1,nameplt=namemod)
-
-
-
-    PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,sbsky)
-
-
-    plt.savefig(namepng)
-
-
-    Mulelipsectors(img, model, mgzpt, exptime, scale, xc, yc, q,
-        ang, skylevel=skylevel, n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1,nameplt="SectorGalaxy.png")
-
-    plt.savefig(namemul)
-
-    # deleting temp mask
-
-
-    if mask != None:
-        os.remove(mask)
 
 
 if __name__ == '__main__':
