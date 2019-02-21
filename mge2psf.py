@@ -25,20 +25,25 @@ from mgefit.mge_fit_sectors import mge_fit_sectors
 
 def main():
 
-    if len(sys.argv[1:]) != 5 and len(sys.argv[1:]) != 6:
+    if len(sys.argv[1:]) != 5 and len(sys.argv[1:]) != 6 and len(sys.argv[1:]) != 7:
       print ('Missing arguments')
-      print ("Usage: %s [Image] [X] [Y] [MagZpt] [Box Size] [Sky (Optional)] " % (sys.argv[0]))
+      print ("Usage: %s [Image] [X] [Y] [MagZpt] [Box Size] [Sky (Optional)] [Mask (Optional)] " % (sys.argv[0]))
 #      print ("Usage: %s [Image] [MagZpt] [PSF sigma] [twist yes 0=No] [Sky (Optional)] [Mask (optional)] " % (sys.argv[0]))
+      print ("Example: %s  image.fits 1000 1050 25 50 0.5 mask.fits" % (sys.argv[0]))
       print ("Example: %s  image.fits 1000 1050 25 50 0.5" % (sys.argv[0]))
       print ("Example: %s  image.fits 1000 1050 25 100 " % (sys.argv[0]))
       sys.exit()
 
     flagsky=False
     flageven=False
+    flagmask=False
 
     imgname= sys.argv[1]
 
     maskfile ="none"
+
+
+    mgeoutfile="psfmge.txt"
 
     X = np.float(sys.argv[2])
     Y = np.float(sys.argv[3])
@@ -56,6 +61,10 @@ def main():
         flagsky =True
         sky = np.float(sys.argv[6])
 
+    if len(sys.argv[1:]) == 7:
+        flagmask =True
+        maskfile = sys.argv[7]
+
 
 #    exptime= sys.argv[3]
 #    exptime=np.float(exptime)
@@ -64,6 +73,7 @@ def main():
 
 #    sky=0.55
     fit=1
+    fitsky=0
     Z=0
 
     xpos=367
@@ -109,7 +119,9 @@ def main():
 
 #    skylev = 0.55   # counts/pixel
 
-    minlevel = 2  # counts/pixel
+    minlevel = 0  # counts/pixel
+#    minlevel = 2  # counts/pixel
+
     ngauss = 12
 
     plt.clf()
@@ -138,9 +150,28 @@ def main():
     ypeak=xtemp
 
     plt.clf()
+################################
+######### Mask ############
+
+    if flagmask == True:
+
+        errmsg="file {} does not exist".format(maskfile)
+        assert os.path.isfile(maskfile), errmsg
+
+        hdu = fits.open(maskfile)
+        mask = hdu[0].data
+        maskb=np.array(mask,dtype=bool)
+        maskbt=maskb.T
+        hdu.close()
+
+    else:
+        maskb=None
+##############################
+##############################
+
 
 #    s = sectors_photometry(img, eps, theta, xpeak, ypeak, minlevel=minlevel, plot=1)
-    s = sectors_photometry(img, eps, theta, xpeak, ypeak, minlevel=minlevel)
+    s = sectors_photometry(img, eps, theta, xpeak, ypeak, badpixels=maskb, minlevel=minlevel,plot=1)
 
 
 #            s = sectors_photometry(img, eps, theta, xpeak, ypeak, minlevel=minlevel, plot=1)
@@ -155,11 +186,13 @@ def main():
 
 #    m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
 #                        ngauss=ngauss, scale=scale, plot=1, bulge_disk=0, linear=0)
+    plt.clf()
 
     m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
-                        ngauss=ngauss, scale=scale, bulge_disk=0, linear=0)
+                        ngauss=ngauss, scale=scale, bulge_disk=0, linear=0,plot=1)
 
 
+    plt.pause(2)  # Allow plot to appear on the screen
 
     #    print(len(m.sol.T))
     #    print(len(m.sol))
@@ -182,7 +215,7 @@ def main():
     consfile="constraints"
 
     T1 = "{}".format(imgname)
-    T2 = outname + "-gas.fits"
+    T2 = outname + "-psf.fits"
     T3 = "{}".format(rmsname)
 
 #    xlo=1
@@ -222,11 +255,17 @@ def main():
 #    scale = 0.0455
 
     fout1 = open(parfile, "w")
+    fout2 = open(mgeoutfile, "w")
+
 
     PrintHeader(fout1, T1, T2, T3, psfname, 1, maskfile, consfile, xlo, xhi, ylo,
                 yhi, convbox, convbox, mgzpt, scale, scale, "regular", 0, 0)
 
     index = 0
+
+
+    outline2 = "# counts Mag Sig(pixels) FWHM(pixels) q angle \n"
+    fout2.write(outline2)
 
 #    index+=1
 
@@ -252,8 +291,12 @@ def main():
     #        mgesb= mgzpt - 2.5*np.log10(mgecount/exptime) + 2.5*np.log10(plate**2) + 0.1
 
 
-        outline = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(mgemag, SigPix, FWHM, qobs, anglegass)
+        outline = "Counts: {:.2f} Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(TotCounts,mgemag, SigPix, FWHM, qobs, anglegass)
         print(outline)
+
+        outline2 = "{:.2f} {:.2f} {:.2f} {:.2f} {:.2f} {:.2f} \n".format(TotCounts, mgemag, SigPix, FWHM, qobs, anglegass)
+        fout2.write(outline2)
+
 
         PrintGauss(fout1, index, xpos, ypos, mgemag, FWHM, qobs, anglegass, Z, fit)
 
@@ -262,12 +305,13 @@ def main():
 
 
 # sky removed as requested by GALFIT
-    PrintSky(fout1, index, sky, 1, fit)
+    PrintSky(fout1, index, sky, 1, fitsky)
     fout1.close()
+    fout2.close()
 
     print("Done. Run GALFIT as : 'galfit -o1 psfgas.txt' to create psf model ")
     print("or  Run GALFIT as : 'galfit psfgas.txt' to adjust the mge psf model ")
-
+    print("mge parameters are stored in {} ".format(mgeoutfile))
 
 
 ####################################################
@@ -661,6 +705,7 @@ def CheckFlag(val, check):
         maxx = maxx / 2
 
     return flag
+
 
 
 #############################################################################

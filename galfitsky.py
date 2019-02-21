@@ -23,12 +23,15 @@ import matplotlib.pyplot as plt
 def main():
 
 
-    if len(sys.argv[1:]) != 3:
+    if len(sys.argv[1:]) != 3 and len(sys.argv[1:]) != 5 :
         print ('Missing arguments')
-        print ("Usage:\n %s [ImageFile] [Magzpt] [scale]" % sys.argv[0])
+        print ("Usage:\n %s [ImageFile] [Magzpt] [scale] [X optional] [Y optional]" % sys.argv[0])
         print ("Example:\n %s image.fits 25 1.5" % sys.argv[0])
+        print ("Example:\n %s image.fits 25 1.5 353 245" % sys.argv[0])
+
         sys.exit()
 
+    flagpos=False
 #    sexfile= sys.argv[1]
     imgname= sys.argv[1]
     maskfile= "masksky.fits"
@@ -37,6 +40,12 @@ def main():
     mgzpt=np.float(mgzpt)
 
     scale= sys.argv[3]
+
+    if len(sys.argv[1:]) == 5 :
+        flagpos=True
+        X = np.float(sys.argv[4])
+        Y = np.float(sys.argv[5])
+
 
     scale = float(scale)
 
@@ -93,8 +102,8 @@ def main():
     fit=1
     Z=0
 
-    xpos=367
-    ypos=357
+    xpos=xpeak
+    ypos=ypeak
     anglegass=35.8
 
 
@@ -123,10 +132,237 @@ def main():
 #    sigmapsf = [0.494, 1.44, 4.71, 13.4]      # In PC1 pixels
 #    normpsf = [0.294, 0.559, 0.0813, 0.0657]  # total(normpsf)=1
 
-
 ############################
 
+    FitBox=6
 
+    Num, RA, Dec, XPos, YPos, Mag, Kron, FluxRad, IsoArea, AIm, E, Theta, Background, Class, Flag, XMin, XMax, YMin, YMax, XSMin, XSMax, YSMin, YSMax = np.genfromtxt(
+	    sexarsort, delimiter="", unpack=True)  # sorted
+
+##
+#    Obj.Angle = Obj.Theta - 90
+#    Obj.AR = 1 - Obj.E
+#    Obj.RKron = ParVar.KronScale * Obj.AIm * Obj.Kron
+    Sky = Background
+
+#    Obj.Num = Obj.Num.astype(int)
+#    Obj.Flag = Obj.Flag.astype(int)
+
+# other stuff:
+
+#    Tot = len(Obj.Num)
+#    Tot = ParVar.Total
+
+#    Obj.Sersic = [ParVar.NSer] * Tot
+#    Obj.Sersic = np.array(Obj.Sersic)
+
+#    Obj.RSky = ParVar.SkyScale * Obj.AIm * Obj.Kron + ParVar.Offset + ParVar.SkyWidth
+#    Obj.RKron = ParVar.KronScale * Obj.AIm * Obj.Kron
+
+
+#    masky = Obj.RSky <= 0
+#    if masky.any():
+#        Obj.RSky[masky] = 1
+
+#    maskron = Obj.RKron <= 0
+#    if maskron.any():
+#        Obj.RKron[maskron] = 1
+
+#    Obj.SkyFlag = [True] * Tot
+#    Obj.SkyFlag = np.array(Obj.SkyFlag)
+
+#    Obj.Neighbors = Obj.Num
+
+
+# subpanel stuff:
+
+#    Obj.IX = (Obj.XPos / XChunk) + 1
+#    Obj.IY = (Obj.YPos / YChunk) + 1
+
+#    Obj.IX = Obj.IX.astype(int)
+#    Obj.IY = Obj.IY.astype(int)
+
+
+#    XPos = XPos.astype(int)
+#    YPos = YPos.astype(int)
+
+
+    XMin = XMin.astype(int)
+    XMax = XMax.astype(int)
+    YMin = YMin.astype(int)
+    YMax = YMax.astype(int)
+
+    XSMin = XSMin.astype(int)
+    XSMax = XSMax.astype(int)
+    YSMin = YSMin.astype(int)
+    YSMax = YSMax.astype(int)
+
+
+
+#    maskblkx = Obj.IX > ParVar.Split
+#    if maskblkx.any():
+#        Obj.IX[maskblkx]= Obj.IX[maskblkx] -1
+
+
+#    maskblky = Obj.IY > ParVar.Split
+#    if maskblky.any():
+#        Obj.IY[maskblky]= Obj.IY[maskblky] -1
+
+
+#   Make sure the object coordinate in the subpanel is correct
+
+# create arrays
+
+#    Obj.XBuffer=np.array([0]*Tot)
+#    Obj.YBuffer=np.array([0]*Tot)
+
+
+#    maskix = Obj.IX == 1
+#    if maskix.any():
+#        Obj.XBuffer[maskix] = 0
+
+#    maskix = Obj.IX != 1
+#    if maskix.any():
+#        Obj.XBuffer[maskix] = ParVar.Buffer
+
+#    maskiy = Obj.IY == 1
+#    if maskiy.any():
+#        Obj.YBuffer[maskiy] = 0
+
+#    maskiy = Obj.IY != 1
+#    if maskiy.any():
+#        Obj.YBuffer[maskiy] = ParVar.Buffer
+
+# Obj.OFFX and Obj.OFFY transform coordinates
+#  from big image to tile image --> IM-X-Y.fits
+#    Obj.OFFX = (Obj.IX - 1) * XChunk - Obj.XBuffer
+#    Obj.OFFY = (Obj.IY - 1) * YChunk - Obj.YBuffer
+
+
+##############################################################
+##############################################################
+# creating empty arrays
+
+#    Obj.gXMIN = np.array([0]*Tot)
+#    Obj.gXMAX = np.array([0]*Tot)
+#    Obj.gYMIN = np.array([0]*Tot)
+#    Obj.gYMAX = np.array([0]*Tot)
+
+
+    XSize = XMax - XMin
+    YSize = YMax - YMin
+
+#   enlarge fit area
+
+    XSize = FitBox * XSize
+    YSize = FitBox * YSize
+
+##  30 pixels is the minimum area to fit (arbitrary number):
+
+    masksize = XSize < 30
+
+    if masksize.any():
+        XSize[masksize] = 30
+
+    masksize = YSize < 30
+
+    if masksize.any():
+        YSize[masksize] = 30
+
+    #  Calculate the (x,y) position of the current object relative to
+    #  the tile in which it lives.
+
+    XFit = XPos
+    YFit = YPos
+
+    #  Calculate fitting box needed to plug into galfit header:
+
+    XLo = XFit - XSize / 2
+    XLo = XLo.astype(int)
+
+    maskxy = XLo <= 0
+    if maskxy.any():
+        XLo[maskxy] = 1
+
+
+    XHi = XFit + XSize / 2
+    XHi = XHi.astype(int)
+
+    maskxy = XHi > NCol  #This does not affect the code at all
+    if maskxy.any():
+        XHi[maskxy] = NCol
+
+
+    YLo = YFit - YSize / 2
+    YLo = YLo.astype(int)
+
+    maskxy = YLo <= 0
+    if maskxy.any():
+        YLo[maskxy] = 1
+
+
+    YHi = YFit + YSize / 2
+    YHi = YHi.astype(int)
+
+    maskxy = YHi > NRow  # same as above but for y axis
+    if maskxy.any():
+        YHi[maskxy] = NRow
+
+####### find galax
+
+    if flagpos == True:
+
+    #        index =  Mag.argsort()
+    #        i=0
+        dist=15
+
+        for idx, item in enumerate(Num):
+    #        for i in index:
+
+            dx= XPos[idx] - X
+            dy= YPos[idx] - Y
+            dt= np.sqrt(dx**2 + dy**2)
+
+
+            cflag=CheckFlag(4,Flag[idx])
+            if cflag==False and dt < dist:
+                dist = dt
+                sindex=idx
+
+
+        Num=Num[sindex]
+        xpos=XPos[sindex]
+        ypos=YPos[sindex]
+
+        xlo=XLo[sindex]
+        ylo=YLo[sindex]
+
+        xhi=XHi[sindex]
+        yhi=YHi[sindex]
+
+
+#    Background=Background[sindex]
+
+##
+#        Angle = np.abs(Theta)
+#        AR = 1 - E
+#        RKron = KronScale * AIm * Kron
+#        Sky = Background
+
+
+
+#    XPos=np.round(XPos)
+#    YPos=np.round(YPos)
+
+#    XPos=np.int(XPos)
+#    YPos=np.int(YPos)
+
+##########
+
+
+
+
+##################################
 ## I have to switch x and y coordinates
 #    xtemp=xpeak
 #    xpeak=ypeak
@@ -178,10 +414,11 @@ def main():
     T2 = outname + "-sky.fits"
     T3 = "{}".format(rmsname)
 
-    xlo=1
-    ylo=1
+    if flagpos == False:
+        xlo=1
+        ylo=1
 
-    (xhi,yhi)=GetAxis(imgname)
+        (xhi,yhi)=GetAxis(imgname)
 
     plate=1
 #    scale = 0.0455
