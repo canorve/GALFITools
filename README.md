@@ -37,8 +37,8 @@ To run the code just type in the command line:
 ```
  ./BorderMask.py [ImageFile] [MaskBorderImage] [Value]
 ```
-Where ImageFile is the original image. MaskBorderImage is the 
-output mask image. Value is the number that will have the 
+Where ImageFile is the original image. MaskBorderImage is the
+output mask image. Value is the number that will have the
 pixel flux in the border mask.
 
 
@@ -48,7 +48,7 @@ pixel flux in the border mask.
 This is another version of BorderMask.py. The difference
 with the previous one is that BorderMask create the mask for those
 regions which pixel flux are below or equal to zero.
-On the other hand, BorderMask2 creates the mask on those 
+On the other hand, BorderMask2 creates the mask on those
 regions where the pixels are equal to zero.
 
 To run the code just type in the command line:
@@ -56,24 +56,30 @@ To run the code just type in the command line:
  ./BorderMask2.py [ImageFile] [MaskBorderImage] [Value]
 ```
 
-## ElipSectGalfit.py
+## EllipSectGalfit.py
 
-This is a "quick" (and dirty) substitute for IRAF's ellipse 
-routine. It creates a "ellipse" profile of galaxy 
-and GALFIT's model output (peng et al 2002). It also create a 
+This is a "quick" (and dirty) substitute for IRAF's ellipse
+routine. It creates a "ellipse" profile of galaxy
+and GALFIT's model output (peng et al 2002). It also create a
 multiple plots for different angles.  
 
 To run the code just type in the command line (or in ipython):
 
 ```
- ./EllipSectGalfit.py [GALFITOutputFile] [AxisRatio OPTIONAL] [PA OPTIONAL]
+ ./EllipSectGalfit.py [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--init]
  ```
 
-Where GALFITOutputFile is the output GALFIT file (e.g. galfit.01). 
-AxisRatio is an optional argument where
-the user can fix the axis ratio of the axial symmetric generalized 
-ellipse where EllipSectGalfit computes the profile. If ignored, 
-this code takes the one that comes in GALFITOutputFile.  
+GALFITOutputFile: GALFIT output file  (e.g. galfit.01)
+logx: plots X-axis as logarithm
+q: introduce axis ratio  where the user introduces the axial symmetric generalized
+ellipse where EllipSectGalfit computes the profile. If ignored,
+it takes the one of the last component that comes in GALFITOutputFile.
+pa: introduce position angle (same as GALFIT).  If ignored,
+this code takes the one of the last component that comes in GALFITOutputFile.
+sub: plots subcomponents.
+init: plots initial parameter model from subcomponents. It can be used
+to estimate the true parameters from the initial parameters before to run GALFIT
+
 
 Note: Errors given by EllipSectGalfit will be greater
 than those from IRAF's ellipse since this program leaves fixed
@@ -90,7 +96,7 @@ Be sure to run this code in the same path as you run GALFIT.
 Maskbox.py put (or remove) mask patch on
 an already existing mask FITS file. It does this
 using a box file region. This file is
-created by DS9 program. You can create as many 
+created by DS9 program. You can create as many
 box regions as you like in a single file. Maskbox will fill
 those box regions with the number specified in Value.   
 
@@ -110,7 +116,7 @@ establish for the pixels within the box region.
 
 Perl script that gives the K constant for a
 determined Sersic index. The one that allows the surface
-brightness (Ie) to be at the half of the light radius (Re). 
+brightness (Ie) to be at the half of the light radius (Re).
 See Sersic equation.
 
 To run the code just type in the command line:
