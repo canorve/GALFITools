@@ -20,6 +20,12 @@ def main():
     if (len(sys.argv[1:]) == 0):
         print ('Missing arguments')
         print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] " % (sys.argv[0]))
+        print ("GALFITOutputFile: GALFIT output file ")
+        print ("logx: activates X-axis as logarithm ")
+        print ("q: introduce axis ratio ")
+        print ("pa: introduce position angle (same as GALFIT) ")
+        print ("sub: plots subcomponents ")
+        print ("init: plots initial parameter model from subcomponents ")
         print ("Example:\n %s galfit.01 --logx" % (sys.argv[0]))
         print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub" % (sys.argv[0]))
         sys.exit()
