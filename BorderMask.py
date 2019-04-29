@@ -14,85 +14,115 @@ import subprocess as sp
 
 def main():
 
-  if len(sys.argv[1:]) != 3:
-    print ('Missing arguments')
-    print ("Usage:\n %s [ImageFile] [MaskBorderImage] [Value] " % (sys.argv[0]))
-    print ("Example:\n %s image.fits border.fits 100" % (sys.argv[0]))
-    sys.exit()
+    if len(sys.argv[1:]) == 0:
+        print ('Missing arguments')
+        print ("Usage:\n %s [ImageFile] [MaskBorderImage] [--val Value] [--le0] " % (sys.argv[0]))
+        print ("Example:\n %s image.fits border.fits --val 100" % (sys.argv[0]))
+        sys.exit()
 
 
-  ImageFile= sys.argv[1]
-  BorderFile= sys.argv[2]
-  Value = sys.argv[3]
+    ImageFile= sys.argv[1]
+    BorderFile= sys.argv[2]
+    Value = 1
+################################################
+################################################
+    flagvalue=False
+    flagle0=False
+
+    OptionHandleList = ['--le0',"--val"]
+    options = {}
+    for OptionHandle in OptionHandleList:
+        options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
+    if options['le0'] != None:
+        flagle0=True
+        print(" <= 0 pixels will be masked")
+    if options['val'] != None:
+        flagvalue=True
+
+################################
+    if flagvalue == True:
+        opt={}
+        OptionHandle="--val"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        Value=np.int(opt['val'])
+
+
+    galfile= sys.argv[1]
+
+    print("Value for mask pixels:  ",Value)
 
 
 
-  Value=np.float64(Value)
+###############################################3
+################################################
+    Value=np.float64(Value)
 
-  BorderMask(ImageFile,BorderFile,Value)
+    BorderMask(ImageFile,BorderFile,Value,flagle0)
 
 #################################################################
 #################################################################
 
-def BorderMask(ImageFile,BorderFile,Value):
+def BorderMask(ImageFile,BorderFile,Value,flag):
 
-  SexFile="sexmask.fits"
-
-
-  if not os.path.exists(ImageFile):
-    print ('%s: image filename does not exist!' %(sys.argv[1]))
-    sys.exit()
+    SexFile="sexmask.fits"
 
 
-  (ncol, nrow) = GetAxis(ImageFile)
+    if not os.path.exists(ImageFile):
+        print ('%s: image filename does not exist!' %(sys.argv[1]))
+        sys.exit()
 
 
-  MakeImage(BorderFile, ncol, nrow)
-
-  MakeImage1(SexFile, ncol, nrow)
+    (ncol, nrow) = GetAxis(ImageFile)
 
 
-#  BorderImage = np.zeros((ncol, nrow),dtype=np.float64)
+    MakeImage(BorderFile, ncol, nrow)
+
+    MakeImage1(SexFile, ncol, nrow)
 
 
-  # original file
-  hdu=fits.open(ImageFile)
-  Image = hdu[0].data
-#  Header = hdu[0].header
+    #  BorderImage = np.zeros((ncol, nrow),dtype=np.float64)
 
 
-# output file
-  hdu2=fits.open(BorderFile)
-  BorderImage = hdu2[0].data
-
-# output file 2
-  hdu3=fits.open(SexFile)
-  SexImage = hdu3[0].data
+      # original file
+    hdu=fits.open(ImageFile)
+    Image = hdu[0].data
+    #  Header = hdu[0].header
 
 
+    # output file
+    hdu2=fits.open(BorderFile)
+    BorderImage = hdu2[0].data
 
-  mask = Image <= 0
-
-
-  if mask.any():
-
-    BorderImage[mask] = Value
-    SexImage[mask] = 0
-
-
-  hdu2[0].data=BorderImage
-  hdu3[0].data=SexImage
-
-#  hdu[0].header=Header
+    # output file 2
+    hdu3=fits.open(SexFile)
+    SexImage = hdu3[0].data
 
 
-  hdu2.writeto(BorderFile,overwrite=True)
-  hdu3.writeto(SexFile,overwrite=True)
+    if (flag == True):
+        mask = Image <= 0
+    else:
+        mask = Image == 0
 
 
-  hdu.close()
-  hdu2.close()
-  hdu3.close()
+
+    if mask.any():
+        BorderImage[mask] = Value
+        SexImage[mask] = 0
+
+
+    hdu2[0].data=BorderImage
+    hdu3[0].data=SexImage
+
+    #  hdu[0].header=Header
+
+
+    hdu2.writeto(BorderFile,overwrite=True)
+    hdu3.writeto(SexFile,overwrite=True)
+
+
+    hdu.close()
+    hdu2.close()
+    hdu3.close()
 
 
 
