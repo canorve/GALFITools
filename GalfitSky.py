@@ -19,35 +19,72 @@ import matplotlib.pyplot as plt
 #from mgefit.mge_print_contours import mge_print_contours
 #from mgefit.mge_fit_sectors_twist import mge_fit_sectors_twist
 
+# computes sky using GALFIT
 
 def main():
 
 
-    if len(sys.argv[1:]) != 3 and len(sys.argv[1:]) != 5 :
+    if len(sys.argv[1:]) == 0 or len(sys.argv[1:]) == 1 or len(sys.argv[1:]) == 2:
         print ('Missing arguments')
-        print ("Usage:\n %s [ImageFile] [Magzpt] [scale] [X optional] [Y optional]" % sys.argv[0])
-        print ("Example:\n %s image.fits 25 1.5" % sys.argv[0])
-        print ("Example:\n %s image.fits 25 1.5 353 245" % sys.argv[0])
+        print ("Usage:\n %s [ImageFile] [Magzpt] [--s scale] [--X x] [--Y y]" % sys.argv[0])
+        print ("Example:\n %s image.fits 25 --s 1.5" % sys.argv[0])
+        print ("Example:\n %s image.fits 25 --s 1.5 --X 353 --Y 245" % sys.argv[0])
 
         sys.exit()
 
     flagpos=False
-#    sexfile= sys.argv[1]
+
     imgname= sys.argv[1]
     maskfile= "masksky.fits"
 
     mgzpt= sys.argv[2]
     mgzpt=np.float(mgzpt)
 
-    scale= sys.argv[3]
+################################################
+################################################
 
-    if len(sys.argv[1:]) == 5 :
-        flagpos=True
-        X = np.float(sys.argv[4])
-        Y = np.float(sys.argv[5])
+    flagx=False
+    flagy=False
+    flagscale=False
+
+    OptionHandleList = ['--X',"--Y","--s"]
+    options = {}
+    for OptionHandle in OptionHandleList:
+        options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
+    if options['X'] != None:
+        flagx=True
+    if options['Y'] != None:
+        flagy=True
+    if options['s'] != None:
+        flagscale=True
+
+    if flagx == True:
+        opt={}
+        OptionHandle="--X"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        X=np.int(opt['X'])
+
+    if flagy == True:
+        opt={}
+        OptionHandle="--Y"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        Y=np.int(opt['Y'])
+
+    if flagscale == True:
+        opt={}
+        OptionHandle="--s"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        scale=np.float(opt['s'])
 
 
-    scale = float(scale)
+#    scale= sys.argv[3]
+#    scale = np.float(scale)
+
+
+################################
+
+
+
 
     sexfile = "sim.cat"
     sexarsort   = "sexsort.cat"

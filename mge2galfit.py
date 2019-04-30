@@ -25,12 +25,12 @@ from mgefit.mge_fit_sectors_twist import mge_fit_sectors_twist
 
 def main():
 
-    if len(sys.argv[1:]) != 6 and len(sys.argv[1:]) != 7 and len(sys.argv[1:]) != 8:
+    if len(sys.argv[1:]) <= 6:
       print ('Missing arguments')
-      print ("Usage: %s [Image] [X] [Y] [MagZpt] [PSF sigma or File] [Twist 1=yes 0=No] [Sky (Optional)] [Mask (optional)] " % (sys.argv[0]))
+      print ("Usage: %s [Image] [X] [Y] [MagZpt] [PSF sigma or File] [Twist 1=yes 0=No] [--sky Sky] [--m Mask] " % (sys.argv[0]))
       print ("Example: %s  image.fits 500 500 25 0.494 0" % (sys.argv[0]))
-      print ("Example: %s  image.fits 500 500 25 0.494 1 0.5 " % (sys.argv[0]))
-      print ("Example: %s  image.fits 500 500 25 0.494 1 0.5 mask.fits " % (sys.argv[0]))
+      print ("Example: %s  image.fits 500 500 25 0.494 1 --sky 0.5 " % (sys.argv[0]))
+      print ("Example: %s  image.fits 500 500 25 0.494 1 --sky 0.5 --m mask.fits " % (sys.argv[0]))
 
       sys.exit()
 
@@ -41,14 +41,51 @@ def main():
 
     imgname= sys.argv[1]
     flagmask=False
-    maskfile="mask-cD.fits"
+    maskfile="mask.fits"
 
     mgeoutfile="mgegas.txt"
 
 
+    sky=0
+
     X = np.float(sys.argv[2])
     Y = np.float(sys.argv[3])
 
+##########################################
+############################################
+
+    flaglogx=False
+    flagq=False
+    flagpa=False
+    flagsub=False
+    flaginit=False
+
+
+    OptionHandleList = ['--m', '--sky']
+    options = {}
+    for OptionHandle in OptionHandleList:
+        options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
+    if options['m'] != None:
+        flagmask=True
+    if options['sky'] != None:
+        flagsky=True
+################################
+    if flagsky == True:
+        opt={}
+        OptionHandle="--sky"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        sky=np.int(opt['sky'])
+
+    if flagmask == True:
+        opt={}
+        OptionHandle="--m"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        maskfile=np.float(opt['m'])
+
+
+
+######################################
+######################################
 
     if imgname.find(".") != -1:
         (timg, trash) = imgname.split(".")
@@ -74,24 +111,8 @@ def main():
         sigpsf,normpsf=ReadMgePsf(valpsf)
 
 
-
     twist = np.bool(np.int(sys.argv[6]))
 
-##    print("twist: ",twist)
-
-    if len(sys.argv[1:]) == 7:
-        flagsky =True
-        sky = np.float(sys.argv[7])
-
-    if len(sys.argv[1:]) == 8:
-        flagsky =True
-        sky = np.float(sys.argv[7])
-
-        flagmask =True
-        maskfile = sys.argv[8]
-
-#    exptime= sys.argv[3]
-#    exptime=np.float(exptime)
 
     convbox=100
 

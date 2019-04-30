@@ -22,15 +22,13 @@ from mgefit.mge_fit_sectors import mge_fit_sectors
 #from mgefit.mge_print_contours import mge_print_contours
 #from mgefit.mge_fit_sectors_twist import mge_fit_sectors_twist
 
-
 def main():
 
-    if len(sys.argv[1:]) != 5 and len(sys.argv[1:]) != 6 and len(sys.argv[1:]) != 7:
+    if len(sys.argv[1:]) <= 5:
       print ('Missing arguments')
-      print ("Usage: %s [Image] [X] [Y] [MagZpt] [Box Size] [Sky (Optional)] [Mask (Optional)] " % (sys.argv[0]))
-#      print ("Usage: %s [Image] [MagZpt] [PSF sigma] [twist yes 0=No] [Sky (Optional)] [Mask (optional)] " % (sys.argv[0]))
-      print ("Example: %s  image.fits 1000 1050 25 50 0.5 mask.fits" % (sys.argv[0]))
-      print ("Example: %s  image.fits 1000 1050 25 50 0.5" % (sys.argv[0]))
+      print ("Usage: %s [Image] [X] [Y] [MagZpt] [Box Size] [--sky Sky] [--m Mask] " % (sys.argv[0]))
+      print ("Example: %s  image.fits 1000 1050 25 50 --sky 0.5 --m mask.fits" % (sys.argv[0]))
+      print ("Example: %s  image.fits 1000 1050 25 50 --sky 0.5" % (sys.argv[0]))
       print ("Example: %s  image.fits 1000 1050 25 100 " % (sys.argv[0]))
       sys.exit()
 
@@ -39,11 +37,9 @@ def main():
     flagmask=False
 
     imgname= sys.argv[1]
-
     maskfile ="none"
-
-
     mgeoutfile="psfmge.txt"
+    sky=0
 
     X = np.float(sys.argv[2])
     Y = np.float(sys.argv[3])
@@ -57,15 +53,40 @@ def main():
     if boxsize % 2 == 0:
         flageven=True
 
-    if len(sys.argv[1:]) == 6:
-        flagsky =True
-        sky = np.float(sys.argv[6])
 
-    if len(sys.argv[1:]) == 7:
-        flagmask =True
-        maskfile = sys.argv[7]
+####################################
+#####################################
+# init values
+
+    OptionHandleList = ['--sky', '--m']
+    options = {}
+    for OptionHandle in OptionHandleList:
+        options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
+    if options['sky'] != None:
+        flagsky=True
+    if options['m'] != None:
+        flagmask=True
+
+################################
+    if flagsky == True:
+        opt={}
+        OptionHandle="--sky"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        sky=np.float(opt['sky'])
+
+    if flagmask == True:
+        opt={}
+        OptionHandle="--m"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        maskfile=opt['m']
+
+################################################
 
 
+
+
+####################################
+####################################
 #    exptime= sys.argv[3]
 #    exptime=np.float(exptime)
 

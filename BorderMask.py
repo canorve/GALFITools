@@ -14,7 +14,7 @@ import subprocess as sp
 
 def main():
 
-    if len(sys.argv[1:]) == 0:
+    if len(sys.argv[1:]) == 0 or len(sys.argv[1:]) == 1:
         print ('Missing arguments')
         print ("Usage:\n %s [ImageFile] [MaskBorderImage] [--val Value] [--le0] " % (sys.argv[0]))
         print ("Example:\n %s image.fits border.fits --val 100" % (sys.argv[0]))
@@ -46,8 +46,6 @@ def main():
         opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         Value=np.int(opt['val'])
 
-
-    galfile= sys.argv[1]
 
     print("Value for mask pixels:  ",Value)
 
