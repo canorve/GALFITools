@@ -99,6 +99,11 @@ def main():
     if flagpa == True:
         ang=parg
 
+## correction
+#    ang=90+ang
+
+###
+
     str = "q = {} is used ".format(q)
     print(str)
 
@@ -117,7 +122,6 @@ def main():
     namesec=namefile + "-gal.png"
     namemod=namefile + "-mod.png"
     namemul=namefile + "-mul.png"
-
 
 #    sbsky = mgzpt -2.5*np.log10(skylevel/exptime) + 2.5*np.log10(scale**2)
 
@@ -219,6 +223,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     xctemp=yc
 # and angle is different as well:
     angsec=90-ang
+#    angsec=ang
 
 ####################
 
@@ -242,7 +247,9 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     mgecount=g.counts[stidxg]
     mgeangle=g.angle[stidxg]
 #    mgeanrad=(mgeangle)*np.pi/180
-    mgeanrad=(90-mgeangle)*np.pi/180 #converting back angle
+    mgeanrad=np.deg2rad(mgeangle)
+
+#    mgeanrad=(90-mgeangle)*np.pi/180 #converting back angle
 
 
     ab=q
@@ -291,7 +298,9 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
         mgecount=m.counts[stidxm]
         mgeangle=m.angle[stidxm]
 #        mgeanrad=mgeangle*np.pi/180
-        mgeanrad=(90-mgeangle)*np.pi/180
+        mgeanrad=np.deg2rad(mgeangle)
+
+#        mgeanrad=(90-mgeangle)*np.pi/180
 
 
         ab=q
@@ -327,11 +336,19 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     (magser,reser,nser,qser,paser)=ReadSersic(xc,yc,galfile)
     (magexp,rsexp,qexp,paexp)=ReadExp(xc,yc,galfile)
 
+
     if flagsub == True:
+
+#        print(magas,fwhmgas,qgas,pagas,ang,limx)
 
         PlotGauss(magas,fwhmgas*plate,qgas,pagas,ang,limx)
         PlotSersic(magser,reser*plate,nser,qser,paser,ang,limx)
         PlotExp(magexp,rsexp*plate,qexp,paexp,ang,limx)
+
+#        PlotGauss(magas,fwhmgas*plate,qgas,pagas,0,limx)
+#        PlotSersic(magser,reser*plate,nser,qser,paser,0,limx)
+#        PlotExp(magexp,rsexp*plate,qexp,0,0,limx)
+
 
     if flaginit == True:
         PloTotal(magas,fwhmgas*plate,qgas,pagas,magser,reser*plate,nser,qser,paser,magexp,rsexp*plate,qexp,paexp,ang,limx)
@@ -439,15 +456,15 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     xc=yc
     yc=xtemp
 
-    ang=90-ang
+    angsec=90-ang
 ######################
 
-    sg = sectors_photometry(img, eps, ang, xc, yc,minlevel=minlevel,
+    sg = sectors_photometry(img, eps, angsec, xc, yc,minlevel=minlevel,
             plot=1, badpixels=maskb, n_sectors=n_sectors)
 
 
     if flaginit == False:
-        sm = sectors_photometry(model, eps, ang, xc, yc,minlevel=minlevel,
+        sm = sectors_photometry(model, eps, angsec, xc, yc,minlevel=minlevel,
                 plot=1, badpixels=maskb, n_sectors=n_sectors)
 
 
@@ -470,8 +487,8 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     mgecount=sg.counts[stidx]
     mgeangle=sg.angle[stidx]
 #    mgeanrad=mgeangle*np.pi/180
-    mgeangle=(90-mgeangle)
-    mgeanrad=(mgeangle)*np.pi/180
+#    mgeangle=(90-mgeangle)
+    mgeanrad=np.deg2rad(mgeangle)
 
 
 # model
@@ -483,7 +500,9 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
         mgemodcount=sm.counts[stidx]
         mgemodangle=sm.angle[stidx]
 #        mgemodanrad=mgemodangle*np.pi/180
-        mgemodanrad=(90 - mgemodangle)*np.pi/180
+        mgemodanrad=np.deg2rad(mgemodangle)
+
+#        mgemodanrad=(90 - mgemodangle)*np.pi/180
 
 
 
@@ -520,16 +539,30 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     ax[-1, 0].set_xlabel("arcsec")
     ax[-1, 1].set_xlabel("arcsec")
 
-    row = 0
+#    row = 0
+    row = 7
     for j in range(0, n, dn):
         w = np.nonzero(mgeangle == sectors[j])[0]
         w = w[np.argsort(mgerad[w])]
         r = mgerad[w]
 
-        if flaginit == False:
-            r2 = mgemodrad[w]
 
-        txt = "$%.f^\circ$" % sectors[j]
+        if flaginit == False:
+            wmod = np.nonzero(mgemodangle == sectors[j])[0]
+            wmod = wmod[np.argsort(mgemodrad[wmod])]
+#            print(w,sectors[j],len(mgemodrad),len(mgerad))
+            if (len(mgemodrad) < len(mgerad)):
+                r2 = mgemodrad[wmod]
+            else:
+                wmod=w
+#                r2 = mgemodrad[w]
+                r2 = mgemodrad[wmod]
+
+
+        txtang=90 - sectors[j]
+#        txt = "$%.f^\circ$" % sectors[j]
+        txt = "$%.f^\circ$" % txtang
+
 
         ax[row, 0].set_xlim(xran)
         ax[row, 0].set_ylim(yran)
@@ -538,36 +571,54 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
             ax[row, 0].plot(r, mgesb[w], 'C0o')
 
             if flaginit == False:
-                ax[row, 0].plot(r2, mgemodsb[w], 'C1-', linewidth=2)
+#                if (len(mgemodrad) < len(mgerad)):
+                ax[row, 0].plot(r2, mgemodsb[wmod], 'C1-', linewidth=2)
+#                else:
+#                    ax[row, 0].plot(r2, mgemodsb[w], 'C1-', linewidth=2)
 
         else:
             ax[row, 0].semilogx(r, mgesb[w], 'C0o')
 
             if flaginit == False:
-                ax[row, 0].semilogx(r2, mgemodsb[w], 'C1-', linewidth=2)
+#                if (len(mgemodrad) < len(mgerad)):
+                ax[row, 0].semilogx(r2, mgemodsb[wmod], 'C1-', linewidth=2)
+#                else:
+#                    ax[row, 0].semilogx(r2, mgemodsb[w], 'C1-', linewidth=2)
+
 
 #########################
 
         if flaginit == True:
-            PlotMulTotal(magas,fwhmgas*plate,qgas,pagas,magser,reser*plate,nser,qser,paser,magexp,rsexp*plate,qexp,paexp,sectors[j],ax,row,limx,flag)
+            PlotMulTotal(magas,fwhmgas*plate,qgas,pagas,magser,reser*plate,nser,qser,paser,magexp,rsexp*plate,qexp,paexp,90-sectors[j],ax,row,limx,flag)
 
         if flagsub == True:
-            PlotMulGauss(magas,fwhmgas*plate,qgas,pagas,sectors[j],ax,row,limx,flag)
-            PlotMulSersic(magser,reser*plate,nser,qser,paser,sectors[j],ax,row,limx,flag)
-            PlotMulExp(magexp,rsexp*plate,qexp,paexp,sectors[j],ax,row,limx,flag)
+#            PlotMulGauss(magas,fwhmgas*plate,qgas,pagas,sectors[j],ax,row,limx,flag)
+#            PlotMulSersic(magser,reser*plate,nser,qser,paser,sectors[j],ax,row,limx,flag)
+            PlotMulGauss(magas,fwhmgas*plate,qgas,pagas,90-sectors[j],ax,row,limx,flag)
+            PlotMulSersic(magser,reser*plate,nser,qser,paser,90-sectors[j],ax,row,limx,flag)
+
+#            PlotMulExp(magexp,rsexp*plate,qexp,paexp,sectors[j],ax,row,limx,flag)
+            PlotMulExp(magexp,rsexp*plate,qexp,paexp,90-sectors[j],ax,row,limx,flag)
+
 
         ax[row, 0].text(0.98, 0.95, txt, ha='right', va='top', transform=ax[row, 0].transAxes)
 
         if flaginit == False:
-            sberr=1-mgemodsb[w]/mgesb[w]
-            ax[row, 1].plot(r, sberr*100, 'C0o')
+            if (len(mgemodrad) < len(mgerad)):
+                sberr=1-mgemodsb[wmod]/mgesb[wmod]
+                ax[row, 1].plot(r2, sberr*100, 'C0o')
+            else:
+                sberr=1-mgemodsb[w]/mgesb[w]
+                ax[row, 1].plot(r, sberr*100, 'C0o')
+
 
         ax[row, 1].axhline(linestyle='--', color='C1', linewidth=2)
         ax[row, 1].yaxis.tick_right()
         ax[row, 1].yaxis.set_label_position("right")
         ax[row, 1].set_ylim([-19.5, 20])
 
-        row += 1
+#        row += 1
+        row -= 1
 
 
 #    return xrad, ysb, ysberr
@@ -982,14 +1033,19 @@ def ReadGauss(xpos,ypos,inputf):
 
 def GalGauss(magauss,fwhmgauss,qgauss,pagauss,angle,radx):
 
+
     sigma=fwhmgauss/2.354
+
 
     mags=(-magauss)/2.5
     ftot=10**(mags)
     I0=ftot/(2*np.pi*qgauss*sigma**2)
 
-    angle=angle*np.pi/180
-    pagauss=pagauss*np.pi/180
+#    angle=angle*np.pi/180
+#    pagauss=pagauss*np.pi/180
+
+    angle=np.deg2rad(angle)
+    pagauss=np.deg2rad(pagauss)
 
 
     xgas=radx*np.cos(angle)*np.cos(pagauss) - radx*qgauss*np.sin(angle)*np.sin(pagauss)
@@ -1013,9 +1069,13 @@ def GalTotal(magauss,fwhmgauss,qgauss,pagauss,magser,reser,nser,qser,paser,magex
     It=0
 
 ## rest angle
-    anglegas= patot - pagauss
-    angleser= patot - paser
-    angleexp= patot - paexp
+    anglegas= patot
+    angleser= patot
+    angleexp= patot
+#    anglegas= patot - pagauss
+#    angleser= patot - paser
+#    angleexp= patot - paexp
+
 
 # changing to rads!
     pagauss=pagauss*np.pi/180
@@ -1037,8 +1097,10 @@ def GalTotal(magauss,fwhmgauss,qgauss,pagauss,magser,reser,nser,qser,paser,magex
     kser=GetKAprox(nser)
     mags=(-magser)/2.5
     ftot=10**(mags)
-    Ie=ftot/(2*np.pi*(reser**2)*nser*kser**(-2*nser)*(scipy.special.gamma(2*nser)*qser))
+    Ie=ftot/(2*np.pi*(reser**2)*np.exp(kser)*nser*kser**(-2*nser)*(scipy.special.gamma(2*nser)*qser))
 ##
+
+
 
 ## exponential
     mags=(-magexp)/2.5
@@ -1048,8 +1110,11 @@ def GalTotal(magauss,fwhmgauss,qgauss,pagauss,magser,reser,nser,qser,paser,magex
 ###############################################
     for idx, item in enumerate(magauss):
 #  gauss
-        alpha1=np.cos(anglegas[idx])*np.cos(pagauss[idx])+np.sin(anglegas[idx])*np.sin(pagauss[idx])
-        alpha2=np.cos(anglegas[idx])*np.sin(pagauss[idx])-np.sin(anglegas[idx])*np.cos(pagauss[idx])
+#        alpha1=np.cos(anglegas[idx])*np.cos(pagauss[idx])+np.sin(anglegas[idx])*np.sin(pagauss[idx])
+#        alpha2=np.cos(anglegas[idx])*np.sin(pagauss[idx])-np.sin(anglegas[idx])*np.cos(pagauss[idx])
+        alpha1=np.cos(anglegas)*np.cos(pagauss[idx])+np.sin(anglegas)*np.sin(pagauss[idx])
+        alpha2=np.cos(anglegas)*np.sin(pagauss[idx])-np.sin(anglegas)*np.cos(pagauss[idx])
+
         agas2=(rad**2)*(alpha1**2+(1/(qgauss[idx]**2))*alpha2**2)
         Irgas=I0[idx]*np.exp(-(agas2)/(2*sigma[idx]**2))
 
@@ -1057,8 +1122,11 @@ def GalTotal(magauss,fwhmgauss,qgauss,pagauss,magser,reser,nser,qser,paser,magex
 
     for idx, item in enumerate(magser):
 #Sersic
-        alpha1=np.cos(angleser[idx])*np.cos(paser[idx])+np.sin(angleser[idx])*np.sin(paser[idx])
-        alpha2=np.cos(angleser[idx])*np.sin(paser[idx])-np.sin(angleser[idx])*np.cos(paser[idx])
+#        alpha1=np.cos(angleser[idx])*np.cos(paser[idx])+np.sin(angleser[idx])*np.sin(paser[idx])
+#        alpha2=np.cos(angleser[idx])*np.sin(paser[idx])-np.sin(angleser[idx])*np.cos(paser[idx])
+        alpha1=np.cos(angleser)*np.cos(paser[idx])+np.sin(angleser)*np.sin(paser[idx])
+        alpha2=np.cos(angleser)*np.sin(paser[idx])-np.sin(angleser)*np.cos(paser[idx])
+
         aser2=(rad**2)*(alpha1**2+(1/(qser[idx]**2))*alpha2**2)
         aser=np.sqrt(aser2)
         Irser=Ie[idx]*np.exp(-kser[idx]*((aser/reser[idx])**(1/nser[idx]) - 1 ))
@@ -1068,8 +1136,11 @@ def GalTotal(magauss,fwhmgauss,qgauss,pagauss,magser,reser,nser,qser,paser,magex
     for idx, item in enumerate(magexp):
 
 #Exponential
-        alpha1=np.cos(angleexp[idx])*np.cos(paexp[idx])+np.sin(angleexp[idx])*np.sin(paexp[idx])
-        alpha2=np.cos(angleexp[idx])*np.sin(paexp[idx])-np.sin(angleexp[idx])*np.cos(paexp[idx])
+        alpha1=np.cos(angleexp)*np.cos(paexp[idx])+np.sin(angleexp)*np.sin(paexp[idx])
+        alpha2=np.cos(angleexp)*np.sin(paexp[idx])-np.sin(angleexp)*np.cos(paexp[idx])
+#        alpha1=np.cos(angleexp[idx])*np.cos(paexp[idx])+np.sin(angleexp[idx])*np.sin(paexp[idx])
+#        alpha2=np.cos(angleexp[idx])*np.sin(paexp[idx])-np.sin(angleexp[idx])*np.cos(paexp[idx])
+
         aexp2=(rad**2)*(alpha1**2+(1/(qexp[idx]**2))*alpha2**2)
         aexp=np.sqrt(aexp2)
         Irexp=Is*np.exp(-aexp/rsexp[idx])
@@ -1345,13 +1416,14 @@ def GalSersic(magser,reser,nser,qser,paser,angle,radx):
 
     kser=GetKAprox(nser)
 
+
     mags=(-magser)/2.5
     ftot=10**(mags)
 
     angle=angle*np.pi/180
     paser=paser*np.pi/180
 
-    Ie=ftot/(2*np.pi*(reser**2)*nser*kser**(-2*nser)*(scipy.special.gamma(2*nser)*qser))
+    Ie=ftot/(2*np.pi*(reser**2)*np.exp(kser)*nser*kser**(-2*nser)*(scipy.special.gamma(2*nser)*qser))
 
     xser=radx*np.cos(angle)*np.cos(paser) - radx*qser*np.sin(angle)*np.sin(paser)
     yser=radx*np.cos(angle)*np.sin(paser) + radx*qser*np.sin(angle)*np.cos(paser)
@@ -1639,11 +1711,15 @@ def GalExp(magexp,rsexp,qexp,paexp,angle,radx):
     mags=(-magexp)/2.5
     ftot=10**(mags)
 
+#    Is=ftot/(2*np.pi*(rsexp**2)*qexp)
     Is=ftot/(2*np.pi*(rsexp**2)*qexp)
 
 
-    angle=angle*np.pi/180
-    paexp=paexp*np.pi/180
+#    angle=angle*np.pi/180
+#    paexp=paexp*np.pi/180
+    angle=np.deg2rad(angle)
+    paexp=np.deg2rad(paexp)
+
 
     xexp=radx*np.cos(angle)*np.cos(paexp) - radx*qexp*np.sin(angle)*np.sin(paexp)
     yexp=radx*np.cos(angle)*np.sin(paexp) + radx*qexp*np.sin(angle)*np.cos(paexp)
@@ -1665,6 +1741,7 @@ def PlotExp(magexp,rsexp,qexp,paexp,angle,xlim):
 
     xexp =  np.arange(xlim[0],xlim[1],0.1)
 
+
     alpha= angle - paexp
 
 
@@ -1673,6 +1750,8 @@ def PlotExp(magexp,rsexp,qexp,paexp,angle,xlim):
     for idx, item in enumerate(magexp):
 
         radx,yexp=GalExp(magexp[idx],rsexp[idx],qexp[idx],paexp[idx],alpha[idx],xexp)
+#        radx,yexp=GalExp(magexp[idx],rsexp[idx],qexp[idx],paexp,alpha,xexp)
+
         strgas="exponential " + str(num)
         plt.plot(radx, yexp,'--',color='blue',markersize=0.7,label=strgas)
         num=num+1
