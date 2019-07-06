@@ -93,6 +93,7 @@ def main():
 ######################################
 #    print(file)
 
+
     if flagq == True:
         q=qarg
 
@@ -672,15 +673,12 @@ def FindSB(xarcq, ymgeq, numsectors):
 def ReadGALFITout(inputf):
 
 #  It obtains the xc,yc,pa, q from the first components. It ignore the rest
-    flagser = True
-    flagexp = True
-    flagauss = True
+    flagfirst = True
 
 #    inputf = "fit.log"
 
 #   init values
     maskimage = ""
-
 
 
     GalfitFile = open(inputf,"r")
@@ -738,10 +736,11 @@ def ReadGALFITout(inputf):
         if tmp[0] == "K)":     # plate scale
             scale=float(tmp[1])
 
-        # first sersic component
-        if tmp[0] == "0)" and tmp[1] == "sersic" and flagser == True:     # plate scale
 
-            flagser=False
+        # first component
+        if tmp[0] == "0)" and flagfirst == True:     # plate scale
+
+            flagfirst=False
 
             while (tmp[0] != "Z)"):
 
@@ -759,10 +758,32 @@ def ReadGALFITout(inputf):
                 if tmp[0] == "10)": # position angle
                     pa=float(tmp[1])
 
-# second component exponential model
-        if tmp[0] == "0)" and tmp[1] == "expdisk" and flagexp == True:     # plate scale
+        # sersic component
+        if tmp[0] == "0)" and tmp[1] == "sersic":     # plate scale
 
-            flagexp=False
+            while (tmp[0] != "Z)"):
+
+                index += 1
+                line = lines[index]
+                (tmp) = line.split()
+
+                if tmp[0] == "1)":   # center
+                    xcser=float(tmp[1])
+                    ycser=float(tmp[2])
+
+                    if flagfirst == False:
+                        dist = np.sqrt((xc-xcser)**2+(yc-ycser)**2)
+
+
+
+                if tmp[0] == "9)" and (dist < 3):    # axis ratio
+                    q=float(tmp[1])
+
+                if tmp[0] == "10)" and (dist < 3): # position angle
+                    pa=float(tmp[1])
+
+# second component exponential model
+        if tmp[0] == "0)" and tmp[1] == "expdisk" :     # plate scale
 
             while (tmp[0] != "Z)"):
 
@@ -774,26 +795,20 @@ def ReadGALFITout(inputf):
                     xcexp=float(tmp[1])
                     ycexp=float(tmp[2])
 
-                    if flagser == False:
+                    if flagfirst == False:
                         dist = np.sqrt((xc-xcexp)**2+(yc-ycexp)**2)
-                    else:
-                        dist=0
-                        xc=xcexp
-                        yc=ycexp
 
 
-                if (tmp[0] == "9)") and (dist < 5):    # axis ratio
+                if (tmp[0] == "9)") and (dist < 3):    # axis ratio
                     q=float(tmp[1])
 
-                if (tmp[0] == "10)") and (dist < 5): # position angle
+                if (tmp[0] == "10)") and (dist < 3): # position angle
                     pa=float(tmp[1])
 
-# check if a third component exists
 
-        if tmp[0] == "0)" and tmp[1] == "gaussian" and flagauss == True and flagexp == True:     # plate scale
+        if tmp[0] == "0)" and tmp[1] == "gaussian":
         #  flagexp == True forces to take the value of exp instead of gauss
 
-            flagauss=False
             while (tmp[0] != "Z)"):
 
                 index += 1
@@ -804,18 +819,13 @@ def ReadGALFITout(inputf):
                     xcgauss=float(tmp[1])
                     ycgauss=float(tmp[2])
 
-                    if flagser == False:
+                    if flagfirst == False:
                         dist = np.sqrt((xc-xcgauss)**2+(yc-ycgauss)**2)
-                    else:
-                        dist=0
-                        xc=xcgauss
-                        yc=ycgauss
 
-
-                if (tmp[0] == "9)") and (dist < 5):    # axis ratio
+                if (tmp[0] == "9)") and (dist < 3):    # axis ratio
                     q=float(tmp[1])
 
-                if (tmp[0] == "10)") and (dist < 5): # position angle
+                if (tmp[0] == "10)") and (dist < 3): # position angle
                     pa=float(tmp[1])
 
 
@@ -844,6 +854,9 @@ def ReadGALFITout(inputf):
 
     errmsg="xc and yc are unknown "
     assert ("xc" in locals()) and ("yc" in locals())  , errmsg
+
+
+    print("center is at xc, yc = ",xc,yc)
 
 
     # correcting coordinates
