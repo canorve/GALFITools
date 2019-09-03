@@ -1102,7 +1102,7 @@ def ReadNComp(inputf,X,Y):
             X=X+xmin-1
             Y=Y+ymin-1
 
-            print("xc, yc =",X,Y)
+#            print("xc, yc =",X,Y)
 
 
         if tmp[0] == "0)":
@@ -1944,7 +1944,9 @@ def GetExpTime(Image):
     "Get exposition time from the image"
 
     hdu = fits.open(Image)
-    exptime = hdu[0].header["EXPTIME"]
+#    exptime = hdu[0].header["EXPTIME"]
+    exptime = hdu[0].header.get("EXPTIME",1) # return 1 if not found
+
     hdu.close()
     return exptime
 
