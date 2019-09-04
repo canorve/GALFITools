@@ -864,6 +864,7 @@ def ReadGALFITout(inputf):
 
     maskimage = ""
 
+    skylevel=0
 
     GalfitFile = open(inputf,"r")
 
