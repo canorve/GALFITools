@@ -153,13 +153,16 @@ def main():
 
     if flagsub:
 
-        rungal = "galfit -o3 {}".format(galfile)
-        errgal = sp.run([rungal], shell=True, stdout=sp.PIPE,
-                        stderr=sp.PIPE, universal_newlines=True)
+        if (not(os.path.isfile(namesub))):
 
-        runchg = "mv subcomps.fits {}".format(namesub)
-        errchg = sp.run([runchg], shell=True, stdout=sp.PIPE,
-                        stderr=sp.PIPE, universal_newlines=True)
+            rungal = "galfit -o3 {}".format(galfile)
+            errgal = sp.run([rungal], shell=True, stdout=sp.PIPE,
+            stderr=sp.PIPE, universal_newlines=True)
+
+            runchg = "mv subcomps.fits {}".format(namesub)
+            errchg = sp.run([runchg], shell=True, stdout=sp.PIPE,
+            stderr=sp.PIPE, universal_newlines=True)
+
 
     # read number of components
         Comps,N=ReadNComp(galfile,xc,yc)
