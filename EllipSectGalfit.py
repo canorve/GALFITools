@@ -712,7 +712,6 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
 #    row = 0
     row = 7
-    kk=-1
     for j in range(0, n, dn):
         w = np.nonzero(mgeangle == sectors[j])[0]
         w = w[np.argsort(mgerad[w])]
@@ -720,8 +719,6 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
         wmod = np.nonzero(mgemodangle == sectors[j])[0]
         wmod = wmod[np.argsort(mgemodrad[wmod])]
-
-#        print("ws ", len(w),len(wmod))
 
         if (len(mgemodrad) < len(mgerad)):
             r2 = mgemodrad[wmod]
@@ -739,11 +736,10 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
                     rtsub = mgeradsub[ii][tsub]
                     rsub.append(rtsub)
                 else:
+                    tsub=w  # agregado
                     rtsub = mgeradsub[ii][tsub]
-
                     rsub.append(rtsub)
                 wsub.append(tsub)
-                kk+=1
                 ii+=1
 
         txtang= sectors[j]
@@ -775,16 +771,15 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
                 if flag == False:
 
-                    ax[row, 0].plot(rsub[kk], mgesbsub[ii][wsub[kk]], 'C9--', linewidth=2)
+                    ax[row, 0].plot(rsub[ii], mgesbsub[ii][wsub[ii]], 'C9--', linewidth=2)
 
                 else:
 
-                    ax[row, 0].semilogx(rsub[kk], mgesbsub[ii][wsub[kk]], 'C9--', linewidth=2)
+                    ax[row, 0].semilogx(rsub[ii], mgesbsub[ii][wsub[ii]], 'C9--', linewidth=2)
 
 
 
                 ii+=1
-
 
 #            SubMulComp(namesub,N,Comps,mgzpt,exptime,scale,xc,yc,q,ang,skylevel=skylevel,
 #                n_sectors=numsectors, badpixels=mask, minlevel=minlevel)
