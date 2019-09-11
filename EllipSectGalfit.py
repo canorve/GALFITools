@@ -636,7 +636,7 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
     if flagsub:
 
-        wsub=[]
+        wtemp=[]
         mgesbsub=[]
         mgeradsub=[]
         mgeanglesub=[]
@@ -726,21 +726,21 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
             wmod=w
             r2 = mgemodrad[wmod]
 
-        if flagsub:
-            ii=0
-            while(ii<N):
-                tsub = np.nonzero(mgeanglesub[ii] == sectors[j])[0]
-                tsub = tsub[np.argsort(mgeradsub[ii][tsub])]
+#        if flagsub:
+#            ii=0
+#            while(ii<N):
+#                tsub = np.nonzero(mgeanglesub[ii] == sectors[j])[0]
+#                tsub = tsub[np.argsort(mgeradsub[ii][tsub])]
 
-                if (len(mgeradsub[ii]) < len(mgerad)):
-                    rtsub = mgeradsub[ii][tsub]
-                    rsub.append(rtsub)
-                else:
-                    tsub=w  # agregado
-                    rtsub = mgeradsub[ii][tsub]
-                    rsub.append(rtsub)
-                wsub.append(tsub)
-                ii+=1
+#                if (len(mgeradsub[ii]) < len(mgerad)):
+#                    rtsub = mgeradsub[ii][tsub]
+#                    rsub.append(rtsub)
+#                else:
+#                    tsub=w  # agregado
+#                    rtsub = mgeradsub[ii][tsub]
+#                    rsub.append(rtsub)
+#                ii+=1
+#                wsub.append(tsub)   # wsub corresponde a ii
 
         txtang= sectors[j]
         txt = "$%.f^\circ$" % txtang
@@ -769,14 +769,20 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
             ii=0
             while(ii<N):
 
+                wtemp = np.nonzero(mgeanglesub[ii] == sectors[j])[0]
+                wtemp = wtemp[np.argsort(mgeradsub[ii][wtemp])]
+
+                rtemp = mgeradsub[ii][wtemp]
+
+
                 if flag == False:
 
-                    ax[row, 0].plot(rsub[ii], mgesbsub[ii][wsub[ii]], 'C9--', linewidth=2)
+                    ax[row, 0].plot(rtemp, mgesbsub[ii][wtemp], 'C9--', linewidth=2)
+
 
                 else:
 
-                    ax[row, 0].semilogx(rsub[ii], mgesbsub[ii][wsub[ii]], 'C9--', linewidth=2)
-
+                    ax[row, 0].semilogx(rtemp, mgesbsub[ii][wtemp], 'C9--', linewidth=2)
 
 
                 ii+=1
@@ -801,8 +807,6 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
 #        row += 1
         row -= 1
-
-#    print("ws2 ",len(wsub[6]))
 
 #    return xrad, ysb, ysberr
 
