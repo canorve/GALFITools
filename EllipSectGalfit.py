@@ -19,22 +19,24 @@ def main():
 
     if (len(sys.argv[1:]) == 0):
         print ('Missing arguments')
-        print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] " % (sys.argv[0]))
+        print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] " % (sys.argv[0]))
         print ("GALFITOutputFile: GALFIT output file ")
         print ("logx: activates X-axis as logarithm ")
         print ("q: introduce axis ratio ")
         print ("pa: introduce position angle (same as GALFIT) ")
         print ("sub: plots subcomponents ")
+        print ("pix: plot the x-axis in pixels ")
+
 #        print ("init: plots initial parameter model from subcomponents ")
         print ("Example:\n %s galfit.01 --logx" % (sys.argv[0]))
         print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub" % (sys.argv[0]))
         sys.exit()
 
-
     flaglogx=False
     flagq=False
     flagpa=False
     flagsub=False
+    flagpix=False
 
 # init values
     qarg=1
@@ -44,7 +46,7 @@ def main():
     Comps=np.array([False])
     N=0
 
-    OptionHandleList = ['--logx', '--q', '--pa','--sub']
+    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
@@ -55,12 +57,14 @@ def main():
         flagq=True
     if options['pa'] != None:
         flagpa=True
+    if options['pix'] != None:
+        flagpix=True
     if options['sub'] != None:
         flagsub=True
         print("Plotting subcomponents ")
 #        print("Warning: Subcomponents and Model will not match within the convolution box ")
 
-################################
+################## search arguments after the option:
     if flagpa == True:
         opt={}
         OptionHandle="--pa"
@@ -142,7 +146,7 @@ def main():
     minlevel=-100  # minimun value for sky
 
 
-    limx,limy=EllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, skylevel=skylevel,
+    limx,limy=EllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, skylevel=skylevel,
               n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1)
 
 
@@ -171,7 +175,7 @@ def main():
         Comps,N=ReadNComp(galfile,xc,yc)
 
 
-        SubComp(namesub,N,Comps,mgzpt,exptime,scale,xc,yc,q,ang,skylevel=skylevel,
+        SubComp(namesub,N,Comps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,skylevel=skylevel,
               n_sectors=numsectors, badpixels=mask, minlevel=minlevel)
 
 
@@ -189,7 +193,7 @@ def main():
 ########################################################
 
     MulEllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q,
-        ang, galfile, limx, flaglogx, flagsub, namesub, N, Comps, skylevel=skylevel, n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1,nameplt="SectorGalaxy.png")
+        ang, galfile, limx, flaglogx, flagsub, flagpix, namesub, N, Comps, skylevel=skylevel, n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1,nameplt="SectorGalaxy.png")
 
 
 
@@ -216,7 +220,7 @@ def main():
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 
 
-def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, skylevel=0, badpixels=None,
+def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, skylevel=0, badpixels=None,
               n_sectors=19, mask=None, minlevel=0, plot=False):
 
     namesec=namefile + "-gal.png"
@@ -289,7 +293,12 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 
     aellabg= mgerad * np.sqrt((np.sin(mgeanrad)**2)/ab**2 + np.cos(mgeanrad)**2)
 
-    aellarcg=aellabg*plate
+
+    if flagpix is False:
+        aellarcg=aellabg*plate
+    else:
+        aellarcg=aellabg
+
 
 ####
 # formula according to cappellary mge manual:
@@ -338,8 +347,10 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 
     aellabm= mgerad * np.sqrt((np.sin(mgeanrad)**2)/ab**2 + np.cos(mgeanrad)**2)
 
-
-    aellarcm=aellabm*plate
+    if flagpix is False:
+        aellarcm=aellabm*plate
+    else:
+        aellarcm=aellabm
 
     # formula according to cappellary mge manual
 
@@ -360,7 +371,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     ###############
     ################
 
-    limx,limy=PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flaglogx)
+    limx,limy=PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flaglogx,flagpix)
 
     ####### Read Gaussians from GALFIT
 #    (magas,fwhmgas,qgas,pagas)=ReadGauss(xc,yc,galfile)
@@ -391,7 +402,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 
 
 
-def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag):
+def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix):
     """
     Produces final best-fitting plot
 
@@ -416,7 +427,12 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag):
     plt.xlim(xran)
     plt.ylim(yran)
 
-    plt.xlabel("arcsec")
+
+    if flagpix is False:
+        plt.xlabel("radius ('')")
+    else:
+        plt.xlabel("radius (pixels)")
+
     plt.ylabel("mag/''")
 
     plt.gca().invert_yaxis()
@@ -433,7 +449,7 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag):
 ##########################################################
 ##########################################################
 
-def SubComp(namesub,N,Comps,mgzpt,exptime,plate,xc,yc,q,ang,skylevel=0,
+def SubComp(namesub,N,Comps,mgzpt,exptime,plate,xc,yc,q,ang,flagpix,skylevel=0,
     n_sectors=19, badpixels=None, minlevel=0):
 
     errmsg="file {} does not exist".format(namesub)
@@ -511,7 +527,10 @@ def SubComp(namesub,N,Comps,mgzpt,exptime,plate,xc,yc,q,ang,skylevel=0,
 
         aellabg= mgerad * np.sqrt((np.sin(mgeanrad)**2)/ab**2 + np.cos(mgeanrad)**2)
 
-        aellarcg=aellabg*plate
+        if flagpix is False:
+            aellarcg=aellabg*plate
+        else:
+            aellarcg=aellabg
 
 # formula according to cappellary mge manual
 
@@ -555,7 +574,7 @@ def PlotSub(xradq,ysbq,nsub):
 ############################
 
 
-def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, limx, flag, flagsub, namesub, N, Comps, skylevel=0, badpixels=None,
+def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, limx, flag, flagsub, flagpix, namesub, N, Comps, skylevel=0, badpixels=None,
               n_sectors=19, mask=None, minlevel=0, plot=False, nameplt=None):
 
 
@@ -613,7 +632,11 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     stidx = np.argsort(sg.radius)
 
 #   galaxy
-    mgerad=sg.radius[stidx]*plate
+    if flagpix is False:
+        mgerad=sg.radius[stidx]*plate
+    else:
+        mgerad=sg.radius[stidx]
+
     mgecount=sg.counts[stidx]
     mgeangle=sg.angle[stidx]
     mgeanrad=np.deg2rad(mgeangle)
@@ -623,7 +646,11 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
     stidx = np.argsort(sm.radius)
 
-    mgemodrad=sm.radius[stidx]*plate
+    if flagpix is False:
+        mgemodrad=sm.radius[stidx]*plate
+    else:
+        mgemodrad=sm.radius[stidx]
+
     mgemodcount=sm.counts[stidx]
     mgemodangle=sm.angle[stidx]
     mgemodanrad=np.deg2rad(mgemodangle)
@@ -672,7 +699,11 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
             subidx = np.argsort(subcmp.radius)
 
-            temprad=subcmp.radius[subidx]*plate
+            if flagpix is False:
+                temprad=subcmp.radius[subidx]*plate
+            else:
+                temprad=subcmp.radius[subidx]
+
             mgecountsub=subcmp.counts[subidx]
 
             tempangle=subcmp.angle[subidx]
@@ -710,8 +741,14 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     fig.text(0.04, 0.5, 'Surface brightness', va='center', rotation='vertical')
     fig.text(0.96, 0.5, 'error (%)', va='center', rotation='vertical')
 
-    ax[-1, 0].set_xlabel("arcsec")
-    ax[-1, 1].set_xlabel("arcsec")
+    if flagpix is False:
+        ax[-1, 0].set_xlabel("radius ('')")
+        ax[-1, 1].set_xlabel("radius ('')")
+    else:
+        ax[-1, 0].set_xlabel("radius (pixels)")
+        ax[-1, 1].set_xlabel("radius (pixels)")
+
+
 
 #    row = 0
     row = 7
