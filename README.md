@@ -91,6 +91,9 @@ than those coming from IRAF's ellipse since this program leaves fixed
 the axis ratio for the whole galaxy while IRAF's ellipse
 can change axis ratio for each isophote.
 
+Note 2: EllipSectGalfit already uses your mask (option "F)" GALFIT) if this
+is a FITS image.  
+
 
 #### Warning
 Be sure to run this code in the same path that you run GALFIT.
