@@ -19,13 +19,14 @@ def main():
 
     if (len(sys.argv[1:]) == 0):
         print ('Missing arguments')
-        print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] " % (sys.argv[0]))
+        print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] [--ranx Value] " % (sys.argv[0]))
         print ("GALFITOutputFile: GALFIT output file ")
         print ("logx: activates X-axis as logarithm ")
         print ("q: introduce axis ratio ")
         print ("pa: introduce position angle (same as GALFIT) ")
         print ("sub: plots subcomponents ")
         print ("pix: plot the x-axis in pixels ")
+        print ("ranx: constant that multiplies the range of the x axis")
 
 #        print ("init: plots initial parameter model from subcomponents ")
         print ("Example:\n %s galfit.01 --logx" % (sys.argv[0]))
@@ -37,16 +38,19 @@ def main():
     flagpa=False
     flagsub=False
     flagpix=False
+    flagranx=False
+
 
 # init values
     qarg=1
     parg=0
+    ranx=1
 
 ## init sub values
     Comps=np.array([False])
     N=0
 
-    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix']
+    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
@@ -59,6 +63,8 @@ def main():
         flagpa=True
     if options['pix'] != None:
         flagpix=True
+    if options['ranx'] != None:
+        flagranx=True
     if options['sub'] != None:
         flagsub=True
         print("Plotting subcomponents ")
@@ -76,6 +82,12 @@ def main():
         OptionHandle="--q"
         opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         qarg=np.float(opt['q'])
+
+    if flagranx == True:
+        opt={}
+        OptionHandle="--ranx"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        ranx=np.float(opt['ranx'])
 
 
     galfile= sys.argv[1]
@@ -146,7 +158,7 @@ def main():
     minlevel=-100  # minimun value for sky
 
 
-    limx,limy=EllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, skylevel=skylevel,
+    limx,limy=EllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, ranx, skylevel=skylevel,
               n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1)
 
 
@@ -193,7 +205,7 @@ def main():
 ########################################################
 
     MulEllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q,
-        ang, galfile, limx, flaglogx, flagsub, flagpix, namesub, N, Comps, skylevel=skylevel, n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1,nameplt="SectorGalaxy.png")
+        ang, galfile, limx, flaglogx, flagsub, flagpix, namesub, N, Comps, ranx, skylevel=skylevel, n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1,nameplt="SectorGalaxy.png")
 
 
 
@@ -220,7 +232,7 @@ def main():
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 
 
-def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, skylevel=0, badpixels=None,
+def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, ranx, skylevel=0, badpixels=None,
               n_sectors=19, mask=None, minlevel=0, plot=False):
 
     namesec=namefile + "-gal.png"
@@ -267,7 +279,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 ###############################
 #  galaxy:
 
-    g = sectors_photometry(img, eps, angsec, xctemp, yctemp,minlevel=minlevel,
+    g = sectors_photometry(img, eps, angsec, xctemp, yctemp, minlevel=minlevel,
             plot=1, badpixels=maskb, n_sectors=n_sectors)
 
 
@@ -371,7 +383,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     ###############
     ################
 
-    limx,limy=PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flaglogx,flagpix)
+    limx,limy=PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flaglogx,flagpix,ranx)
 
     ####### Read Gaussians from GALFIT
 #    (magas,fwhmgas,qgas,pagas)=ReadGauss(xc,yc,galfile)
@@ -402,7 +414,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 
 
 
-def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix):
+def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,ranx):
     """
     Produces final best-fitting plot
 
@@ -415,7 +427,7 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix):
 ###  set limits
 
     minrad = np.min(xradq)
-    maxrad = np.max(xradq)
+    maxrad = np.max(xradq) * ranx
     mincnt = np.min(ysbq)
     maxcnt = np.max(ysbq)
     xran = minrad * (maxrad/minrad)**np.array([-0.02, +1.02])
@@ -574,7 +586,7 @@ def PlotSub(xradq,ysbq,nsub):
 ############################
 
 
-def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, limx, flag, flagsub, flagpix, namesub, N, Comps, skylevel=0, badpixels=None,
+def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, limx, flag, flagsub, flagpix, namesub, N, Comps, ranx, skylevel=0, badpixels=None,
               n_sectors=19, mask=None, minlevel=0, plot=False, nameplt=None):
 
 
@@ -721,7 +733,7 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
 
     minrad = np.min(mgerad)
-    maxrad = np.max(mgerad)
+    maxrad = np.max(mgerad)*ranx
     minsb = np.min(mgesb)
     maxsb = np.max(mgesb)
     xran = minrad * (maxrad/minrad)**np.array([-0.02, +1.02])
