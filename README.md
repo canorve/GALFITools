@@ -1,17 +1,16 @@
 # GALFITools
 
 
-GALFITools is a collection of
-programs written in python which helps
-the GALFIT's user to make masks, and aid
-fitting analysis.
+GALFITools is a collection of Python 
+scripts that I have used to improve the 
+output analysis of GALFIT.
 
 ## Installation
 
 Copy or clone this code. These codes are
 written for python 3.
 
-The python libraries need to be installed are:
+The python libraries used for those scripts are:
 - numpy
 - sys
 - os
