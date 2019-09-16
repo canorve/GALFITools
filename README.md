@@ -23,7 +23,7 @@ The python libraries need to be installed are:
 
 The main programs are:
 - BorderMask.py
-- ElipSectGalfit.py
+- EllipSectGalfit.py
 - MaskBox.py
 - GetK.pl
 - GalfitSky.py
