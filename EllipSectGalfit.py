@@ -19,7 +19,7 @@ def main():
 
     if (len(sys.argv[1:]) == 0):
         print ('Missing arguments')
-        print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] [--ranx Value] " % (sys.argv[0]))
+        print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] [--ranx/y Value] [--noplot] " % (sys.argv[0]))
         print ("GALFITOutputFile: GALFIT output file ")
         print ("logx: activates X-axis as logarithm ")
         print ("q: introduce axis ratio ")
@@ -27,6 +27,9 @@ def main():
         print ("sub: plots subcomponents ")
         print ("pix: plot the x-axis in pixels ")
         print ("ranx: constant that multiplies the range of the x axis")
+        print ("rany: constant that multiplies the range of the y axis")
+        print ("noplot: do not display images")
+
 
 #        print ("init: plots initial parameter model from subcomponents ")
         print ("Example:\n %s galfit.01 --logx" % (sys.argv[0]))
@@ -39,18 +42,22 @@ def main():
     flagsub=False
     flagpix=False
     flagranx=False
+    flagrany=False
+    flagnoplot=False
 
 
 # init values
     qarg=1
     parg=0
     ranx=1
+    rany=1
+    dplot=True
 
 ## init sub values
     Comps=np.array([False])
     N=0
 
-    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx']
+    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--noplot']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
@@ -65,10 +72,16 @@ def main():
         flagpix=True
     if options['ranx'] != None:
         flagranx=True
+    if options['rany'] != None:
+        flagrany=True
     if options['sub'] != None:
         flagsub=True
         print("Plotting subcomponents ")
 #        print("Warning: Subcomponents and Model will not match within the convolution box ")
+    if options['noplot'] != None:
+        flagnoplot=True
+        print("images will not be displayed")
+
 
 ################## search arguments after the option:
     if flagpa == True:
@@ -88,6 +101,15 @@ def main():
         OptionHandle="--ranx"
         opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         ranx=np.float(opt['ranx'])
+
+    if flagrany == True:
+        opt={}
+        OptionHandle="--rany"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        rany=np.float(opt['rany'])
+
+    if flagnoplot == True:
+        dplot=False
 
 
     galfile= sys.argv[1]
@@ -158,8 +180,8 @@ def main():
     minlevel=-100  # minimun value for sky
 
 
-    limx,limy=EllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, ranx, skylevel=skylevel,
-              n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1)
+    limx,limy=EllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, ranx, rany, skylevel=skylevel,
+              n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=dplot)
 
 
 ##############################################
@@ -195,27 +217,27 @@ def main():
 ##############################################
 ##############################################
 
-
-    plt.pause(1)
+    if dplot:
+        plt.pause(1)
     plt.savefig(namepng)
-
 
 ########################################################
 ################ Multiplots: ###########################
 ########################################################
 
     MulEllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q,
-        ang, galfile, limx, flaglogx, flagsub, flagpix, namesub, N, Comps, ranx, skylevel=skylevel, n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=1,nameplt="SectorGalaxy.png")
+        ang, galfile, limx, flaglogx, flagsub, flagpix, namesub, N, Comps, ranx, rany, skylevel=skylevel, n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=dplot)
 
 
+    if dplot:
+        plt.pause(1)
 
-    plt.pause(1)
     plt.savefig(namemul)
 
     if mask != None:
         os.remove(mask)
 
-    print("Fin.")
+#    print("Fin.")
 
 ##############       #############
 ##############  END  #############
@@ -232,7 +254,7 @@ def main():
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 
 
-def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, ranx, skylevel=0, badpixels=None,
+def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, ranx, rany, skylevel=0, badpixels=None,
               n_sectors=19, mask=None, minlevel=0, plot=False):
 
     namesec=namefile + "-gal.png"
@@ -280,12 +302,15 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 #  galaxy:
 
     g = sectors_photometry(img, eps, angsec, xctemp, yctemp, minlevel=minlevel,
-            plot=1, badpixels=maskb, n_sectors=n_sectors)
+            plot=plot, badpixels=maskb, n_sectors=n_sectors)
+
+#    g = sectors_photometry(img, eps, angsec, xctemp, yctemp, minlevel=minlevel,
+#            plot=1, badpixels=maskb, n_sectors=n_sectors)
 
 
     if plot:
-        plt.savefig(namesec)
         plt.pause(1)  # Allow plot to appear on the screen
+        plt.savefig(namesec)
 
 
 ###################################################
@@ -334,12 +359,15 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 
     #  model:
     m = sectors_photometry(model, eps, angsec, xctemp, yctemp,minlevel=minlevel,
-            plot=1, badpixels=maskb, n_sectors=n_sectors)
+            plot=plot, badpixels=maskb, n_sectors=n_sectors)
+
+#    m = sectors_photometry(model, eps, angsec, xctemp, yctemp,minlevel=minlevel,
+#            plot=1, badpixels=maskb, n_sectors=n_sectors)
 
 
     if plot:
-        plt.savefig(namemod)
         plt.pause(1)  # Allow plot to appear on the screen
+        plt.savefig(namemod)
 
 
     ###################################################
@@ -383,7 +411,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     ###############
     ################
 
-    limx,limy=PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flaglogx,flagpix,ranx)
+    limx,limy=PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flaglogx,flagpix,ranx,rany)
 
     ####### Read Gaussians from GALFIT
 #    (magas,fwhmgas,qgas,pagas)=ReadGauss(xc,yc,galfile)
@@ -414,7 +442,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 
 
 
-def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,ranx):
+def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,ranx,rany):
     """
     Produces final best-fitting plot
 
@@ -434,6 +462,21 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,ranx):
     yran = mincnt * (maxcnt/mincnt)**np.array([-0.05, +1.05])
 
     plt.errorbar(xradq, ysbq,yerr=ysberrq,fmt='o-',capsize=2,color='red',markersize=0.7,label="galaxy")
+
+    yran1=yran[0]
+    yran2=yran[1]
+
+    lyran= yran2 - yran1
+
+    yranmid= yran1 + lyran/2
+
+    lyran=lyran*rany
+
+    yran1 = yranmid - lyran/2
+    yran2 = yranmid + lyran/2
+
+    yran[0] = yran1
+    yran[1] = yran2
 
 
     plt.xlim(xran)
@@ -586,8 +629,8 @@ def PlotSub(xradq,ysbq,nsub):
 ############################
 
 
-def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, limx, flag, flagsub, flagpix, namesub, N, Comps, ranx, skylevel=0, badpixels=None,
-              n_sectors=19, mask=None, minlevel=0, plot=False, nameplt=None):
+def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, limx, flag, flagsub, flagpix, namesub, N, Comps, ranx, rany, skylevel=0, badpixels=None,
+              n_sectors=19, mask=None, minlevel=0, plot=False):
 
 
     img = img - skylevel
@@ -633,11 +676,11 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 ######################
 
     sg = sectors_photometry(img, eps, angsec, xc, yc,minlevel=minlevel,
-            plot=1, badpixels=maskb, n_sectors=n_sectors)
+            plot=plot, badpixels=maskb, n_sectors=n_sectors)
 
 
     sm = sectors_photometry(model, eps, angsec, xc, yc,minlevel=minlevel,
-            plot=1, badpixels=maskb, n_sectors=n_sectors)
+            plot=plot, badpixels=maskb, n_sectors=n_sectors)
 
 ###################################################
 
@@ -738,6 +781,24 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     maxsb = np.max(mgesb)
     xran = minrad * (maxrad/minrad)**np.array([-0.02, +1.02])
     yran = minsb * (maxsb/minsb)**np.array([+1.05,-0.05])
+
+    yran1=yran[0]
+    yran2=yran[1]
+
+    lyran= yran2 - yran1
+
+    yranmid= yran1 + lyran/2
+
+    lyran=lyran*rany
+
+    yran1 = yranmid - lyran/2
+    yran2 = yranmid + lyran/2
+
+    yran[0] = yran1
+    yran[1] = yran2
+
+
+
 
 
     sectors = np.unique(mgeangle)
