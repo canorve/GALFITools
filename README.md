@@ -78,6 +78,10 @@ pix: plot the x-axis in pixels
 
 ranx: constant that multiplies the range of the x axis
 
+rany: constant that multiplies the range of the y axis
+
+noplot: do not display images
+
 Example:
  EllipSectGalfit.py galfit.01 --logx
 

@@ -824,7 +824,8 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
 
 #    row = 0
-    row = 7
+#    row = 7 # old values
+    row = nrows -1
     for j in range(0, n, dn):
         w = np.nonzero(mgeangle == sectors[j])[0]
         w = w[np.argsort(mgerad[w])]
