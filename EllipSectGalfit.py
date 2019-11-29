@@ -331,7 +331,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     aellabg= mgerad * np.sqrt((np.sin(mgeanrad)**2)/ab**2 + np.cos(mgeanrad)**2)
 
 
-    if flagpix is False:
+    if flagpix == False:
         aellarcg=aellabg*plate
     else:
         aellarcg=aellabg
@@ -387,7 +387,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 
     aellabm= mgerad * np.sqrt((np.sin(mgeanrad)**2)/ab**2 + np.cos(mgeanrad)**2)
 
-    if flagpix is False:
+    if flagpix == False:
         aellarcm=aellabm*plate
     else:
         aellarcm=aellabm
@@ -483,7 +483,7 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,ranx,rany):
     plt.ylim(yran)
 
 
-    if flagpix is False:
+    if flagpix == False:
         plt.xlabel("radius ('')")
     else:
         plt.xlabel("radius (pixels)")
@@ -582,7 +582,7 @@ def SubComp(namesub,N,Comps,mgzpt,exptime,plate,xc,yc,q,ang,flagpix,skylevel=0,
 
         aellabg= mgerad * np.sqrt((np.sin(mgeanrad)**2)/ab**2 + np.cos(mgeanrad)**2)
 
-        if flagpix is False:
+        if flagpix == False:
             aellarcg=aellabg*plate
         else:
             aellarcg=aellabg
@@ -687,7 +687,7 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     stidx = np.argsort(sg.radius)
 
 #   galaxy
-    if flagpix is False:
+    if flagpix == False:
         mgerad=sg.radius[stidx]*plate
     else:
         mgerad=sg.radius[stidx]
@@ -701,7 +701,7 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
     stidx = np.argsort(sm.radius)
 
-    if flagpix is False:
+    if flagpix == False:
         mgemodrad=sm.radius[stidx]*plate
     else:
         mgemodrad=sm.radius[stidx]
@@ -754,7 +754,7 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
             subidx = np.argsort(subcmp.radius)
 
-            if flagpix is False:
+            if flagpix == False:
                 temprad=subcmp.radius[subidx]*plate
             else:
                 temprad=subcmp.radius[subidx]
@@ -814,7 +814,7 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     fig.text(0.04, 0.5, 'Surface brightness', va='center', rotation='vertical')
     fig.text(0.96, 0.5, 'error (%)', va='center', rotation='vertical')
 
-    if flagpix is False:
+    if flagpix == False:
         ax[-1, 0].set_xlabel("radius ('')")
         ax[-1, 1].set_xlabel("radius ('')")
     else:
