@@ -14,6 +14,9 @@ import mimetypes
 
 from mgefit.sectors_photometry import sectors_photometry
 
+from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,NullFormatter,
+                               AutoMinorLocator,LogLocator,LinearLocator,AutoLocator)
+
 
 def main():
 
@@ -184,33 +187,10 @@ def main():
               n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=dplot)
 
 
-##############################################
-##############################################
-#### Creating Subcomponents Galfit output file
-    Comps=[]
+    Comps,N=ReadNComp(galfile,xc,yc)
 
-    if flagsub:
+    print("Number of components = ",N)
 
-#        if (not(os.path.isfile(namesub))):
-
-
-        print("running galfit to create subcomponents...")
-
-        rungal = "galfit -o3 {}".format(galfile)
-        errgal = sp.run([rungal], shell=True, stdout=sp.PIPE,
-        stderr=sp.PIPE, universal_newlines=True)
-
-        runchg = "mv subcomps.fits {}".format(namesub)
-        errchg = sp.run([runchg], shell=True, stdout=sp.PIPE,
-        stderr=sp.PIPE, universal_newlines=True)
-
-
-    # read number of components
-        Comps,N=ReadNComp(galfile,xc,yc)
-
-
-        SubComp(namesub,N,Comps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,skylevel=skylevel,
-              n_sectors=numsectors, badpixels=mask, minlevel=minlevel)
 
 
 ##############################################
@@ -218,8 +198,10 @@ def main():
 ##############################################
 
     if dplot:
-        plt.pause(1)
+        plt.pause(1.5)
     plt.savefig(namepng)
+    plt.close()
+
 
 ########################################################
 ################ Multiplots: ###########################
@@ -230,9 +212,11 @@ def main():
 
 
     if dplot:
-        plt.pause(1)
+        plt.pause(1.5)
 
     plt.savefig(namemul)
+    plt.close()
+
 
     if mask != None:
         os.remove(mask)
@@ -259,6 +243,9 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 
     namesec=namefile + "-gal.png"
     namemod=namefile + "-mod.png"
+    namesub=namefile + "-sub.fits"
+
+#    print("skylevel ",skylevel)
 
 # removing background:
     img = img - skylevel
@@ -330,11 +317,8 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 
     aellabg= mgerad * np.sqrt((np.sin(mgeanrad)**2)/ab**2 + np.cos(mgeanrad)**2)
 
-
-    if flagpix == False:
-        aellarcg=aellabg*plate
-    else:
-        aellarcg=aellabg
+    #changing to arc sec
+    aellarcg=aellabg*plate
 
 
 ####
@@ -364,12 +348,10 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 #    m = sectors_photometry(model, eps, angsec, xctemp, yctemp,minlevel=minlevel,
 #            plot=1, badpixels=maskb, n_sectors=n_sectors)
 
-
     if plot:
         plt.pause(1)  # Allow plot to appear on the screen
         plt.savefig(namemod)
-
-
+#        plt.clf()
     ###################################################
 
     stidxm = np.argsort(m.radius)
@@ -387,10 +369,8 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 
     aellabm= mgerad * np.sqrt((np.sin(mgeanrad)**2)/ab**2 + np.cos(mgeanrad)**2)
 
-    if flagpix == False:
-        aellarcm=aellabm*plate
-    else:
-        aellarcm=aellabm
+
+    aellarcm=aellabm*plate
 
     # formula according to cappellary mge manual
 
@@ -411,7 +391,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     ###############
     ################
 
-    limx,limy=PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flaglogx,flagpix,ranx,rany)
+    limx,limy,axsec=PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flaglogx,flagpix,ranx,rany,plate)
 
     ####### Read Gaussians from GALFIT
 #    (magas,fwhmgas,qgas,pagas)=ReadGauss(xc,yc,galfile)
@@ -433,8 +413,42 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 
 #        PloTotal(magas,fwhmgas*plate,qgas,pagas,magser,reser*plate,nser,qser,paser,magexp,rsexp*plate,qexp,paexp,ang,limx)
 
+#    plt.legend(loc=1)
 
-    plt.legend(loc=1)
+
+##############################################
+##############################################
+#### Creating Subcomponents Galfit output file
+    Comps=[]
+
+    if flagsub:
+
+#        if (not(os.path.isfile(namesub))):
+
+        print("running galfit to create subcomponents...")
+
+        rungal = "galfit -o3 {}".format(galfile)
+        errgal = sp.run([rungal], shell=True, stdout=sp.PIPE,
+        stderr=sp.PIPE, universal_newlines=True)
+
+        runchg = "mv subcomps.fits {}".format(namesub)
+        errchg = sp.run([runchg], shell=True, stdout=sp.PIPE,
+        stderr=sp.PIPE, universal_newlines=True)
+
+
+    # read number of components
+        Comps,N=ReadNComp(galfile,xc,yc)
+
+
+        xradq,ysbq,n=SubComp(namesub,N,Comps,mgzpt,exptime,plate,xc,yc,q,ang,flagpix,axsec,skylevel=skylevel,
+              n_sectors=n_sectors, badpixels=badpixels, minlevel=minlevel)
+
+
+#    PlotSub(xradq,ysbq,n,axsec)
+
+    axsec.legend(loc=1)
+
+#    plt.legend(loc=1)
 
 
     return limx,limy
@@ -442,17 +456,22 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 
 
 
-def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,ranx,rany):
+def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,ranx,rany,plate):
     """
     Produces final best-fitting plot
 
     """
 
-        # Select an x and y plot range that is the same for all plots
-        #
+    # Select an x and y plot range that is the same for all plots
+    #
+    fig, axsec = plt.subplots()
 
-    plt.clf()
+#    axsec.clear()
+#    plt.clf()
 ###  set limits
+
+#    plate=1
+
 
     minrad = np.min(xradq)
     maxrad = np.max(xradq) * ranx
@@ -461,7 +480,6 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,ranx,rany):
     xran = minrad * (maxrad/minrad)**np.array([-0.02, +1.02])
     yran = mincnt * (maxcnt/mincnt)**np.array([-0.05, +1.05])
 
-    plt.errorbar(xradq, ysbq,yerr=ysberrq,fmt='o-',capsize=2,color='red',markersize=0.7,label="galaxy")
 
     yran1=yran[0]
     yran2=yran[1]
@@ -475,36 +493,95 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,ranx,rany):
     yran1 = yranmid - lyran/2
     yran2 = yranmid + lyran/2
 
-    yran[0] = yran1
-    yran[1] = yran2
+#    yran[0] = yran1
+#    yran[1] = yran2
+
+    yran[0] = yran2 #inverted axis
+    yran[1] = yran1
 
 
-    plt.xlim(xran)
-    plt.ylim(yran)
+    axsec.set_xlabel("radius ('')")
+    axsec.set_ylabel("mag/''")
 
+    axsec.errorbar(xradq, ysbq,yerr=ysberrq,fmt='o-',capsize=2,color='red',markersize=0.7,label="galaxy")
+    axsec.errorbar(xradm, ysbm,yerr=ysberrm,fmt='o-',capsize=2,color='blue',markersize=0.7,label="Model")
+    axsec.set_xlim(xran)
+    axsec.set_ylim(yran)
 
-    if flagpix == False:
-        plt.xlabel("radius ('')")
-    else:
-        plt.xlabel("radius (pixels)")
-
-    plt.ylabel("mag/''")
-
-    plt.gca().invert_yaxis()
-
-    plt.errorbar(xradm, ysbm,yerr=ysberrm,fmt='o-',capsize=2,color='blue',markersize=0.7,label="Model")
 
     if flag == True:
-        plt.xscale("log")
 
-    return xran,yran
+        axsec.set_xscale("log")
+
+        locmaj = LogLocator(base=10,numticks=12)
+        axsec.xaxis.set_major_locator(locmaj)
+
+        locmin = LogLocator(base=10.0,subs=(0.2,0.4,0.6,0.8),numticks=12)
+        axsec.xaxis.set_minor_locator(locmin)
+        axsec.xaxis.set_minor_formatter(NullFormatter())
+
+    else:
+        axsec.xaxis.set_minor_locator(AutoMinorLocator())
+        axsec.xaxis.set_major_locator(AutoLocator())
+
+
+    axsec.tick_params(which='both', width=2)
+    axsec.tick_params(which='major', length=7)
+    axsec.tick_params(which='minor', length=4, color='r')
+
+    axsec.yaxis.set_minor_locator(AutoMinorLocator())
+    axsec.yaxis.set_major_locator(AutoLocator())
+
+    if flagpix == True:
+
+        axpix = axsec.twiny()
+
+        axpix.set_xlabel("(pixels)")
+        x1, x2 = axsec.get_xlim()
+
+        axpix.set_xlim(x1/plate, x2/plate)
+
+#        axpix.errorbar(xradm, ysbm,yerr=ysberrm,fmt='o-',capsize=2,color='cyan',markersize=0.7,label="Model")
+#        axpix.errorbar(xradq, ysbq,yerr=ysberrq,fmt='o-',capsize=2,color='magenta',markersize=0.7,label="galaxy")
+
+        axpix.figure.canvas.draw()
+
+
+        if flag == True:
+            axpix.set_xscale("log")
+            locmaj = LogLocator(base=10,numticks=12)
+            axpix.xaxis.set_major_locator(locmaj)
+
+            locmin = LogLocator(base=10.0,subs=(0.2,0.4,0.6,0.8),numticks=12)
+            axpix.xaxis.set_minor_locator(locmin)
+            axpix.xaxis.set_minor_formatter(NullFormatter())
+
+        else:
+            axpix.xaxis.set_minor_locator(AutoMinorLocator())
+            axpix.xaxis.set_major_locator(AutoLocator())
+
+        axpix.tick_params(which='both', width=2)
+        axpix.tick_params(which='major', length=7)
+        axpix.tick_params(which='minor', length=4, color='r')
+
+        axret=axsec
+    else:
+#        axsec.errorbar(xradq, ysbq,yerr=ysberrq,fmt='o-',capsize=2,color='red',markersize=0.7,label="galaxy")
+#        axsec.errorbar(xradm, ysbm,yerr=ysberrm,fmt='o-',capsize=2,color='blue',markersize=0.7,label="Model")
+        axret=axsec
+
+
+    return xran,yran,axret
+
+
+
 
 
 ##########################################################
 ##########################################################
 ##########################################################
 
-def SubComp(namesub,N,Comps,mgzpt,exptime,plate,xc,yc,q,ang,flagpix,skylevel=0,
+def SubComp(namesub,N,Comps,mgzpt,exptime,plate,xc,yc,q,ang,flagpix,axsec,skylevel=0,
     n_sectors=19, badpixels=None, minlevel=0):
 
     errmsg="file {} does not exist".format(namesub)
@@ -513,6 +590,7 @@ def SubComp(namesub,N,Comps,mgzpt,exptime,plate,xc,yc,q,ang,flagpix,skylevel=0,
     hdu = fits.open(namesub)
 
     subimgs=[]
+
 
     cnt=0  # image =0 do not count
     while(cnt<len(Comps)):
@@ -582,12 +660,12 @@ def SubComp(namesub,N,Comps,mgzpt,exptime,plate,xc,yc,q,ang,flagpix,skylevel=0,
 
         aellabg= mgerad * np.sqrt((np.sin(mgeanrad)**2)/ab**2 + np.cos(mgeanrad)**2)
 
-        if flagpix == False:
-            aellarcg=aellabg*plate
-        else:
-            aellarcg=aellabg
+        #converting to arcsec
 
-# formula according to cappellary mge manual
+        aellarcg=aellabg*plate
+
+
+        # formula according to cappellary mge manual
 
         mgesbg= mgzpt - 2.5*np.log10(mgecount/exptime) + 2.5*np.log10(plate**2) + 0.1
 
@@ -600,8 +678,7 @@ def SubComp(namesub,N,Comps,mgzpt,exptime,plate,xc,yc,q,ang,flagpix,skylevel=0,
         xradq, ysbq, ysberrq    = FindSB(xarcg, ymgeg, n_sectors)
 
 
-
-        PlotSub(xradq,ysbq,n)
+        PlotSub(xradq,ysbq,n,axsec)
 
         n=n+1
 
@@ -611,7 +688,7 @@ def SubComp(namesub,N,Comps,mgzpt,exptime,plate,xc,yc,q,ang,flagpix,skylevel=0,
 
 
 
-def PlotSub(xradq,ysbq,nsub):
+def PlotSub(xradq,ysbq,nsub,axsec):
     """
     Produces subcomponent plot
 
@@ -619,9 +696,11 @@ def PlotSub(xradq,ysbq,nsub):
 
     substr="component "+np.str(nsub+1)
 
-    plt.plot(xradq, ysbq,'--',color='cyan',linewidth=4,markersize=0.7,label=substr)
+#    plt.plot(xradq, ysbq,'--',color='cyan',linewidth=4,markersize=0.7,label=substr)
+    axsec.plot(xradq, ysbq,'--',color='skyblue',linewidth=4,markersize=0.7,label=substr)
 
-    plt.legend(loc=1)
+
+#    plt.legend(loc=1)
 
 
 ###########################
@@ -676,21 +755,21 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 ######################
 
     sg = sectors_photometry(img, eps, angsec, xc, yc,minlevel=minlevel,
-            plot=plot, badpixels=maskb, n_sectors=n_sectors)
+            plot=False, badpixels=maskb, n_sectors=n_sectors)
 
 
     sm = sectors_photometry(model, eps, angsec, xc, yc,minlevel=minlevel,
-            plot=plot, badpixels=maskb, n_sectors=n_sectors)
+            plot=False, badpixels=maskb, n_sectors=n_sectors)
 
 ###################################################
 
     stidx = np.argsort(sg.radius)
 
 #   galaxy
-    if flagpix == False:
-        mgerad=sg.radius[stidx]*plate
-    else:
-        mgerad=sg.radius[stidx]
+#    if flagpix == False:
+#        mgerad=sg.radius[stidx]*plate
+#    else:
+    mgerad=sg.radius[stidx]
 
     mgecount=sg.counts[stidx]
     mgeangle=sg.angle[stidx]
@@ -701,15 +780,20 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
     stidx = np.argsort(sm.radius)
 
-    if flagpix == False:
-        mgemodrad=sm.radius[stidx]*plate
-    else:
-        mgemodrad=sm.radius[stidx]
+#    if flagpix == False:
+#        mgemodrad=sm.radius[stidx]*plate
+#    else:
+    mgemodrad=sm.radius[stidx]
 
     mgemodcount=sm.counts[stidx]
     mgemodangle=sm.angle[stidx]
     mgemodanrad=np.deg2rad(mgemodangle)
 
+
+    # converting to pixels
+
+    mgerad=mgerad*plate
+    mgemodrad=mgemodrad*plate
 
 
 # formula according to cappellary mge manual
@@ -754,10 +838,13 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
             subidx = np.argsort(subcmp.radius)
 
-            if flagpix == False:
-                temprad=subcmp.radius[subidx]*plate
-            else:
-                temprad=subcmp.radius[subidx]
+#            if flagpix == False:
+#                temprad=subcmp.radius[subidx]*plate
+#            else:
+            temprad=subcmp.radius[subidx]
+
+            #converting to arcsec
+            temprad=temprad*plate
 
             mgecountsub=subcmp.counts[subidx]
 
@@ -799,8 +886,6 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
 
 
-
-
     sectors = np.unique(mgeangle)
     n = sectors.size
     dn = int(round(n/6.))
@@ -808,20 +893,52 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
     plt.clf()
 
-    fig, ax = plt.subplots(nrows, 2, sharex=True, sharey='col', num=fignum)
+    fig, axsec = plt.subplots(nrows, 2, sharex=True, sharey='col', num=fignum)
     fig.subplots_adjust(hspace=0.01)
+
+    if flagpix:
+        axpix = axsec[0,0].twiny()
+        axpix2 = axsec[0,1].twiny()
+
+
+
 
     fig.text(0.04, 0.5, 'Surface brightness', va='center', rotation='vertical')
     fig.text(0.96, 0.5, 'error (%)', va='center', rotation='vertical')
 
-    if flagpix == False:
-        ax[-1, 0].set_xlabel("radius ('')")
-        ax[-1, 1].set_xlabel("radius ('')")
+
+#    if flagpix == False:
+    axsec[-1, 0].set_xlabel("radius ('')")
+    axsec[-1, 1].set_xlabel("radius ('')")
+
+    if flag == True:
+        axsec[-1, 0].xaxis.set_major_locator(LogLocator(base=10.0, numticks=15))
+        if flagpix:
+            axpix.set_xscale("log")
+            axpix2.set_xscale("log")
+
+
     else:
-        ax[-1, 0].set_xlabel("radius (pixels)")
-        ax[-1, 1].set_xlabel("radius (pixels)")
+        axsec[-1, 0].xaxis.set_minor_locator(AutoMinorLocator())
+
+#    axsec[-1, 0].xaxis.set_minor_locator(AutoMinorLocator())
+    axsec[-1, 0].tick_params(which='both', width=2)
+    axsec[-1, 0].tick_params(which='major', length=7)
+    axsec[-1, 0].tick_params(which='minor', length=4, color='r')
+
+    if flag == True:
+        axsec[-1, 0].xaxis.set_major_locator(LogLocator(base=10.0, numticks=15))
+    else:
+        axsec[-1, 0].xaxis.set_minor_locator(AutoMinorLocator())
+#    axsec[-1, 1].xaxis.set_minor_locator(AutoMinorLocator())
+    axsec[-1, 1].tick_params(which='both', width=2)
+    axsec[-1, 1].tick_params(which='major', length=7)
+    axsec[-1, 1].tick_params(which='minor', length=4, color='r')
 
 
+#    else:
+#        ax[-1, 0].set_xlabel("radius (pixels)")
+#        ax[-1, 1].set_xlabel("radius (pixels)")
 
 #    row = 0
 #    row = 7 # old values
@@ -859,22 +976,22 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
         txtang= sectors[j]
         txt = "$%.f^\circ$" % txtang
 
-        ax[row, 0].set_xlim(xran)
-        ax[row, 0].set_ylim(yran)
+        axsec[row, 0].set_xlim(xran)
+        axsec[row, 0].set_ylim(yran)
 
         if flag == False:
-            ax[row, 0].plot(r, mgesb[w], 'C3o')
+            axsec[row, 0].plot(r, mgesb[w], 'C3o')
 
-            ax[row, 0].plot(r2, mgemodsb[wmod], 'C0-', linewidth=2)
+            axsec[row, 0].plot(r2, mgemodsb[wmod], 'C0-', linewidth=2)
 
         else:
-            ax[row, 0].semilogx(r, mgesb[w], 'C3o')
+            axsec[row, 0].semilogx(r, mgesb[w], 'C3o')
 
-            ax[row, 0].semilogx(r2, mgemodsb[wmod], 'C0-', linewidth=2)
+            axsec[row, 0].semilogx(r2, mgemodsb[wmod], 'C0-', linewidth=2)
 
 #########################
 
-
+#        print("flagsub N",flagsub,N)
         if flagsub == True:
 #            PlotMulGauss(magas,fwhmgas*plate,qgas,pagas,90-sectors[j],ax,row,limx,flag)
 #            PlotMulSersic(magser,reser*plate,nser,qser,paser,90-sectors[j],ax,row,limx,flag)
@@ -891,12 +1008,11 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
                 if flag == False:
 
-                    ax[row, 0].plot(rtemp, mgesbsub[ii][wtemp], 'C9--', linewidth=2)
-
+                    axsec[row, 0].plot(rtemp, mgesbsub[ii][wtemp],'--',color='skyblue', linewidth=2)
 
                 else:
 
-                    ax[row, 0].semilogx(rtemp, mgesbsub[ii][wtemp], 'C9--', linewidth=2)
+                    axsec[row, 0].semilogx(rtemp, mgesbsub[ii][wtemp], '--',color='skyblue', linewidth=2)
 
 
                 ii+=1
@@ -904,26 +1020,67 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 #            SubMulComp(namesub,N,Comps,mgzpt,exptime,scale,xc,yc,q,ang,skylevel=skylevel,
 #                n_sectors=numsectors, badpixels=mask, minlevel=minlevel)
 
-        ax[row, 0].text(0.98, 0.95, txt, ha='right', va='top', transform=ax[row, 0].transAxes)
+        axsec[row, 0].text(0.98, 0.95, txt, ha='right', va='top', transform=axsec[row, 0].transAxes)
 
         if (len(mgemodrad) < len(mgerad)):
             sberr=1-mgemodsb[wmod]/mgesb[wmod]
-            ax[row, 1].plot(r2, sberr*100, 'C0o')
+            axsec[row, 1].plot(r2, sberr*100, 'C0o')
         else:
             sberr=1-mgemodsb[w]/mgesb[w]
-            ax[row, 1].plot(r, sberr*100, 'C0o')
+            axsec[row, 1].plot(r, sberr*100, 'C0o')
 
 
-        ax[row, 1].axhline(linestyle='--', color='C1', linewidth=2)
-        ax[row, 1].yaxis.tick_right()
-        ax[row, 1].yaxis.set_label_position("right")
-        ax[row, 1].set_ylim([-19.5, 20])
+        axsec[row, 1].axhline(linestyle='--', color='C1', linewidth=2)
+        axsec[row, 1].yaxis.tick_right()
+        axsec[row, 1].yaxis.set_label_position("right")
+        axsec[row, 1].set_ylim([-19.5, 20])
+
+
+        axsec[row, 0].yaxis.set_minor_locator(AutoMinorLocator())
+        axsec[row, 0].tick_params(which='both', width=2)
+        axsec[row, 0].tick_params(which='major', length=7)
+        axsec[row, 0].tick_params(which='minor', length=4, color='r')
+
+        axsec[row, 1].yaxis.set_minor_locator(AutoMinorLocator())
+        axsec[row, 1].tick_params(which='both', width=2)
+        axsec[row, 1].tick_params(which='major', length=7)
+        axsec[row, 1].tick_params(which='minor', length=4, color='r')
+
 
 #        row += 1
         row -= 1
 
 #    return xrad, ysb, ysberr
 
+    if flagpix == True:
+        axpix.set_xlabel("(pixels)")
+        x1, x2 = axsec[7,0].get_xlim()
+        axpix.set_xlim(x1/plate, x2/plate)
+        axpix.figure.canvas.draw()
+
+        axpix2.set_xlabel("(pixels)")
+        axpix2.set_xlim(x1/plate, x2/plate)
+        axpix2.figure.canvas.draw()
+
+##
+        if flag == True:
+            axpix.xaxis.set_major_locator(LogLocator(base=10.0, numticks=15))
+        else:
+            axpix.xaxis.set_minor_locator(AutoMinorLocator())
+
+#        axpix.xaxis.set_minor_locator(AutoMinorLocator())
+        axpix.tick_params(which='both', width=2)
+        axpix.tick_params(which='major', length=7)
+        axpix.tick_params(which='minor', length=4, color='r')
+
+        if flag == True:
+            axpix2.xaxis.set_major_locator(LogLocator(base=10.0, numticks=15))
+        else:
+            axpix2.xaxis.set_minor_locator(AutoMinorLocator())
+#        axpix2.xaxis.set_minor_locator(AutoMinorLocator())
+        axpix2.tick_params(which='both', width=2)
+        axpix2.tick_params(which='major', length=7)
+        axpix2.tick_params(which='minor', length=4, color='r')
 
 
 
@@ -1255,10 +1412,6 @@ def ReadNComp(inputf,X,Y):
         index += 1
 
     GalfitFile.close()
-
-
-    print("Number of components = ",Ncomp)
-
 
 
     return Comps,Ncomp
