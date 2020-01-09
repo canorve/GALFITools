@@ -28,15 +28,17 @@ def main():
         print ("q: introduce axis ratio ")
         print ("pa: introduce position angle (same as GALFIT) ")
         print ("sub: plots subcomponents ")
-        print ("pix: plot the x-axis in pixels ")
-        print ("ranx: constant that multiplies the range of the x axis")
-        print ("rany: constant that multiplies the range of the y axis")
+        print ("pix: plot the top x-axis in pixels ")
+        print ("ranx: constant that multiplies the range of the x axis or xmin-xmax range")
+        print ("rany: constant that multiplies the range of the y axis or ymin-ymax range")
         print ("noplot: do not display images")
 
 
 #        print ("init: plots initial parameter model from subcomponents ")
         print ("Example:\n %s galfit.01 --logx" % (sys.argv[0]))
-        print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub" % (sys.argv[0]))
+        print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub --ranx 2" % (sys.argv[0]))
+        print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub --ranx 1-20" % (sys.argv[0]))
+
         sys.exit()
 
     flaglogx=False
@@ -44,8 +46,8 @@ def main():
     flagpa=False
     flagsub=False
     flagpix=False
-    flagranx=False
-    flagrany=False
+    flagranx=[False,False]
+    flagrany=[False,False]
     flagnoplot=False
 
 
@@ -74,9 +76,9 @@ def main():
     if options['pix'] != None:
         flagpix=True
     if options['ranx'] != None:
-        flagranx=True
+        flagranx[0]=True
     if options['rany'] != None:
-        flagrany=True
+        flagrany[0]=True
     if options['sub'] != None:
         flagsub=True
         print("Plotting subcomponents ")
@@ -99,17 +101,29 @@ def main():
         opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         qarg=np.float(opt['q'])
 
-    if flagranx == True:
+    if flagranx[0] == True:
         opt={}
         OptionHandle="--ranx"
         opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        ranx=np.float(opt['ranx'])
 
-    if flagrany == True:
+        rangex=opt["ranx"]
+        if "-" in rangex:
+            flagranx[1] = True
+            ranx=opt['ranx']
+        else:
+            ranx=np.float(opt['ranx'])
+
+    if flagrany[0]== True:
         opt={}
         OptionHandle="--rany"
         opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        rany=np.float(opt['rany'])
+
+        rangey=opt["rany"]
+        if "-" in rangey:
+            flagrany[1] = True
+            rany=opt['rany']
+        else:
+            rany=np.float(opt['rany'])
 
     if flagnoplot == True:
         dplot=False
@@ -118,7 +132,6 @@ def main():
     galfile= sys.argv[1]
 
     print("angle in multi-plot is measured from the galaxy's major axis ")
-
 
 
 ################################################
@@ -142,7 +155,6 @@ def main():
 
 ## correction
 #    ang=90+ang
-
 ###
 
     str = "q = {} is used ".format(q)
@@ -183,7 +195,7 @@ def main():
     minlevel=-100  # minimun value for sky
 
 
-    limx,limy=EllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, ranx, rany, skylevel=skylevel,
+    limx,limy=EllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, flagranx, ranx, flagrany, rany, skylevel=skylevel,
               n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=dplot)
 
 
@@ -203,12 +215,13 @@ def main():
     plt.close()
 
 
+
 ########################################################
 ################ Multiplots: ###########################
 ########################################################
 
-    MulEllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q,
-        ang, galfile, limx, flaglogx, flagsub, flagpix, namesub, N, Comps, ranx, rany, skylevel=skylevel, n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=dplot)
+    MulEllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q, ang, galfile,
+         limx, flaglogx,flagsub, flagpix, namesub, N, Comps, flagranx, ranx, flagrany, rany, skylevel=skylevel, n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=dplot)
 
 
     if dplot:
@@ -238,7 +251,7 @@ def main():
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 
 
-def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, ranx, rany, skylevel=0, badpixels=None,
+def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, flagranx, ranx, flagrany, rany, skylevel=0, badpixels=None,
               n_sectors=19, mask=None, minlevel=0, plot=False):
 
     namesec=namefile + "-gal.png"
@@ -391,7 +404,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     ###############
     ################
 
-    limx,limy,axsec=PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flaglogx,flagpix,ranx,rany,plate)
+    limx,limy,axsec=PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flaglogx,flagpix,flagranx,ranx,flagrany,rany,plate)
 
     ####### Read Gaussians from GALFIT
 #    (magas,fwhmgas,qgas,pagas)=ReadGauss(xc,yc,galfile)
@@ -456,7 +469,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 
 
 
-def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,ranx,rany,plate):
+def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flagrany,rany,plate):
     """
     Produces final best-fitting plot
 
@@ -473,31 +486,46 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,ranx,rany,plate):
 #    plate=1
 
 
+    if flagranx[1] == True:
+        (xmin,xmax)=ranx.split("-")
+        xmin=np.float(xmin)
+        xmax=np.float(xmax)
+
+    if flagrany[1] == True:
+        (ymin,ymax)=rany.split("-")
+        ymin=np.float(ymin)
+        ymax=np.float(ymax)
+
+
     minrad = np.min(xradq)
-    maxrad = np.max(xradq) * ranx
+    if flagranx[1] == False:
+        maxrad = np.max(xradq) * ranx
+    else:
+        maxrad = np.max(xradq)
+
     mincnt = np.min(ysbq)
     maxcnt = np.max(ysbq)
     xran = minrad * (maxrad/minrad)**np.array([-0.02, +1.02])
     yran = mincnt * (maxcnt/mincnt)**np.array([-0.05, +1.05])
 
+    if flagrany[1] == False:
+        yran1=yran[0]
+        yran2=yran[1]
 
-    yran1=yran[0]
-    yran2=yran[1]
+        lyran= yran2 - yran1
 
-    lyran= yran2 - yran1
+        yranmid= yran1 + lyran/2
 
-    yranmid= yran1 + lyran/2
+        lyran=lyran*rany
 
-    lyran=lyran*rany
+        yran1 = yranmid - lyran/2
+        yran2 = yranmid + lyran/2
 
-    yran1 = yranmid - lyran/2
-    yran2 = yranmid + lyran/2
+        #    yran[0] = yran1
+        #    yran[1] = yran2
 
-#    yran[0] = yran1
-#    yran[1] = yran2
-
-    yran[0] = yran2 #inverted axis
-    yran[1] = yran1
+        yran[0] = yran2 #inverted axis
+        yran[1] = yran1
 
 
     axsec.set_xlabel("radius ('')")
@@ -505,8 +533,17 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,ranx,rany,plate):
 
     axsec.errorbar(xradq, ysbq,yerr=ysberrq,fmt='o-',capsize=2,color='red',markersize=0.7,label="galaxy")
     axsec.errorbar(xradm, ysbm,yerr=ysberrm,fmt='o-',capsize=2,color='blue',markersize=0.7,label="Model")
-    axsec.set_xlim(xran)
-    axsec.set_ylim(yran)
+    if flagranx[1] == False:
+        axsec.set_xlim(xran)
+    else:
+        axsec.set_xlim(xmin,xmax)
+
+
+    if flagrany[1] == False:
+        axsec.set_ylim(yran)
+    else:
+        # axsec.set_ylim(ymin,ymax)
+        axsec.set_ylim(ymax,ymin) #inverted
 
 
     if flag == True:
@@ -708,7 +745,7 @@ def PlotSub(xradq,ysbq,nsub,axsec):
 ############################
 
 
-def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, limx, flag, flagsub, flagpix, namesub, N, Comps, ranx, rany, skylevel=0, badpixels=None,
+def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, limx, flag, flagsub, flagpix, namesub, N, Comps, flagranx, ranx, flagrany, rany, skylevel=0, badpixels=None,
               n_sectors=19, mask=None, minlevel=0, plot=False):
 
 
@@ -743,8 +780,19 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 #    (magser,reser,nser,qser,paser)=ReadSersic(xc,yc,galfile)
 #    (magexp,rsexp,qexp,paexp)=ReadExp(xc,yc,galfile)
 
+    if flagranx[1] == True:
+        (xmin,xmax)=ranx.split("-")
+        xmin=np.float(xmin)
+        xmax=np.float(xmax)
 
-############
+    if flagrany[1] == True:
+        (ymin,ymax)=rany.split("-")
+        ymin=np.float(ymin)
+        ymax=np.float(ymax)
+
+
+
+###################
 # I have to switch x and y values because they are different axes for
 # numpy
     xtemp=xc
@@ -863,26 +911,36 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
 
     minrad = np.min(mgerad)
-    maxrad = np.max(mgerad)*ranx
+
+#    minrad = np.min(xradq)
+    if flagranx[1] == False:
+        maxrad = np.max(mgerad) * ranx
+    else:
+        maxrad = np.max(mgerad)
+#    maxrad = np.max(mgerad)*ranx
+
     minsb = np.min(mgesb)
     maxsb = np.max(mgesb)
     xran = minrad * (maxrad/minrad)**np.array([-0.02, +1.02])
     yran = minsb * (maxsb/minsb)**np.array([+1.05,-0.05])
 
-    yran1=yran[0]
-    yran2=yran[1]
 
-    lyran= yran2 - yran1
+    if flagrany[1] == False:
 
-    yranmid= yran1 + lyran/2
+        yran1=yran[0]
+        yran2=yran[1]
 
-    lyran=lyran*rany
+        lyran= yran2 - yran1
 
-    yran1 = yranmid - lyran/2
-    yran2 = yranmid + lyran/2
+        yranmid= yran1 + lyran/2
 
-    yran[0] = yran1
-    yran[1] = yran2
+        lyran=lyran*rany
+
+        yran1 = yranmid - lyran/2
+        yran2 = yranmid + lyran/2
+
+        yran[0] = yran1
+        yran[1] = yran2
 
 
 
@@ -899,7 +957,6 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     if flagpix:
         axpix = axsec[0,0].twiny()
         axpix2 = axsec[0,1].twiny()
-
 
 
 
@@ -976,8 +1033,23 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
         txtang= sectors[j]
         txt = "$%.f^\circ$" % txtang
 
-        axsec[row, 0].set_xlim(xran)
-        axsec[row, 0].set_ylim(yran)
+        if flagranx[1] == False:
+            axsec[row, 0].set_xlim(xran)
+        else:
+            axsec[row, 0].set_xlim(xmin,xmax)
+
+        #      axsec[row, 0].set_xlim(xran)
+        #     axsec[row, 0].set_ylim(yran)
+
+
+        if flagrany[1] == False:
+            axsec[row, 0].set_ylim(yran)
+        else:
+            # axsec.set_ylim(ymin,ymax)
+            axsec[row, 0].set_ylim(ymax,ymin) #inverted
+
+
+
 
         if flag == False:
             axsec[row, 0].plot(r, mgesb[w], 'C3o')
@@ -1034,6 +1106,11 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
         axsec[row, 1].yaxis.tick_right()
         axsec[row, 1].yaxis.set_label_position("right")
         axsec[row, 1].set_ylim([-19.5, 20])
+
+        if flagranx[1] == False:
+            axsec[row, 1].set_xlim(xran)
+        else:
+            axsec[row, 1].set_xlim(xmin,xmax)
 
 
         axsec[row, 0].yaxis.set_minor_locator(AutoMinorLocator())
