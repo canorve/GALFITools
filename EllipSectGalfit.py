@@ -22,7 +22,7 @@ def main():
 
     if (len(sys.argv[1:]) == 0):
         print ('Missing arguments')
-        print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] [--ranx/y Value] [--grid] [--noplot] " % (sys.argv[0]))
+        print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] [--ranx/y Value] [--grid] [--dpi Value] [--noplot] " % (sys.argv[0]))
         print ("GALFITOutputFile: GALFIT output file ")
         print ("logx: activates X-axis as logarithm ")
         print ("q: introduce axis ratio ")
@@ -32,6 +32,7 @@ def main():
         print ("ranx: constant that multiplies the range of the x axis or xmin-xmax range")
         print ("rany: constant that multiplies the range of the y axis or ymin-ymax range")
         print ("grid: display a grid in the plot ")
+        print ("dpi: dots per inch for saving plot ")
         print ("noplot: do not display images")
 
 
@@ -51,6 +52,7 @@ def main():
     flagrany=[False,False]
     flagnoplot=False
     flagrid=False
+    flagdpi=False
 
 
 # init values
@@ -60,11 +62,13 @@ def main():
     rany=1
     dplot=True
 
+    dpival=100
+
 ## init sub values
     Comps=np.array([False])
     N=0
 
-    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--grid','--noplot']
+    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--grid','--dpi','--noplot']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
@@ -83,6 +87,8 @@ def main():
         flagrany[0]=True
     if options['grid'] != None:
         flagrid=True
+    if options['dpi'] != None:
+        flagdpi=True
     if options['sub'] != None:
         flagsub=True
         print("Plotting subcomponents ")
@@ -129,6 +135,13 @@ def main():
         else:
             rany=np.float(opt['rany'])
 
+    if flagdpi == True:
+        opt={}
+        OptionHandle="--dpi"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        dpival=np.int(opt['dpi'])
+
+
     if flagnoplot == True:
         dplot=False
 
@@ -167,6 +180,11 @@ def main():
     str = "pa = {} is used ".format(ang)
     print(str)
 
+
+    ##
+    str = "dpi = {} for plots ".format(dpival)
+    print(str)
+    ##
 
     (tmp)=file.split(".")
 
@@ -215,7 +233,7 @@ def main():
 
     if dplot:
         plt.pause(1.5)
-    plt.savefig(namepng)
+    plt.savefig(namepng,dpi=dpival)
     plt.close()
 
 
@@ -231,7 +249,7 @@ def main():
     if dplot:
         plt.pause(1.5)
 
-    plt.savefig(namemul)
+    plt.savefig(namemul,dpi=dpival)
     plt.close()
 
 
