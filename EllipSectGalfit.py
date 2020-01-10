@@ -22,7 +22,7 @@ def main():
 
     if (len(sys.argv[1:]) == 0):
         print ('Missing arguments')
-        print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] [--ranx/y Value] [--noplot] " % (sys.argv[0]))
+        print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] [--ranx/y Value] [--grid] [--noplot] " % (sys.argv[0]))
         print ("GALFITOutputFile: GALFIT output file ")
         print ("logx: activates X-axis as logarithm ")
         print ("q: introduce axis ratio ")
@@ -31,6 +31,7 @@ def main():
         print ("pix: plot the top x-axis in pixels ")
         print ("ranx: constant that multiplies the range of the x axis or xmin-xmax range")
         print ("rany: constant that multiplies the range of the y axis or ymin-ymax range")
+        print ("grid: display a grid in the plot ")
         print ("noplot: do not display images")
 
 
@@ -49,6 +50,7 @@ def main():
     flagranx=[False,False]
     flagrany=[False,False]
     flagnoplot=False
+    flagrid=False
 
 
 # init values
@@ -62,7 +64,7 @@ def main():
     Comps=np.array([False])
     N=0
 
-    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--noplot']
+    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--grid','--noplot']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
@@ -79,6 +81,8 @@ def main():
         flagranx[0]=True
     if options['rany'] != None:
         flagrany[0]=True
+    if options['grid'] != None:
+        flagrid=True
     if options['sub'] != None:
         flagsub=True
         print("Plotting subcomponents ")
@@ -195,7 +199,7 @@ def main():
     minlevel=-100  # minimun value for sky
 
 
-    limx,limy=EllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, flagranx, ranx, flagrany, rany, skylevel=skylevel,
+    limx,limy=EllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, flagranx, ranx, flagrany, rany, flagrid, skylevel=skylevel,
               n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=dplot)
 
 
@@ -221,7 +225,7 @@ def main():
 ########################################################
 
     MulEllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q, ang, galfile,
-         limx, flaglogx,flagsub, flagpix, namesub, N, Comps, flagranx, ranx, flagrany, rany, skylevel=skylevel, n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=dplot)
+         limx, flaglogx,flagsub, flagpix, namesub, N, Comps, flagranx, ranx, flagrany, rany, flagrid, skylevel=skylevel, n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=dplot)
 
 
     if dplot:
@@ -251,7 +255,7 @@ def main():
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 
 
-def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, flagranx, ranx, flagrany, rany, skylevel=0, badpixels=None,
+def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, flagranx, ranx, flagrany, rany, flagrid, skylevel=0, badpixels=None,
               n_sectors=19, mask=None, minlevel=0, plot=False):
 
     namesec=namefile + "-gal.png"
@@ -404,7 +408,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     ###############
     ################
 
-    limx,limy,axsec=PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flaglogx,flagpix,flagranx,ranx,flagrany,rany,plate)
+    limx,limy,axsec=PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flaglogx,flagpix,flagranx,ranx,flagrany,rany,flagrid,plate)
 
     ####### Read Gaussians from GALFIT
 #    (magas,fwhmgas,qgas,pagas)=ReadGauss(xc,yc,galfile)
@@ -469,7 +473,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 
 
 
-def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flagrany,rany,plate):
+def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flagrany,rany,flagrid,plate):
     """
     Produces final best-fitting plot
 
@@ -607,6 +611,8 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flag
 #        axsec.errorbar(xradm, ysbm,yerr=ysberrm,fmt='o-',capsize=2,color='blue',markersize=0.7,label="Model")
         axret=axsec
 
+    if flagrid == True:
+        axsec.grid(True)
 
     return xran,yran,axret
 
@@ -745,7 +751,7 @@ def PlotSub(xradq,ysbq,nsub,axsec):
 ############################
 
 
-def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, limx, flag, flagsub, flagpix, namesub, N, Comps, flagranx, ranx, flagrany, rany, skylevel=0, badpixels=None,
+def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, limx, flag, flagsub, flagpix, namesub, N, Comps, flagranx, ranx, flagrany, rany, flagrid, skylevel=0, badpixels=None,
               n_sectors=19, mask=None, minlevel=0, plot=False):
 
 
@@ -954,6 +960,7 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     fig, axsec = plt.subplots(nrows, 2, sharex=True, sharey='col', num=fignum)
     fig.subplots_adjust(hspace=0.01)
 
+
     if flagpix:
         axpix = axsec[0,0].twiny()
         axpix2 = axsec[0,1].twiny()
@@ -973,7 +980,6 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
         if flagpix:
             axpix.set_xscale("log")
             axpix2.set_xscale("log")
-
 
     else:
         axsec[-1, 0].xaxis.set_minor_locator(AutoMinorLocator())
@@ -1060,6 +1066,10 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
             axsec[row, 0].semilogx(r, mgesb[w], 'C3o')
 
             axsec[row, 0].semilogx(r2, mgemodsb[wmod], 'C0-', linewidth=2)
+
+        if flagrid == True:
+            axsec[row,0].grid(True)
+
 
 #########################
 
@@ -1161,6 +1171,7 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
 
 
+#    plt.tight_layout()
 
 
 def FindSB(xarcq, ymgeq, numsectors):
