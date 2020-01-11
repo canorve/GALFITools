@@ -36,7 +36,6 @@ def main():
         print ("noplot: do not display images")
 
 
-#        print ("init: plots initial parameter model from subcomponents ")
         print ("Example:\n %s galfit.01 --logx" % (sys.argv[0]))
         print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub --ranx 2" % (sys.argv[0]))
         print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub --ranx 1-20" % (sys.argv[0]))
@@ -92,7 +91,6 @@ def main():
     if options['sub'] != None:
         flagsub=True
         print("Plotting subcomponents ")
-#        print("Warning: Subcomponents and Model will not match within the convolution box ")
     if options['noplot'] != None:
         flagnoplot=True
         print("images will not be displayed")
@@ -151,18 +149,17 @@ def main():
     print("angle in multi-plot is measured from the galaxy's major axis ")
 
 
-################################################
-################################################
-################################################
+    ########  End of parameter reading #############
+    ################################################
+    ################################################
 
-######################################
-####### Read Galfit File #############
+    ######################################
+    ####### Read Galfit File #############
 
     xc,yc,q,ang,skylevel,scale,file,mgzpt,exptime,mask=ReadGALFITout(galfile)
 
-######################################
-######################################
-#    print(file)
+    ######################################
+    ######################################
 
     if flagq == True:
         q=qarg
@@ -170,16 +167,12 @@ def main():
     if flagpa == True:
         ang=parg
 
-## correction
-#    ang=90+ang
-###
 
     str = "q = {} is used ".format(q)
     print(str)
 
     str = "pa = {} is used ".format(ang)
     print(str)
-
 
     ##
     str = "dpi = {} for plots ".format(dpival)
@@ -191,7 +184,7 @@ def main():
     namefile=tmp[0]
 
 
-# names for the different png
+    # names for the different png
 
     namepng=namefile + ".png"
     namesec=namefile + "-gal.png"
@@ -199,7 +192,7 @@ def main():
     namemul=namefile + "-mul.png"
     namesub=namefile + "-sub.fits"
 
-# hdu 1 => image   hdu 2 => model
+    # hdu 1 => image   hdu 2 => model
 
     errmsg="file {} does not exist".format(file)
 
@@ -211,8 +204,7 @@ def main():
     hdu.close()
 
 
-#   numsectors=19
-#   numsectors=36
+    #   numsectors=19
     numsectors=15
     minlevel=-100  # minimun value for sky
 
@@ -226,10 +218,9 @@ def main():
     print("Number of components = ",N)
 
 
-
-##############################################
-##############################################
-##############################################
+    ##############################################
+    ##############################################
+    ##############################################
 
     if dplot:
         plt.pause(1.5)
@@ -238,9 +229,9 @@ def main():
 
 
 
-########################################################
-################ Multiplots: ###########################
-########################################################
+    ########################################################
+    ################ Multiplots: ###########################
+    ########################################################
 
     MulEllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q, ang, galfile,
          limx, flaglogx,flagsub, flagpix, namesub, N, Comps, flagranx, ranx, flagrany, rany, flagrid, skylevel=skylevel, n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=dplot)
@@ -256,21 +247,19 @@ def main():
     if mask != None:
         os.remove(mask)
 
-#    print("Fin.")
 
-##############       #############
-##############  END  #############
-##############       #############
+    ##############       #############
+    ##############  END  #############
+    ##############       #############
 
-
-#     ______________________________________________________________________
-#    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
-#   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
-#   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/|
-#   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
-#   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/|
-#   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
-#   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
+    #     ______________________________________________________________________
+    #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
+    #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
+    #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/|
+    #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
+    #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/|
+    #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
+    #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 
 
 def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, flagranx, ranx, flagrany, rany, flagrid, skylevel=0, badpixels=None,
@@ -280,9 +269,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     namemod=namefile + "-mod.png"
     namesub=namefile + "-sub.fits"
 
-#    print("skylevel ",skylevel)
-
-# removing background:
+    # removing background:
     img = img - skylevel
     model = model - skylevel
 
@@ -309,25 +296,22 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
         plt.clf()
         print("")
 
-############
-# I have to switch x and y values because they are different axes for
-# numpy:
+    ############
+    # I have to switch x and y values because they are different axes for
+    # numpy:
     yctemp=xc
     xctemp=yc
-# and angle is different as well:
+    # and angle is different as well:
     angsec=90-ang
-#    angsec=ang
+    #    angsec=ang
 
-####################
 
-###############################
-#  galaxy:
+    ###############################
+    #  galaxy:
 
     g = sectors_photometry(img, eps, angsec, xctemp, yctemp, minlevel=minlevel,
             plot=plot, badpixels=maskb, n_sectors=n_sectors)
 
-#    g = sectors_photometry(img, eps, angsec, xctemp, yctemp, minlevel=minlevel,
-#            plot=1, badpixels=maskb, n_sectors=n_sectors)
 
 
     if plot:
@@ -335,18 +319,14 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
         plt.savefig(namesec)
 
 
-###################################################
+    ###################################################
 
     stidxg = np.argsort(g.radius)
 
     mgerad=g.radius[stidxg]
     mgecount=g.counts[stidxg]
     mgeangle=g.angle[stidxg]
-#    mgeanrad=(mgeangle)*np.pi/180
     mgeanrad=np.deg2rad(mgeangle)
-
-#    mgeanrad=(90-mgeangle)*np.pi/180 #converting back angle
-
 
     ab=q
 
@@ -356,10 +336,10 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     aellarcg=aellabg*plate
 
 
-####
-# formula according to cappellary mge manual:
+    ####
+    # formula according to cappellary mge manual:
     mgesbg= mgzpt - 2.5*np.log10(mgecount/exptime) + 2.5*np.log10(plate**2) + 0.1
-####
+    ####
 
     stidxq = np.argsort(aellarcg)
 
@@ -367,26 +347,22 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     xarcg = aellarcg[stidxq]
     ymgeg = mgesbg[stidxq]
 
-#############
-#############  Function to order SB
+    #############  Function to order SB along X-axis
 
     xradq, ysbq, ysberrq    = FindSB(xarcg, ymgeg, n_sectors)
 
-################
-###############
-###############################
+    ################
 
+
+    ###############################
     #  model:
     m = sectors_photometry(model, eps, angsec, xctemp, yctemp,minlevel=minlevel,
             plot=plot, badpixels=maskb, n_sectors=n_sectors)
 
-#    m = sectors_photometry(model, eps, angsec, xctemp, yctemp,minlevel=minlevel,
-#            plot=1, badpixels=maskb, n_sectors=n_sectors)
 
     if plot:
         plt.pause(1)  # Allow plot to appear on the screen
         plt.savefig(namemod)
-#        plt.clf()
     ###################################################
 
     stidxm = np.argsort(m.radius)
@@ -394,11 +370,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     mgerad=m.radius[stidxm]
     mgecount=m.counts[stidxm]
     mgeangle=m.angle[stidxm]
-#        mgeanrad=mgeangle*np.pi/180
     mgeanrad=np.deg2rad(mgeangle)
-
-#        mgeanrad=(90-mgeangle)*np.pi/180
-
 
     ab=q
 
@@ -408,8 +380,8 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     aellarcm=aellabm*plate
 
     # formula according to cappellary mge manual
-
     mgesbm= mgzpt - 2.5*np.log10(mgecount/exptime) + 2.5*np.log10(plate**2) + 0.1
+    ##
 
     stidxq = np.argsort(aellarcm)
 
@@ -417,48 +389,22 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     xarcm = aellarcm[stidxq]
     ymgem = mgesbm[stidxq]
 
-    #############
-    #############  Function
+    ######  Function to order SB along X-axis
 
     xradm, ysbm, ysberrm    = FindSB(xarcm, ymgem, n_sectors)
 
-    ################
-    ###############
-    ################
+    ################ Plotting
 
     limx,limy,axsec=PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flaglogx,flagpix,flagranx,ranx,flagrany,rany,flagrid,plate)
 
-    ####### Read Gaussians from GALFIT
-#    (magas,fwhmgas,qgas,pagas)=ReadGauss(xc,yc,galfile)
-#    (magser,reser,nser,qser,paser)=ReadSersic(xc,yc,galfile)
-#    (magexp,rsexp,qexp,paexp)=ReadExp(xc,yc,galfile)
+    ###
 
 
-#    if flagsub == True:
+    #### Creating Subcomponents images with Galfit
 
-########  Run galfit to create sub components
-
-#        PlotGauss(magas,fwhmgas*plate,qgas,pagas,ang,limx)
-#        PlotSersic(magser,reser*plate,nser,qser,paser,ang,limx)
-#        PlotExp(magexp,rsexp*plate,qexp,paexp,ang,limx)
-
-#        PlotGauss(magas,fwhmgas*plate,qgas,pagas,0,limx)
-#        PlotSersic(magser,reser*plate,nser,qser,paser,0,limx)
-#        PlotExp(magexp,rsexp*plate,qexp,0,0,limx)
-
-#        PloTotal(magas,fwhmgas*plate,qgas,pagas,magser,reser*plate,nser,qser,paser,magexp,rsexp*plate,qexp,paexp,ang,limx)
-
-#    plt.legend(loc=1)
-
-
-##############################################
-##############################################
-#### Creating Subcomponents Galfit output file
     Comps=[]
 
     if flagsub:
-
-#        if (not(os.path.isfile(namesub))):
 
         print("running galfit to create subcomponents...")
 
@@ -471,7 +417,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
         stderr=sp.PIPE, universal_newlines=True)
 
 
-    # read number of components
+        # read number of components
         Comps,N=ReadNComp(galfile,xc,yc)
 
 
@@ -479,16 +425,10 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
               n_sectors=n_sectors, badpixels=badpixels, minlevel=minlevel)
 
 
-#    PlotSub(xradq,ysbq,n,axsec)
 
     axsec.legend(loc=1)
 
-#    plt.legend(loc=1)
-
-
     return limx,limy
-
-
 
 
 def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flagrany,rany,flagrid,plate):
@@ -497,15 +437,9 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flag
 
     """
 
-    # Select an x and y plot range that is the same for all plots
-    #
+    # subplot for arc sec axis
     fig, axsec = plt.subplots()
 
-#    axsec.clear()
-#    plt.clf()
-###  set limits
-
-#    plate=1
 
 
     if flagranx[1] == True:
@@ -543,8 +477,6 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flag
         yran1 = yranmid - lyran/2
         yran2 = yranmid + lyran/2
 
-        #    yran[0] = yran1
-        #    yran[1] = yran2
 
         yran[0] = yran2 #inverted axis
         yran[1] = yran1
@@ -564,7 +496,6 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flag
     if flagrany[1] == False:
         axsec.set_ylim(yran)
     else:
-        # axsec.set_ylim(ymin,ymax)
         axsec.set_ylim(ymax,ymin) #inverted
 
 
@@ -600,9 +531,6 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flag
 
         axpix.set_xlim(x1/plate, x2/plate)
 
-#        axpix.errorbar(xradm, ysbm,yerr=ysberrm,fmt='o-',capsize=2,color='cyan',markersize=0.7,label="Model")
-#        axpix.errorbar(xradq, ysbq,yerr=ysberrq,fmt='o-',capsize=2,color='magenta',markersize=0.7,label="galaxy")
-
         axpix.figure.canvas.draw()
 
 
@@ -625,8 +553,6 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flag
 
         axret=axsec
     else:
-#        axsec.errorbar(xradq, ysbq,yerr=ysberrq,fmt='o-',capsize=2,color='red',markersize=0.7,label="galaxy")
-#        axsec.errorbar(xradm, ysbm,yerr=ysberrm,fmt='o-',capsize=2,color='blue',markersize=0.7,label="Model")
         axret=axsec
 
     if flagrid == True:
@@ -635,12 +561,6 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flag
     return xran,yran,axret
 
 
-
-
-
-##########################################################
-##########################################################
-##########################################################
 
 def SubComp(namesub,N,Comps,mgzpt,exptime,plate,xc,yc,q,ang,flagpix,axsec,skylevel=0,
     n_sectors=19, badpixels=None, minlevel=0):
@@ -684,32 +604,26 @@ def SubComp(namesub,N,Comps,mgzpt,exptime,plate,xc,yc,q,ang,flagpix,axsec,skylev
     eps=1-q
 
 
-############
-# I have to switch x and y values because they are different axes for
-# numpy:
+    ############
+    # I have to switch x and y values because they are different axes for
+    # numpy:
     yctemp=xc
     xctemp=yc
-# and angle is different as well:
+    # and angle is different as well:
     angsec=90-ang
-#    angsec=ang
 
-####################
+    ####################
 
-###############################
-#  galaxy:
     ab=q
-
     n=0
     while(n<N):
 
         subim=subimgs[n]
 
-
-        ### checar niveles de minlevel
         scmp = sectors_photometry(subim, eps, angsec, xctemp, yctemp,minlevel=minlevel,
                 plot=0, badpixels=maskb, n_sectors=n_sectors)
 
-###################################################
+        ###################################################
 
         stidxg = np.argsort(scmp.radius)
 
@@ -747,8 +661,6 @@ def SubComp(namesub,N,Comps,mgzpt,exptime,plate,xc,yc,q,ang,flagpix,axsec,skylev
     return  xradq,ysbq,n
 
 
-
-
 def PlotSub(xradq,ysbq,nsub,axsec):
     """
     Produces subcomponent plot
@@ -757,21 +669,12 @@ def PlotSub(xradq,ysbq,nsub,axsec):
 
     substr="component "+np.str(nsub+1)
 
-#    plt.plot(xradq, ysbq,'--',color='cyan',linewidth=4,markersize=0.7,label=substr)
     axsec.plot(xradq, ysbq,'--',color='skyblue',linewidth=4,markersize=0.7,label=substr)
 
-
-#    plt.legend(loc=1)
-
-
-###########################
-##########################
-############################
-
+####
 
 def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, limx, flag, flagsub, flagpix, namesub, N, Comps, flagranx, ranx, flagrany, rany, flagrid, skylevel=0, badpixels=None,
               n_sectors=19, mask=None, minlevel=0, plot=False):
-
 
     img = img - skylevel
     model = model - skylevel
@@ -798,12 +701,6 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
         plt.clf()
         print("")
 
-
-        ####### Read Gaussians from GALFIT
-#    (magas,fwhmgas,qgas,pagas)=ReadGauss(xc,yc,galfile)
-#    (magser,reser,nser,qser,paser)=ReadSersic(xc,yc,galfile)
-#    (magexp,rsexp,qexp,paexp)=ReadExp(xc,yc,galfile)
-
     if flagranx[1] == True:
         (xmin,xmax)=ranx.split("-")
         xmin=np.float(xmin)
@@ -814,17 +711,15 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
         ymin=np.float(ymin)
         ymax=np.float(ymax)
 
-
-
-###################
-# I have to switch x and y values because they are different axes for
-# numpy
+    ###################
+    # I have to switch x and y values because they are different axes for
+    # numpy
     xtemp=xc
     xc=yc
     yc=xtemp
 
     angsec=90-ang
-######################
+    ######################
 
     sg = sectors_photometry(img, eps, angsec, xc, yc,minlevel=minlevel,
             plot=False, badpixels=maskb, n_sectors=n_sectors)
@@ -833,14 +728,11 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     sm = sectors_photometry(model, eps, angsec, xc, yc,minlevel=minlevel,
             plot=False, badpixels=maskb, n_sectors=n_sectors)
 
-###################################################
+    ###################################################
 
     stidx = np.argsort(sg.radius)
 
-#   galaxy
-#    if flagpix == False:
-#        mgerad=sg.radius[stidx]*plate
-#    else:
+    #   galaxy
     mgerad=sg.radius[stidx]
 
     mgecount=sg.counts[stidx]
@@ -848,13 +740,10 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     mgeanrad=np.deg2rad(mgeangle)
 
 
-# model
+    # model
 
     stidx = np.argsort(sm.radius)
 
-#    if flagpix == False:
-#        mgemodrad=sm.radius[stidx]*plate
-#    else:
     mgemodrad=sm.radius[stidx]
 
     mgemodcount=sm.counts[stidx]
@@ -868,10 +757,10 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     mgemodrad=mgemodrad*plate
 
 
-# formula according to cappellary mge manual
+    # formula according to cappellary mge manual
+    # galaxy:
     mgesb= mgzpt - 2.5*np.log10(mgecount/exptime) + 2.5*np.log10(plate**2) + 0.1
-################# Model:
-
+    # Model:
     mgemodsb= mgzpt - 2.5*np.log10(mgemodcount/exptime) + 2.5*np.log10(plate**2) + 0.1
 
 
@@ -910,9 +799,6 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
             subidx = np.argsort(subcmp.radius)
 
-#            if flagpix == False:
-#                temprad=subcmp.radius[subidx]*plate
-#            else:
             temprad=subcmp.radius[subidx]
 
             #converting to arcsec
@@ -924,7 +810,7 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
             mgeanradsub=np.deg2rad(tempangle)
 
 
-    # formula according to cappellary mge manual
+            # formula according to cappellary mge manual
             tempmge= mgzpt - 2.5*np.log10(mgecountsub/exptime) + 2.5*np.log10(plate**2) + 0.1
 
             mgesbsub.append(tempmge)
@@ -936,12 +822,10 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
     minrad = np.min(mgerad)
 
-#    minrad = np.min(xradq)
     if flagranx[1] == False:
         maxrad = np.max(mgerad) * ranx
     else:
         maxrad = np.max(mgerad)
-#    maxrad = np.max(mgerad)*ranx
 
     minsb = np.min(mgesb)
     maxsb = np.max(mgesb)
@@ -988,8 +872,6 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     fig.text(0.04, 0.5, 'Surface brightness', va='center', rotation='vertical')
     fig.text(0.96, 0.5, 'error (%)', va='center', rotation='vertical')
 
-
-#    if flagpix == False:
     axsec[-1, 0].set_xlabel("radius ('')")
     axsec[-1, 1].set_xlabel("radius ('')")
 
@@ -1002,7 +884,6 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     else:
         axsec[-1, 0].xaxis.set_minor_locator(AutoMinorLocator())
 
-#    axsec[-1, 0].xaxis.set_minor_locator(AutoMinorLocator())
     axsec[-1, 0].tick_params(which='both', width=2)
     axsec[-1, 0].tick_params(which='major', length=7)
     axsec[-1, 0].tick_params(which='minor', length=4, color='r')
@@ -1011,18 +892,12 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
         axsec[-1, 0].xaxis.set_major_locator(LogLocator(base=10.0, numticks=15))
     else:
         axsec[-1, 0].xaxis.set_minor_locator(AutoMinorLocator())
-#    axsec[-1, 1].xaxis.set_minor_locator(AutoMinorLocator())
     axsec[-1, 1].tick_params(which='both', width=2)
     axsec[-1, 1].tick_params(which='major', length=7)
     axsec[-1, 1].tick_params(which='minor', length=4, color='r')
 
 
-#    else:
-#        ax[-1, 0].set_xlabel("radius (pixels)")
-#        ax[-1, 1].set_xlabel("radius (pixels)")
-
-#    row = 0
-#    row = 7 # old values
+    #    row = 7 # old values
     row = nrows -1
     for j in range(0, n, dn):
         w = np.nonzero(mgeangle == sectors[j])[0]
@@ -1038,21 +913,6 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
             wmod=w
             r2 = mgemodrad[wmod]
 
-#        if flagsub:
-#            ii=0
-#            while(ii<N):
-#                tsub = np.nonzero(mgeanglesub[ii] == sectors[j])[0]
-#                tsub = tsub[np.argsort(mgeradsub[ii][tsub])]
-
-#                if (len(mgeradsub[ii]) < len(mgerad)):
-#                    rtsub = mgeradsub[ii][tsub]
-#                    rsub.append(rtsub)
-#                else:
-#                    tsub=w  # agregado
-#                    rtsub = mgeradsub[ii][tsub]
-#                    rsub.append(rtsub)
-#                ii+=1
-#                wsub.append(tsub)   # wsub corresponde a ii
 
         txtang= sectors[j]
         txt = "$%.f^\circ$" % txtang
@@ -1062,18 +922,10 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
         else:
             axsec[row, 0].set_xlim(xmin,xmax)
 
-        #      axsec[row, 0].set_xlim(xran)
-        #     axsec[row, 0].set_ylim(yran)
-
-
         if flagrany[1] == False:
             axsec[row, 0].set_ylim(yran)
         else:
-            # axsec.set_ylim(ymin,ymax)
             axsec[row, 0].set_ylim(ymax,ymin) #inverted
-
-
-
 
         if flag == False:
             axsec[row, 0].plot(r, mgesb[w], 'C3o')
@@ -1088,15 +940,7 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
         if flagrid == True:
             axsec[row,0].grid(True)
 
-
-#########################
-
-#        print("flagsub N",flagsub,N)
         if flagsub == True:
-#            PlotMulGauss(magas,fwhmgas*plate,qgas,pagas,90-sectors[j],ax,row,limx,flag)
-#            PlotMulSersic(magser,reser*plate,nser,qser,paser,90-sectors[j],ax,row,limx,flag)
-#            PlotMulExp(magexp,rsexp*plate,qexp,paexp,90-sectors[j],ax,row,limx,flag)
-
             ii=0
             while(ii<N):
 
@@ -1116,9 +960,6 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
 
                 ii+=1
-
-#            SubMulComp(namesub,N,Comps,mgzpt,exptime,scale,xc,yc,q,ang,skylevel=skylevel,
-#                n_sectors=numsectors, badpixels=mask, minlevel=minlevel)
 
         axsec[row, 0].text(0.98, 0.95, txt, ha='right', va='top', transform=axsec[row, 0].transAxes)
 
@@ -1152,10 +993,7 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
         axsec[row, 1].tick_params(which='minor', length=4, color='r')
 
 
-#        row += 1
         row -= 1
-
-#    return xrad, ysb, ysberr
 
     if flagpix == True:
         axpix.set_xlabel("(pixels)")
@@ -1167,13 +1005,12 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
         axpix2.set_xlim(x1/plate, x2/plate)
         axpix2.figure.canvas.draw()
 
-##
+        ##
         if flag == True:
             axpix.xaxis.set_major_locator(LogLocator(base=10.0, numticks=15))
         else:
             axpix.xaxis.set_minor_locator(AutoMinorLocator())
 
-#        axpix.xaxis.set_minor_locator(AutoMinorLocator())
         axpix.tick_params(which='both', width=2)
         axpix.tick_params(which='major', length=7)
         axpix.tick_params(which='minor', length=4, color='r')
@@ -1182,19 +1019,14 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
             axpix2.xaxis.set_major_locator(LogLocator(base=10.0, numticks=15))
         else:
             axpix2.xaxis.set_minor_locator(AutoMinorLocator())
-#        axpix2.xaxis.set_minor_locator(AutoMinorLocator())
         axpix2.tick_params(which='both', width=2)
         axpix2.tick_params(which='major', length=7)
         axpix2.tick_params(which='minor', length=4, color='r')
 
 
-
-#    plt.tight_layout()
-
-
 def FindSB(xarcq, ymgeq, numsectors):
-# the xarcq array must be ordered
-# use mag instead of counts
+    # the xarcq array must be ordered
+    # use mag instead of counts
 
     xradq=[]
     ysbq=[]
@@ -1236,7 +1068,6 @@ def FindSB(xarcq, ymgeq, numsectors):
     return xradq, ysbq, ysberrq
 
 
-
 def ReadGALFITout(inputf):
 
     flagfirst = True
@@ -1257,25 +1088,23 @@ def ReadGALFITout(inputf):
     lines = list(lines)
     index = 0
 
-#    function="sersic"
-
     while index < len(lines):
 
-#================================================================================
-# IMAGE and GALFIT CONTROL PARAMETERS
-#A) tempfits/A2399-3-2.fits      # Input data image (FITS file)
-#B) A2399-215615.96-m073822.7-337-out.fits      # Output data image block
-#C) tempfits/none-3-2.fits      # Sigma image name (made from data if blank or "none")
-#D) psfs/PSF-1309-721.fits          # Input PSF image and (optional) diffusion kernel
-#E) 1                   # PSF fine sampling factor relative to data
-#F) mask-337            # Bad pixel mask (FITS image or ASCII coord list)
-#G) constraints         # File with parameter constraints (ASCII file)
-#H) 129  809  265  809  # Image region to fit (xmin xmax ymin ymax)
-#I) 60     60           # Size of the convolution box (x y)
-#J) 21.672              # Magnitude photometric zeropoint
-#K) 0.680  0.680        # Plate scale (dx dy)   [arcsec per pixel]
-#O) regular             # Display type (regular, curses, both)
-#P) 0                   # Choose: 0=optimize, 1=model, 2=imgblock, 3=subcomps
+        #================================================================================
+        # IMAGE and GALFIT CONTROL PARAMETERS
+        #A) tempfits/A2399-3-2.fits      # Input data image (FITS file)
+        #B) A2399-215615.96-m073822.7-337-out.fits      # Output data image block
+        #C) tempfits/none-3-2.fits      # Sigma image name (made from data if blank or "none")
+        #D) psfs/PSF-1309-721.fits          # Input PSF image and (optional) diffusion kernel
+        #E) 1                   # PSF fine sampling factor relative to data
+        #F) mask-337            # Bad pixel mask (FITS image or ASCII coord list)
+        #G) constraints         # File with parameter constraints (ASCII file)
+        #H) 129  809  265  809  # Image region to fit (xmin xmax ymin ymax)
+        #I) 60     60           # Size of the convolution box (x y)
+        #J) 21.672              # Magnitude photometric zeropoint
+        #K) 0.680  0.680        # Plate scale (dx dy)   [arcsec per pixel]
+        #O) regular             # Display type (regular, curses, both)
+        #P) 0                   # Choose: 0=optimize, 1=model, 2=imgblock, 3=subcomps
 
         line = lines[index]
         (tmp) = line.split()
@@ -1346,7 +1175,7 @@ def ReadGALFITout(inputf):
                 if tmp[0] == "10)" and (dist < 3): # position angle
                     pa=float(tmp[1])
 
-# second component exponential model
+        # second component exponential model
         if tmp[0] == "0)" and tmp[1] == "expdisk" :     # plate scale
 
             while (tmp[0] != "Z)"):
@@ -1446,12 +1275,9 @@ def ReadGALFITout(inputf):
 
     return xc,yc,q,pa,skylevel,scale,outimage,mgzpt,exptime,mask
 
-##################
-##################
-
 
 def ReadNComp(inputf,X,Y):
-## search and count model components
+    ## search and count model components
 
     GalfitFile = open(inputf,"r")
 
@@ -1482,9 +1308,6 @@ def ReadNComp(inputf,X,Y):
             X=X+xmin-1
             Y=Y+ymin-1
 
-#            print("xc, yc =",X,Y)
-
-
         if tmp[0] == "0)":
 
             if (tmp[1] != "sky"):
@@ -1512,8 +1335,6 @@ def ReadNComp(inputf,X,Y):
                         pa=float(tmp[1])
             else:
                 Comps=np.append(Comps,False)
-#                Ncomp=Ncomp + 1
-
 
         index += 1
 
@@ -1522,14 +1343,44 @@ def ReadNComp(inputf,X,Y):
 
     return Comps,Ncomp
 
-######
-### This function is no longer used in this program
-######
+def GetExpTime(Image):
+    # k Check
+    "Get exposition time from the image"
+
+    hdu = fits.open(Image)
+    exptime = hdu[0].header.get("EXPTIME",1) # return 1 if not found
+
+    hdu.close()
+    return exptime
+
+
+def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
+    "Get a piece from the image"
+    # k Check
+
+    if os.path.isfile(Imageout):
+        print("{} deleted; a new one is created \n".format(Imageout))
+        runcmd = "rm {}".format(Imageout)
+        errrm = sp.run([runcmd], shell=True, stdout=sp.PIPE,
+                        stderr=sp.PIPE, universal_newlines=True)
+
+    hdu = fits.open(Image)
+    dat = hdu[0].data[ylo - 1:yhi, xlo - 1:xhi]
+    hdu[0].data = dat
+    hdu.writeto(Imageout, overwrite=True)
+    hdu.close()
+
+##############################################
+##############################################
+## Functions no longer used in this script: ##
+##############################################
+##############################################
+##       deprecated Functions               ##
+
 def ReadGauss(xpos,ypos,inputf):
 
     flagauss = False
     maskimage = ""
-
 
     GalfitFile = open(inputf,"r")
 
@@ -1557,21 +1408,21 @@ def ReadGauss(xpos,ypos,inputf):
 
     while index < len(lines):
 
-#================================================================================
-# IMAGE and GALFIT CONTROL PARAMETERS
-#A) tempfits/A2399-3-2.fits      # Input data image (FITS file)
-#B) A2399-215615.96-m073822.7-337-out.fits      # Output data image block
-#C) tempfits/none-3-2.fits      # Sigma image name (made from data if blank or "none")
-#D) psfs/PSF-1309-721.fits          # Input PSF image and (optional) diffusion kernel
-#E) 1                   # PSF fine sampling factor relative to data
-#F) mask-337            # Bad pixel mask (FITS image or ASCII coord list)
-#G) constraints         # File with parameter constraints (ASCII file)
-#H) 129  809  265  809  # Image region to fit (xmin xmax ymin ymax)
-#I) 60     60           # Size of the convolution box (x y)
-#J) 21.672              # Magnitude photometric zeropoint
-#K) 0.680  0.680        # Plate scale (dx dy)   [arcsec per pixel]
-#O) regular             # Display type (regular, curses, both)
-#P) 0                   # Choose: 0=optimize, 1=model, 2=imgblock, 3=subcomps
+        #================================================================================
+        # IMAGE and GALFIT CONTROL PARAMETERS
+        #A) tempfits/A2399-3-2.fits      # Input data image (FITS file)
+        #B) A2399-215615.96-m073822.7-337-out.fits      # Output data image block
+        #C) tempfits/none-3-2.fits      # Sigma image name (made from data if blank or "none")
+        #D) psfs/PSF-1309-721.fits          # Input PSF image and (optional) diffusion kernel
+        #E) 1                   # PSF fine sampling factor relative to data
+        #F) mask-337            # Bad pixel mask (FITS image or ASCII coord list)
+        #G) constraints         # File with parameter constraints (ASCII file)
+        #H) 129  809  265  809  # Image region to fit (xmin xmax ymin ymax)
+        #I) 60     60           # Size of the convolution box (x y)
+        #J) 21.672              # Magnitude photometric zeropoint
+        #K) 0.680  0.680        # Plate scale (dx dy)   [arcsec per pixel]
+        #O) regular             # Display type (regular, curses, both)
+        #P) 0                   # Choose: 0=optimize, 1=model, 2=imgblock, 3=subcomps
 
         line = lines[index]
         (tmp) = line.split()
@@ -1640,7 +1491,7 @@ def ReadGauss(xpos,ypos,inputf):
             if (flagdist == True):
 
 
-# saving data
+            # saving data
                 magas=np.append(magas,magauss)
                 fwhmgas=np.append(fwhmgas,fwhmgauss)
                 qgas=np.append(qgas,q)
@@ -1652,201 +1503,11 @@ def ReadGauss(xpos,ypos,inputf):
 
     return magas,fwhmgas,qgas,pagas
 
-
-
-def GalGauss(magauss,fwhmgauss,qgauss,pagauss,angle,radx):
-
-
-    sigma=fwhmgauss/2.354
-
-
-    mags=(-magauss)/2.5
-    ftot=10**(mags)
-    I0=ftot/(2*np.pi*qgauss*sigma**2)
-
-
-    angle=np.deg2rad(angle)
-    pagauss=np.deg2rad(pagauss)
-
-
-    xgas=radx*np.cos(angle)*np.cos(pagauss) - radx*qgauss*np.sin(angle)*np.sin(pagauss)
-    ygas=radx*np.cos(angle)*np.sin(pagauss) + radx*qgauss*np.sin(angle)*np.cos(pagauss)
-
-
-    radang= np.sqrt(xgas**2 + ygas**2)
-
-    Ir=I0*np.exp(-(radx**2)/(2*sigma**2))
-
-
-    Magr = -2.5*np.log10(Ir)
-
-    return radang,Magr
-
-
-
-
-def GalTotal(magauss,fwhmgauss,qgauss,pagauss,magser,reser,nser,qser,paser,magexp,rsexp,qexp,paexp,patot,rad):
-
-    It=0
-
-## rest angle
-    anglegas= patot
-    angleser= patot
-    angleexp= patot
-# changing to rads!
-    pagauss=pagauss*np.pi/180
-    paser=paser*np.pi/180
-    paexp=paexp*np.pi/180
-    anglegas=anglegas*np.pi/180
-    angleser=angleser*np.pi/180
-    angleexp=angleexp*np.pi/180
-#
-
-##  gauss
-    sigma=fwhmgauss/2.354
-    mags=(-magauss)/2.5
-    ftot=10**(mags)
-    I0=ftot/(2*np.pi*qgauss*sigma**2)
-###
-
-##  Sersic
-    kser=GetKAprox(nser)
-    mags=(-magser)/2.5
-    ftot=10**(mags)
-    Ie=ftot/(2*np.pi*(reser**2)*np.exp(kser)*nser*kser**(-2*nser)*(scipy.special.gamma(2*nser)*qser))
-##
-
-
-
-## exponential
-    mags=(-magexp)/2.5
-    ftot=10**(mags)
-    Is=ftot/(2*np.pi*(rsexp**2)*qexp)
-
-###############################################
-    for idx, item in enumerate(magauss):
-        alpha1=np.cos(anglegas)*np.cos(pagauss[idx])+np.sin(anglegas)*np.sin(pagauss[idx])
-        alpha2=np.cos(anglegas)*np.sin(pagauss[idx])-np.sin(anglegas)*np.cos(pagauss[idx])
-
-        agas2=(rad**2)*(alpha1**2+(1/(qgauss[idx]**2))*alpha2**2)
-        Irgas=I0[idx]*np.exp(-(agas2)/(2*sigma[idx]**2))
-
-        It=It+Irgas
-
-    for idx, item in enumerate(magser):
-        alpha1=np.cos(angleser)*np.cos(paser[idx])+np.sin(angleser)*np.sin(paser[idx])
-        alpha2=np.cos(angleser)*np.sin(paser[idx])-np.sin(angleser)*np.cos(paser[idx])
-
-        aser2=(rad**2)*(alpha1**2+(1/(qser[idx]**2))*alpha2**2)
-        aser=np.sqrt(aser2)
-        Irser=Ie[idx]*np.exp(-kser[idx]*((aser/reser[idx])**(1/nser[idx]) - 1 ))
-
-        It=It+ Irser
-
-    for idx, item in enumerate(magexp):
-
-#Exponential
-        alpha1=np.cos(angleexp)*np.cos(paexp[idx])+np.sin(angleexp)*np.sin(paexp[idx])
-        alpha2=np.cos(angleexp)*np.sin(paexp[idx])-np.sin(angleexp)*np.cos(paexp[idx])
-
-        aexp2=(rad**2)*(alpha1**2+(1/(qexp[idx]**2))*alpha2**2)
-        aexp=np.sqrt(aexp2)
-        Irexp=Is*np.exp(-aexp/rsexp[idx])
-
-        It = It + Irexp
-
-    Magt = -2.5*np.log10(It)
-
-    return rad,Magt
-
-
-######################
-######################
-
-
-
-
-def PloTotal(magas,fwhmgas,qgas,pagas,magser,reser,nser,qser,paser,magexp,rsexp,qexp,paexp,patot,xlim):
-
-
-    xgauss =  np.arange(xlim[0],xlim[1],0.1)
-
-
-    radx,ytot=GalTotal(magas,fwhmgas,qgas,pagas,magser,reser,nser,qser,paser,magexp,rsexp,qexp,paexp,patot,xgauss)
-
-    strtot="init Model"
-    plt.plot(radx, ytot,'--',color='blue',markersize=0.7,label=strtot)
-
-
-
-def PlotMulTotal(magas,fwhmgas,qgas,pagas,magser,reser,nser,qser,paser,magexp,rsexp,qexp,paexp,patot,ax,row,xlim,flaglogx):
-
-
-    xgauss =  np.arange(xlim[0],xlim[1],0.1)
-
-
-    radx,ytot=GalTotal(magas,fwhmgas,qgas,pagas,magser,reser,nser,qser,paser,magexp,rsexp,qexp,paexp,patot,xgauss)
-
-    strtot="init Model"
-
-    if flaglogx == False:
-        ax[row,0].plot(radx, ytot,'--',color='blue',markersize=0.7,label=strtot)
-    else:
-        ax[row,0].semilogx(radx, ytot,'--',color='blue',markersize=0.7,label=strtot)
-
-
-
-# function no longer used in this program
-def PlotMulGauss(magas,fwhmgas,qgas,pagas,angle,ax,row,xlim,flaglogx):
-
-
-    xgauss =  np.arange(xlim[0],xlim[1],0.1)
-
-    ngauss=1
-
-    alpha= angle - pagas
-
-    for idx, item in enumerate(magas):
-
-
-        radx,ygauss=GalGauss(magas[idx],fwhmgas[idx],qgas[idx],pagas[idx],alpha[idx],xgauss)
-        strgas="gauss " + str(ngauss)
-        if flaglogx == False:
-            ax[row, 0].plot(radx, ygauss,'--',color='green',markersize=0.7,label=strgas)
-        else:
-            ax[row, 0].semilogx(radx, ygauss,'--',color='green',markersize=0.7,label=strgas)
-
-        ngauss=ngauss+1
-
-
-
-
-def PlotGauss(magas,fwhmgas,qgas,pagas,angle,xlim):
-
-
-    xgauss =  np.arange(xlim[0],xlim[1],0.1)
-
-    ngauss=1
-
-    alpha= angle - pagas
-
-
-    for idx, item in enumerate(magas):
-
-        radx,ygauss=GalGauss(magas[idx],fwhmgas[idx],qgas[idx],pagas[idx],alpha[idx],xgauss)
-
-
-        strgas="gauss " + str(ngauss)
-        plt.plot(radx, ygauss,'--',color='green',markersize=0.7,label=strgas)
-        ngauss=ngauss+1
-
-
-## function no longer used in this program
 def ReadSersic(xpos,ypos,inputf):
 
     flagser = False
 
-#   init values
+    #   init values
     maskimage = ""
 
     GalfitFile = open(inputf,"r")
@@ -1877,21 +1538,21 @@ def ReadSersic(xpos,ypos,inputf):
 
     while index < len(lines):
 
-#================================================================================
-# IMAGE and GALFIT CONTROL PARAMETERS
-#A) tempfits/A2399-3-2.fits      # Input data image (FITS file)
-#B) A2399-215615.96-m073822.7-337-out.fits      # Output data image block
-#C) tempfits/none-3-2.fits      # Sigma image name (made from data if blank or "none")
-#D) psfs/PSF-1309-721.fits          # Input PSF image and (optional) diffusion kernel
-#E) 1                   # PSF fine sampling factor relative to data
-#F) mask-337            # Bad pixel mask (FITS image or ASCII coord list)
-#G) constraints         # File with parameter constraints (ASCII file)
-#H) 129  809  265  809  # Image region to fit (xmin xmax ymin ymax)
-#I) 60     60           # Size of the convolution box (x y)
-#J) 21.672              # Magnitude photometric zeropoint
-#K) 0.680  0.680        # Plate scale (dx dy)   [arcsec per pixel]
-#O) regular             # Display type (regular, curses, both)
-#P) 0                   # Choose: 0=optimize, 1=model, 2=imgblock, 3=subcomps
+        #================================================================================
+        # IMAGE and GALFIT CONTROL PARAMETERS
+        #A) tempfits/A2399-3-2.fits      # Input data image (FITS file)
+        #B) A2399-215615.96-m073822.7-337-out.fits      # Output data image block
+        #C) tempfits/none-3-2.fits      # Sigma image name (made from data if blank or "none")
+        #D) psfs/PSF-1309-721.fits          # Input PSF image and (optional) diffusion kernel
+        #E) 1                   # PSF fine sampling factor relative to data
+        #F) mask-337            # Bad pixel mask (FITS image or ASCII coord list)
+        #G) constraints         # File with parameter constraints (ASCII file)
+        #H) 129  809  265  809  # Image region to fit (xmin xmax ymin ymax)
+        #I) 60     60           # Size of the convolution box (x y)
+        #J) 21.672              # Magnitude photometric zeropoint
+        #K) 0.680  0.680        # Plate scale (dx dy)   [arcsec per pixel]
+        #O) regular             # Display type (regular, curses, both)
+        #P) 0                   # Choose: 0=optimize, 1=model, 2=imgblock, 3=subcomps
 
         line = lines[index]
         (tmp) = line.split()
@@ -1918,7 +1579,6 @@ def ReadSersic(xpos,ypos,inputf):
             scale=float(tmp[1])
 
         if tmp[0] == "0)" and tmp[1] == "sersic":     # plate scale
-        #  flagexp == True forces to take the value of exp instead of gauss
 
             flagser=True
             xcgas=0
@@ -1947,7 +1607,6 @@ def ReadSersic(xpos,ypos,inputf):
 
                 if (tmp[0] == "3)") and (flagdist==True):    # axis ratio
                     mag=float(tmp[1])
-#                    magauss = magauss + mgzpt
 
                 if (tmp[0] == "4)") and (flagdist==True):    # axis ratio
                     re=float(tmp[1])
@@ -1964,7 +1623,7 @@ def ReadSersic(xpos,ypos,inputf):
             if (flagdist == True):
 
 
-# saving data
+            # saving data
                 magser=np.append(magser,mag)
                 reser=np.append(reser,re)
                 nser=np.append(nser,n)
@@ -1978,145 +1637,6 @@ def ReadSersic(xpos,ypos,inputf):
 
     return magser,reser,nser,qser,paser
 
-
-def GalSersic(magser,reser,nser,qser,paser,angle,radx):
-
-    kser=GetKAprox(nser)
-
-
-    mags=(-magser)/2.5
-    ftot=10**(mags)
-
-    angle=angle*np.pi/180
-    paser=paser*np.pi/180
-
-    Ie=ftot/(2*np.pi*(reser**2)*np.exp(kser)*nser*kser**(-2*nser)*(scipy.special.gamma(2*nser)*qser))
-
-    xser=radx*np.cos(angle)*np.cos(paser) - radx*qser*np.sin(angle)*np.sin(paser)
-    yser=radx*np.cos(angle)*np.sin(paser) + radx*qser*np.sin(angle)*np.cos(paser)
-
-    radang= np.sqrt(xser**2 + yser**2)
-
-    Ir=Ie*np.exp(-kser*((radx/reser)**(1/nser) - 1 ))
-
-    yser = -2.5*np.log10(Ir)
-
-    return radang,yser
-
-
-
-
-def GetKAprox(n):
-
-    K=2*n-1/3+4/(405*n)+46/(25515*n**2)+131/(1148175*n**3)-2194697/(30690717750*n**4)
-
-
-    return (K)
-
-
-
-
-def GetK(n):
-    "Solve the Sersic function to get the dependence of K over Sersic index"
-
-## solve the Sersic equation
-# to get the dependence of K over
-# Sersic index
-
-    count = 1
-
-    #limits
-    lima=0
-    limb=100
-
-    fxa = fx(n,lima)
-    fxb = fx(n,limb)
-
-    resk= (lima + limb)/2
-
-    fxres=fx(n,resk)
-
-
-    if(fxa * fxb < 0):
-
-        while(np.abs(fxres) > 0.00000001):
-
-            if(fxa * fxres > 0):
-                lima=resk
-            elif(fxa * fxres < 0):
-                limb=resk
-            elif(fxres==0):
-                break
-            resk= (lima + limb)/2
-            fxres=fx(n,resk)
-
-            count+=1
-
-            if (count >= 10000):
-                break
-
-    else:
-        print("no solution in the range: ({},{})\n".format(lima,limb))
-
-    return (resk)
-
-
-def fx(n,k):
-    "function to solve to get the relation between Sersic index and K"
-
-
-    func = np.exp(scipy.special.gammaln(2*n)) - 2 * np.exp(scipy.special.gammaln(2*n)) * scipy.special.gammainc(2*n,k)
-
-
-    return(func)
-
-
-
-## function no longer used in this program
-def PlotSersic(magser,reser,nser,qser,paser,angle,xlim):
-
-    xser =  np.arange(xlim[0],xlim[1],0.1)
-
-    alpha= angle - paser
-
-    num=1
-
-    for idx, item in enumerate(magser):
-
-        radx,yser=GalSersic(magser[idx],reser[idx],nser[idx],qser[idx],paser[idx],alpha[idx],xser)
-        strgas="sersic " + str(num)
-        plt.plot(radx, yser,'--',color='red',markersize=0.7,label=strgas)
-        num=num+1
-
-
-
-
-def PlotMulSersic(magser,reser,nser,qser,paser,angle,ax,row,xlim,flaglogx):
-
-    xser =  np.arange(xlim[0],xlim[1],0.1)
-
-    num=1
-
-    alpha= angle - paser
-
-    for idx, item in enumerate(magser):
-        radx,yser=GalSersic(magser[idx],reser[idx],nser[idx],qser[idx],paser[idx],alpha[idx],xser)
-        strgas="sersic " + str(num)
-        if flaglogx == False:
-            ax[row, 0].plot(radx, yser,'--',color='red',markersize=0.7,label=strgas)
-        else:
-            ax[row, 0].semilogx(radx, yser,'--',color='red',markersize=0.7,label=strgas)
-
-        num=num+1
-
-######
-
-
-
-
-####################
-
-## function no longer used in this  program
 
 def ReadExp(xpos,ypos,inputf):
 
@@ -2150,21 +1670,21 @@ def ReadExp(xpos,ypos,inputf):
 
     while index < len(lines):
 
-#================================================================================
-# IMAGE and GALFIT CONTROL PARAMETERS
-#A) tempfits/A2399-3-2.fits      # Input data image (FITS file)
-#B) A2399-215615.96-m073822.7-337-out.fits      # Output data image block
-#C) tempfits/none-3-2.fits      # Sigma image name (made from data if blank or "none")
-#D) psfs/PSF-1309-721.fits          # Input PSF image and (optional) diffusion kernel
-#E) 1                   # PSF fine sampling factor relative to data
-#F) mask-337            # Bad pixel mask (FITS image or ASCII coord list)
-#G) constraints         # File with parameter constraints (ASCII file)
-#H) 129  809  265  809  # Image region to fit (xmin xmax ymin ymax)
-#I) 60     60           # Size of the convolution box (x y)
-#J) 21.672              # Magnitude photometric zeropoint
-#K) 0.680  0.680        # Plate scale (dx dy)   [arcsec per pixel]
-#O) regular             # Display type (regular, curses, both)
-#P) 0                   # Choose: 0=optimize, 1=model, 2=imgblock, 3=subcomps
+        #================================================================================
+        # IMAGE and GALFIT CONTROL PARAMETERS
+        #A) tempfits/A2399-3-2.fits      # Input data image (FITS file)
+        #B) A2399-215615.96-m073822.7-337-out.fits      # Output data image block
+        #C) tempfits/none-3-2.fits      # Sigma image name (made from data if blank or "none")
+        #D) psfs/PSF-1309-721.fits          # Input PSF image and (optional) diffusion kernel
+        #E) 1                   # PSF fine sampling factor relative to data
+        #F) mask-337            # Bad pixel mask (FITS image or ASCII coord list)
+        #G) constraints         # File with parameter constraints (ASCII file)
+        #H) 129  809  265  809  # Image region to fit (xmin xmax ymin ymax)
+        #I) 60     60           # Size of the convolution box (x y)
+        #J) 21.672              # Magnitude photometric zeropoint
+        #K) 0.680  0.680        # Plate scale (dx dy)   [arcsec per pixel]
+        #O) regular             # Display type (regular, curses, both)
+        #P) 0                   # Choose: 0=optimize, 1=model, 2=imgblock, 3=subcomps
 
         line = lines[index]
         (tmp) = line.split()
@@ -2219,7 +1739,6 @@ def ReadExp(xpos,ypos,inputf):
 
                 if (tmp[0] == "3)") and (flagdist==True):    # axis ratio
                     mag=float(tmp[1])
-#                    magauss = magauss + mgzpt
 
                 if (tmp[0] == "4)") and (flagdist==True):    # axis ratio
                     rs=float(tmp[1])
@@ -2233,7 +1752,7 @@ def ReadExp(xpos,ypos,inputf):
             if (flagdist == True):
 
 
-# saving data
+            # saving data
                 magexp=np.append(magexp,mag)
                 rsexp=np.append(rsexp,rs)
                 qexp=np.append(qexp,q)
@@ -2245,6 +1764,328 @@ def ReadExp(xpos,ypos,inputf):
     GalfitFile.close()
 
     return magexp,rsexp,qexp,paexp
+
+
+
+def PloTotal(magas,fwhmgas,qgas,pagas,magser,reser,nser,qser,paser,magexp,rsexp,qexp,paexp,patot,xlim):
+
+
+    xgauss =  np.arange(xlim[0],xlim[1],0.1)
+
+
+    radx,ytot=GalTotal(magas,fwhmgas,qgas,pagas,magser,reser,nser,qser,paser,magexp,rsexp,qexp,paexp,patot,xgauss)
+
+    strtot="init Model"
+    plt.plot(radx, ytot,'--',color='blue',markersize=0.7,label=strtot)
+
+
+
+def PlotMulTotal(magas,fwhmgas,qgas,pagas,magser,reser,nser,qser,paser,magexp,rsexp,qexp,paexp,patot,ax,row,xlim,flaglogx):
+
+
+    xgauss =  np.arange(xlim[0],xlim[1],0.1)
+
+
+    radx,ytot=GalTotal(magas,fwhmgas,qgas,pagas,magser,reser,nser,qser,paser,magexp,rsexp,qexp,paexp,patot,xgauss)
+
+    strtot="init Model"
+
+    if flaglogx == False:
+        ax[row,0].plot(radx, ytot,'--',color='blue',markersize=0.7,label=strtot)
+    else:
+        ax[row,0].semilogx(radx, ytot,'--',color='blue',markersize=0.7,label=strtot)
+
+
+def PlotMulGauss(magas,fwhmgas,qgas,pagas,angle,ax,row,xlim,flaglogx):
+
+
+    xgauss =  np.arange(xlim[0],xlim[1],0.1)
+
+    ngauss=1
+
+    alpha= angle - pagas
+
+    for idx, item in enumerate(magas):
+
+
+        radx,ygauss=GalGauss(magas[idx],fwhmgas[idx],qgas[idx],pagas[idx],alpha[idx],xgauss)
+        strgas="gauss " + str(ngauss)
+        if flaglogx == False:
+            ax[row, 0].plot(radx, ygauss,'--',color='green',markersize=0.7,label=strgas)
+        else:
+            ax[row, 0].semilogx(radx, ygauss,'--',color='green',markersize=0.7,label=strgas)
+
+        ngauss=ngauss+1
+
+
+
+
+def PlotGauss(magas,fwhmgas,qgas,pagas,angle,xlim):
+
+
+    xgauss =  np.arange(xlim[0],xlim[1],0.1)
+
+    ngauss=1
+
+    alpha= angle - pagas
+
+
+    for idx, item in enumerate(magas):
+
+        radx,ygauss=GalGauss(magas[idx],fwhmgas[idx],qgas[idx],pagas[idx],alpha[idx],xgauss)
+
+
+        strgas="gauss " + str(ngauss)
+        plt.plot(radx, ygauss,'--',color='green',markersize=0.7,label=strgas)
+        ngauss=ngauss+1
+
+
+def PlotSersic(magser,reser,nser,qser,paser,angle,xlim):
+
+    xser =  np.arange(xlim[0],xlim[1],0.1)
+
+    alpha= angle - paser
+
+    num=1
+
+    for idx, item in enumerate(magser):
+
+        radx,yser=GalSersic(magser[idx],reser[idx],nser[idx],qser[idx],paser[idx],alpha[idx],xser)
+        strgas="sersic " + str(num)
+        plt.plot(radx, yser,'--',color='red',markersize=0.7,label=strgas)
+        num=num+1
+
+
+
+def PlotMulSersic(magser,reser,nser,qser,paser,angle,ax,row,xlim,flaglogx):
+
+    xser =  np.arange(xlim[0],xlim[1],0.1)
+
+    num=1
+
+    alpha= angle - paser
+
+    for idx, item in enumerate(magser):
+        radx,yser=GalSersic(magser[idx],reser[idx],nser[idx],qser[idx],paser[idx],alpha[idx],xser)
+        strgas="sersic " + str(num)
+        if flaglogx == False:
+            ax[row, 0].plot(radx, yser,'--',color='red',markersize=0.7,label=strgas)
+        else:
+            ax[row, 0].semilogx(radx, yser,'--',color='red',markersize=0.7,label=strgas)
+
+        num=num+1
+
+
+def PlotExp(magexp,rsexp,qexp,paexp,angle,xlim):
+
+
+    xexp =  np.arange(xlim[0],xlim[1],0.1)
+
+
+    alpha= angle - paexp
+
+
+    num=1
+
+    for idx, item in enumerate(magexp):
+
+        radx,yexp=GalExp(magexp[idx],rsexp[idx],qexp[idx],paexp[idx],alpha[idx],xexp)
+
+        strgas="exponential " + str(num)
+        plt.plot(radx, yexp,'--',color='blue',markersize=0.7,label=strgas)
+        num=num+1
+
+
+def PlotMulExp(magexp,rsexp,qexp,paexp,angle,ax,row,xlim,flaglogx):
+
+
+    xexp =  np.arange(xlim[0],xlim[1],0.1)
+
+    alpha= angle - paexp
+
+
+    num=1
+
+    for idx, item in enumerate(magexp):
+
+        radx,yexp=GalExp(magexp[idx],rsexp[idx],qexp[idx],paexp[idx],alpha[idx],xexp)
+        strgas="exponential " + str(num)
+
+        if flaglogx == False:
+            ax[row,0].plot(radx, yexp,'--',color='blue',markersize=0.7,label=strgas)
+        else:
+            ax[row,0].semilogx(radx, yexp,'--',color='blue',markersize=0.7,label=strgas)
+
+        num=num+1
+
+
+
+
+def GalTotal(magauss,fwhmgauss,qgauss,pagauss,magser,reser,nser,qser,paser,magexp,rsexp,qexp,paexp,patot,rad):
+
+    It=0
+
+    ## rest angle
+    anglegas= patot
+    angleser= patot
+    angleexp= patot
+    # changing to rads!
+    pagauss=pagauss*np.pi/180
+    paser=paser*np.pi/180
+    paexp=paexp*np.pi/180
+    anglegas=anglegas*np.pi/180
+    angleser=angleser*np.pi/180
+    angleexp=angleexp*np.pi/180
+    #
+
+    ##  gauss
+    sigma=fwhmgauss/2.354
+    mags=(-magauss)/2.5
+    ftot=10**(mags)
+    I0=ftot/(2*np.pi*qgauss*sigma**2)
+    ###
+
+    ##  Sersic
+    kser=GetKAprox(nser)
+    mags=(-magser)/2.5
+    ftot=10**(mags)
+    Ie=ftot/(2*np.pi*(reser**2)*np.exp(kser)*nser*kser**(-2*nser)*(scipy.special.gamma(2*nser)*qser))
+    ##
+
+
+
+    ## exponential
+    mags=(-magexp)/2.5
+    ftot=10**(mags)
+    Is=ftot/(2*np.pi*(rsexp**2)*qexp)
+
+    ###############################################
+    for idx, item in enumerate(magauss):
+        alpha1=np.cos(anglegas)*np.cos(pagauss[idx])+np.sin(anglegas)*np.sin(pagauss[idx])
+        alpha2=np.cos(anglegas)*np.sin(pagauss[idx])-np.sin(anglegas)*np.cos(pagauss[idx])
+
+        agas2=(rad**2)*(alpha1**2+(1/(qgauss[idx]**2))*alpha2**2)
+        Irgas=I0[idx]*np.exp(-(agas2)/(2*sigma[idx]**2))
+
+        It=It+Irgas
+
+    for idx, item in enumerate(magser):
+        alpha1=np.cos(angleser)*np.cos(paser[idx])+np.sin(angleser)*np.sin(paser[idx])
+        alpha2=np.cos(angleser)*np.sin(paser[idx])-np.sin(angleser)*np.cos(paser[idx])
+
+        aser2=(rad**2)*(alpha1**2+(1/(qser[idx]**2))*alpha2**2)
+        aser=np.sqrt(aser2)
+        Irser=Ie[idx]*np.exp(-kser[idx]*((aser/reser[idx])**(1/nser[idx]) - 1 ))
+
+        It=It+ Irser
+
+    for idx, item in enumerate(magexp):
+
+    #Exponential
+        alpha1=np.cos(angleexp)*np.cos(paexp[idx])+np.sin(angleexp)*np.sin(paexp[idx])
+        alpha2=np.cos(angleexp)*np.sin(paexp[idx])-np.sin(angleexp)*np.cos(paexp[idx])
+
+        aexp2=(rad**2)*(alpha1**2+(1/(qexp[idx]**2))*alpha2**2)
+        aexp=np.sqrt(aexp2)
+        Irexp=Is*np.exp(-aexp/rsexp[idx])
+
+        It = It + Irexp
+
+    Magt = -2.5*np.log10(It)
+
+    return rad,Magt
+
+def GalSersic(magser,reser,nser,qser,paser,angle,radx):
+
+    kser=GetKAprox(nser)
+
+
+    mags=(-magser)/2.5
+    ftot=10**(mags)
+
+    angle=angle*np.pi/180
+    paser=paser*np.pi/180
+
+    Ie=ftot/(2*np.pi*(reser**2)*np.exp(kser)*nser*kser**(-2*nser)*(scipy.special.gamma(2*nser)*qser))
+
+    xser=radx*np.cos(angle)*np.cos(paser) - radx*qser*np.sin(angle)*np.sin(paser)
+    yser=radx*np.cos(angle)*np.sin(paser) + radx*qser*np.sin(angle)*np.cos(paser)
+
+    radang= np.sqrt(xser**2 + yser**2)
+
+    Ir=Ie*np.exp(-kser*((radx/reser)**(1/nser) - 1 ))
+
+    yser = -2.5*np.log10(Ir)
+
+    return radang,yser
+
+
+
+
+def GetKAprox(n):
+
+    K=2*n-1/3+4/(405*n)+46/(25515*n**2)+131/(1148175*n**3)-2194697/(30690717750*n**4)
+
+
+    return (K)
+
+
+
+
+def GetK(n):
+    "Solve the Sersic function to get the dependence of K over Sersic index"
+
+    ## solve the Sersic equation
+    # to get the dependence of K over
+    # Sersic index
+
+    count = 1
+
+    #limits
+    lima=0
+    limb=100
+
+    fxa = fx(n,lima)
+    fxb = fx(n,limb)
+
+    resk= (lima + limb)/2
+
+    fxres=fx(n,resk)
+
+
+    if(fxa * fxb < 0):
+
+        while(np.abs(fxres) > 0.00000001):
+
+            if(fxa * fxres > 0):
+                lima=resk
+            elif(fxa * fxres < 0):
+                limb=resk
+            elif(fxres==0):
+                break
+            resk= (lima + limb)/2
+            fxres=fx(n,resk)
+
+            count+=1
+
+            if (count >= 10000):
+                break
+
+    else:
+        print("no solution in the range: ({},{})\n".format(lima,limb))
+
+    return (resk)
+
+
+def fx(n,k):
+    "function to solve to get the relation between Sersic index and K"
+
+
+    func = np.exp(scipy.special.gammaln(2*n)) - 2 * np.exp(scipy.special.gammaln(2*n)) * scipy.special.gammainc(2*n,k)
+
+
+    return(func)
+
 
 
 
@@ -2271,81 +2112,38 @@ def GalExp(magexp,rsexp,qexp,paexp,angle,radx):
 
     return radang,yexp
 
+def GalGauss(magauss,fwhmgauss,qgauss,pagauss,angle,radx):
+
+    sigma=fwhmgauss/2.354
 
 
-def PlotExp(magexp,rsexp,qexp,paexp,angle,xlim):
+    mags=(-magauss)/2.5
+    ftot=10**(mags)
+    I0=ftot/(2*np.pi*qgauss*sigma**2)
 
 
-    xexp =  np.arange(xlim[0],xlim[1],0.1)
+    angle=np.deg2rad(angle)
+    pagauss=np.deg2rad(pagauss)
 
 
-    alpha= angle - paexp
+    xgas=radx*np.cos(angle)*np.cos(pagauss) - radx*qgauss*np.sin(angle)*np.sin(pagauss)
+    ygas=radx*np.cos(angle)*np.sin(pagauss) + radx*qgauss*np.sin(angle)*np.cos(pagauss)
 
 
-    num=1
+    radang= np.sqrt(xgas**2 + ygas**2)
 
-    for idx, item in enumerate(magexp):
-
-        radx,yexp=GalExp(magexp[idx],rsexp[idx],qexp[idx],paexp[idx],alpha[idx],xexp)
-
-        strgas="exponential " + str(num)
-        plt.plot(radx, yexp,'--',color='blue',markersize=0.7,label=strgas)
-        num=num+1
-
-def PlotMulExp(magexp,rsexp,qexp,paexp,angle,ax,row,xlim,flaglogx):
+    Ir=I0*np.exp(-(radx**2)/(2*sigma**2))
 
 
-    xexp =  np.arange(xlim[0],xlim[1],0.1)
+    Magr = -2.5*np.log10(Ir)
 
-    alpha= angle - paexp
+    return radang,Magr
 
-
-    num=1
-
-    for idx, item in enumerate(magexp):
-
-        radx,yexp=GalExp(magexp[idx],rsexp[idx],qexp[idx],paexp[idx],alpha[idx],xexp)
-        strgas="exponential " + str(num)
-
-        if flaglogx == False:
-            ax[row,0].plot(radx, yexp,'--',color='blue',markersize=0.7,label=strgas)
-        else:
-            ax[row,0].semilogx(radx, yexp,'--',color='blue',markersize=0.7,label=strgas)
-
-        num=num+1
-
-
-def GetExpTime(Image):
-    # k Check
-    "Get exposition time from the image"
-
-    hdu = fits.open(Image)
-#    exptime = hdu[0].header["EXPTIME"]
-    exptime = hdu[0].header.get("EXPTIME",1) # return 1 if not found
-
-    hdu.close()
-    return exptime
-
-
-def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
-    "Get a piece from the image"
-# k Check
-
-
-    if os.path.isfile(Imageout):
-        print("{} deleted; a new one is created \n".format(Imageout))
-        runcmd = "rm {}".format(Imageout)
-        errrm = sp.run([runcmd], shell=True, stdout=sp.PIPE,
-                        stderr=sp.PIPE, universal_newlines=True)
-
-
-    hdu = fits.open(Image)
-    dat = hdu[0].data[ylo - 1:yhi, xlo - 1:xhi]
-    hdu[0].data = dat
-    hdu.writeto(Imageout, overwrite=True)
-    hdu.close()
-
-
+##############################################
+##############################################
+######## end of deprecated Functions  ########
+##############################################
+##############################################
 
 
 if __name__ == '__main__':
