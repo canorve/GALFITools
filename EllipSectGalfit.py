@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 
-
 import numpy as np
 import sys
 import os
@@ -42,109 +41,86 @@ def main():
 
         sys.exit()
 
-    flaglogx=False
-    flagq=False
-    flagpa=False
-    flagsub=False
-    flagpix=False
-    flagranx=[False,False]
-    flagrany=[False,False]
-    flagnoplot=False
-    flagrid=False
-    flagdpi=False
-
-
-# init values
-    qarg=1
-    parg=0
-    ranx=1
-    rany=1
-    dplot=True
-
-    dpival=100
-
-## init sub values
-    Comps=np.array([False])
-    N=0
+    #class for saving user's parameters
+    params=InputParams()
 
     OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--grid','--dpi','--noplot']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
     if options['logx'] != None:
-        flaglogx=True
+        params.flaglogx=True
         print("X axis is logarithm")
     if options['q'] != None:
-        flagq=True
+        params.flagq=True
     if options['pa'] != None:
-        flagpa=True
+        params.flagpa=True
     if options['pix'] != None:
-        flagpix=True
+        params.flagpix=True
     if options['ranx'] != None:
-        flagranx[0]=True
+        params.flagranx[0]=True
     if options['rany'] != None:
-        flagrany[0]=True
+        params.flagrany[0]=True
     if options['grid'] != None:
-        flagrid=True
+        params.flagrid=True
     if options['dpi'] != None:
-        flagdpi=True
+        params.flagdpi=True
     if options['sub'] != None:
-        flagsub=True
+        params.flagsub=True
         print("Plotting subcomponents ")
     if options['noplot'] != None:
-        flagnoplot=True
+        params.flagnoplot=True
         print("images will not be displayed")
 
 
-################## search arguments after the option:
-    if flagpa == True:
+    ################## search arguments after the option:
+    if params.flagpa == True:
         opt={}
         OptionHandle="--pa"
         opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        parg=np.int(opt['pa'])
+        params.parg=np.int(opt['pa'])
 
-    if flagq == True:
+    if params.flagq == True:
         opt={}
         OptionHandle="--q"
         opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        qarg=np.float(opt['q'])
+        params.qarg=np.float(opt['q'])
 
-    if flagranx[0] == True:
+    if params.flagranx[0] == True:
         opt={}
         OptionHandle="--ranx"
         opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
 
-        rangex=opt["ranx"]
-        if "-" in rangex:
-            flagranx[1] = True
-            ranx=opt['ranx']
+        params.rangex=opt["ranx"]
+        if "-" in params.rangex:
+            params.flagranx[1] = True
+            params.ranx=opt['ranx']
         else:
-            ranx=np.float(opt['ranx'])
+            params.ranx=np.float(opt['ranx'])
 
-    if flagrany[0]== True:
+    if params.flagrany[0]== True:
         opt={}
         OptionHandle="--rany"
         opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
 
-        rangey=opt["rany"]
-        if "-" in rangey:
-            flagrany[1] = True
-            rany=opt['rany']
+        params.rangey=opt["rany"]
+        if "-" in params.rangey:
+            params.flagrany[1] = True
+            params.rany=opt['rany']
         else:
-            rany=np.float(opt['rany'])
+            params.rany=np.float(opt['rany'])
 
-    if flagdpi == True:
+    if params.flagdpi == True:
         opt={}
         OptionHandle="--dpi"
         opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        dpival=np.int(opt['dpi'])
+        params.dpival=np.int(opt['dpi'])
+
+    if params.flagnoplot == True:
+        params.dplot=False
 
 
-    if flagnoplot == True:
-        dplot=False
-
-
-    galfile= sys.argv[1]
+    params.galfile= sys.argv[1]
 
     print("angle in multi-plot is measured from the galaxy's major axis ")
 
@@ -153,54 +129,59 @@ def main():
     ################################################
     ################################################
 
+    #class for GALFIT's parameters
+    galpar=GalfitParams()
+
+
     ######################################
     ####### Read Galfit File #############
+    #  xc,yc,q,ang,skylevel,scale,file,mgzpt,exptime,mask=ReadGALFITout(params.galfile,galpars)
+    ReadGALFITout(params.galfile,galpar)
 
-    xc,yc,q,ang,skylevel,scale,file,mgzpt,exptime,mask=ReadGALFITout(galfile)
+
 
     ######################################
     ######################################
 
-    if flagq == True:
-        q=qarg
+    if params.flagq == True:
+        galpar.q=params.qarg
 
-    if flagpa == True:
-        ang=parg
+    if params.flagpa == True:
+        galpar.ang=params.parg
 
 
-    str = "q = {} is used ".format(q)
+    str = "q = {} is used ".format(galpar.q)
     print(str)
 
-    str = "pa = {} is used ".format(ang)
+    str = "pa = {} is used ".format(galpar.ang)
     print(str)
 
     ##
-    str = "dpi = {} for plots ".format(dpival)
+    str = "dpi = {} for plots ".format(params.dpival)
     print(str)
     ##
 
-    (tmp)=file.split(".")
+    (tmp)=galpar.outimage.split(".")
 
-    namefile=tmp[0]
-
+    params.namefile=tmp[0]
 
     # names for the different png
 
-    namepng=namefile + ".png"
-    namesec=namefile + "-gal.png"
-    namemod=namefile + "-mod.png"
-    namemul=namefile + "-mul.png"
-    namesub=namefile + "-sub.fits"
+    params.namepng=params.namefile + ".png"
+    params.namesec=params.namefile + "-gal.png"
+    params.namemod=params.namefile + "-mod.png"
+    params.namemul=params.namefile + "-mul.png"
+    params.namesub=params.namefile + "-sub.fits"
 
     # hdu 1 => image   hdu 2 => model
 
-    errmsg="file {} does not exist".format(file)
+    errmsg="file {} does not exist".format(galpar.outimage)
 
-    assert os.path.isfile(file), errmsg
+    assert os.path.isfile(galpar.outimage), errmsg
 
-    hdu = fits.open(file)
-    img = hdu[1].data
-    model = hdu[2].data
+    hdu = fits.open(galpar.outimage)
+    galpar.img = hdu[1].data
+    galpar.model = hdu[2].data
     hdu.close()
 
 
@@ -209,22 +190,21 @@ def main():
     minlevel=-100  # minimun value for sky
 
 
-    limx,limy=EllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, flagranx, ranx, flagrany, rany, flagrid, skylevel=skylevel,
-              n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=dplot)
+    limx,limy=EllipSectors(galpar, params, n_sectors=numsectors, minlevel=minlevel)
 
 
-    Comps,N=ReadNComp(galfile,xc,yc)
+    params.Comps,params.N=ReadNComp(params.galfile,galpar.xc,galpar.yc)
 
-    print("Number of components = ",N)
+    print("Number of components = ",params.N)
 
 
     ##############################################
     ##############################################
     ##############################################
 
-    if dplot:
+    if params.dplot:
         plt.pause(1.5)
-    plt.savefig(namepng,dpi=dpival)
+    plt.savefig(params.namepng,dpi=params.dpival)
     plt.close()
 
 
@@ -233,19 +213,18 @@ def main():
     ################ Multiplots: ###########################
     ########################################################
 
-    MulEllipSectors(img, model, mgzpt, exptime, scale, xc, yc, q, ang, galfile,
-         limx, flaglogx,flagsub, flagpix, namesub, N, Comps, flagranx, ranx, flagrany, rany, flagrid, skylevel=skylevel, n_sectors=numsectors, badpixels=mask, minlevel=minlevel, plot=dplot)
+    MulEllipSectors(galpar, params, n_sectors=numsectors,  minlevel=minlevel)
 
 
-    if dplot:
+    if params.dplot:
         plt.pause(1.5)
 
-    plt.savefig(namemul,dpi=dpival)
+    plt.savefig(params.namemul,dpi=params.dpival)
     plt.close()
 
 
-    if mask != None:
-        os.remove(mask)
+    if galpar.mask != None:
+        os.remove(galpar.mask) # removing temp mask file
 
 
     ##############       #############
@@ -262,16 +241,77 @@ def main():
     #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 
 
-def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, namefile, flaglogx, flagsub, flagpix, flagranx, ranx, flagrany, rany, flagrid, skylevel=0, badpixels=None,
-              n_sectors=19, mask=None, minlevel=0, plot=False):
+### class for parameters
+class InputParams:
 
-    namesec=namefile + "-gal.png"
-    namemod=namefile + "-mod.png"
-    namesub=namefile + "-sub.fits"
+    flaglogx=False
+    flagq=False
+    flagpa=False
+    flagsub=False
+    flagpix=False
+    flagranx=[False,False]
+    flagrany=[False,False]
+    flagnoplot=False
+    flagrid=False
+    flagdpi=False
+
+    #init
+    qarg=1
+    parg=0
+    ranx=1
+    rany=1
+    dplot=True
+
+    dpival=100
+
+    # init sub values
+    Comps=np.array([False])
+    N=0
+
+
+    #input file
+    galfile= "galfit.01"
+
+    namefile="none"
+    namepng="none.png"
+    namesec="none-gal.png"
+    namemod="none-mod.png"
+    namemul="none-mul.png"
+    namesub="none-sub.fits"
+
+
+
+### class for Galfit parameters
+class GalfitParams:
+
+    xc=1
+    yc=1
+    q=1
+    ang=0
+    skylevel=0
+    scale=1
+    inputimage="galaxy.fits"
+    outimage="galaxy-out.fits"
+    maskimage="galaxy-mask.fits"
+    mgzpt=25
+    exptime=1
+    mask="mask.fits"
+    xmin=1
+    xmax=2
+    ymin=1
+    ymax=2
+    img = np.array([[1,1],[1,1]])
+    model = np.array([[1,1],[1,1]])
+
+##### end of classes
+
+def EllipSectors(galpar, params, n_sectors=19, minlevel=0):
+
+    badpixels=galpar.mask
 
     # removing background:
-    img = img - skylevel
-    model = model - skylevel
+    galpar.img = galpar.img - galpar.skylevel
+    galpar.model = galpar.model - galpar.skylevel
 
     xradm = []
     ysbm = []
@@ -290,33 +330,32 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     else:
         maskb=None
 
-    eps=1-q
+    eps=1-galpar.q
 
-    if plot:
+    if params.dplot:
         plt.clf()
         print("")
 
     ############
     # I have to switch x and y values because they are different axes for
     # numpy:
-    yctemp=xc
-    xctemp=yc
+    yctemp=galpar.xc
+    xctemp=galpar.yc
     # and angle is different as well:
-    angsec=90-ang
+    angsec=90-galpar.ang
     #    angsec=ang
 
 
     ###############################
     #  galaxy:
 
-    g = sectors_photometry(img, eps, angsec, xctemp, yctemp, minlevel=minlevel,
-            plot=plot, badpixels=maskb, n_sectors=n_sectors)
+    g = sectors_photometry(galpar.img, eps, angsec, xctemp, yctemp, minlevel=minlevel,
+            plot=params.dplot, badpixels=maskb, n_sectors=n_sectors)
 
 
-
-    if plot:
+    if params.dplot:
         plt.pause(1)  # Allow plot to appear on the screen
-        plt.savefig(namesec)
+        plt.savefig(params.namesec)
 
 
     ###################################################
@@ -328,17 +367,17 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     mgeangle=g.angle[stidxg]
     mgeanrad=np.deg2rad(mgeangle)
 
-    ab=q
+    ab=galpar.q
 
     aellabg= mgerad * np.sqrt((np.sin(mgeanrad)**2)/ab**2 + np.cos(mgeanrad)**2)
 
     #changing to arc sec
-    aellarcg=aellabg*plate
+    aellarcg=aellabg*galpar.scale
 
 
     ####
     # formula according to cappellary mge manual:
-    mgesbg= mgzpt - 2.5*np.log10(mgecount/exptime) + 2.5*np.log10(plate**2) + 0.1
+    mgesbg= galpar.mgzpt - 2.5*np.log10(mgecount/galpar.exptime) + 2.5*np.log10(galpar.scale**2) + 0.1
     ####
 
     stidxq = np.argsort(aellarcg)
@@ -356,13 +395,13 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 
     ###############################
     #  model:
-    m = sectors_photometry(model, eps, angsec, xctemp, yctemp,minlevel=minlevel,
-            plot=plot, badpixels=maskb, n_sectors=n_sectors)
+    m = sectors_photometry(galpar.model, eps, angsec, xctemp, yctemp,minlevel=minlevel,
+            plot=params.dplot, badpixels=maskb, n_sectors=n_sectors)
 
 
-    if plot:
+    if params.dplot:
         plt.pause(1)  # Allow plot to appear on the screen
-        plt.savefig(namemod)
+        plt.savefig(params.namemod)
     ###################################################
 
     stidxm = np.argsort(m.radius)
@@ -372,19 +411,18 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     mgeangle=m.angle[stidxm]
     mgeanrad=np.deg2rad(mgeangle)
 
-    ab=q
+    ab=galpar.q
 
     aellabm= mgerad * np.sqrt((np.sin(mgeanrad)**2)/ab**2 + np.cos(mgeanrad)**2)
 
 
-    aellarcm=aellabm*plate
+    aellarcm=aellabm*galpar.scale
 
     # formula according to cappellary mge manual
-    mgesbm= mgzpt - 2.5*np.log10(mgecount/exptime) + 2.5*np.log10(plate**2) + 0.1
+    mgesbm= galpar.mgzpt - 2.5*np.log10(mgecount/galpar.exptime) + 2.5*np.log10(galpar.scale**2) + 0.1
     ##
 
     stidxq = np.argsort(aellarcm)
-
 
     xarcm = aellarcm[stidxq]
     ymgem = mgesbm[stidxq]
@@ -395,33 +433,32 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
 
     ################ Plotting
 
-    limx,limy,axsec=PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flaglogx,flagpix,flagranx,ranx,flagrany,rany,flagrid,plate)
+    limx,limy,axsec=PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,params,galpar.scale)
 
     ###
 
 
     #### Creating Subcomponents images with Galfit
 
-    Comps=[]
+    params.Comps=[]
 
-    if flagsub:
+    if params.flagsub:
 
         print("running galfit to create subcomponents...")
 
-        rungal = "galfit -o3 {}".format(galfile)
+        rungal = "galfit -o3 {}".format(params.galfile)
         errgal = sp.run([rungal], shell=True, stdout=sp.PIPE,
         stderr=sp.PIPE, universal_newlines=True)
 
-        runchg = "mv subcomps.fits {}".format(namesub)
+        runchg = "mv subcomps.fits {}".format(params.namesub)
         errchg = sp.run([runchg], shell=True, stdout=sp.PIPE,
         stderr=sp.PIPE, universal_newlines=True)
 
 
         # read number of components
-        Comps,N=ReadNComp(galfile,xc,yc)
+        params.Comps,params.N=ReadNComp(params.galfile,galpar.xc,galpar.yc)
 
-
-        xradq,ysbq,n=SubComp(namesub,N,Comps,mgzpt,exptime,plate,xc,yc,q,ang,flagpix,axsec,skylevel=skylevel,
+        xradq,ysbq,n=SubComp(params.namesub,params.N,params.Comps,galpar.mgzpt,galpar.exptime,galpar.scale,galpar.xc,galpar.yc,galpar.q,galpar.ang,params.flagpix,axsec,skylevel=galpar.skylevel,
               n_sectors=n_sectors, badpixels=badpixels, minlevel=minlevel)
 
 
@@ -431,7 +468,7 @@ def EllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, nam
     return limx,limy
 
 
-def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flagrany,rany,flagrid,plate):
+def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,params,scale):
     """
     Produces final best-fitting plot
 
@@ -441,21 +478,20 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flag
     fig, axsec = plt.subplots()
 
 
-
-    if flagranx[1] == True:
-        (xmin,xmax)=ranx.split("-")
+    if params.flagranx[1] == True:
+        (xmin,xmax)=params.ranx.split("-")
         xmin=np.float(xmin)
         xmax=np.float(xmax)
 
-    if flagrany[1] == True:
-        (ymin,ymax)=rany.split("-")
+    if params.flagrany[1] == True:
+        (ymin,ymax)=params.rany.split("-")
         ymin=np.float(ymin)
         ymax=np.float(ymax)
 
 
     minrad = np.min(xradq)
-    if flagranx[1] == False:
-        maxrad = np.max(xradq) * ranx
+    if params.flagranx[1] == False:
+        maxrad = np.max(xradq) * params.ranx
     else:
         maxrad = np.max(xradq)
 
@@ -464,7 +500,7 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flag
     xran = minrad * (maxrad/minrad)**np.array([-0.02, +1.02])
     yran = mincnt * (maxcnt/mincnt)**np.array([-0.05, +1.05])
 
-    if flagrany[1] == False:
+    if params.flagrany[1] == False:
         yran1=yran[0]
         yran2=yran[1]
 
@@ -472,11 +508,10 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flag
 
         yranmid= yran1 + lyran/2
 
-        lyran=lyran*rany
+        lyran=lyran*params.rany
 
         yran1 = yranmid - lyran/2
         yran2 = yranmid + lyran/2
-
 
         yran[0] = yran2 #inverted axis
         yran[1] = yran1
@@ -487,19 +522,19 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flag
 
     axsec.errorbar(xradq, ysbq,yerr=ysberrq,fmt='o-',capsize=2,color='red',markersize=0.7,label="galaxy")
     axsec.errorbar(xradm, ysbm,yerr=ysberrm,fmt='o-',capsize=2,color='blue',markersize=0.7,label="Model")
-    if flagranx[1] == False:
+    if params.flagranx[1] == False:
         axsec.set_xlim(xran)
     else:
         axsec.set_xlim(xmin,xmax)
 
 
-    if flagrany[1] == False:
+    if params.flagrany[1] == False:
         axsec.set_ylim(yran)
     else:
         axsec.set_ylim(ymax,ymin) #inverted
 
 
-    if flag == True:
+    if params.flaglogx == True:
 
         axsec.set_xscale("log")
 
@@ -522,19 +557,19 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flag
     axsec.yaxis.set_minor_locator(AutoMinorLocator())
     axsec.yaxis.set_major_locator(AutoLocator())
 
-    if flagpix == True:
+    if params.flagpix == True:
 
         axpix = axsec.twiny()
 
         axpix.set_xlabel("(pixels)")
         x1, x2 = axsec.get_xlim()
 
-        axpix.set_xlim(x1/plate, x2/plate)
+        axpix.set_xlim(x1/scale, x2/scale)
 
         axpix.figure.canvas.draw()
 
 
-        if flag == True:
+        if params.flaglogx == True:
             axpix.set_xscale("log")
             locmaj = LogLocator(base=10,numticks=12)
             axpix.xaxis.set_major_locator(locmaj)
@@ -555,14 +590,14 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,flag,flagpix,flagranx,ranx,flag
     else:
         axret=axsec
 
-    if flagrid == True:
+    if params.flagrid == True:
         axsec.grid(True)
 
     return xran,yran,axret
 
 
 
-def SubComp(namesub,N,Comps,mgzpt,exptime,plate,xc,yc,q,ang,flagpix,axsec,skylevel=0,
+def SubComp(namesub,N,Comps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,axsec,skylevel=0,
     n_sectors=19, badpixels=None, minlevel=0):
 
     errmsg="file {} does not exist".format(namesub)
@@ -637,12 +672,12 @@ def SubComp(namesub,N,Comps,mgzpt,exptime,plate,xc,yc,q,ang,flagpix,axsec,skylev
 
         #converting to arcsec
 
-        aellarcg=aellabg*plate
+        aellarcg=aellabg*scale
 
 
         # formula according to cappellary mge manual
 
-        mgesbg= mgzpt - 2.5*np.log10(mgecount/exptime) + 2.5*np.log10(plate**2) + 0.1
+        mgesbg= mgzpt - 2.5*np.log10(mgecount/exptime) + 2.5*np.log10(scale**2) + 0.1
 
 
         stidxq = np.argsort(aellarcg)
@@ -671,13 +706,14 @@ def PlotSub(xradq,ysbq,nsub,axsec):
 
     axsec.plot(xradq, ysbq,'--',color='skyblue',linewidth=4,markersize=0.7,label=substr)
 
-####
 
-def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, limx, flag, flagsub, flagpix, namesub, N, Comps, flagranx, ranx, flagrany, rany, flagrid, skylevel=0, badpixels=None,
-              n_sectors=19, mask=None, minlevel=0, plot=False):
+def MulEllipSectors(galpar, params, n_sectors=19, minlevel=0):
 
-    img = img - skylevel
-    model = model - skylevel
+    badpixels=galpar.mask
+
+    #it's already done
+    #galpar.img = galpar.img - galpar.skylevel
+    #galpar.model = galpar.model - galpar.skylevel
 
     fignum=1
 
@@ -695,37 +731,37 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
         maskb=None
 
 
-    eps=1-q
+    eps=1-galpar.q
 
-    if plot:
+    if params.dplot:
         plt.clf()
         print("")
 
-    if flagranx[1] == True:
-        (xmin,xmax)=ranx.split("-")
+    if params.flagranx[1] == True:
+        (xmin,xmax)=params.ranx.split("-")
         xmin=np.float(xmin)
         xmax=np.float(xmax)
 
-    if flagrany[1] == True:
-        (ymin,ymax)=rany.split("-")
+    if params.flagrany[1] == True:
+        (ymin,ymax)=params.rany.split("-")
         ymin=np.float(ymin)
         ymax=np.float(ymax)
 
     ###################
     # I have to switch x and y values because they are different axes for
     # numpy
-    xtemp=xc
-    xc=yc
-    yc=xtemp
+    xtemp=galpar.xc
+    galpar.xc=galpar.yc
+    galpar.yc=xtemp
 
-    angsec=90-ang
+    angsec=90-galpar.ang
     ######################
 
-    sg = sectors_photometry(img, eps, angsec, xc, yc,minlevel=minlevel,
+    sg = sectors_photometry(galpar.img, eps, angsec, galpar.xc, galpar.yc,minlevel=minlevel,
             plot=False, badpixels=maskb, n_sectors=n_sectors)
 
 
-    sm = sectors_photometry(model, eps, angsec, xc, yc,minlevel=minlevel,
+    sm = sectors_photometry(galpar.model, eps, angsec, galpar.xc, galpar.yc,minlevel=minlevel,
             plot=False, badpixels=maskb, n_sectors=n_sectors)
 
     ###################################################
@@ -753,32 +789,32 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
     # converting to pixels
 
-    mgerad=mgerad*plate
-    mgemodrad=mgemodrad*plate
+    mgerad=mgerad*galpar.scale
+    mgemodrad=mgemodrad*galpar.scale
 
 
     # formula according to cappellary mge manual
     # galaxy:
-    mgesb= mgzpt - 2.5*np.log10(mgecount/exptime) + 2.5*np.log10(plate**2) + 0.1
+    mgesb= galpar.mgzpt - 2.5*np.log10(mgecount/galpar.exptime) + 2.5*np.log10(galpar.scale**2) + 0.1
     # Model:
-    mgemodsb= mgzpt - 2.5*np.log10(mgemodcount/exptime) + 2.5*np.log10(plate**2) + 0.1
+    mgemodsb= galpar.mgzpt - 2.5*np.log10(mgemodcount/galpar.exptime) + 2.5*np.log10(galpar.scale**2) + 0.1
 
 
-    if flagsub:
+    if params.flagsub:
 
         wtemp=[]
         mgesbsub=[]
         mgeradsub=[]
         mgeanglesub=[]
         rsub=[]
-        hdusub = fits.open(namesub)
+        hdusub = fits.open(params.namesub)
 
         subimgs=[]
 
         cnt=0
-        while(cnt<len(Comps)):
+        while(cnt<len(params.Comps)):
 
-            if Comps[cnt] == True:
+            if params.Comps[cnt] == True:
                 imgsub = hdusub[cnt+2].data
                 subimgs.append(imgsub)
             cnt=cnt+1
@@ -788,13 +824,13 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
     ###############################
     #  galaxy:
-        ab=q
+        ab=galpar.q
         ni=0
-        while(ni<N):
+        while(ni<params.N):
 
             subim=subimgs[ni]
 
-            subcmp = sectors_photometry(subim, eps, angsec, xc, yc, minlevel=minlevel,
+            subcmp = sectors_photometry(subim, eps, angsec, galpar.xc, galpar.yc, minlevel=minlevel,
                     plot=0, badpixels=maskb, n_sectors=n_sectors)
 
             subidx = np.argsort(subcmp.radius)
@@ -802,7 +838,7 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
             temprad=subcmp.radius[subidx]
 
             #converting to arcsec
-            temprad=temprad*plate
+            temprad=temprad*galpar.scale
 
             mgecountsub=subcmp.counts[subidx]
 
@@ -811,7 +847,7 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
 
             # formula according to cappellary mge manual
-            tempmge= mgzpt - 2.5*np.log10(mgecountsub/exptime) + 2.5*np.log10(plate**2) + 0.1
+            tempmge= galpar.mgzpt - 2.5*np.log10(mgecountsub/galpar.exptime) + 2.5*np.log10(galpar.scale**2) + 0.1
 
             mgesbsub.append(tempmge)
             mgeradsub.append(temprad)
@@ -822,8 +858,8 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
     minrad = np.min(mgerad)
 
-    if flagranx[1] == False:
-        maxrad = np.max(mgerad) * ranx
+    if params.flagranx[1] == False:
+        maxrad = np.max(mgerad) * params.ranx
     else:
         maxrad = np.max(mgerad)
 
@@ -833,7 +869,7 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     yran = minsb * (maxsb/minsb)**np.array([+1.05,-0.05])
 
 
-    if flagrany[1] == False:
+    if params.flagrany[1] == False:
 
         yran1=yran[0]
         yran2=yran[1]
@@ -842,14 +878,13 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
         yranmid= yran1 + lyran/2
 
-        lyran=lyran*rany
+        lyran=lyran*params.rany
 
         yran1 = yranmid - lyran/2
         yran2 = yranmid + lyran/2
 
         yran[0] = yran1
         yran[1] = yran2
-
 
 
     sectors = np.unique(mgeangle)
@@ -863,11 +898,9 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     fig.subplots_adjust(hspace=0.01)
 
 
-    if flagpix:
+    if params.flagpix:
         axpix = axsec[0,0].twiny()
         axpix2 = axsec[0,1].twiny()
-
-
 
     fig.text(0.04, 0.5, 'Surface brightness', va='center', rotation='vertical')
     fig.text(0.96, 0.5, 'error (%)', va='center', rotation='vertical')
@@ -875,9 +908,9 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     axsec[-1, 0].set_xlabel("radius ('')")
     axsec[-1, 1].set_xlabel("radius ('')")
 
-    if flag == True:
+    if params.flaglogx == True:
         axsec[-1, 0].xaxis.set_major_locator(LogLocator(base=10.0, numticks=15))
-        if flagpix:
+        if params.flagpix:
             axpix.set_xscale("log")
             axpix2.set_xscale("log")
 
@@ -888,7 +921,7 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
     axsec[-1, 0].tick_params(which='major', length=7)
     axsec[-1, 0].tick_params(which='minor', length=4, color='r')
 
-    if flag == True:
+    if params.flaglogx == True:
         axsec[-1, 0].xaxis.set_major_locator(LogLocator(base=10.0, numticks=15))
     else:
         axsec[-1, 0].xaxis.set_minor_locator(AutoMinorLocator())
@@ -917,17 +950,17 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
         txtang= sectors[j]
         txt = "$%.f^\circ$" % txtang
 
-        if flagranx[1] == False:
+        if params.flagranx[1] == False:
             axsec[row, 0].set_xlim(xran)
         else:
             axsec[row, 0].set_xlim(xmin,xmax)
 
-        if flagrany[1] == False:
+        if params.flagrany[1] == False:
             axsec[row, 0].set_ylim(yran)
         else:
             axsec[row, 0].set_ylim(ymax,ymin) #inverted
 
-        if flag == False:
+        if params.flaglogx == False:
             axsec[row, 0].plot(r, mgesb[w], 'C3o')
 
             axsec[row, 0].plot(r2, mgemodsb[wmod], 'C0-', linewidth=2)
@@ -937,12 +970,12 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
             axsec[row, 0].semilogx(r2, mgemodsb[wmod], 'C0-', linewidth=2)
 
-        if flagrid == True:
+        if params.flagrid == True:
             axsec[row,0].grid(True)
 
-        if flagsub == True:
+        if params.flagsub == True:
             ii=0
-            while(ii<N):
+            while(ii<params.N):
 
                 wtemp = np.nonzero(mgeanglesub[ii] == sectors[j])[0]
                 wtemp = wtemp[np.argsort(mgeradsub[ii][wtemp])]
@@ -950,7 +983,7 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
                 rtemp = mgeradsub[ii][wtemp]
 
 
-                if flag == False:
+                if params.flaglogx == False:
 
                     axsec[row, 0].plot(rtemp, mgesbsub[ii][wtemp],'--',color='skyblue', linewidth=2)
 
@@ -975,8 +1008,10 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
         axsec[row, 1].yaxis.tick_right()
         axsec[row, 1].yaxis.set_label_position("right")
         axsec[row, 1].set_ylim([-19.5, 20])
+        # axsec[row, 1].set_ylim([-20, 20])
 
-        if flagranx[1] == False:
+
+        if params.flagranx[1] == False:
             axsec[row, 1].set_xlim(xran)
         else:
             axsec[row, 1].set_xlim(xmin,xmax)
@@ -995,18 +1030,18 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
 
         row -= 1
 
-    if flagpix == True:
+    if params.flagpix == True:
         axpix.set_xlabel("(pixels)")
         x1, x2 = axsec[7,0].get_xlim()
-        axpix.set_xlim(x1/plate, x2/plate)
+        axpix.set_xlim(x1/galpar.scale, x2/galpar.scale)
         axpix.figure.canvas.draw()
 
         axpix2.set_xlabel("(pixels)")
-        axpix2.set_xlim(x1/plate, x2/plate)
+        axpix2.set_xlim(x1/galpar.scale, x2/galpar.scale)
         axpix2.figure.canvas.draw()
 
         ##
-        if flag == True:
+        if params.flaglogx == True:
             axpix.xaxis.set_major_locator(LogLocator(base=10.0, numticks=15))
         else:
             axpix.xaxis.set_minor_locator(AutoMinorLocator())
@@ -1015,7 +1050,7 @@ def MulEllipSectors(img, model, mgzpt, exptime, plate, xc, yc, q, ang, galfile, 
         axpix.tick_params(which='major', length=7)
         axpix.tick_params(which='minor', length=4, color='r')
 
-        if flag == True:
+        if params.flaglogx == True:
             axpix2.xaxis.set_major_locator(LogLocator(base=10.0, numticks=15))
         else:
             axpix2.xaxis.set_minor_locator(AutoMinorLocator())
@@ -1068,13 +1103,12 @@ def FindSB(xarcq, ymgeq, numsectors):
     return xradq, ysbq, ysberrq
 
 
-def ReadGALFITout(inputf):
+def ReadGALFITout(inputf,galpar):
 
     flagfirst = True
 
     maskimage = ""
-
-    skylevel=0
+    #    skylevel=0
 
     GalfitFile = open(inputf,"r")
 
@@ -1109,25 +1143,25 @@ def ReadGALFITout(inputf):
         line = lines[index]
         (tmp) = line.split()
         if tmp[0] == "A)":     # input image
-            inputimage=tmp[1]
+            galpar.inputimage=tmp[1]
 
         if tmp[0] == "B)":     # out image
-            outimage=tmp[1]
+            galpar.outimage=tmp[1]
 
         if tmp[0] == "F)":     # mask image
-            maskimage=tmp[1]
+            galpar.maskimage=tmp[1]
 
         if tmp[0] == "H)":     # region fit box
-            xmin=int(tmp[1])
-            xmax=int(tmp[2])
-            ymin=int(tmp[3])
-            ymax=int(tmp[4])
+            galpar.xmin=int(tmp[1])
+            galpar.xmax=int(tmp[2])
+            galpar.ymin=int(tmp[3])
+            galpar.ymax=int(tmp[4])
 
         if tmp[0] == "J)":     # mgzpt
-            mgzpt=float(tmp[1])
+            galpar.mgzpt=float(tmp[1])
 
         if tmp[0] == "K)":     # plate scale
-            scale=float(tmp[1])
+            galpar.scale=float(tmp[1])
 
 
         # first component
@@ -1142,14 +1176,14 @@ def ReadGALFITout(inputf):
                 (tmp) = line.split()
 
                 if tmp[0] == "1)":   # center
-                    xc=float(tmp[1])
-                    yc=float(tmp[2])
+                    galpar.xc=float(tmp[1])
+                    galpar.yc=float(tmp[2])
 
                 if tmp[0] == "9)":    # axis ratio
-                    q=float(tmp[1])
+                    galpar.q=float(tmp[1])
 
                 if tmp[0] == "10)": # position angle
-                    pa=float(tmp[1])
+                    galpar.ang=float(tmp[1])
 
         # sersic component
         if tmp[0] == "0)" and tmp[1] == "sersic":     # plate scale
@@ -1165,15 +1199,15 @@ def ReadGALFITout(inputf):
                     ycser=float(tmp[2])
 
                     if flagfirst == False:
-                        dist = np.sqrt((xc-xcser)**2+(yc-ycser)**2)
+                        dist = np.sqrt((galpar.xc-xcser)**2+(galpar.yc-ycser)**2)
 
 
 
                 if tmp[0] == "9)" and (dist < 3):    # axis ratio
-                    q=float(tmp[1])
+                    galpar.q=float(tmp[1])
 
                 if tmp[0] == "10)" and (dist < 3): # position angle
-                    pa=float(tmp[1])
+                    galpar.ang=float(tmp[1])
 
         # second component exponential model
         if tmp[0] == "0)" and tmp[1] == "expdisk" :     # plate scale
@@ -1189,14 +1223,14 @@ def ReadGALFITout(inputf):
                     ycexp=float(tmp[2])
 
                     if flagfirst == False:
-                        dist = np.sqrt((xc-xcexp)**2+(yc-ycexp)**2)
+                        dist = np.sqrt((galpar.xc-xcexp)**2+(galpar.yc-ycexp)**2)
 
 
                 if (tmp[0] == "9)") and (dist < 3):    # axis ratio
-                    q=float(tmp[1])
+                    galpar.q=float(tmp[1])
 
                 if (tmp[0] == "10)") and (dist < 3): # position angle
-                    pa=float(tmp[1])
+                    galpar.ang=float(tmp[1])
 
 
         if tmp[0] == "0)" and tmp[1] == "gaussian":
@@ -1212,13 +1246,13 @@ def ReadGALFITout(inputf):
                     ycgauss=float(tmp[2])
 
                     if flagfirst == False:
-                        dist = np.sqrt((xc-xcgauss)**2+(yc-ycgauss)**2)
+                        dist = np.sqrt((galpar.xc-xcgauss)**2+(galpar.yc-ycgauss)**2)
 
                 if (tmp[0] == "9)") and (dist < 3):    # axis ratio
-                    q=float(tmp[1])
+                    galpar.q=float(tmp[1])
 
                 if (tmp[0] == "10)") and (dist < 3): # position angle
-                    pa=float(tmp[1])
+                    galpar.ang=float(tmp[1])
 
 
 
@@ -1231,33 +1265,31 @@ def ReadGALFITout(inputf):
                 (tmp) = line.split()
 
                 if tmp[0] == "1)":    # axis ratio
-                    skylevel=float(tmp[1])
+                    galpar.skylevel=float(tmp[1])
 
         index += 1
 
     GalfitFile.close()
 
 
-    errmsg="file {} does not exist".format(inputimage)
-    assert os.path.isfile(inputimage), errmsg
+    errmsg="file {} does not exist".format(galpar.inputimage)
+    assert os.path.isfile(galpar.inputimage), errmsg
 
-    exptime=GetExpTime(inputimage)
-
-
-    errmsg="xc and yc are unknown "
-    assert ("xc" in locals()) and ("yc" in locals())  , errmsg
+    galpar.exptime=GetExpTime(galpar.inputimage)
 
 
-    print("center is at xc, yc = ",xc,yc)
+    #errmsg="xc and yc are unknown "
+    #assert ("xc" in locals()) and ("yc" in locals())  , errmsg
 
+    print("center is at xc, yc = ",galpar.xc,galpar.yc)
 
     # correcting coordinates
-    xc=xc-xmin+1
-    yc=yc-ymin+1
+    galpar.xc=galpar.xc-galpar.xmin+1
+    galpar.yc=galpar.yc-galpar.ymin+1
 
 
-    if os.path.isfile(maskimage):
-        mime=mimetypes.guess_type(maskimage)
+    if os.path.isfile(galpar.maskimage):
+        mime=mimetypes.guess_type(galpar.maskimage)
 
         flagbm = not(mime[0] == "text/plain")
 
@@ -1265,15 +1297,15 @@ def ReadGALFITout(inputf):
         assert flagbm is True, errmsg
 
 
-        mask="tempmask.fits"
-        GetFits(maskimage, mask, xmin, xmax, ymin, ymax)
+        galpar.mask="tempmask.fits"
+        GetFits(galpar.maskimage, galpar.mask, galpar.xmin, galpar.xmax, galpar.ymin, galpar.ymax)
 
     else:
         errmsg="Mask file does not exist"
         print(errmsg)
-        mask=None
+        galpar.mask=None
 
-    return xc,yc,q,pa,skylevel,scale,outimage,mgzpt,exptime,mask
+    #return xc,yc,q,pa,skylevel,scale,outimage,mgzpt,exptime,mask
 
 
 def ReadNComp(inputf,X,Y):
@@ -1344,7 +1376,6 @@ def ReadNComp(inputf,X,Y):
     return Comps,Ncomp
 
 def GetExpTime(Image):
-    # k Check
     "Get exposition time from the image"
 
     hdu = fits.open(Image)
@@ -1356,7 +1387,6 @@ def GetExpTime(Image):
 
 def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
     "Get a piece from the image"
-    # k Check
 
     if os.path.isfile(Imageout):
         print("{} deleted; a new one is created \n".format(Imageout))
