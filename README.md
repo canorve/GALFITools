@@ -21,7 +21,7 @@ The python libraries used for those scripts are:
 
 The main programs are:
 - BorderMask.py
-- [EllipSectGalfit.py](Ellipse)
+- [EllipSectGalfit.py](./Ellipse.md)
 - MaskBox.py
 - GetK.pl
 - GalfitSky.py
