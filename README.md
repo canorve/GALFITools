@@ -1,8 +1,7 @@
 # GALFITools
 
-
-GALFITools is a collection of Python 
-scripts that I have used to improve the 
+GALFITools is a collection of Python
+scripts that I have used to improve the
 output analysis of GALFIT.
 
 ## Installation
@@ -22,7 +21,7 @@ The python libraries used for those scripts are:
 
 The main programs are:
 - BorderMask.py
-- EllipSectGalfit.py
+- [EllipSectGalfit.py](Ellipse)
 - MaskBox.py
 - GetK.pl
 - GalfitSky.py
@@ -45,6 +44,7 @@ pixel flux in the border mask. le0 will mask all the pixels below or
 equal to zero.
 
 ## EllipSectGalfit.py
+
 
 This is a "quick" (and dirty) substitute for IRAF's ellipse
 routine. It creates a "ellipse" profile of galaxy
