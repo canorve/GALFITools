@@ -22,11 +22,11 @@ The python libraries used for those scripts are:
 The main programs are:
 
 - [BorderMask.py](./docs/BorderMask.md)
-- [EllipSectGalfit.py](./docs/Ellipse)
-- [MaskBox.py](./docs/MaskBox)
-- [GetK.pl](./docs/GetK)
-- [GalfitSky.py](./docs/GalfitSky)
-- [xy2fits.py](./docs/xy2fits)
+- [EllipSectGalfit.py](./docs/Ellipse.md)
+- [MaskBox.py](./docs/MaskBox.md)
+- [GetK.pl](./docs/GetK.md)
+- [GalfitSky.py](./docs/GalfitSky.md)
+- [xy2fits.py](./docs/xy2fits.md)
 
 
 Every program has its own page. Click in the
