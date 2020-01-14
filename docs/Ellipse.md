@@ -6,10 +6,10 @@ routine. It creates a "ellipse" profile of galaxy
 and GALFIT's model output (peng et al 2002). It also create a
 multiple plots for different angles.  
 
-![A85 gal](img/A85mgetwist-gal.png)
-![A85 gal](img/A85mgetwist-mod.png)
-![A85 gal](img/A85mgetwist.png)
-![A85 gal](img/A85mgetwist-mul.png)
+![A85 gal](../img/A85mgetwist-gal.png)
+![A85 gal](../img/A85mgetwist-mod.png)
+![A85 gal](../img/A85mgetwist.png)
+![A85 gal](../img/A85mgetwist-mul.png)
 
 To run the code just type in the command line (or in ipython):
 
