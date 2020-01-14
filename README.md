@@ -21,7 +21,7 @@ The python libraries used for those scripts are:
 
 The main programs are:
 
-- [BorderMask.py](./docs/BorderMask)
+- [BorderMask.py](./docs/BorderMask.md)
 - [EllipSectGalfit.py](./docs/Ellipse)
 - [MaskBox.py](./docs/MaskBox)
 - [GetK.pl](./docs/GetK)
