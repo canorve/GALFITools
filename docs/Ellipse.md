@@ -55,3 +55,7 @@ is a FITS image.
 
 #### Warning
 Be sure to run this code in the same path that you run GALFIT.
+
+
+EllipSectGalfit.py uses the mgefit library which is
+described in Cappellari, MNRAS, 333, 400 (2002).
