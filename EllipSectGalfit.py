@@ -611,7 +611,6 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,params,scale):
             locmin = LogLocator(base=10.0,subs=(0.2,0.4,0.6,0.8),numticks=12)
             axpix.xaxis.set_minor_locator(locmin)
             axpix.xaxis.set_minor_formatter(NullFormatter())
-
         else:
             axpix.xaxis.set_minor_locator(AutoMinorLocator())
             axpix.xaxis.set_major_locator(AutoLocator())
@@ -625,7 +624,10 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,params,scale):
         axret=axsec
 
     if params.flagrid == True:
-        axsec.grid(True)
+        # Customize the major grid
+        axsec.grid(which='major', linestyle='-', linewidth='0.7', color='black')
+        # Customize the minor grid
+        axsec.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
 
     return xran,yran,axret
 
@@ -1005,7 +1007,12 @@ def MulEllipSectors(galpar, params, n_sectors=19, minlevel=0):
             axsec[row, 0].semilogx(r2, mgemodsb[wmod], 'C0-', linewidth=2)
 
         if params.flagrid == True:
-            axsec[row,0].grid(True)
+        # Customize the major grid
+            axsec[row,0].grid(which='major', linestyle='-', linewidth='0.7', color='black')
+        # Customize the minor grid
+            axsec[row,0].grid(which='minor', linestyle=':', linewidth='0.5', color='black')
+
+        #  axsec[row,0].grid(True)
 
         if params.flagsub == True:
             ii=0
