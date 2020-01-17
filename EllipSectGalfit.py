@@ -21,7 +21,7 @@ def main():
 
     if (len(sys.argv[1:]) == 0):
         print ('Missing arguments')
-        print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] [--ranx/y Value] [--grid] [--dpi Value] [--noplot] " % (sys.argv[0]))
+        print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] [--ranx/y Value] [--grid] [--dpi Value] [--noplot] [--out OutFile] " % (sys.argv[0]))
         print ("GALFITOutputFile: GALFIT output file ")
         print ("logx: activates X-axis as logarithm ")
         print ("q: introduce axis ratio ")
@@ -33,18 +33,20 @@ def main():
         print ("grid: display a grid in the plot ")
         print ("dpi: dots per inch for saving plot ")
         print ("noplot: do not display images")
+        print ("out: creates output file of both galaxy and model sb profiles")
 
 
         print ("Example:\n %s galfit.01 --logx" % (sys.argv[0]))
-        print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub --ranx 2" % (sys.argv[0]))
+        print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub --ranx 2 --out file.txt" % (sys.argv[0]))
         print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub --ranx 1-20" % (sys.argv[0]))
+        print ("see https://github.com/canorve/GALFITools for more examples")
 
         sys.exit()
 
     #class for saving user's parameters
     params=InputParams()
 
-    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--grid','--dpi','--noplot']
+    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--grid','--dpi','--out','--noplot']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
@@ -71,6 +73,9 @@ def main():
     if options['noplot'] != None:
         params.flagnoplot=True
         print("images will not be displayed")
+    if options['out'] != None:
+        params.flagout=True
+        print("output file will be created")
 
 
     ################## search arguments after the option:
@@ -118,6 +123,12 @@ def main():
 
     if params.flagnoplot == True:
         params.dplot=False
+
+    if params.flagout == True:
+        opt={}
+        OptionHandle="--out"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        params.output=opt['out']
 
 
     params.galfile= sys.argv[1]
@@ -254,7 +265,7 @@ class InputParams:
     flagnoplot=False
     flagrid=False
     flagdpi=False
-
+    flagout=False
     #init
     qarg=1
     parg=0
@@ -271,6 +282,9 @@ class InputParams:
 
     #input file
     galfile= "galfit.01"
+
+    #output file
+    output = "out.txt"
 
     namefile="none"
     namepng="none.png"
@@ -436,6 +450,26 @@ def EllipSectors(galpar, params, n_sectors=19, minlevel=0):
     limx,limy,axsec=PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,params,galpar.scale)
 
     ###
+
+    if params.flagout == True: 
+
+        OUTFH = open (params.output,"w")
+
+        lineout= "#            Galaxy                          Model               \n"
+        OUTFH.write(lineout)
+
+        lineout= "#     rad      SB        SBerr       rad       SB        SBerr \n"
+        OUTFH.write(lineout)
+
+        lineout= "# (arcsec) (mag/arcsec) (error)   (arcsec) (mag/arcsec)  (error) \n"
+        OUTFH.write(lineout)
+
+        for idx, item in enumerate(xradq):
+            lineout= "{0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f} \n".format(xradq[idx],ysbq[idx],ysberrq[idx],xradm[idx],ysbm[idx],ysberrm[idx])
+            OUTFH.write(lineout)
+
+        OUTFH.close()
+
 
 
     #### Creating Subcomponents images with Galfit
