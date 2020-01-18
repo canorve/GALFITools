@@ -2,8 +2,8 @@
 # EllipSectGalfit.py
 
 This is a "quick" (and dirty) substitute for IRAF's ellipse
-routine. It creates a "ellipse" profile of galaxy
-and GALFIT's model output (peng et al 2002). It also creates 
+routine. It creates an "ellipse" profile of the galaxy
+and model from GALFIT output (peng et al 2002). It also creates 
 multiple plots for different angles.  
 
 The options to run the code in the terminal (or ipython) are:
@@ -14,11 +14,11 @@ The options to run the code in the terminal (or ipython) are:
 
 Examples: 
 
- EllipSectGalfit.py galfit.01 --logx
+ ./EllipSectGalfit.py galfit.01 --logx
 
 *or* 
 
- EllipSectGalfit.py galfit.02 --q 0.35 --pa 60 --sub
+ ./EllipSectGalfit.py galfit.02 --q 0.35 --pa 60 --sub
 
 
 ## Options 
@@ -29,7 +29,7 @@ Examples:
 
 **q**: axis ratio value. If ignored, it takes the one from the last component in GALFITOutputFile.
 
-**pa**: position angle value (same as GALFIT).  If ignored, it takes the one 
+**pa**: position angle value (same as GALFIT). If ignored, it takes the one 
 from the last component in GALFITOutputFile.
 
 **sub**: plots include the model subcomponents
@@ -39,7 +39,7 @@ from the last component in GALFITOutputFile.
 **ranx**: constant that multiplies the range of the x axis to increase/decrease *or* 
 it can be used as xmin-xmax to change range
 
-**rany**: constant that multiplies the range of the y axis to increase/decrease range
+**rany**: constant that multiplies the range of the y axis to increase/decrease it
 *or* it can be used as ymin-ymax to change range.
 
 **noplot**: the code creates images but do not display them.
@@ -53,13 +53,13 @@ it can be used as xmin-xmax to change range
 
 ## Notes
 
-* EllipSectGalfit already uses mask image (option "*F*" GALFIT) if this
-    is a **FITS** image. If your mask is an *ASCII* file you can convert it to **FITS**
-    using the **[xy2fits.py]**(./xy2fits.md) tool.
+* EllipSectGalfit already uses the mask image (option "*F*" GALFIT) only if this
+    is a **FITS** image. In case your mask is an *ASCII* file, you can convert it to **FITS**
+    using the [xy2fits.py](./xy2fits.md) tool.
 
 
-* EllipSectGalfit uses axis ratio (*q*) and position angle (*pa*) to create a grid 
-    using the function sectors_photometry from the mgefit library. Unlike IRAF's Ellipse, 
+* EllipSectGalfit uses axis ratio (*q*) and position angle (*pa*) to create a *grid* 
+    using the function *sectors_photometry* from the *mgefit* library. Unlike IRAF's Ellipse, 
     *q* and *pa* are fixed through radius. See the two images below: 
 
     ![A85 gal](../img/A85.img.png)
@@ -67,19 +67,18 @@ it can be used as xmin-xmax to change range
 
     For this reason, errors given by this program are expected to 
     be greater than those coming from IRAF's ellipse since EllipSectGalfit 
-    leaves the axis ratio fixed for the whole radio. On the other hand, IRAF's ellipse
+    leaves the axis ratio fixed for the whole radio. While, on the other hand, IRAF's ellipse
     can change axis ratio and angular position for each isophote.
 
 * Be sure to run this code in the same path that you run GALFIT. 
 
-* Since EllipSectGalfit reads the "B)" option of galfit.XX file, it 
+* Since EllipSectGalfit reads the "*B*" option of galfit.XX file, this
     must be the last GALFIT fit. 
 
 ## Examples
 
 See the examples below for an elliptical galaxy that was fitted 
-with 7 gaussians (Galaxy and model images are the ones 
-displayed above). 
+with 7 gaussians (images for this galaxy are displayed above). 
 
 * Example 1: 
     ./EllipSectGalfit.py galfit.46 
