@@ -18,6 +18,7 @@ The python libraries used for those scripts are:
 - scipy
 - matplotlib
 - mgefit
+- mimetypes
 
 The main programs are:
 
@@ -27,10 +28,6 @@ The main programs are:
 - [GetK.pl](./docs/GetK.md)
 - [GalfitSky.py](./docs/GalfitSky.md)
 - [xy2fits.py](./docs/xy2fits.md)
-
-
-Every program has its own page. Click in the
-correspondent link.
 
 ## Questions?
 
