@@ -78,6 +78,9 @@ it can be used as xmin-xmax to change range
 * The angles shown in the multi-plot are measured from the galaxy's major axis.
     They are not measured from the Y-axis as it is the case in GALFIT.
 
+* In order for the program to detect the components, they must have the same 
+    center (x,y).
+
 ## Examples
 
 See the examples below for an elliptical galaxy that was fitted 
