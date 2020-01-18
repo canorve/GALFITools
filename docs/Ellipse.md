@@ -1,5 +1,5 @@
 
-## EllipSectGalfit.py
+# EllipSectGalfit.py
 
 This is a "quick" (and dirty) substitute for IRAF's ellipse
 routine. It creates a "ellipse" profile of galaxy
@@ -15,15 +15,13 @@ The options to run the code in the terminal (or ipython) are:
 Examples: 
 
  EllipSectGalfit.py galfit.01 --logx
+
 or 
+
  EllipSectGalfit.py galfit.02 --q 0.35 --pa 60 --sub
 
-#### Warning
-Be sure to run this code in the same path that you run GALFIT. In addition,
-since EllipSectGalfit reads the "B)" option of galfit.XX file, it 
-must be the last fit of GALFIT. 
 
-The options are explained below.
+### Options 
 
 GALFITOutputFile: GALFIT output file  (e.g. galfit.01)
 
@@ -52,21 +50,31 @@ dpi: dots per inch value to increase/decrease resolution.
 
 out: creates output file from the data of the plot (Rad (arcsec) SurfaceBrightness  ErrSurface). 
 
-EllipSectGalfit already uses mask image (option "F" GALFIT) if this
-is a FITS image. If your mask is an ASCII file you can convert it to FITS
-using the xy2fits [xy2fits.py](./xy2fits.md) tool.
 
-Note: EllipSectGalfit uses axis ratio (q) and position angle (pa) to create a grid 
-using the function sectors_photometry from the mgefit library. Unlike IRAF's Ellipse, 
-q and pa are fixed through radius. See the two images below: 
+### Notes
 
-![A85 gal](../img/A85.img.png)
-![A85 mod](../img/A85.img.mod.png)
+* EllipSectGalfit already uses mask image (option "F" GALFIT) if this
+    is a FITS image. If your mask is an ASCII file you can convert it to FITS
+    using the xy2fits [xy2fits.py](./xy2fits.md) tool.
 
-For this reason, errors given by this program are expected to 
-be greater than those coming from IRAF's ellipse since EllipSectGalfit 
-leaves the axis ratio fixed for the whole radius while IRAF's ellipse
-can change axis ratio and angular position for each isophote.
+
+* EllipSectGalfit uses axis ratio (q) and position angle (pa) to create a grid 
+    using the function sectors_photometry from the mgefit library. Unlike IRAF's Ellipse, 
+    q and pa are fixed through radius. See the two images below: 
+
+    ![A85 gal](../img/A85.img.png)
+    ![A85 mod](../img/A85.img.mod.png)
+
+    For this reason, errors given by this program are expected to 
+    be greater than those coming from IRAF's ellipse since EllipSectGalfit 
+    leaves the axis ratio fixed for the whole radio. On the other hand, IRAF's ellipse
+    can change axis ratio and angular position for each isophote.
+
+* Be sure to run this code in the same path that you run GALFIT. In addition,
+    since EllipSectGalfit reads the "B)" option of galfit.XX file, it 
+    must be the last fit of GALFIT. 
+
+### Examples
 
 To check how the plots change with the output options see 
 the examples below for a Elliptical galaxy that was fitted 
@@ -123,7 +131,7 @@ Example 7:
 
 Example 8: 
 ./EllipSectGalfit.py galfit.46 --grid 
-(displays grid)
+
 
 ![A85 ](../img/A85.grid.png)
 ![A85 ](../img/A85.mul.grid.png)
