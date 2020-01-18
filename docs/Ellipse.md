@@ -75,6 +75,9 @@ it can be used as xmin-xmax to change range
 * Since EllipSectGalfit reads the "*B*" option of galfit.XX file, this
     must be the last GALFIT fit. 
 
+* The angles shown in the multi-plot are measured from the galaxy's major axis.
+    They are not measured from the Y-axis as it is the case in GALFIT.
+
 ## Examples
 
 See the examples below for an elliptical galaxy that was fitted 
