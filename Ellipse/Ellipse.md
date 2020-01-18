@@ -55,7 +55,7 @@ it can be used as xmin-xmax to change range
 
 * EllipSectGalfit already uses the mask image (option "*F*" GALFIT) only if this
     is a **FITS** image. In case your mask is an *ASCII* file, you can convert it to **FITS**
-    using the [xy2fits.py](./xy2fits.md) tool.
+    using the [xy2fits.py](../xy2fits/xy2fits.md) tool.
 
 
 * EllipSectGalfit uses axis ratio (*q*) and position angle (*pa*) to create a *grid* 

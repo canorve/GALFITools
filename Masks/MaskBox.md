@@ -16,4 +16,4 @@ To run the code just type in the command line (or in ipython):
 Where ImageFile is the mask image to edit. RegFile
 is the DS9 Region file which contains the box region
 to patch, and, Value is the flux number you want to
-establish for the pixels within the box region.
+set for the pixels within the box region.
