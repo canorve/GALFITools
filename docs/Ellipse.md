@@ -6,6 +6,9 @@ routine. It creates an "ellipse" profile of the galaxy
 and model from GALFIT output (peng et al 2002). It also creates 
 multiple plots for different angles.  
 
+Code: [EllipSectGalfit.py](../EllipSectGalfit.py).
+
+
 The options to run the code in the terminal (or ipython) are:
 
 ```
@@ -142,3 +145,7 @@ with 7 gaussians (images for this galaxy are displayed above).
 
 **EllipSectGalfit.py** uses the mgefit library which is
 described in Cappellari, MNRAS, 333, 400 (2002).
+
+Check my others GALFIT tools [here](../README.md)
+ 
+
