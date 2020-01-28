@@ -455,7 +455,10 @@ def EllipSectors(galpar, params, n_sectors=19, minlevel=0):
 
         OUTFH = open (params.output,"w")
 
-        lineout= "#            Galaxy                          Model               \n"
+        lineout= "#        sectors_photometry used with pa={}         q={}       \n".format(galpar.ang,galpar.q)
+        OUTFH.write(lineout)
+
+        lineout= "#            Galaxy                          Model                \n"
         OUTFH.write(lineout)
 
         lineout= "#     rad      SB        SBerr       rad       SB        SBerr \n"
