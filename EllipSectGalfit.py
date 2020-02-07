@@ -21,7 +21,7 @@ def main():
 
     if (len(sys.argv[1:]) == 0):
         print ('Missing arguments')
-        print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] [--ranx/y Value] [--grid] [--dpi Value] [--noplot] [--out OutFile] " % (sys.argv[0]))
+        print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] [--ranx/y Value] [--grid] [--dpi Value] [--noplot] [--out] " % (sys.argv[0]))
         print ("GALFITOutputFile: GALFIT output file ")
         print ("logx: activates X-axis as logarithm ")
         print ("q: introduce axis ratio ")
@@ -33,13 +33,13 @@ def main():
         print ("grid: display a grid in the plot ")
         print ("dpi: dots per inch for saving plot ")
         print ("noplot: do not display images")
-        print ("out: creates output file of both galaxy and model sb profiles")
+        print ("out: creates output file containing the surface brightness profiles")
 
 
         print ("Example:\n %s galfit.01 --logx" % (sys.argv[0]))
-        print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub --ranx 2 --out file.txt" % (sys.argv[0]))
+        print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub --ranx 2 --out " % (sys.argv[0]))
         print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub --ranx 1-20" % (sys.argv[0]))
-        print ("see https://github.com/canorve/GALFITools for more examples")
+        print ("see https://github.com/canorve/GALFITools/blob/master/docs/Ellipse.md  for more examples")
 
         sys.exit()
 
@@ -124,11 +124,11 @@ def main():
     if params.flagnoplot == True:
         params.dplot=False
 
-    if params.flagout == True:
-        opt={}
-        OptionHandle="--out"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        params.output=opt['out']
+    #if params.flagout == True:
+    #    opt={}
+    #    OptionHandle="--out"
+    #    opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+    #    params.output=opt['out']
 
 
     params.galfile= sys.argv[1]
@@ -183,6 +183,12 @@ def main():
     params.namemod=params.namefile + "-mod.png"
     params.namemul=params.namefile + "-mul.png"
     params.namesub=params.namefile + "-sub.fits"
+
+    params.output=params.namefile + "-sbout.txt"
+
+    if params.flagout == True: 
+        msg="surface brightness output file: {} ".format(params.output)
+        print(msg)
 
     # hdu 1 => image   hdu 2 => model
 
@@ -284,7 +290,7 @@ class InputParams:
     galfile= "galfit.01"
 
     #output file
-    output = "out.txt"
+    output = "sbout.txt"
 
     namefile="none"
     namepng="none.png"
@@ -468,7 +474,11 @@ def EllipSectors(galpar, params, n_sectors=19, minlevel=0):
         OUTFH.write(lineout)
 
         for idx, item in enumerate(xradq):
-            lineout= "{0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f} \n".format(xradq[idx],ysbq[idx],ysberrq[idx],xradm[idx],ysbm[idx],ysberrm[idx])
+            if idx < len(xradm):
+                lineout= "{0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f} \n".format(xradq[idx],ysbq[idx],ysberrq[idx],xradm[idx],ysbm[idx],ysberrm[idx])
+            else:
+                lineout= "{0:.3f} {1:.3f} {2:.3f} \n".format(xradq[idx],ysbq[idx],ysberrq[idx])
+
             OUTFH.write(lineout)
 
         OUTFH.close()
