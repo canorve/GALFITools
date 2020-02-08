@@ -1,18 +1,23 @@
 
 # EllipSectGalfit.py
 
-This is a "quick" (and dirty) substitute for IRAF's ellipse
-routine. It creates an "ellipse" profile of the galaxy
-and model from GALFIT output (peng et al 2002). It also creates 
-multiple plots for different angles.  
+EllipSectGalfit.py creates surface brightness profiles
+for galaxy and galfit model from the galfit output: galfit.XX. 
+See peng et al. (2002). It also creates multiple surface brightness 
+plots for separate angles.  
 
+**
 Code: [EllipSectGalfit.py](../EllipSectGalfit.py).
+**
 
+This is a "quick" substitute for IRAF's ellipse
+routine. It creates an "ellipse" profile of the galaxy
+and model.
 
 The options to run the code in the terminal (or ipython) are:
 
 ```
- ./EllipSectGalfit.py [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] [--ranx Value] [--ranx/y Value] [--grid] [--dpi Value] [--noplot] [--out OutFile]
+ ./EllipSectGalfit.py [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] [--ranx Value] [--ranx/y Value] [--grid] [--dpi Value] [--noplot] [--out]
  ```
 
 Examples: 
@@ -51,7 +56,7 @@ it can be used as xmin-xmax to change range
 
 **dpi**: dots per inch value to increase/decrease resolution.
 
-**out**: creates output file from the data of the plot (Rad (arcsec) SurfaceBrightness  ErrSurface). 
+**out**: creates output file from the data of the plot. 
 
 
 ## Notes
