@@ -6,9 +6,7 @@ for galaxy and galfit model from the galfit output: galfit.XX.
 See peng et al. (2002). It also creates multiple surface brightness 
 plots for separate angles.  
 
-**
-Code: [EllipSectGalfit.py](../EllipSectGalfit.py).
-**
+**Code: [EllipSectGalfit.py](../EllipSectGalfit.py)**
 
 This is a "quick" substitute for IRAF's ellipse
 routine. It creates an "ellipse" profile of the galaxy
