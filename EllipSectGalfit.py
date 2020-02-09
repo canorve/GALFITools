@@ -1086,7 +1086,16 @@ def MulEllipSectors(galpar, params, n_sectors=19, minlevel=0):
 
     if params.flagpix == True:
         axpix.set_xlabel("(pixels)")
-        x1, x2 = axsec[7,0].get_xlim()
+     
+        #x1, x2 = axsec[7,0].get_xlim() ## buggy for some data have to change it for code below:
+        
+        if params.flagranx[1] == False:
+            x1= xran[0]
+            x2= xran[1]
+        else:
+            x1=xmin
+            x2=xmax
+
         axpix.set_xlim(x1/galpar.scale, x2/galpar.scale)
         axpix.figure.canvas.draw()
 
