@@ -20,12 +20,15 @@ The options to run the code in the terminal (or ipython) are:
 
 Examples: 
 
+```
  ./EllipSectGalfit.py galfit.01 --logx
+```
 
 *or* 
 
+```
  ./EllipSectGalfit.py galfit.02 --q 0.35 --pa 60 --sub
-
+```
 
 ## Options 
 
@@ -59,12 +62,19 @@ it can be used as xmin-xmax to change range
 
 ## Notes
 
+* You need to install the mgefit library via pip:  
+
+```
+pip install mgefit
+```
+
+
 * EllipSectGalfit already uses the mask image (option "*F*" GALFIT) only if this
     is a **FITS** image. In case your mask is an *ASCII* file, you can convert it to **FITS**
     using the [xy2fits.py](xy2fits.md) tool.
 
 
-* EllipSectGalfit uses axis ratio (*q*) and position angle (*pa*) to create a *grid* 
+* EllipSectGalfit uses axis ratio (*q*) and position angle (*pa*) to create an "ellipse" *grid* 
     using the function *sectors_photometry* from the *mgefit* library. Unlike IRAF's Ellipse, 
     *q* and *pa* are fixed through radius. See the two images below: 
 
@@ -74,7 +84,9 @@ it can be used as xmin-xmax to change range
     For this reason, errors given by this program are expected to 
     be greater than those coming from IRAF's ellipse since EllipSectGalfit 
     leaves the axis ratio fixed for the whole radio. While, on the other hand, IRAF's ellipse
-    can change axis ratio and angular position for each isophote.
+    can change axis ratio and angular position for each isophote. 
+    
+    In addition, the errors are averaged within different close isophotes, specially for large radius. This is how mgefit *sectors_photometry* returns the counts data and, unless I write my own code, I can't change that. 
 
 * Be sure to run this code in the same path that you run GALFIT. 
 
@@ -82,9 +94,9 @@ it can be used as xmin-xmax to change range
     must be the last GALFIT fit. 
 
 * The angles shown in the multi-plot are measured from the galaxy's major axis.
-    They are not measured from the Y-axis as it is the case in GALFIT.
+    They are not measured from the Y-axis as it is the in GALFIT.
 
-* In order for the program to detect the components, they must have the same 
+* In order for the program to detect the components, they must share the same 
     center (x,y).
 
 ## Examples
