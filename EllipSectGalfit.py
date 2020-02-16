@@ -209,8 +209,8 @@ def main():
 
     limx,limy=EllipSectors(galpar, params, n_sectors=numsectors, minlevel=minlevel)
 
-
-    params.Comps,params.N=ReadNComp(params.galfile,galpar.xc,galpar.yc)
+    
+    params.Comps,params.N,params.NameComps=ReadNComp(params.galfile,galpar.xc,galpar.yc)
 
     print("Number of components = ",params.N)
 
@@ -284,7 +284,8 @@ class InputParams:
     # init sub values
     Comps=np.array([False])
     N=0
-
+    NameComps=np.array(["none"])
+    
 
     #input file
     galfile= "galfit.01"
@@ -503,9 +504,9 @@ def EllipSectors(galpar, params, n_sectors=19, minlevel=0):
 
 
         # read number of components
-        params.Comps,params.N=ReadNComp(params.galfile,galpar.xc,galpar.yc)
+        params.Comps,params.N,params.NameComps=ReadNComp(params.galfile,galpar.xc,galpar.yc)
 
-        xradq,ysbq,n=SubComp(params.namesub,params.N,params.Comps,galpar.mgzpt,galpar.exptime,galpar.scale,galpar.xc,galpar.yc,galpar.q,galpar.ang,params.flagpix,axsec,skylevel=galpar.skylevel,
+        xradq,ysbq,n=SubComp(params.namesub,params.N,params.Comps,params.NameComps,galpar.mgzpt,galpar.exptime,galpar.scale,galpar.xc,galpar.yc,galpar.q,galpar.ang,params.flagpix,axsec,skylevel=galpar.skylevel,
               n_sectors=n_sectors, badpixels=badpixels, minlevel=minlevel)
 
 
@@ -646,7 +647,7 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,params,scale):
 
 
 
-def SubComp(namesub,N,Comps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,axsec,skylevel=0,
+def SubComp(namesub,N,Comps,NameComps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,axsec,skylevel=0,
     n_sectors=19, badpixels=None, minlevel=0):
 
     errmsg="file {} does not exist".format(namesub)
@@ -703,6 +704,8 @@ def SubComp(namesub,N,Comps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,axsec,skylev
     while(n<N):
 
         subim=subimgs[n]
+        
+        namec=NameComps[n]
 
         scmp = sectors_photometry(subim, eps, angsec, xctemp, yctemp,minlevel=minlevel,
                 plot=0, badpixels=maskb, n_sectors=n_sectors)
@@ -737,7 +740,7 @@ def SubComp(namesub,N,Comps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,axsec,skylev
         xradq, ysbq, ysberrq    = FindSB(xarcg, ymgeg, n_sectors)
 
 
-        PlotSub(xradq,ysbq,n,axsec)
+        PlotSub(xradq,ysbq,n,axsec,namec)
 
         n=n+1
 
@@ -745,13 +748,13 @@ def SubComp(namesub,N,Comps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,axsec,skylev
     return  xradq,ysbq,n
 
 
-def PlotSub(xradq,ysbq,nsub,axsec):
+def PlotSub(xradq,ysbq,nsub,axsec,namec):
     """
     Produces subcomponent plot
 
     """
 
-    substr="component "+np.str(nsub+1)
+    substr=namec+" "+np.str(nsub+1)
 
     axsec.plot(xradq, ysbq,'--',color='skyblue',linewidth=4,markersize=0.7,label=substr)
 
@@ -1388,6 +1391,8 @@ def ReadNComp(inputf,X,Y):
 
     Ncomp=0
     Comps=[]
+    NameComps=[]
+
     while index < len(lines):
 
         line = lines[index]
@@ -1406,6 +1411,7 @@ def ReadNComp(inputf,X,Y):
         if tmp[0] == "0)":
 
             if (tmp[1] != "sky"):
+                namec=tmp[1] 
                 while (tmp[0] != "Z)"):
 
                     index += 1
@@ -1419,6 +1425,7 @@ def ReadNComp(inputf,X,Y):
                         dist = np.sqrt((xc-X)**2+(yc-Y)**2)
                         if (dist < 3):
                             Comps=np.append(Comps,True)
+                            NameComps=np.append(NameComps,namec)
                             Ncomp=Ncomp + 1
                         else:
                             Comps=np.append(Comps,False)
@@ -1436,7 +1443,7 @@ def ReadNComp(inputf,X,Y):
     GalfitFile.close()
 
 
-    return Comps,Ncomp
+    return Comps,Ncomp,NameComps
 
 def GetExpTime(Image):
     "Get exposition time from the image"
