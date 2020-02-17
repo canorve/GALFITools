@@ -81,12 +81,12 @@ pip install mgefit
     ![A85 gal](../img/A85.img.png)
     ![A85 mod](../img/A85.img.mod.png)
 
-    For this reason, errors given by this program are expected to 
+    For this reason, errors are expected to 
     be greater than those coming from IRAF's ellipse since EllipSectGalfit 
-    leaves the axis ratio fixed for the whole radio. While, on the other hand, IRAF's ellipse
+    averages errors for different isophotes, specially for large radius. While, on the other hand, IRAF's ellipse
     can change axis ratio and angular position for each isophote. 
     
-    In addition, the errors are averaged within different close isophotes, specially for large radius. This is how mgefit *sectors_photometry* returns the counts data and, unless I write my own code, I can't change that. 
+    This is how mgefit *sectors_photometry* returns the counts data and, unless I write my own code, I can't change that. 
 
 * Be sure to run this code in the same path that you run GALFIT. 
 
