@@ -9,7 +9,11 @@ import os.path
 import scipy
 import scipy.special
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
+import matplotlib.cm as cmx
 import mimetypes
+
+
 
 from mgefit.sectors_photometry import sectors_photometry
 
@@ -568,8 +572,8 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,params,scale):
     axsec.set_xlabel("radius ('')")
     axsec.set_ylabel("mag/''")
 
-    axsec.errorbar(xradq, ysbq,yerr=ysberrq,fmt='o-',capsize=2,color='red',markersize=0.7,label="galaxy")
-    axsec.errorbar(xradm, ysbm,yerr=ysberrm,fmt='o-',capsize=2,color='blue',markersize=0.7,label="Model")
+    axsec.errorbar(xradq, ysbq,yerr=ysberrq,fmt='o-',capsize=2,color='red',markersize=0.7,label="galaxy",linewidth=2)
+    axsec.errorbar(xradm, ysbm,yerr=ysberrm,fmt='o-',capsize=2,color='blue',markersize=0.7,label="Model",linewidth=2)
     if params.flagranx[1] == False:
         axsec.set_xlim(xran)
     else:
@@ -697,8 +701,13 @@ def SubComp(namesub,N,Comps,NameComps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,ax
     # and angle is different as well:
     angsec=90-ang
 
-    ####################
+    #color value
+    values = range(N)
+    jet = cm = plt.get_cmap('jet') 
+    cNorm  = colors.Normalize(vmin=0, vmax=values[-1])
+    scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 
+    ####################
     ab=q
     n=0
     while(n<N):
@@ -739,8 +748,8 @@ def SubComp(namesub,N,Comps,NameComps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,ax
 
         xradq, ysbq, ysberrq    = FindSB(xarcg, ymgeg, n_sectors)
 
-
-        PlotSub(xradq,ysbq,n,axsec,namec)
+        colorVal = scalarMap.to_rgba(values[n])
+        PlotSub(xradq,ysbq,n,axsec,namec,colorVal)
 
         n=n+1
 
@@ -748,7 +757,7 @@ def SubComp(namesub,N,Comps,NameComps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,ax
     return  xradq,ysbq,n
 
 
-def PlotSub(xradq,ysbq,nsub,axsec,namec):
+def PlotSub(xradq,ysbq,nsub,axsec,namec,colorval):
     """
     Produces subcomponent plot
 
@@ -756,7 +765,9 @@ def PlotSub(xradq,ysbq,nsub,axsec,namec):
 
     substr=namec+" "+np.str(nsub+1)
 
-    axsec.plot(xradq, ysbq,'--',color='skyblue',linewidth=4,markersize=0.7,label=substr)
+#   axsec.plot(xradq, ysbq,'--',color='skyblue',linewidth=4,markersize=0.7,label=substr)
+    axsec.plot(xradq, ysbq,'--',color=colorval,linewidth=1.5,markersize=0.7,label=substr)
+
 
 
 def MulEllipSectors(galpar, params, n_sectors=19, minlevel=0):
@@ -1032,6 +1043,12 @@ def MulEllipSectors(galpar, params, n_sectors=19, minlevel=0):
 
         if params.flagsub == True:
             ii=0
+                #color value
+            values = range(params.N)
+            jet = cm = plt.get_cmap('jet') 
+            cNorm  = colors.Normalize(vmin=0, vmax=values[-1])
+            scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
+
             while(ii<params.N):
 
                 wtemp = np.nonzero(mgeanglesub[ii] == sectors[j])[0]
@@ -1039,14 +1056,16 @@ def MulEllipSectors(galpar, params, n_sectors=19, minlevel=0):
 
                 rtemp = mgeradsub[ii][wtemp]
 
-
+                colorval = scalarMap.to_rgba(values[ii])
                 if params.flaglogx == False:
 
-                    axsec[row, 0].plot(rtemp, mgesbsub[ii][wtemp],'--',color='skyblue', linewidth=2)
+#                    axsec[row, 0].plot(rtemp, mgesbsub[ii][wtemp],'--',color='skyblue', linewidth=2)
+                    axsec[row, 0].plot(rtemp, mgesbsub[ii][wtemp],'--',color=colorval, linewidth=1.5)
+
 
                 else:
 
-                    axsec[row, 0].semilogx(rtemp, mgesbsub[ii][wtemp], '--',color='skyblue', linewidth=2)
+                    axsec[row, 0].semilogx(rtemp, mgesbsub[ii][wtemp], '--',color=colorval, linewidth=1.5)
 
 
                 ii+=1
