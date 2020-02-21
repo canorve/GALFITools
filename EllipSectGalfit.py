@@ -87,7 +87,7 @@ def main():
         opt={}
         OptionHandle="--pa"
         opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        params.parg=np.int(opt['pa'])
+        params.parg=np.float(opt['pa'])
 
     if params.flagq == True:
         opt={}
