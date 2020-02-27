@@ -188,10 +188,10 @@ def main():
     params.namemul=params.namefile + "-mul.png"
     params.namesub=params.namefile + "-sub.fits"
 
-    params.output=params.namefile + "-sbout.txt"
+    params.output=params.namefile + "-sbout"
 
     if params.flagout == True: 
-        msg="surface brightness output file: {} ".format(params.output)
+        msg="surface brightness output file: {} ".format(params.output+".txt")
         print(msg)
 
     # hdu 1 => image   hdu 2 => model
@@ -464,9 +464,9 @@ def EllipSectors(galpar, params, n_sectors=19, minlevel=0):
 
     if params.flagout == True: 
 
-        OUTFH = open (params.output,"w")
+        OUTFH = open (params.output+".txt","w")
 
-        lineout= "#        sectors_photometry used with pa={}         q={}       \n".format(galpar.ang,galpar.q)
+        lineout= "#        sectors_photometry used with q={} and pa={} (same as GALFIT) \n".format(galpar.q,galpar.ang)
         OUTFH.write(lineout)
 
         lineout= "#            Galaxy                          Model                \n"
@@ -477,8 +477,8 @@ def EllipSectors(galpar, params, n_sectors=19, minlevel=0):
 
         lineout= "# (arcsec) (mag/arcsec) (error)   (arcsec) (mag/arcsec)  (error) \n"
         OUTFH.write(lineout)
-
-        for idx, item in enumerate(xradq):
+        #for idx, item in enumerate(xradq):
+        for idx, item in reversed(list(enumerate(xradq))):
             if idx < len(xradm):
                 lineout= "{0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f} \n".format(xradq[idx],ysbq[idx],ysberrq[idx],xradm[idx],ysbm[idx],ysberrm[idx])
             else:
@@ -487,7 +487,6 @@ def EllipSectors(galpar, params, n_sectors=19, minlevel=0):
             OUTFH.write(lineout)
 
         OUTFH.close()
-
 
 
     #### Creating Subcomponents images with Galfit
@@ -885,8 +884,8 @@ def MulEllipSectors(galpar, params, n_sectors=19, minlevel=0):
         hdu.close()
 
 
-    ###############################
-    #  galaxy:
+        ###############################
+        #  galaxy:
         ab=galpar.q
         ni=0
         while(ni<params.N):
@@ -1033,13 +1032,46 @@ def MulEllipSectors(galpar, params, n_sectors=19, minlevel=0):
 
             axsec[row, 0].semilogx(r2, mgemodsb[wmod], 'C0-', linewidth=2)
 
+        if params.flagout == True: 
+
+            rtxtang=np.int(np.round(txtang)) 
+
+            OUTFH = open (params.output+"-"+str(rtxtang)+".txt","w")
+
+            lineout= "# Values along radius with ang = {} from major axis \n".format(rtxtang)
+            OUTFH.write(lineout)
+
+            lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
+            OUTFH.write(lineout)
+
+
+            lineout= "#        Galaxy                          Model                \n"
+            OUTFH.write(lineout)
+
+            lineout= "#     rad      SB                       rad       SB       \n"
+            OUTFH.write(lineout)
+
+            lineout= "#   (arcsec) (mag/arcsec)          (arcsec) (mag/arcsec)  \n"
+            OUTFH.write(lineout)
+
+            for idx, item in enumerate(r):
+                if idx < len(r2):
+                    lineout= "{0:.3f} {1:.3f} {2:.3f} {3:.3f} \n".format(r[idx],mgesb[w][idx],r2[idx],mgemodsb[wmod][idx])
+                else:
+                    lineout= "{0:.3f} {1:.3f} \n".format(r[idx],mgesb[w][idx])
+
+                OUTFH.write(lineout)
+
+            OUTFH.close()
+
+
         if params.flagrid == True:
-        # Customize the major grid
+            # Customize the major grid
             axsec[row,0].grid(which='major', linestyle='-', linewidth='0.7', color='black')
-        # Customize the minor grid
+            # Customize the minor grid
             axsec[row,0].grid(which='minor', linestyle=':', linewidth='0.5', color='black')
 
-        #  axsec[row,0].grid(True)
+            #  axsec[row,0].grid(True)
 
         if params.flagsub == True:
             ii=0
@@ -1059,7 +1091,7 @@ def MulEllipSectors(galpar, params, n_sectors=19, minlevel=0):
                 colorval = scalarMap.to_rgba(values[ii])
                 if params.flaglogx == False:
 
-#                    axsec[row, 0].plot(rtemp, mgesbsub[ii][wtemp],'--',color='skyblue', linewidth=2)
+                #    axsec[row, 0].plot(rtemp, mgesbsub[ii][wtemp],'--',color='skyblue', linewidth=2)
                     axsec[row, 0].plot(rtemp, mgesbsub[ii][wtemp],'--',color=colorval, linewidth=1.5)
 
 
