@@ -464,29 +464,66 @@ def EllipSectors(galpar, params, n_sectors=19, minlevel=0):
 
     if params.flagout == True: 
 
-        OUTFH = open (params.output+".txt","w")
+        # output for galaxy
+        OUTFH = open (params.output+".gal.txt","w")
 
         lineout= "#        sectors_photometry used with q={} and pa={} (same as GALFIT) \n".format(galpar.q,galpar.ang)
         OUTFH.write(lineout)
 
-        lineout= "#            Galaxy                          Model                \n"
+        lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
         OUTFH.write(lineout)
 
-        lineout= "#     rad      SB        SBerr       rad       SB        SBerr \n"
+        lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
         OUTFH.write(lineout)
 
-        lineout= "# (arcsec) (mag/arcsec) (error)   (arcsec) (mag/arcsec)  (error) \n"
+
+        lineout= "#            Galaxy                                   \n"
         OUTFH.write(lineout)
-        #for idx, item in enumerate(xradq):
+
+
+
+        lineout= "#     rad      SB        SBerr       \n"
+        OUTFH.write(lineout)
+
+        lineout= "# (arcsec) (mag/arcsec) (error)   \n"
+        OUTFH.write(lineout)
+
         for idx, item in reversed(list(enumerate(xradq))):
-            if idx < len(xradm):
-                lineout= "{0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f} \n".format(xradq[idx],ysbq[idx],ysberrq[idx],xradm[idx],ysbm[idx],ysberrm[idx])
-            else:
-                lineout= "{0:.3f} {1:.3f} {2:.3f} \n".format(xradq[idx],ysbq[idx],ysberrq[idx])
+            lineout= "{0:.3f} {1:.3f} {2:.3f} \n".format(xradq[idx],ysbq[idx],ysberrq[idx])
+            OUTFH.write(lineout)
+
+        OUTFH.close()
+
+        # output for model 
+        OUTFH = open (params.output+".mod.txt","w")
+
+        lineout= "#        sectors_photometry used with q={} and pa={} (same as GALFIT) \n".format(galpar.q,galpar.ang)
+        OUTFH.write(lineout)
+
+        lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
+        OUTFH.write(lineout)
+
+        lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
+        OUTFH.write(lineout)
+
+
+        lineout= "#           Surface Brightness   Model                \n"
+        OUTFH.write(lineout)
+
+        lineout= "#    rad       SB        SBerr \n"
+        OUTFH.write(lineout)
+
+        lineout= "# (arcsec) (mag/arcsec) (error)  \n"
+        OUTFH.write(lineout)
+
+        for idx, item in reversed(list(enumerate(xradm))):
+            
+            lineout= "{0:.3f} {1:.3f} {2:.3f} \n".format(xradm[idx],ysbm[idx],ysberrm[idx])
 
             OUTFH.write(lineout)
 
         OUTFH.close()
+
 
 
     #### Creating Subcomponents images with Galfit
@@ -509,7 +546,7 @@ def EllipSectors(galpar, params, n_sectors=19, minlevel=0):
         # read number of components
         params.Comps,params.N,params.NameComps=ReadNComp(params.galfile,galpar.xc,galpar.yc)
 
-        xradq,ysbq,n=SubComp(params.namesub,params.N,params.Comps,params.NameComps,galpar.mgzpt,galpar.exptime,galpar.scale,galpar.xc,galpar.yc,galpar.q,galpar.ang,params.flagpix,axsec,skylevel=galpar.skylevel,
+        xradq,ysbq,n=SubComp(params.namesub,params.N,params.Comps,params.NameComps,galpar.mgzpt,galpar.exptime,galpar.scale,galpar.xc,galpar.yc,galpar.q,galpar.ang,params.flagpix,axsec,params.flagout,params.output,galpar.outimage,skylevel=galpar.skylevel,
               n_sectors=n_sectors, badpixels=badpixels, minlevel=minlevel)
 
 
@@ -650,7 +687,7 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,params,scale):
 
 
 
-def SubComp(namesub,N,Comps,NameComps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,axsec,skylevel=0,
+def SubComp(namesub,N,Comps,NameComps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,axsec,flagout,output,outimage,skylevel=0,
     n_sectors=19, badpixels=None, minlevel=0):
 
     errmsg="file {} does not exist".format(namesub)
@@ -749,6 +786,42 @@ def SubComp(namesub,N,Comps,NameComps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,ax
 
         colorVal = scalarMap.to_rgba(values[n])
         PlotSub(xradq,ysbq,n,axsec,namec,colorVal)
+
+
+        if flagout == True:
+            ncomp=n+1
+            ncomp=str(ncomp)
+
+            #subcomponent model 
+
+            OUTFH = open (output+".sub-"+ncomp+".txt","w")
+
+            lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(q,ang)
+            OUTFH.write(lineout)
+
+            lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(outimage,mgzpt,exptime,scale)
+            OUTFH.write(lineout)
+
+            lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(xc, yc, skylevel)
+            OUTFH.write(lineout)
+
+
+            lineout= "#        Model   component {}            \n".format(ncomp)
+            OUTFH.write(lineout)
+
+            lineout= "#     rad      SB   SBerror  \n"
+            OUTFH.write(lineout)
+
+            lineout= "#   (arcsec) (mag/arcsec) (error) \n"
+            OUTFH.write(lineout)
+
+            for idx, item in reversed(list(enumerate(xradq))):
+
+                lineout= "{0:.3f} {1:.3f} {2:.3f}  \n".format(xradq[idx],ysbq[idx],ysberrq[idx])
+
+                OUTFH.write(lineout)
+
+            OUTFH.close()
 
         n=n+1
 
@@ -1036,7 +1109,8 @@ def MulEllipSectors(galpar, params, n_sectors=19, minlevel=0):
 
             rtxtang=np.int(np.round(txtang)) 
 
-            OUTFH = open (params.output+"-"+str(rtxtang)+".txt","w")
+            # galaxy
+            OUTFH = open (params.output+"-"+str(rtxtang)+".gal.txt","w")
 
             lineout= "# Values along radius with ang = {} from major axis \n".format(rtxtang)
             OUTFH.write(lineout)
@@ -1044,25 +1118,63 @@ def MulEllipSectors(galpar, params, n_sectors=19, minlevel=0):
             lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
             OUTFH.write(lineout)
 
-
-            lineout= "#        Galaxy                          Model                \n"
+            lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel]\n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
             OUTFH.write(lineout)
 
-            lineout= "#     rad      SB                       rad       SB       \n"
+            lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
             OUTFH.write(lineout)
 
-            lineout= "#   (arcsec) (mag/arcsec)          (arcsec) (mag/arcsec)  \n"
+
+            lineout= "#            Galaxy                                   \n"
+            OUTFH.write(lineout)
+
+            lineout= "#     rad      SB              \n"
+            OUTFH.write(lineout)
+
+            lineout= "# (arcsec) (mag/arcsec)    \n"
             OUTFH.write(lineout)
 
             for idx, item in enumerate(r):
-                if idx < len(r2):
-                    lineout= "{0:.3f} {1:.3f} {2:.3f} {3:.3f} \n".format(r[idx],mgesb[w][idx],r2[idx],mgemodsb[wmod][idx])
-                else:
-                    lineout= "{0:.3f} {1:.3f} \n".format(r[idx],mgesb[w][idx])
+
+                lineout= "{0:.3f} {1:.3f} \n".format(r[idx],mgesb[w][idx])
 
                 OUTFH.write(lineout)
 
             OUTFH.close()
+
+            #model
+            OUTFH = open (params.output+"-"+str(rtxtang)+".mod.txt","w")
+
+            lineout= "# Values along radius with ang = {} from major axis \n".format(rtxtang)
+            OUTFH.write(lineout)
+
+            lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
+            OUTFH.write(lineout)
+
+            lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
+            OUTFH.write(lineout)
+
+            lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
+            OUTFH.write(lineout)
+
+
+            lineout= "#        Model                \n"
+            OUTFH.write(lineout)
+
+            lineout= "#     rad      SB     \n"
+            OUTFH.write(lineout)
+
+            lineout= "#   (arcsec) (mag/arcsec) \n"
+            OUTFH.write(lineout)
+
+            for idx, item in enumerate(r2):
+
+                lineout= "{0:.3f} {1:.3f}  \n".format(r2[idx],mgemodsb[wmod][idx])
+
+                OUTFH.write(lineout)
+
+            OUTFH.close()
+
 
 
         if params.flagrid == True:
@@ -1098,6 +1210,44 @@ def MulEllipSectors(galpar, params, n_sectors=19, minlevel=0):
                 else:
 
                     axsec[row, 0].semilogx(rtemp, mgesbsub[ii][wtemp], '--',color=colorval, linewidth=1.5)
+
+                #introduce output 
+                if params.flagout == True:
+                    ncomp=ii+1
+                    ncomp=str(ncomp)
+                    #subcomponent model 
+                    OUTFH = open (params.output+"-"+str(rtxtang)+".sub-"+ncomp+".txt","w")
+
+                    lineout= "# Values along radius with ang = {} from major axis \n".format(rtxtang)
+                    OUTFH.write(lineout)
+
+                    lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
+                    OUTFH.write(lineout)
+
+                    lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
+                    OUTFH.write(lineout)
+
+                    lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
+                    OUTFH.write(lineout)
+
+
+                    lineout= "#        Model   component {}            \n".format(ncomp)
+                    OUTFH.write(lineout)
+
+                    lineout= "#     rad      SB     \n"
+                    OUTFH.write(lineout)
+
+                    lineout= "#   (arcsec) (mag/arcsec) \n"
+                    OUTFH.write(lineout)
+
+                    for idx, item in enumerate(rtemp):
+
+                        lineout= "{0:.3f} {1:.3f}  \n".format(rtemp[idx], mgesbsub[ii][wtemp][idx])
+
+                        OUTFH.write(lineout)
+
+                    OUTFH.close()
+
 
 
                 ii+=1
