@@ -50,7 +50,7 @@ def main():
     #class for saving user's parameters
     params=InputParams()
 
-    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--grid','--dpi','--out','--noplot']
+    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--grid','--dpi','--out','--noplot','--minlevel','--sectors']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
@@ -80,6 +80,10 @@ def main():
     if options['out'] != None:
         params.flagout=True
         print("output file will be created")
+    if options['minlevel'] != None:
+        params.flagminlevel=True
+    if options['sectors'] != None:
+        params.flagsectors=True
 
 
     ################## search arguments after the option:
@@ -128,11 +132,17 @@ def main():
     if params.flagnoplot == True:
         params.dplot=False
 
-    #if params.flagout == True:
-    #    opt={}
-    #    OptionHandle="--out"
-    #    opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-    #    params.output=opt['out']
+    if params.flagminlevel == True:
+        opt={}
+        OptionHandle="--minlevel"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        params.minlevel=np.int(opt['minlevel'])
+
+    if params.flagsectors == True:
+        opt={}
+        OptionHandle="--sectors"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        params.minlevel=np.int(opt['sectors'])
 
 
     params.galfile= sys.argv[1]
@@ -171,10 +181,26 @@ def main():
     str = "pa = {} is used ".format(galpar.ang)
     print(str)
 
+
+    str = "sky = {} ".format(galpar.skylevel)
+    print(str)
+
+
     ##
     str = "dpi = {} for plots ".format(params.dpival)
     print(str)
     ##
+
+
+    ##
+    str = "minlevel = {} ".format(params.minlevel)
+    print(str)
+
+    ##
+    str = "number of sectors = {}  ".format(params.sectors)
+    print(str)
+
+
 
     (tmp)=galpar.outimage.split(".")
 
@@ -207,8 +233,12 @@ def main():
 
 
     #   numsectors=19
-    numsectors=15
-    minlevel=-100  # minimun value for sky
+    #   numsectors=15
+    numsectors=params.sectors
+
+    # minlevel=-100  # minimun value for sky
+    # minlevel=15  # minimun value for sky
+    minlevel=params.minlevel  # minimun value for sky
 
 
     limx,limy=EllipSectors(galpar, params, n_sectors=numsectors, minlevel=minlevel)
@@ -276,6 +306,9 @@ class InputParams:
     flagrid=False
     flagdpi=False
     flagout=False
+    flagminlevel=False
+    flagsectors=False
+
     #init
     qarg=1
     parg=0
@@ -284,6 +317,9 @@ class InputParams:
     dplot=True
 
     dpival=100
+
+    minlevel=0
+    sectors=15
 
     # init sub values
     Comps=np.array([False])
