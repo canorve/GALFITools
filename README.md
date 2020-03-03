@@ -22,7 +22,7 @@ The python libraries used for those scripts are:
 
 The main programs are:
 
-- [EllipSectGalfit](./docs/Ellipse.md)
+
 - [BorderMask](./docs/BorderMask.md)
 - [MaskBox](./docs/MaskBox.md)
 - [MakeMask](./docs/MakeMask.md)
