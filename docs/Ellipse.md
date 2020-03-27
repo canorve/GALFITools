@@ -99,6 +99,10 @@ pip install mgefit
 * In order for the program to detect the components, they must share the same 
     center (x,y).
 
+* For the sub option, some odd variations in surface brightness can 
+    be seen along radius for some components (see gaussian 6 in example 3).
+    This is due to differences between q, pa and q, pa of the subcomponent. 
+
 ## Examples
 
 See the examples below for an elliptical galaxy that was fitted 
