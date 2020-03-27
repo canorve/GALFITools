@@ -921,18 +921,17 @@ def MulEllipSectors(galpar, params, n_sectors=19, minlevel=0):
     ###################
     # I have to switch x and y values because they are different axes for
     # numpy
-    xtemp=galpar.xc
-    galpar.xc=galpar.yc
-    galpar.yc=xtemp
+    yctemp=galpar.xc
+    xctemp=galpar.yc
 
     angsec=90-galpar.ang
     ######################
 
-    sg = sectors_photometry(galpar.img, eps, angsec, galpar.xc, galpar.yc,minlevel=minlevel,
+    sg = sectors_photometry(galpar.img, eps, angsec, xctemp, yctemp,minlevel=minlevel,
             plot=False, badpixels=maskb, n_sectors=n_sectors)
 
 
-    sm = sectors_photometry(galpar.model, eps, angsec, galpar.xc, galpar.yc,minlevel=minlevel,
+    sm = sectors_photometry(galpar.model, eps, angsec, xctemp, yctemp,minlevel=minlevel,
             plot=False, badpixels=maskb, n_sectors=n_sectors)
 
     ###################################################
@@ -1001,7 +1000,7 @@ def MulEllipSectors(galpar, params, n_sectors=19, minlevel=0):
 
             subim=subimgs[ni]
 
-            subcmp = sectors_photometry(subim, eps, angsec, galpar.xc, galpar.yc, minlevel=minlevel,
+            subcmp = sectors_photometry(subim, eps, angsec, xctemp, yctemp, minlevel=minlevel,
                     plot=0, badpixels=maskb, n_sectors=n_sectors)
 
             subidx = np.argsort(subcmp.radius)
