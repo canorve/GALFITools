@@ -144,11 +144,9 @@ def main():
         opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         params.minlevel=np.int(opt['sectors'])
 
-
     params.galfile= sys.argv[1]
 
     print("angle in multi-plot is measured from the galaxy's major axis ")
-
 
     ########  End of parameter reading #############
     ################################################
@@ -245,16 +243,19 @@ def main():
     print("Number of components = ",params.N)
 
 
+    # initial values for image matrixes 
+
+    sectgalax=sectmodel=sectcomps=[]
+
     #call to sectors_photometry for galaxy and model
     sectgalax,sectmodel=SectPhot(galpar, params, n_sectors=numsectors, minlevel=minlevel)
 
+    if params.flagsub:
+        sectcomps=SectPhotComp(galpar, params, n_sectors=numsectors, minlevel=minlevel)
 
+    print("creating plots..")
 
-    
-    limx,limy=EllipSectors(galpar, params,sectgalax,sectmodel, n_sectors=numsectors, minlevel=minlevel)
-
-    #lastmod: checar subcomp: avoid duplicate reading
-
+    limx,limy=EllipSectors(galpar, params,sectgalax,sectmodel, sectcomps, n_sectors=numsectors, minlevel=minlevel)
 
 
     ##############################################
@@ -267,12 +268,12 @@ def main():
     plt.close()
 
 
-
     ########################################################
     ################ Multiplots: ###########################
     ########################################################
+    print("creating multi-plots..")
 
-    MulEllipSectors(galpar, params,sectgalax, sectmodel, n_sectors=numsectors,  minlevel=minlevel)
+    MulEllipSectors(galpar, params,sectgalax, sectmodel, sectcomps)
 
 
     if params.dplot:
@@ -440,7 +441,81 @@ def SectPhot(galpar, params, n_sectors=19, minlevel=0):
     return sectgalax,sectmodel
 
 
-def EllipSectors(galpar, params, sectgalax, sectmodel, n_sectors=19, minlevel=0):
+
+def SectPhotComp(galpar, params, n_sectors=19, minlevel=0):
+    """ calls to function sectors_photometry for subcomponents """
+
+    print("running galfit to create individual components...")
+
+    rungal = "galfit -o3 {}".format(params.galfile)
+    errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
+        universal_newlines=True)
+
+    runchg = "mv subcomps.fits {}".format(params.namesub)
+    errchg = sp.run([runchg], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
+        universal_newlines=True)
+
+    errmsg="file {} does not exist".format(params.namesub)
+    assert os.path.isfile(params.namesub), errmsg
+
+    hdu = fits.open(params.namesub)
+
+    subimgs=[]
+
+    cnt=0  # image =0 do not count
+    while(cnt<len(params.Comps)):
+        if params.Comps[cnt] == True:
+            img = hdu[cnt+2].data
+            subimgs.append(img)
+
+        cnt=cnt+1
+    hdu.close()
+
+
+    badpixels=galpar.mask
+
+    if badpixels is not None:
+
+        errmsg="file {} does not exist".format(badpixels)
+        assert os.path.isfile(badpixels), errmsg
+
+        hdu = fits.open(badpixels)
+        mask = hdu[0].data
+        maskb=np.array(mask,dtype=bool)
+        hdu.close()
+    else:
+        maskb=None
+
+    eps=1-galpar.q
+
+    ############
+    # I have to switch x and y values because they are different axes for
+    # numpy:
+    yctemp=galpar.xc
+    xctemp=galpar.yc
+    # and angle is different as well:
+    angsec=90-galpar.ang
+
+    #############
+    sectcomps=[]
+    n=0
+
+    while(n<params.N):
+
+        subim=subimgs[n]
+        
+        scmp = sectors_photometry(subim, eps, angsec, xctemp, yctemp,minlevel=minlevel,plot=0, badpixels=maskb, n_sectors=n_sectors)
+
+        sectcomps.append(scmp)
+
+        n=n+1
+
+
+
+    return sectcomps
+
+
+def EllipSectors(galpar, params, sectgalax, sectmodel, sectcomps,n_sectors=19, minlevel=0):
 
     badpixels=galpar.mask
 
@@ -595,7 +670,6 @@ def EllipSectors(galpar, params, sectgalax, sectmodel, n_sectors=19, minlevel=0)
         OUTFH.close()
 
 
-
     #### Creating Subcomponents images with Galfit
 
     #params.Comps=[]
@@ -612,14 +686,9 @@ def EllipSectors(galpar, params, sectgalax, sectmodel, n_sectors=19, minlevel=0)
         errchg = sp.run([runchg], shell=True, stdout=sp.PIPE,
         stderr=sp.PIPE, universal_newlines=True)
 
-
-        # read number of components
-        #params.Comps,params.N,params.NameComps=ReadNComp(params.galfile,galpar.xc,galpar.yc)
-
-
-        xradq,ysbq,n=SubComp(params.namesub,params.N,params.Comps,params.NameComps,galpar.mgzpt,galpar.exptime,galpar.scale,galpar.xc,galpar.yc,galpar.q,galpar.ang,params.flagpix,axsec,params.flagout,params.output,galpar.outimage,skylevel=galpar.skylevel,
-              n_sectors=n_sectors, badpixels=badpixels, minlevel=minlevel)
-
+        xradq,ysbq,n=SubComp(sectcomps,params.N,params.NameComps,galpar.mgzpt,galpar.exptime,galpar.scale,galpar.xc,galpar.yc,galpar.q,galpar.ang,
+            params.flagpix,axsec,params.flagout,params.output,galpar.outimage,skylevel=galpar.skylevel,
+            n_sectors=n_sectors)
 
 
     axsec.legend(loc=1)
@@ -628,10 +697,7 @@ def EllipSectors(galpar, params, sectgalax, sectmodel, n_sectors=19, minlevel=0)
 
 
 def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,params,scale):
-    """
-    Produces final best-fitting plot
-
-    """
+    """  Produces final best-fitting plot  """
 
     # subplot for arc sec axis
     fig, axsec = plt.subplots()
@@ -756,57 +822,8 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,params,scale):
 
     return xran,yran,axret
 
-
-
-def SubComp(namesub,N,Comps,NameComps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,axsec,flagout,output,outimage,skylevel=0,
-    n_sectors=19, badpixels=None, minlevel=0):
-
-    errmsg="file {} does not exist".format(namesub)
-    assert os.path.isfile(namesub), errmsg
-
-    hdu = fits.open(namesub)
-
-    subimgs=[]
-
-
-    cnt=0  # image =0 do not count
-    while(cnt<len(Comps)):
-
-        if Comps[cnt] == True:
-            img = hdu[cnt+2].data
-            subimgs.append(img)
-
-        cnt=cnt+1
-
-    hdu.close()
-
-    xradm = []
-    ysbm = []
-    ysberrm = []
-
-    if badpixels is not None:
-
-        errmsg="file {} does not exist".format(badpixels)
-        assert os.path.isfile(badpixels), errmsg
-
-        hdu = fits.open(badpixels)
-        mask = hdu[0].data
-        maskb=np.array(mask,dtype=bool)
-        maskbt=maskb.T
-        hdu.close()
-    else:
-        maskb=None
-
-    eps=1-q
-
-
-    ############
-    # I have to switch x and y values because they are different axes for
-    # numpy:
-    yctemp=xc
-    xctemp=yc
-    # and angle is different as well:
-    angsec=90-ang
+def SubComp(sectcomps,N,NameComps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,axsec,flagout,output,outimage,skylevel=0,
+    n_sectors=19):
 
     #color value
     values = range(N)
@@ -817,14 +834,14 @@ def SubComp(namesub,N,Comps,NameComps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,ax
     ####################
     ab=q
     n=0
+
     while(n<N):
 
-        subim=subimgs[n]
         
         namec=NameComps[n]
 
-        scmp = sectors_photometry(subim, eps, angsec, xctemp, yctemp,minlevel=minlevel,
-                plot=0, badpixels=maskb, n_sectors=n_sectors)
+        scmp = sectcomps[n] 
+
 
         ###################################################
 
@@ -912,7 +929,7 @@ def PlotSub(xradq,ysbq,nsub,axsec,namec,colorval):
     axsec.plot(xradq, ysbq,'--',color=colorval,linewidth=1.5,markersize=0.7,label=substr)
 
 
-def MulEllipSectors(galpar, params, sectgalax, sectmodel, n_sectors=19, minlevel=0):
+def MulEllipSectors(galpar, params, sectgalax, sectmodel, sectcomps):
 
     badpixels=galpar.mask
 
@@ -999,20 +1016,6 @@ def MulEllipSectors(galpar, params, sectgalax, sectmodel, n_sectors=19, minlevel
         mgesbsub=[]
         mgeradsub=[]
         mgeanglesub=[]
-        rsub=[]
-        hdusub = fits.open(params.namesub)
-
-        subimgs=[]
-
-        cnt=0
-        while(cnt<len(params.Comps)):
-
-            if params.Comps[cnt] == True:
-                imgsub = hdusub[cnt+2].data
-                subimgs.append(imgsub)
-            cnt=cnt+1
-
-        hdu.close()
 
 
         ###############################
@@ -1021,10 +1024,8 @@ def MulEllipSectors(galpar, params, sectgalax, sectmodel, n_sectors=19, minlevel
         ni=0
         while(ni<params.N):
 
-            subim=subimgs[ni]
+            subcmp = sectcomps[ni]
 
-            subcmp = sectors_photometry(subim, eps, angsec, xctemp, yctemp, minlevel=minlevel,
-                    plot=0, badpixels=maskb, n_sectors=n_sectors)
 
             subidx = np.argsort(subcmp.radius)
 
