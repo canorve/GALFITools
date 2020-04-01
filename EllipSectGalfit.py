@@ -37,7 +37,7 @@ def main():
         print ("grid: display a grid in the plot ")
         print ("dpi: dots per inch for saving plot ")
         print ("noplot: do not display images")
-        print ("out: creates output file containing the surface brightness profiles")
+        print ("sbout: creates output file containing the surface brightness profiles")
 
 
         print ("Example:\n %s galfit.01 --logx" % (sys.argv[0]))
@@ -155,6 +155,9 @@ def main():
     #class for GALFIT's parameters
     galpar=GalfitParams()
 
+    #class for GALFIT's components
+    galcomps=GalfitComps()
+
 
     ######################################
     ####### Read Galfit File #############
@@ -238,24 +241,30 @@ def main():
     # minlevel=15  # minimun value for sky
     minlevel=params.minlevel  # minimun value for sky
 
+  
 
-    params.Comps,params.N,params.NameComps=ReadNComp(params.galfile,galpar.xc,galpar.yc)
-    print("Number of components = ",params.N)
+    # read all the object components of the model in galfit.XX
+    ReadNComp(params.galfile,galpar.xc,galpar.yc,galcomps)
 
+    print("Number of components = ",len(galcomps.N))
+
+    
 
     # initial values for image matrixes 
 
     sectgalax=sectmodel=sectcomps=[]
 
     #call to sectors_photometry for galaxy and model
+
     sectgalax,sectmodel=SectPhot(galpar, params, n_sectors=numsectors, minlevel=minlevel)
 
+    
     if params.flagsub:
-        sectcomps=SectPhotComp(galpar, params, n_sectors=numsectors, minlevel=minlevel)
+        sectcomps=SectPhotComp(galpar, params, galcomps, n_sectors=numsectors, minlevel=minlevel)
 
     print("creating plots..")
 
-    limx,limy=EllipSectors(galpar, params,sectgalax,sectmodel, sectcomps, n_sectors=numsectors, minlevel=minlevel)
+    limx,limy=EllipSectors(params, galpar, galcomps, sectgalax,sectmodel, sectcomps,n_sectors=numsectors)
 
 
     ##############################################
@@ -273,7 +282,7 @@ def main():
     ########################################################
     print("creating multi-plots..")
 
-    MulEllipSectors(galpar, params,sectgalax, sectmodel, sectcomps)
+    MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps)
 
 
     if params.dplot:
@@ -330,12 +339,6 @@ class InputParams:
     minlevel=0
     sectors=15
 
-    # init sub values
-    Comps=np.array([False])
-    N=0
-    NameComps=np.array(["none"])
-    
-
     #input file
     galfile= "galfit.01"
 
@@ -354,10 +357,10 @@ class InputParams:
 ### class for Galfit parameters
 class GalfitParams:
 
-    xc=1
-    yc=1
-    q=1
-    ang=0
+    xc=1        #for sectors_photometry
+    yc=1        #for sectors_photometry
+    q=1         #for sectors_photometry
+    ang=0       #for sectors_photometry
     skylevel=0
     scale=1
     inputimage="galaxy.fits"
@@ -372,6 +375,26 @@ class GalfitParams:
     ymax=2
     img = np.array([[1,1],[1,1]])
     model = np.array([[1,1],[1,1]])
+
+### class for Galfit components
+class GalfitComps:
+
+    # init sub values
+    Comps=np.array([])  #remove this?
+    N=np.array([])
+
+    NameComp=np.array([])  #0)
+    PosX=np.array([])            #1)   
+    PosY=np.array([])            #2)   
+    Mag=np.array([])             #3)
+    Rad=np.array([])             #4)
+    Exp=np.array([])             #5)
+    Exp2=np.array([])            #6)  for moffat
+    Exp3=np.array([])            #7)  for moffat
+                                  #8)  There is No 8 in any galfit model
+    AxRat=np.array([])           #9)  AxisRatio
+    PosAng =np.array([])         #10) position angle
+    skip=np.array([])            #z)  skip model
 
 ##### end of classes
 
@@ -442,7 +465,7 @@ def SectPhot(galpar, params, n_sectors=19, minlevel=0):
 
 
 
-def SectPhotComp(galpar, params, n_sectors=19, minlevel=0):
+def SectPhotComp(galpar, params, galcomps, n_sectors=19, minlevel=0):
     """ calls to function sectors_photometry for subcomponents """
 
     print("running galfit to create individual components...")
@@ -463,8 +486,8 @@ def SectPhotComp(galpar, params, n_sectors=19, minlevel=0):
     subimgs=[]
 
     cnt=0  # image =0 do not count
-    while(cnt<len(params.Comps)):
-        if params.Comps[cnt] == True:
+    while(cnt<len(galcomps.Comps)):
+        if galcomps.Comps[cnt] == True:
             img = hdu[cnt+2].data
             subimgs.append(img)
 
@@ -500,7 +523,7 @@ def SectPhotComp(galpar, params, n_sectors=19, minlevel=0):
     sectcomps=[]
     n=0
 
-    while(n<params.N):
+    while(n<len(galcomps.N)):
 
         subim=subimgs[n]
         
@@ -515,7 +538,7 @@ def SectPhotComp(galpar, params, n_sectors=19, minlevel=0):
     return sectcomps
 
 
-def EllipSectors(galpar, params, sectgalax, sectmodel, sectcomps,n_sectors=19, minlevel=0):
+def EllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps,n_sectors=19, minlevel=0):
 
     badpixels=galpar.mask
 
@@ -595,10 +618,14 @@ def EllipSectors(galpar, params, sectgalax, sectmodel, sectcomps,n_sectors=19, m
     xarcm = aellarcm[stidxq]
     ymgem = mgesbm[stidxq]
 
+
+
+
+
+
     ######  Function to order SB along X-axis for model
 
     xradm, ysbm, ysberrm    = FindSB(xarcm, ymgem, n_sectors)
-
 
     ################ Plotting
 
@@ -672,23 +699,21 @@ def EllipSectors(galpar, params, sectgalax, sectmodel, sectcomps,n_sectors=19, m
 
     #### Creating Subcomponents images with Galfit
 
-    #params.Comps=[]
 
     if params.flagsub:
 
-        print("running galfit to create subcomponents...")
+#        print("running galfit to create subcomponents...")
 
-        rungal = "galfit -o3 {}".format(params.galfile)
-        errgal = sp.run([rungal], shell=True, stdout=sp.PIPE,
-        stderr=sp.PIPE, universal_newlines=True)
+ #       rungal = "galfit -o3 {}".format(params.galfile)
+  #      errgal = sp.run([rungal], shell=True, stdout=sp.PIPE,
+   #     stderr=sp.PIPE, universal_newlines=True)
 
-        runchg = "mv subcomps.fits {}".format(params.namesub)
-        errchg = sp.run([runchg], shell=True, stdout=sp.PIPE,
-        stderr=sp.PIPE, universal_newlines=True)
+    #    runchg = "mv subcomps.fits {}".format(params.namesub)
+     #   errchg = sp.run([runchg], shell=True, stdout=sp.PIPE,
+      #  stderr=sp.PIPE, universal_newlines=True)
 
-        xradq,ysbq,n=SubComp(sectcomps,params.N,params.NameComps,galpar.mgzpt,galpar.exptime,galpar.scale,galpar.xc,galpar.yc,galpar.q,galpar.ang,
-            params.flagpix,axsec,params.flagout,params.output,galpar.outimage,skylevel=galpar.skylevel,
-            n_sectors=n_sectors)
+        xradq,ysbq,n=SubComp(params, galpar, galcomps, sectcomps, axsec, n_sectors=n_sectors)
+
 
 
     axsec.legend(loc=1)
@@ -822,8 +847,10 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,params,scale):
 
     return xran,yran,axret
 
-def SubComp(sectcomps,N,NameComps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,axsec,flagout,output,outimage,skylevel=0,
-    n_sectors=19):
+
+def SubComp(params, galpar, galcomps, sectcomps, axsec, n_sectors=19):
+
+    N=len(galcomps.N)
 
     #color value
     values = range(N)
@@ -832,13 +859,13 @@ def SubComp(sectcomps,N,NameComps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,axsec,
     scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 
     ####################
-    ab=q
+    ab=galpar.q
     n=0
 
     while(n<N):
 
         
-        namec=NameComps[n]
+        namec=galcomps.NameComp[n]
 
         scmp = sectcomps[n] 
 
@@ -857,12 +884,12 @@ def SubComp(sectcomps,N,NameComps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,axsec,
 
         #converting to arcsec
 
-        aellarcg=aellabg*scale
+        aellarcg=aellabg*galpar.scale
 
 
         # formula according to cappellary mge manual
 
-        mgesbg= mgzpt - 2.5*np.log10(mgecount/exptime) + 2.5*np.log10(scale**2) + 0.1
+        mgesbg= galpar.mgzpt - 2.5*np.log10(mgecount/galpar.exptime) + 2.5*np.log10(galpar.scale**2) + 0.1
 
 
         stidxq = np.argsort(aellarcg)
@@ -876,21 +903,21 @@ def SubComp(sectcomps,N,NameComps,mgzpt,exptime,scale,xc,yc,q,ang,flagpix,axsec,
         PlotSub(xradq,ysbq,n,axsec,namec,colorVal)
 
 
-        if flagout == True:
+        if params.flagout == True:
             ncomp=n+1
             ncomp=str(ncomp)
 
             #subcomponent model 
 
-            OUTFH = open (output+".sub-"+ncomp+".txt","w")
+            OUTFH = open (params.output+".sub-"+ncomp+".txt","w")
 
-            lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(q,ang)
+            lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
             OUTFH.write(lineout)
 
-            lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(outimage,mgzpt,exptime,scale)
+            lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
             OUTFH.write(lineout)
 
-            lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(xc, yc, skylevel)
+            lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
             OUTFH.write(lineout)
 
 
@@ -929,7 +956,8 @@ def PlotSub(xradq,ysbq,nsub,axsec,namec,colorval):
     axsec.plot(xradq, ysbq,'--',color=colorval,linewidth=1.5,markersize=0.7,label=substr)
 
 
-def MulEllipSectors(galpar, params, sectgalax, sectmodel, sectcomps):
+
+def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
     badpixels=galpar.mask
 
@@ -1022,7 +1050,7 @@ def MulEllipSectors(galpar, params, sectgalax, sectmodel, sectcomps):
         
         ab=galpar.q
         ni=0
-        while(ni<params.N):
+        while(ni<len(galcomps.N)):
 
             subcmp = sectcomps[ni]
 
@@ -1247,12 +1275,12 @@ def MulEllipSectors(galpar, params, sectgalax, sectmodel, sectcomps):
         if params.flagsub == True:
             ii=0
                 #color value
-            values = range(params.N)
+            values = range(len(galcomps.N))
             jet = cm = plt.get_cmap('jet') 
             cNorm  = colors.Normalize(vmin=0, vmax=values[-1])
             scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 
-            while(ii<params.N):
+            while(ii<len(galcomps.N)):
 
                 wtemp = np.nonzero(mgeanglesub[ii] == sectors[j])[0]
                 wtemp = wtemp[np.argsort(mgeradsub[ii][wtemp])]
@@ -1634,7 +1662,7 @@ def ReadGALFITout(inputf,galpar):
     #return xc,yc,q,pa,skylevel,scale,outimage,mgzpt,exptime,mask
 
 
-def ReadNComp(inputf,X,Y):
+def ReadNComp(inputf,X,Y,galcomps):
     ## search and count model components
 
     GalfitFile = open(inputf,"r")
@@ -1649,15 +1677,12 @@ def ReadNComp(inputf,X,Y):
     lines = list(lines)
     index = 0
 
-    Ncomp=0
-    Comps=[]
-    NameComps=[]
+    n=0
 
     while index < len(lines):
 
         line = lines[index]
         (tmp) = line.split()
-
 
         if tmp[0] == "H)":     # region fit box
             xmin=int(tmp[1])
@@ -1668,42 +1693,88 @@ def ReadNComp(inputf,X,Y):
             X=X+xmin-1
             Y=Y+ymin-1
 
+        #init values
+        Comps=False
+        N=0
+        NameComp="none"
+        PosX=0
+        PosY=0
+        Mag=99
+        Rad=0
+        Exp=0
+        Exp2=0
+        Exp3=0
+        AxRat=1
+        PosAng=0
+        skip=1
+        flagcomp=False  # detect components
+
         if tmp[0] == "0)":
 
-            if (tmp[1] != "sky"):
-                namec=tmp[1] 
-                while (tmp[0] != "Z)"):
+            namec=tmp[1] 
+            while (tmp[0] != "Z)"):
 
-                    index += 1
-                    line = lines[index]
-                    (tmp) = line.split()
+                index += 1
+                line = lines[index]
+                (tmp) = line.split()
 
-                    if tmp[0] == "1)":   # center
-                        xc=float(tmp[1])
-                        yc=float(tmp[2])
+                if tmp[0] == "1)":   # center
+                    xc=float(tmp[1])
+                    yc=float(tmp[2])
 
-                        dist = np.sqrt((xc-X)**2+(yc-Y)**2)
-                        if (dist < 3):
-                            Comps=np.append(Comps,True)
-                            NameComps=np.append(NameComps,namec)
-                            Ncomp=Ncomp + 1
-                        else:
-                            Comps=np.append(Comps,False)
+                    dist = np.sqrt((xc-X)**2+(yc-Y)**2)
+                    if (dist < 3 and namec != "sky"):
+                        n=n+1
+                        PosX=xc
+                        PosY=yc
+                        Comps=True
+                        NameComp=namec
+                        N= n 
+                        flagcomp=True
+                    else:
+                        Comps=False
 
-                    if tmp[0] == "9)":    # axis ratio
-                        q=float(tmp[1])
+                if tmp[0] == "3)" and flagcomp == True:    # axis ratio
+                    Mag=float(tmp[1])
+                if tmp[0] == "4)" and flagcomp == True:    # axis ratio
+                    Rad=float(tmp[1])
+                if tmp[0] == "5)" and flagcomp == True:    # axis ratio
+                    Exp=float(tmp[1])
+                if tmp[0] == "6)" and flagcomp == True:    # axis ratio
+                    Exp2=float(tmp[1])
+                if tmp[0] == "7)" and flagcomp == True:    # axis ratio
+                    Exp3=float(tmp[1])
+                if tmp[0] == "9)" and flagcomp == True:    # axis ratio
+                    AxRat=float(tmp[1])
+                if tmp[0] == "10)" and flagcomp == True:    # axis ratio
+                    PosAng=float(tmp[1])
+                if tmp[0] == "z)" and flagcomp == True:    # axis ratio
+                    skip=int(tmp[1])
 
-                    if tmp[0] == "10)": # position angle
-                        pa=float(tmp[1])
-            else:
-                Comps=np.append(Comps,False)
+            if (flagcomp == True):
 
+                galcomps.PosX=np.append(galcomps.PosX,PosX)
+                galcomps.PosY=np.append(galcomps.PosY,PosY)
+                galcomps.Comps=np.append(galcomps.Comps,Comps)
+                galcomps.NameComp=np.append(galcomps.NameComp,NameComp)
+                galcomps.N=np.append(galcomps.N, N)
+                
+                galcomps.Mag=np.append(galcomps.Mag,Mag)
+                galcomps.Rad=np.append(galcomps.Rad,Rad)
+                galcomps.Exp=np.append(galcomps.Exp,Exp)
+                galcomps.Exp2=np.append(galcomps.Exp2,Exp2)
+                galcomps.Exp3=np.append(galcomps.Exp3,Exp3)
+                galcomps.AxRat=np.append(galcomps.AxRat,AxRat)
+                galcomps.PosAng=np.append(galcomps.PosAng,PosAng)
+                galcomps.skip=np.append(galcomps.skip,skip)
+           
         index += 1
 
     GalfitFile.close()
 
+    return True
 
-    return Comps,Ncomp,NameComps
+
 
 def GetExpTime(Image):
     "Get exposition time from the image"
