@@ -167,8 +167,6 @@ def main():
     #  xc,yc,q,ang,skylevel,scale,file,mgzpt,exptime,mask=ReadGALFITout(params.galfile,galpars)
     ReadGALFITout(params.galfile,galpar)
 
-
-
     ######################################
     ######################################
 
@@ -185,16 +183,13 @@ def main():
     str = "pa = {} is used ".format(galpar.ang)
     print(str)
 
-
     str = "sky = {} ".format(galpar.skylevel)
     print(str)
-
 
     ##
     str = "dpi = {} for plots ".format(params.dpival)
     print(str)
     ##
-
 
     ##
     str = "minlevel = {} ".format(params.minlevel)
@@ -218,6 +213,9 @@ def main():
     params.namemul=params.namefile + "-mul.png"
     params.namesub=params.namefile + "-sub.fits"
 
+    params.namesig=params.namefile + "-sig.fits"
+
+
     params.sboutput=params.namefile + "-sbout"
     params.output=params.namefile + "-out"
 
@@ -231,16 +229,43 @@ def main():
         print(msg)
 
 
-    # hdu 1 => image   hdu 2 => model
+    # read all the object components of the model in galfit.XX
+    ReadNComp(params.galfile,galpar.xc,galpar.yc,galcomps)
+    print("Number of components = ",len(galcomps.N))
 
+
+
+
+    #reading galaxy and model images from file
     errmsg="file {} does not exist".format(galpar.outimage)
 
     assert os.path.isfile(galpar.outimage), errmsg
 
+    # hdu 1 => image   hdu 2 => model
     hdu = fits.open(galpar.outimage)
     galpar.img = hdu[1].data
     galpar.model = hdu[2].data
     hdu.close()
+
+    # removing background from galaxy and model images 
+    galpar.img = galpar.img - galpar.skylevel
+    galpar.model = galpar.model - galpar.skylevel
+
+
+    ### reading mask image from file
+
+    if galpar.tempmask is not None:
+
+        errmsg="file {} does not exist".format(galpar.tempmask)
+        assert os.path.isfile(galpar.tempmask), errmsg
+
+        hdu = fits.open(galpar.tempmask)
+        mask = hdu[0].data
+        galpar.mask=np.array(mask,dtype=bool)
+        hdu.close()
+    else:
+        galpar.mask=None
+    ####
 
 
     #   numsectors=19
@@ -251,21 +276,10 @@ def main():
     # minlevel=15  # minimun value for sky
     minlevel=params.minlevel  # minimun value for sky
 
-  
-
-    # read all the object components of the model in galfit.XX
-    ReadNComp(params.galfile,galpar.xc,galpar.yc,galcomps)
-
-    print("Number of components = ",len(galcomps.N))
-
-    
-
     # initial values for image matrixes 
-
     sectgalax=sectmodel=sectcomps=[]
 
     #call to sectors_photometry for galaxy and model
-
     sectgalax,sectmodel=SectPhot(galpar, params, n_sectors=numsectors, minlevel=minlevel)
 
     
@@ -303,8 +317,8 @@ def main():
     plt.close()
 
 
-    if galpar.mask != None:
-        os.remove(galpar.mask) # removing temp mask file
+    if galpar.tempmask != None:
+        os.remove(galpar.tempmask) # removing temp mask file
 
 
     ########################################################
@@ -377,6 +391,7 @@ class InputParams:
     namemod="none-mod.png"
     namemul="none-mul.png"
     namesub="none-sub.fits"
+    namesig="none-sig.fits"
 
 
 
@@ -394,13 +409,16 @@ class GalfitParams:
     maskimage="galaxy-mask.fits"
     mgzpt=25
     exptime=1
-    mask="mask.fits"
+    tempmask="mask.fits"
     xmin=1
     xmax=2
     ymin=1
     ymax=2
     img = np.array([[1,1],[1,1]])
     model = np.array([[1,1],[1,1]])
+    mask = np.array([[1,1],[1,1]])
+    sigma = np.array([[1,1],[1,1]])
+
 
 ### class for Galfit components
 class GalfitComps:
@@ -421,6 +439,8 @@ class GalfitComps:
     AxRat=np.array([])           #9)  AxisRatio
     PosAng =np.array([])         #10) position angle
     skip=np.array([])            #z)  skip model
+    freepar=np.array([])            # Number of free params
+
 
 ##### end of classes
 
@@ -428,24 +448,9 @@ class GalfitComps:
 def SectPhot(galpar, params, n_sectors=19, minlevel=0):
     """ calls to function sectors_photometry for galaxy and model """
 
-    badpixels=galpar.mask
 
-    # removing background:
-    galpar.img = galpar.img - galpar.skylevel
-    galpar.model = galpar.model - galpar.skylevel
+    maskb=galpar.mask
 
-    if badpixels is not None:
-
-        errmsg="file {} does not exist".format(badpixels)
-        assert os.path.isfile(badpixels), errmsg
-
-        hdu = fits.open(badpixels)
-        mask = hdu[0].data
-        maskb=np.array(mask,dtype=bool)
-        maskbt=maskb.T
-        hdu.close()
-    else:
-        maskb=None
 
     eps=1-galpar.q
 
@@ -521,19 +526,8 @@ def SectPhotComp(galpar, params, galcomps, n_sectors=19, minlevel=0):
     hdu.close()
 
 
-    badpixels=galpar.mask
+    maskb=galpar.mask
 
-    if badpixels is not None:
-
-        errmsg="file {} does not exist".format(badpixels)
-        assert os.path.isfile(badpixels), errmsg
-
-        hdu = fits.open(badpixels)
-        mask = hdu[0].data
-        maskb=np.array(mask,dtype=bool)
-        hdu.close()
-    else:
-        maskb=None
 
     eps=1-galpar.q
 
@@ -566,24 +560,10 @@ def SectPhotComp(galpar, params, galcomps, n_sectors=19, minlevel=0):
 
 def EllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps,n_sectors=19, minlevel=0):
 
-    badpixels=galpar.mask
 
     xradm = []
     ysbm = []
     ysberrm = []
-
-    if badpixels is not None:
-
-        errmsg="file {} does not exist".format(badpixels)
-        assert os.path.isfile(badpixels), errmsg
-
-        hdu = fits.open(badpixels)
-        mask = hdu[0].data
-        maskb=np.array(mask,dtype=bool)
-        maskbt=maskb.T
-        hdu.close()
-    else:
-        maskb=None
 
 
     # galax 
@@ -643,8 +623,6 @@ def EllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps,n_sec
 
     xarcm = aellarcm[stidxq]
     ymgem = mgesbm[stidxq]
-
-
 
 
 
@@ -728,15 +706,6 @@ def EllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps,n_sec
 
     if params.flagsub:
 
-#        print("running galfit to create subcomponents...")
-
- #       rungal = "galfit -o3 {}".format(params.galfile)
-  #      errgal = sp.run([rungal], shell=True, stdout=sp.PIPE,
-   #     stderr=sp.PIPE, universal_newlines=True)
-
-    #    runchg = "mv subcomps.fits {}".format(params.namesub)
-     #   errchg = sp.run([runchg], shell=True, stdout=sp.PIPE,
-      #  stderr=sp.PIPE, universal_newlines=True)
 
         xradq,ysbq,n=SubComp(params, galpar, galcomps, sectcomps, axsec, n_sectors=n_sectors)
 
@@ -985,23 +954,8 @@ def PlotSub(xradq,ysbq,nsub,axsec,namec,colorval):
 
 def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
-    badpixels=galpar.mask
-
-   
+  
     fignum=1
-
-    if badpixels is not None:
-
-        errmsg="file {} does not exist".format(badpixels)
-        assert os.path.isfile(badpixels), errmsg
-
-        hdu = fits.open(badpixels)
-        mask = hdu[0].data
-        maskb=np.array(mask,dtype=bool)
-        maskbt=maskb.T
-        hdu.close()
-    else:
-        maskb=None
 
 
     eps=1-galpar.q
@@ -1677,13 +1631,13 @@ def ReadGALFITout(inputf,galpar):
         assert flagbm is True, errmsg
 
 
-        galpar.mask="tempmask.fits"
-        GetFits(galpar.maskimage, galpar.mask, galpar.xmin, galpar.xmax, galpar.ymin, galpar.ymax)
+        galpar.tempmask="tempmask.fits"
+        GetFits(galpar.maskimage, galpar.tempmask, galpar.xmin, galpar.xmax, galpar.ymin, galpar.ymax)
 
     else:
         errmsg="Mask file does not exist"
         print(errmsg)
-        galpar.mask=None
+        galpar.tempmask=None
 
     #return xc,yc,q,pa,skylevel,scale,outimage,mgzpt,exptime,mask
 
@@ -1704,6 +1658,8 @@ def ReadNComp(inputf,X,Y,galcomps):
     index = 0
 
     n=0
+
+    distmin=3 # minimum distance for among component centers
 
     while index < len(lines):
 
@@ -1734,7 +1690,7 @@ def ReadNComp(inputf,X,Y,galcomps):
         PosAng=0
         skip=1
         flagcomp=False  # detect components
-
+        freepar=0
         if tmp[0] == "0)":
 
             namec=tmp[1] 
@@ -1749,7 +1705,7 @@ def ReadNComp(inputf,X,Y,galcomps):
                     yc=float(tmp[2])
 
                     dist = np.sqrt((xc-X)**2+(yc-Y)**2)
-                    if (dist < 3 and namec != "sky"):
+                    if (dist < distmin and namec != "sky"):
                         n=n+1
                         PosX=xc
                         PosY=yc
@@ -1757,26 +1713,43 @@ def ReadNComp(inputf,X,Y,galcomps):
                         NameComp=namec
                         N= n 
                         flagcomp=True
+                        par1=int(tmp[3])
+                        par2=int(tmp[4])
+                        # count the number of free params
+                        freepar=freepar+par1+par2  
                     else:
                         Comps=False
 
                 if tmp[0] == "3)" and flagcomp == True:    # axis ratio
                     Mag=float(tmp[1])
+                    par=int(tmp[2])
+                    freepar+=par
                 if tmp[0] == "4)" and flagcomp == True:    # axis ratio
                     Rad=float(tmp[1])
+                    par=int(tmp[2])
+                    freepar+=par
                 if tmp[0] == "5)" and flagcomp == True:    # axis ratio
                     Exp=float(tmp[1])
+                    par=int(tmp[2])
+                    freepar+=par
                 if tmp[0] == "6)" and flagcomp == True:    # axis ratio
                     Exp2=float(tmp[1])
+                    par=int(tmp[2])
+                    freepar+=par
                 if tmp[0] == "7)" and flagcomp == True:    # axis ratio
                     Exp3=float(tmp[1])
+                    par=int(tmp[2])
+                    freepar+=par
                 if tmp[0] == "9)" and flagcomp == True:    # axis ratio
                     AxRat=float(tmp[1])
+                    par=int(tmp[2])
+                    freepar+=par
                 if tmp[0] == "10)" and flagcomp == True:    # axis ratio
                     PosAng=float(tmp[1])
+                    par=int(tmp[2])
+                    freepar+=par
                 if tmp[0] == "z)" and flagcomp == True:    # axis ratio
                     skip=int(tmp[1])
-
             if (flagcomp == True):
 
                 galcomps.PosX=np.append(galcomps.PosX,PosX)
@@ -1793,11 +1766,11 @@ def ReadNComp(inputf,X,Y,galcomps):
                 galcomps.AxRat=np.append(galcomps.AxRat,AxRat)
                 galcomps.PosAng=np.append(galcomps.PosAng,PosAng)
                 galcomps.skip=np.append(galcomps.skip,skip)
-           
+                galcomps.freepar=np.append(galcomps.freepar,freepar)
+
         index += 1
 
     GalfitFile.close()
-
 
     galcomps.N.astype(int)
 
@@ -1893,6 +1866,26 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
     print("major axis, minor axis (pix) ",aell,bell)
 
+    NCol=len(galpar.img[0])
+    NRow=len(galpar.img)
+
+    #NCol=2000
+    #NRow=2000
+
+    print("max size ",NCol,NRow)
+
+    #Obj.Angle = Obj.Theta - 90
+
+    Theta=galpar.ang + 90
+
+    (xmin, xmax, ymin, ymax) = GetSize(galpar.xc, galpar.yc, aell, Theta, ab, NCol, NRow)
+    #(xmin, xmax, ymin, ymax) = GetSize(galpar.xc, galpar.yc, aell,0, ab, NCol, NRow) #test
+
+    print("size box ",xmin, xmax, ymin, ymax)
+
+
+    # create sigma image
+
     #OUTPHOT = open (params.output+".txt","w")
 
     #lineout= "# output photometry for analysis \n"
@@ -1917,6 +1910,269 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
 
 
+def Tidal(imgout,imsig,immask,num,xser,yser,xlo,xhi,ylo,yhi,goffx,goffy,rmin,sky,btflag):
+    "Computes Tidal  values as defined in Tal et al. 2009 AJ. It algo computes Bumpiness"
+    "(Blakeslee 2006 ApJ) value defined between rmin and rkron (see manual)"
+
+# imgout = galfit output image
+# imsig = sigma image (The one created by GALFIT)
+# immask = Mask image: The original
+# num = object number
+# xser, yser = Sextractor object position on the big image
+# xlo, xhi, ylo, yhi = coordinate of object of the big image
+# goffx, goffy = coordinate tranformation from big to galfit image
+# rmin = minimum radius to compute Tidal and Bumpiness (to avoid PSF Mismatch)
+# sky = Background value
+# btflag = is bulge/disk or sersic component?
+
+    pixcount=0
+    pixcountsnr=0
+    pixcountchi=0
+    sumtidal=0
+    sumsig=0
+    snr=0
+    sigma=1
+    flux=0
+    sumflux=0
+    meanflux=0
+    var=0
+    varb=0
+    res=0
+    resbump=0
+    sumres=0
+    sumchinu=0
+    chinu=0
+    varchi=1
+    sflux=0
+    sumsflux=0
+    meanres=0
+    sumvarres=0
+    varres=0
+    numbump=0
+    ndof=0
+    xglo=yglo=xghi=yghi=0
+    xgser=ygser=0
+
+    tidal=0
+    objchinu=0
+    bump=0
+    snr=0
+
+
+    datg = galpar.img
+
+    datm = galpar.model
+
+    dats = galpar.sigma
+
+    dat =galpar.mask
+
+
+    #lastmod2
+
+############################################################################
+################ Code to compute rmin #######################################
+
+#    for objchinu, Tidal and SNR
+    maskm = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
+
+#   mask including rmin for Bumpiness only
+    maskbum = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
+
+#   transforming coordinates to galfit output image
+    xglo = xlo - goffx
+    yglo = ylo - goffy
+
+    xghi = xhi - goffx
+    yghi = yhi - goffy
+
+    xgser = xser - goffx
+    ygser = yser - goffy
+
+#############
+
+    theta = 0
+
+    ypos, xpos = np.mgrid[yglo - 1:yghi, xglo - 1:xghi]
+
+    dx = xpos - xgser
+    dy = ypos - ygser
+
+    dist = np.sqrt(dx**2 + dy**2)
+
+    landa = np.arctan2(dy, dx)
+
+    mask = landa < 0
+    if mask.any():
+        landa[mask] = landa[mask] + 2 * np.pi
+
+    landa = landa - theta
+
+    angle = np.arctan2(np.sin(landa) / rmin, np.cos(landa) / rmin)
+
+    xell = xgser + rmin * np.cos(angle)
+    yell = ygser + rmin * np.sin(angle)
+
+    dell = np.sqrt((xell - xgser)**2 + (yell - ygser)**2)
+
+    mask = dist < dell
+
+#  correcting for rmin
+    maskbum[mask] = False
+
+    if maskbum.any():
+
+# for Bumpiness
+
+        galfluxbum  = datg[yglo - 1:yghi, xglo - 1:xghi][maskbum]
+        modfluxbum  = datm[yglo - 1:yghi, xglo - 1:xghi][maskbum]
+        sigfluxbum  = dats[yglo - 1:yghi, xglo - 1:xghi][maskbum]
+####
+
+# for Tidal, SNR, and objchinu
+
+        sumflux  = np.sum(datg[yglo - 1:yghi, xglo - 1:xghi][maskm] - sky)
+        sumsig   = np.sum(dats[yglo - 1:yghi, xglo - 1:xghi][maskm])
+
+        galflux  = datg[yglo - 1:yghi, xglo - 1:xghi][maskm]
+        modflux  = datm[yglo - 1:yghi, xglo - 1:xghi][maskm]
+        sigflux  = dats[yglo - 1:yghi, xglo - 1:xghi][maskm]
+
+        resflux = (galflux - modflux)**2
+
+#  local chinu
+
+        varchi = sigflux**2
+        chinu  = np.sum(resflux/varchi)
+
+        pixcountchi = np.size(datm[yglo - 1:yghi, xglo - 1:xghi][maskm])
+
+#  free parameters: sersic = 7 ;   Sersic + disk = 11
+
+        if(pixcountchi > 11):
+
+            if (btflag==False):
+                ndof=pixcountchi-7
+
+            elif(btflag==True):
+                ndof=pixcountchi-11
+
+            objchinu= chinu / ndof
+        else:
+            objchinu=-1
+            ndof=-1
+
+
+        if(np.size(dats[yglo - 1:yghi, xglo - 1:xghi][maskm]) > 0):
+# snr
+            meanflux = sumflux  / np.size(datg[yglo - 1:yghi, xglo - 1:xghi][maskm])
+            sigma = sumsig / np.size(dats[yglo - 1:yghi, xglo - 1:xghi][maskm])
+            snr = meanflux / sigma
+
+        else:
+            snr=-1
+
+# Tidal parameter
+
+        tgal = np.abs((galflux)/(modflux) - 1)
+        sumtidal=np.sum(tgal)
+        pixcountid=np.size(datm[yglo - 1:yghi, xglo - 1:xghi][maskm])
+
+        if pixcountid > 0:
+            tidal = (sumtidal / pixcountid)
+        else:
+            tidal=-1
+
+# bumpiness
+
+        resbump  = (galfluxbum - modfluxbum)**2
+        sflux    = np.sum(np.abs(modfluxbum - sky))
+        varres   = sigfluxbum * sigfluxbum
+        numbump  = np.sum(resbump - varres)
+
+        pixcountbum=np.size(datm[yglo - 1:yghi, xglo - 1:xghi][maskbum])
+
+
+# Bumpiness
+        if pixcountbum > 0:
+
+            meansflux = sflux / pixcountbum
+            meanres   = numbump / pixcountbum
+
+            if (meanres < 0):
+                meanres=0
+
+            bump      = (np.sqrt(meanres)) / meansflux
+
+        else:
+            bump=-1
+
+
+
+    hdug.close()
+    hdus.close()
+    hdu.close()
+
+
+    return (tidal,objchinu,bump,snr,ndof)
+
+
+
+def GetSize(x, y, R, theta, q, ncol, nrow):
+    "this subroutine get the maximun"
+    "and minimim pixels for Kron and sky ellipse"
+    
+    #theta is measured from x-axis    
+    #q = (1 - ell)
+    bim = q * R
+
+    theta = theta * (np.pi / 180)  # rads!!
+
+# getting size
+
+    xmin = x - np.sqrt((R**2) * (np.cos(theta))**2 +
+                       (bim**2) * (np.sin(theta))**2)
+
+    xmax = x + np.sqrt((R**2) * (np.cos(theta))**2 +
+                       (bim**2) * (np.sin(theta))**2)
+
+    ymin = y - np.sqrt((R**2) * (np.sin(theta))**2 +
+                       (bim**2) * (np.cos(theta))**2)
+
+    ymax = y + np.sqrt((R**2) * (np.sin(theta))**2 +
+                       (bim**2) * (np.cos(theta))**2)
+
+    mask = xmin < 1
+    if mask.any():
+        if isinstance(xmin,np.ndarray):
+            xmin[mask] = 1
+        else:
+            xmin = 1
+
+    mask = xmax > ncol
+
+    if mask.any():
+        if isinstance(xmax,np.ndarray):
+            xmax[mask] = ncol
+        else:
+            xmax = ncol
+
+    mask = ymin < 1
+    if mask.any():
+        if isinstance(ymin,np.ndarray):
+            ymin[mask] = 1
+        else:
+            ymin = 1
+
+    mask = ymax > nrow
+    if mask.any():
+        if isinstance(ymax,np.ndarray):
+            ymax[mask] = nrow
+        else:
+            ymax = nrow
+
+
+    return (xmin, xmax, ymin, ymax)
 
 
 
