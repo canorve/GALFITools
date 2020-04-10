@@ -219,6 +219,13 @@ def main():
     params.sboutput=params.namefile + "-sbout"
     params.output=params.namefile + "-out"
 
+    params.namened=params.namefile + "-ned.txt"
+
+
+
+    params.namesnr=params.namefile + "-snr.fits"
+
+
 
     if params.flagsbout == True: 
         msg="surface brightness output file: {} ".format(params.sboutput+".txt")
@@ -326,7 +333,7 @@ def main():
     ########################################################
 
     #lastmod
-    if params.output:
+    if params.flagout:
         print("Computing output photometry ... ")
         OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps)
 
@@ -392,6 +399,8 @@ class InputParams:
     namemul="none-mul.png"
     namesub="none-sub.fits"
     namesig="none-sig.fits"
+    namesnr="none-snr.fits"
+    namened="none-ned.txt"
 
 
 
@@ -418,6 +427,7 @@ class GalfitParams:
     model = np.array([[1,1],[1,1]])
     mask = np.array([[1,1],[1,1]])
     sigma = np.array([[1,1],[1,1]])
+    imsnr = np.array([[1,1],[1,1]])
 
 
 ### class for Galfit components
@@ -499,18 +509,51 @@ def SectPhot(galpar, params, n_sectors=19, minlevel=0):
 def SectPhotComp(galpar, params, galcomps, n_sectors=19, minlevel=0):
     """ calls to function sectors_photometry for subcomponents """
 
-    print("running galfit to create individual components...")
+    if (params.output) and (not(os.path.isfile(params.namesig))):
 
-    rungal = "galfit -o3 {}".format(params.galfile)
-    errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
-        universal_newlines=True)
+        print("running galfit to create sigma image and individual model images...")
 
-    runchg = "mv subcomps.fits {}".format(params.namesub)
-    errchg = sp.run([runchg], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
-        universal_newlines=True)
+        rungal = "galfit -o3 -outsig {}".format(params.galfile)
+        errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
+            universal_newlines=True)
 
-    errmsg="file {} does not exist".format(params.namesub)
-    assert os.path.isfile(params.namesub), errmsg
+        # changing name to subcomponents
+        runchg = "mv subcomps.fits {}".format(params.namesub)
+        errchg = sp.run([runchg], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
+            universal_newlines=True)
+
+        errmsg="file {} does not exist".format(params.namesub)
+        assert os.path.isfile(params.namesub), errmsg
+
+        # changing name to sigma image
+
+        runchg = "mv sigma.fits {}".format(params.namesig)
+        errchg = sp.run([runchg], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
+            universal_newlines=True)
+
+        errmsg="file {} does not exist".format(params.namesig)
+        assert os.path.isfile(params.namesig), errmsg
+
+    else: 
+
+        print("running galfit to create individual model images...")
+
+        rungal = "galfit -o3 {}".format(params.galfile)
+        errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
+            universal_newlines=True)
+
+        # changing name to subcomponents
+        runchg = "mv subcomps.fits {}".format(params.namesub)
+        errchg = sp.run([runchg], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
+            universal_newlines=True)
+
+        errmsg="file {} does not exist".format(params.namesub)
+        assert os.path.isfile(params.namesub), errmsg
+
+        if (os.path.isfile(params.namesig) and (params.output)):
+            print("using existing sigma image")
+
+##
 
     hdu = fits.open(params.namesub)
 
@@ -521,7 +564,6 @@ def SectPhotComp(galpar, params, galcomps, n_sectors=19, minlevel=0):
         if galcomps.Comps[cnt] == True:
             img = hdu[cnt+2].data
             subimgs.append(img)
-
         cnt=cnt+1
     hdu.close()
 
@@ -1854,8 +1896,30 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     mgeangle=sectgalax.angle[stidxg]
     mgeanrad=np.deg2rad(mgeangle)
 
-    ab=galpar.q
+    print("Number of free params ",int(galcomps.freepar.sum()))
 
+
+    # create sigma image
+    if(not(os.path.isfile(params.namesig))):
+
+        print("running galfit to create sigma image...")
+
+        rungal = "galfit -o1 -outsig {} ".format(params.galfile) 
+        errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
+            universal_newlines=True)
+
+        runchg = "mv sigma.fits {}".format(params.namesig)
+        errchg = sp.run([runchg], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
+            universal_newlines=True)
+
+        errmsg="file {} does not exist".format(params.namesig)
+        assert os.path.isfile(params.namesig), errmsg
+    else:
+        if not(params.flagsub):
+            print("using existing sigma image ")
+
+
+    ab=galpar.q
 
     aell = mgerad.max() 
 
@@ -1876,15 +1940,24 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
     #Obj.Angle = Obj.Theta - 90
 
+    #angle computed from y-axis to x-axis  
     Theta=galpar.ang + 90
+
 
     (xmin, xmax, ymin, ymax) = GetSize(galpar.xc, galpar.yc, aell, Theta, ab, NCol, NRow)
     #(xmin, xmax, ymin, ymax) = GetSize(galpar.xc, galpar.yc, aell,0, ab, NCol, NRow) #test
 
     print("size box ",xmin, xmax, ymin, ymax)
 
+    # call to Tidal
+    (tidal,objchinu,bump,snr,ndof)=Tidal(params, galpar, galcomps, xmin, xmax, ymin, ymax, 2)
 
-    # create sigma image
+
+    print("Tidal = ",tidal)  
+    print("Local Chinu = ",objchinu)  
+    print("Bumpiness = ",bump)  
+    print("SNR = ",snr)  
+    print("degrees of freedom = ",ndof)  
 
     #OUTPHOT = open (params.output+".txt","w")
 
@@ -1908,50 +1981,33 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     #OUTPHOT.close()
 
 
-
-
-def Tidal(imgout,imsig,immask,num,xser,yser,xlo,xhi,ylo,yhi,goffx,goffy,rmin,sky,btflag):
+def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
     "Computes Tidal  values as defined in Tal et al. 2009 AJ. It algo computes Bumpiness"
     "(Blakeslee 2006 ApJ) value defined between rmin and rkron (see manual)"
 
-# imgout = galfit output image
-# imsig = sigma image (The one created by GALFIT)
-# immask = Mask image: The original
-# num = object number
-# xser, yser = Sextractor object position on the big image
-# xlo, xhi, ylo, yhi = coordinate of object of the big image
-# goffx, goffy = coordinate tranformation from big to galfit image
-# rmin = minimum radius to compute Tidal and Bumpiness (to avoid PSF Mismatch)
-# sky = Background value
-# btflag = is bulge/disk or sersic component?
+    # rmin = minimum radius to compute Tidal and Bumpiness (to avoid PSF Mismatch)
+
+    #init values
 
     pixcount=0
     pixcountsnr=0
     pixcountchi=0
     sumtidal=0
     sumsig=0
-    snr=0
     sigma=1
     flux=0
     sumflux=0
     meanflux=0
-    var=0
-    varb=0
-    res=0
     resbump=0
     sumres=0
     sumchinu=0
     chinu=0
     varchi=1
     sflux=0
-    sumsflux=0
     meanres=0
-    sumvarres=0
     varres=0
     numbump=0
     ndof=0
-    xglo=yglo=xghi=yghi=0
-    xgser=ygser=0
 
     tidal=0
     objchinu=0
@@ -1959,44 +2015,60 @@ def Tidal(imgout,imsig,immask,num,xser,yser,xlo,xhi,ylo,yhi,goffx,goffy,rmin,sky
     snr=0
 
 
-    datg = galpar.img
-
-    datm = galpar.model
-
-    dats = galpar.sigma
-
-    dat =galpar.mask
+    xser=galpar.xc
+    yser=galpar.yc
 
 
-    #lastmod2
+    imgal = galpar.img
 
-############################################################################
-################ Code to compute rmin #######################################
 
-#    for objchinu, Tidal and SNR
-    maskm = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
+    immodel = galpar.model
 
-#   mask including rmin for Bumpiness only
-    maskbum = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
 
-#   transforming coordinates to galfit output image
-    xglo = xlo - goffx
-    yglo = ylo - goffy
+    hdu = fits.open(params.namesig)
+    header=hdu[0].header  
+    galpar.sigma=hdu[0].data
+    #hdu.close()
 
-    xghi = xhi - goffx
-    yghi = yhi - goffy
+    imsigma = galpar.sigma
 
-    xgser = xser - goffx
-    ygser = yser - goffy
 
-#############
+    immask =galpar.mask
+
+
+    # creates a new image for snr 
+    #NCol=len(galpar.img[0])
+    #NRow=len(galpar.img)
+
+    #MakeImage(params.namesnr, NCol, NRow):
+
+    #hdu = fits.PrimaryHDU()
+    header['TypeIMG'] = ('SNR', 'Signal to Noise Ratio image')
+    hdu[0].header  =header
+    galpar.imsnr=imgal/imsigma
+    hdu[0].data = galpar.imsnr
+
+    hdu.writeto(params.namesnr, overwrite=True)
+    hdu.close()
+
+    print("SNR image created.. ",params.namesnr)
+
+    #    for objchinu, Tidal and SNR
+    #    maskm = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
+    maskm =immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
+
+    #   mask including rmin for Bumpiness only
+    #    maskbum = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
+    maskbum = immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
+
+    #############
 
     theta = 0
 
-    ypos, xpos = np.mgrid[yglo - 1:yghi, xglo - 1:xghi]
+    ypos, xpos = np.mgrid[ylo - 1:yhi, xlo - 1:xhi]
 
-    dx = xpos - xgser
-    dy = ypos - ygser
+    dx = xpos - xser
+    dy = ypos - yser
 
     dist = np.sqrt(dx**2 + dy**2)
 
@@ -2010,90 +2082,87 @@ def Tidal(imgout,imsig,immask,num,xser,yser,xlo,xhi,ylo,yhi,goffx,goffy,rmin,sky
 
     angle = np.arctan2(np.sin(landa) / rmin, np.cos(landa) / rmin)
 
-    xell = xgser + rmin * np.cos(angle)
-    yell = ygser + rmin * np.sin(angle)
+    xell = xser + rmin * np.cos(angle)
+    yell = yser + rmin * np.sin(angle)
 
-    dell = np.sqrt((xell - xgser)**2 + (yell - ygser)**2)
+    dell = np.sqrt((xell - xser)**2 + (yell - yser)**2)
 
     mask = dist < dell
 
-#  correcting for rmin
+    #  correcting for rmin
     maskbum[mask] = False
 
     if maskbum.any():
 
-# for Bumpiness
+    # for Bumpiness
 
-        galfluxbum  = datg[yglo - 1:yghi, xglo - 1:xghi][maskbum]
-        modfluxbum  = datm[yglo - 1:yghi, xglo - 1:xghi][maskbum]
-        sigfluxbum  = dats[yglo - 1:yghi, xglo - 1:xghi][maskbum]
-####
+        galfluxbum  = imgal[ylo - 1:yhi, xlo - 1:xhi][maskbum]
+        modfluxbum  = immodel[ylo - 1:yhi, xlo - 1:xhi][maskbum]
+        sigfluxbum  = imsigma[ylo - 1:yhi, xlo - 1:xhi][maskbum]
+    ####
 
-# for Tidal, SNR, and objchinu
+    # for Tidal, SNR, and objchinu
 
-        sumflux  = np.sum(datg[yglo - 1:yghi, xglo - 1:xghi][maskm] - sky)
-        sumsig   = np.sum(dats[yglo - 1:yghi, xglo - 1:xghi][maskm])
+    #        sumflux  = np.sum(imgal[ylo - 1:yhi, xlo - 1:xhi][maskm] - sky)
+        sumflux  = np.sum(imgal[ylo - 1:yhi, xlo - 1:xhi][maskm])
+        sumsig   = np.sum(imsigma[ylo - 1:yhi, xlo - 1:xhi][maskm])
 
-        galflux  = datg[yglo - 1:yghi, xglo - 1:xghi][maskm]
-        modflux  = datm[yglo - 1:yghi, xglo - 1:xghi][maskm]
-        sigflux  = dats[yglo - 1:yghi, xglo - 1:xghi][maskm]
+        galflux  = imgal[ylo - 1:yhi, xlo - 1:xhi][maskm]
+        modflux  = immodel[ylo - 1:yhi, xlo - 1:xhi][maskm]
+        sigflux  = imsigma[ylo - 1:yhi, xlo - 1:xhi][maskm]
 
         resflux = (galflux - modflux)**2
 
-#  local chinu
+    #  local chinu
 
         varchi = sigflux**2
         chinu  = np.sum(resflux/varchi)
 
-        pixcountchi = np.size(datm[yglo - 1:yghi, xglo - 1:xghi][maskm])
+        pixcountchi = np.size(immodel[ylo - 1:yhi, xlo - 1:xhi][maskm])
 
-#  free parameters: sersic = 7 ;   Sersic + disk = 11
 
         if(pixcountchi > 11):
 
-            if (btflag==False):
-                ndof=pixcountchi-7
-
-            elif(btflag==True):
-                ndof=pixcountchi-11
-
+            ndof=pixcountchi - int(galcomps.freepar.sum())
             objchinu= chinu / ndof
         else:
             objchinu=-1
             ndof=-1
 
 
-        if(np.size(dats[yglo - 1:yghi, xglo - 1:xghi][maskm]) > 0):
-# snr
-            meanflux = sumflux  / np.size(datg[yglo - 1:yghi, xglo - 1:xghi][maskm])
-            sigma = sumsig / np.size(dats[yglo - 1:yghi, xglo - 1:xghi][maskm])
+        # snr
+        if(np.size(imsigma[ylo - 1:yhi, xlo - 1:xhi][maskm]) > 0):
+
+            meanflux = sumflux  / np.size(imgal[ylo - 1:yhi, xlo - 1:xhi][maskm])
+            sigma = sumsig / np.size(imsigma[ylo - 1:yhi, xlo - 1:xhi][maskm])
             snr = meanflux / sigma
 
         else:
             snr=-1
 
-# Tidal parameter
+        # Tidal parameter
 
         tgal = np.abs((galflux)/(modflux) - 1)
         sumtidal=np.sum(tgal)
-        pixcountid=np.size(datm[yglo - 1:yghi, xglo - 1:xghi][maskm])
+        pixcountid=np.size(immodel[ylo - 1:yhi, xlo - 1:xhi][maskm])
 
         if pixcountid > 0:
             tidal = (sumtidal / pixcountid)
         else:
             tidal=-1
 
-# bumpiness
+        # bumpiness
 
         resbump  = (galfluxbum - modfluxbum)**2
-        sflux    = np.sum(np.abs(modfluxbum - sky))
+        # sflux    = np.sum(np.abs(modfluxbum - sky))
+        sflux    = np.sum(np.abs(modfluxbum))
         varres   = sigfluxbum * sigfluxbum
         numbump  = np.sum(resbump - varres)
 
-        pixcountbum=np.size(datm[yglo - 1:yghi, xglo - 1:xghi][maskbum])
+        pixcountbum=np.size(immodel[ylo - 1:yhi, xlo - 1:xhi][maskbum])
 
 
-# Bumpiness
+        # Bumpiness
         if pixcountbum > 0:
 
             meansflux = sflux / pixcountbum
@@ -2106,12 +2175,6 @@ def Tidal(imgout,imsig,immask,num,xser,yser,xlo,xhi,ylo,yhi,goffx,goffy,rmin,sky
 
         else:
             bump=-1
-
-
-
-    hdug.close()
-    hdus.close()
-    hdu.close()
 
 
     return (tidal,objchinu,bump,snr,ndof)
@@ -2174,6 +2237,22 @@ def GetSize(x, y, R, theta, q, ncol, nrow):
 
     return (xmin, xmax, ymin, ymax)
 
+def MakeImage(newfits, sizex, sizey):
+    "create a new blank Image"
+
+    if os.path.isfile(newfits):
+        print("{} deleted; a new one is created \n".format(newfits))
+
+        runcmd = "rm {}".format(newfits)
+        errrm = sp.run([runcmd], shell=True, stdout=sp.PIPE,
+                        stderr=sp.PIPE, universal_newlines=True)
+
+
+    hdu = fits.PrimaryHDU()
+    hdu.data = np.zeros((sizey, sizex))
+    hdu.writeto(newfits, overwrite=True)
+
+    return True
 
 
 ##############################################
