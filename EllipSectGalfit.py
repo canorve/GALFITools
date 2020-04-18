@@ -13,8 +13,7 @@ import matplotlib.colors as colors
 import matplotlib.cm as cmx
 import mimetypes
 
-
-
+from astropy.io.votable import parse
 from mgefit.sectors_photometry import sectors_photometry
 
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,NullFormatter,
@@ -50,7 +49,7 @@ def main():
     #class for saving user's parameters
     params=InputParams()
 
-    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--grid','--dpi','--sbout','--noplot','--minlevel','--sectors','--out']
+    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--grid','--dpi','--sbout','--noplot','--minlevel','--sectors','--out','--object','--filter']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
@@ -87,6 +86,10 @@ def main():
         params.flagminlevel=True
     if options['sectors'] != None:
         params.flagsectors=True
+    if options['object'] != None:
+        params.flagobj=True
+    if options['filter'] != None:
+        params.flagband=True
 
 
     ################## search arguments after the option:
@@ -146,6 +149,19 @@ def main():
         OptionHandle="--sectors"
         opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         params.minlevel=np.int(opt['sectors'])
+
+    if params.flagobj == True:
+        opt={}
+        OptionHandle="--object"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        params.objname=np.str(opt['object'])
+
+    if params.flagband == True:
+        opt={}
+        OptionHandle="--filter"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        params.band=np.str(opt['filter'])
+
 
     params.galfile= sys.argv[1]
 
@@ -219,7 +235,7 @@ def main():
     params.sboutput=params.namefile + "-sbout"
     params.output=params.namefile + "-out"
 
-    params.namened=params.namefile + "-ned.txt"
+    params.namened=params.namefile + "-ned.xml"
 
 
 
@@ -355,6 +371,7 @@ def main():
 ### class for parameters
 class InputParams:
 
+    #flags
     flaglogx=False
     flagq=False
     flagpa=False
@@ -369,6 +386,10 @@ class InputParams:
     flagout=False
     flagminlevel=False
     flagsectors=False
+    flagobj=False
+    flagband=False
+    flagweb=False # to check connection to ned
+
 
     #init
     qarg=1
@@ -391,6 +412,11 @@ class InputParams:
     #output file
     output = "out.txt"
 
+    # object name to search in NED
+
+    objname="none"
+    band="R"
+
 
     namefile="none"
     namepng="none.png"
@@ -400,7 +426,7 @@ class InputParams:
     namesub="none-sub.fits"
     namesig="none-sig.fits"
     namesnr="none-snr.fits"
-    namened="none-ned.txt"
+    namened="none-ned.xml"
 
 
 
@@ -423,6 +449,9 @@ class GalfitParams:
     xmax=2
     ymin=1
     ymax=2
+
+    band="R"
+
     img = np.array([[1,1],[1,1]])
     model = np.array([[1,1],[1,1]])
     mask = np.array([[1,1],[1,1]])
@@ -1952,12 +1981,73 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     # call to Tidal
     (tidal,objchinu,bump,snr,ndof)=Tidal(params, galpar, galcomps, xmin, xmax, ymin, ymax, 2)
 
+    #ATENTION: snr compute mean, stdev and total sum 
 
     print("Tidal = ",tidal)  
     print("Local Chinu = ",objchinu)  
     print("Bumpiness = ",bump)  
     print("SNR = ",snr)  
     print("degrees of freedom = ",ndof)  
+
+
+    #lastmod2
+
+    #fitsfile="A85.fits"
+
+    #Mag=16
+    #band="R"
+
+    #Rearcsec=10 # effective radius in arcsec
+   
+    header = fits.getheader(galpar.inputimage)
+
+    # obj = fits.getval(fitsfile, 'OBJECT')
+
+    # obj aqui se convertira en objname mas abajo
+
+    if not(params.flagobj):
+        if "OBJECT" in header: 
+            params.objname=header["OBJECT"] 
+            params.flagobj=True
+            print("using object name: {} to search in NED ".format(params.objname))            
+
+        elif "TARGNAME": 
+            params.objname=header["TARGNAME"] 
+            params.flagobj=True
+            print("using object name: {} to search in NED ".format(params.objname))            
+        else:
+            print("WARNING: name for object not found in header nor it was provided by user") 
+            print("Luminosity and absolute magnitude will not be computed") 
+    else:
+        print("using object name: {} to search in NED ".format(params.objname))            
+
+    #lastmod3 
+
+    if not(params.flagband):
+        if "BAND" in header: 
+            params.flagband = True
+            params.band=header["BAND"] 
+        elif "FILTER" in header: 
+            params.flagband = True
+            params.band=header["FILTER"] 
+        elif "FILTNAM" in header: 
+            params.flagband = True
+            params.band=header["FILTNAM"] 
+        elif "FILTNAM1" in header: 
+            params.flagband = True
+            params.band=header["FILTNAM1"] 
+        else:
+            print("WARNING: filter not found using default") 
+            print("use --filter option to change band") 
+    else:
+        print("using {} band to correct for galactic extinction ".format(params.band)) 
+
+
+
+
+    (GalExt,DistMod,DistMod2,Scalekpc,SbDim)=NED(params, galpar, galcomps)
+
+
 
     #OUTPHOT = open (params.output+".txt","w")
 
@@ -2254,6 +2344,117 @@ def MakeImage(newfits, sizex, sizey):
 
     return True
 
+
+def NED(params, galpar, galcomps):
+    "connect to NED database to obtain Gal Extinction and other variables"
+    
+    objname=params.objname
+    band=params.band
+
+    params.flagweb=True
+
+    objname=params.objname
+
+    nedweb="https://ned.ipac.caltech.edu/cgi-bin/nph-objsearch?extend=no&of=xml_all&objname="
+
+    filened=params.namened
+
+    #checar si el archivo existe para no hacer conexion a internet
+
+    if(not(os.path.isfile(filened))):
+
+        # command for wget
+        #wget -O NED_51.xml "https://ned.ipac.caltech.edu/cgi-bin/nph-objsearch?extend=no&of=xml_all&objname=m+51"
+        wgetcmd = 'wget -O {} "{}{}"'.format(filened,nedweb,objname)
+
+        print("Running: ",wgetcmd)
+
+        errwg = sp.run([wgetcmd], shell=True, stdout=sp.PIPE,stderr=sp.PIPE, universal_newlines=True)
+
+        if errwg.returncode != 0:
+            print("can't connect to NED webserver. Is your internet connection working? ")
+            params.flagweb=False
+    else:
+        print("using existing {} file ".format(filened))
+
+
+    print("reading ",filened)
+    votable=parse(filened,pedantic=False) 
+
+    try: 
+        table=votable.get_table_by_index(0) 
+    except: 
+        print("I can't read file or object name can be found in file")
+        print("luminosity and absolute magnitude will not be computed")
+        params.flagweb=False 
+
+
+    if params.flagweb==True:
+        # si flag == True
+        tablephot=votable.get_table_by_id("NED_DerivedValuesTable") 
+
+        dataphot=tablephot.array
+
+        lumdist=dataphot["luminosity_distance"].data[0] # units in Mpc
+
+        #DistMod= 5 * np.log10(lumdist/10) 
+
+        DistMod=dataphot["luminosity_distance_moduli"].data[0] # units in magnitudes
+
+        tablext=votable.get_table_by_id("NED_BasicDataTable") 
+        dataext=tablext.array
+
+
+        extband="gal_extinc_"+ band 
+
+        if extband in dataext: 
+            GalExt=dataext[extband].data[0] 
+        else:
+            print("can't found {} in {} check filter name. GalExt=0 ".format(extband,filened))           
+            GalExt=0
+
+        print("Luminosity distance: (Mpc) ",lumdist)
+
+        print("Module Distance (mag): ",DistMod)
+
+        #print("modulo de distancia (obtenido de tabla): ",DistMod2)
+
+        print("Galactic Extinction for band {} : {}",band,GalExt)
+
+        #CorMag = Mag - GalExt # corrected by galactic extinction 
+    
+        #AbsMag=CorMag - DistMod # No K correction applied
+
+        #print("Magnitud Absoluta",AbsMag)
+
+        Scalekpc=dataphot["cosmology_corrected_scale_kpc/arcsec"].data[0] # to convert to kpc
+
+        print("Scale kpc/arcsec",Scalekpc)
+
+        #Rekpc = Rearcsec * scalekpc
+        #print("Re in kpc ",Rekpc)
+
+        SbDim=dataphot["surface_brightness_dimming_mag"].data[0] 
+
+        print("SB dimming in mag",SbDim)
+
+
+        ## modulo de distancia calculado en forma independiente del redshift: 
+        tabledist=votable.get_table_by_id("Redshift_IndependentDistances") 
+
+        datadist=tabledist.array
+
+        DistMod2=datadist["DistanceModulus"].data[0] 
+
+        print("Distance Modulus (z independent) ",float(DistMod2))
+    else:
+        GalExt=0
+        DistMod=0
+        DistMod2=0
+        Scalekpc=0
+        SbDim=0
+
+    return (GalExt,DistMod,DistMod2,Scalekpc,SbDim)
 
 ##############################################
 ##############################################
