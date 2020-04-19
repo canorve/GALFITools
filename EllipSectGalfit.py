@@ -1881,11 +1881,14 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
     maskgal=(galcomps.NameComp != "ferrer") & (galcomps.NameComp != "nuker") & (galcomps.NameComp != "edgedisk") & (galcomps.NameComp != "king")
 
-    Flux=10**((galpar.mgzpt -  galcomps.Mag[maskgal])/2.5)
-    totFlux=Flux.sum()
-    totMag=-2.5*np.log10(totFlux) + galpar.mgzpt
-    print("total magnitud = ",totMag)
-    print("total Flux = ",totFlux)
+    if maskgal.any():
+        Flux=10**((galpar.mgzpt -  galcomps.Mag[maskgal])/2.5)
+        totFlux=Flux.sum()
+        totMag=-2.5*np.log10(totFlux) + galpar.mgzpt
+        print("total magnitud = ",totMag)
+        print("total Flux = ",totFlux)
+    else:
+        print("Total magnitud can be computed with the actual galfit functions")
 
     maskdisk = (galcomps.NameComp == "expdisk") | (galcomps.NameComp == "edgedisk") 
     maskbulge = (galcomps.NameComp == "sersic") | (galcomps.NameComp == "devauc") | (galcomps.NameComp == "moffat") | (galcomps.NameComp == "ferrer") | (galcomps.NameComp == "king") | (galcomps.NameComp == "gaussian") | (galcomps.NameComp == "psf")
@@ -1989,21 +1992,10 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     print("SNR = ",snr)  
     print("degrees of freedom = ",ndof)  
 
-
-    #lastmod2
-
     #fitsfile="A85.fits"
-
-    #Mag=16
-    #band="R"
-
-    #Rearcsec=10 # effective radius in arcsec
    
     header = fits.getheader(galpar.inputimage)
 
-    # obj = fits.getval(fitsfile, 'OBJECT')
-
-    # obj aqui se convertira en objname mas abajo
 
     if not(params.flagobj):
         if "OBJECT" in header: 
@@ -2021,7 +2013,6 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     else:
         print("using object name: {} to search in NED ".format(params.objname))            
 
-    #lastmod3 
 
     if not(params.flagband):
         if "BAND" in header: 
@@ -2037,15 +2028,32 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
             params.flagband = True
             params.band=header["FILTNAM1"] 
         else:
-            print("WARNING: filter not found using default") 
+            print("WARNING: filter not found. I will use default filter: ",params.band) 
             print("use --filter option to change band") 
     else:
         print("using {} band to correct for galactic extinction ".format(params.band)) 
 
+    #lastmod2
+    if (params.flagobj): 
+        (GalExt,DistMod,DistMod2,Scalekpc,SbDim)=NED(params, galpar, galcomps)
+
+    if maskgal.any():
+
+        if (params.flagweb and params.flagobj):
+
+            CorMag = totMag - GalExt # corrected by galactic extinction 
+            
+            AbsMag=CorMag - DistMod # No K correction applied
+
+            AbsMag2=CorMag - DistMod2 # No K correction applied
+
+            print("Magnitud Absoluta",AbsMag)
+            print("Magnitud Absoluta using Distance Modulus independen of z ",AbsMag2)
+            print("check references in ",params.namened)
 
 
-
-    (GalExt,DistMod,DistMod2,Scalekpc,SbDim)=NED(params, galpar, galcomps)
+            Rekpc = galcomps.Rad[maskgal] * galpar.scale * Scalekpc
+            print("Re in kpc ",Rekpc)
 
 
 
@@ -2373,6 +2381,7 @@ def NED(params, galpar, galcomps):
 
         if errwg.returncode != 0:
             print("can't connect to NED webserver. Is your internet connection working? ")
+            print("Luminosity and absolute magnitude will not be computed") 
             params.flagweb=False
     else:
         print("using existing {} file ".format(filened))
@@ -2383,6 +2392,7 @@ def NED(params, galpar, galcomps):
 
     try: 
         table=votable.get_table_by_index(0) 
+
     except: 
         print("I can't read file or object name can be found in file")
         print("luminosity and absolute magnitude will not be computed")
@@ -2407,7 +2417,8 @@ def NED(params, galpar, galcomps):
 
         extband="gal_extinc_"+ band 
 
-        if extband in dataext: 
+
+        if extband in dataext.data[0]: 
             GalExt=dataext[extband].data[0] 
         else:
             print("can't found {} in {} check filter name. GalExt=0 ".format(extband,filened))           
@@ -2417,22 +2428,14 @@ def NED(params, galpar, galcomps):
 
         print("Module Distance (mag): ",DistMod)
 
-        #print("modulo de distancia (obtenido de tabla): ",DistMod2)
 
-        print("Galactic Extinction for band {} : {}",band,GalExt)
+        print("Galactic Extinction for band {} : {}".format(band,GalExt))
 
-        #CorMag = Mag - GalExt # corrected by galactic extinction 
-    
-        #AbsMag=CorMag - DistMod # No K correction applied
-
-        #print("Magnitud Absoluta",AbsMag)
 
         Scalekpc=dataphot["cosmology_corrected_scale_kpc/arcsec"].data[0] # to convert to kpc
 
         print("Scale kpc/arcsec",Scalekpc)
 
-        #Rekpc = Rearcsec * scalekpc
-        #print("Re in kpc ",Rekpc)
 
         SbDim=dataphot["surface_brightness_dimming_mag"].data[0] 
 
@@ -2446,7 +2449,9 @@ def NED(params, galpar, galcomps):
 
         DistMod2=datadist["DistanceModulus"].data[0] 
 
-        print("Distance Modulus (z independent) ",float(DistMod2))
+        DistMod2=float(DistMod2)
+
+        print("Distance Modulus (z independent) ",DistMod2)
     else:
         GalExt=0
         DistMod=0
