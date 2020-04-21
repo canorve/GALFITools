@@ -268,6 +268,7 @@ def main():
     hdu = fits.open(galpar.outimage)
     galpar.img = hdu[1].data
     galpar.model = hdu[2].data
+    galpar.imres = hdu[3].data
     hdu.close()
 
     # removing background from galaxy and model images 
@@ -454,6 +455,8 @@ class GalfitParams:
 
     img = np.array([[1,1],[1,1]])
     model = np.array([[1,1],[1,1]])
+    imres = np.array([[1,1],[1,1]])
+
     mask = np.array([[1,1],[1,1]])
     sigma = np.array([[1,1],[1,1]])
     imsnr = np.array([[1,1],[1,1]])
@@ -1982,14 +1985,16 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     print("size box ",xmin, xmax, ymin, ymax)
 
     # call to Tidal
-    (tidal,objchinu,bump,snr,ndof)=Tidal(params, galpar, galcomps, xmin, xmax, ymin, ymax, 2)
+    (tidal,objchinu,bump,snr,stdsnr,totsnr,rss,ndof)=Tidal(params, galpar, galcomps, xmin, xmax, ymin, ymax, 2)
 
-    #ATENTION: snr compute mean, stdev and total sum 
-
+    
     print("Tidal = ",tidal)  
     print("Local Chinu = ",objchinu)  
     print("Bumpiness = ",bump)  
-    print("SNR = ",snr)  
+    print("mean SNR = ",snr)  
+    print("std SNR = ",stdsnr)  
+    print("total SNR sum over area = ",totsnr)  
+    print("Residual sum of squares =  ",rss)  
     print("degrees of freedom = ",ndof)  
 
     #fitsfile="A85.fits"
@@ -2033,7 +2038,6 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     else:
         print("using {} band to correct for galactic extinction ".format(params.band)) 
 
-    #lastmod2
     if (params.flagobj): 
         (GalExt,DistMod,DistMod2,Scalekpc,SbDim)=NED(params, galpar, galcomps)
 
@@ -2054,6 +2058,105 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
             Rekpc = galcomps.Rad[maskgal] * galpar.scale * Scalekpc
             print("Re in kpc ",Rekpc)
+
+
+# lastmod2
+### information criteria
+
+#;############################  INFORMATION CRITERIA ######################################
+
+
+    #kbd=11
+    #ks=7
+
+    freepar=int(galcomps.freepar.sum())
+
+    npix = ndof + freepar
+    #npixs  = ndofser + ks
+
+
+    #    ; Elements of resolution = npix/(!pi*theta**2).     theta=FWHM (pixels)
+
+    #    ;!pi*theta**2 for locos:
+
+    #theta= 19.635
+
+    #nresbd = npixbd/theta
+    #nress =  npixs/theta
+
+
+    #    ;  AKAIKE INFORMATION CRITERION
+    #    ; AIC = χ2 + 2k
+
+    AICrit = objchinu * ndof + 2*freepar
+    #AICs  = localchinuser * ndofser + 2*ks
+
+    #    ;  AKAIKE CRITERION 10x
+    #    ; AIC10 = χ2 + 20k
+
+    #AIC10bd = localchinu * ndof + 20*kbd
+    #AIC10s  = localchinuser * ndofser + 20*ks
+
+    #    ; BAYESIAN INFORMATION CRITERION
+    #    ; BIC = χ2 + k * ln(n)
+
+    BICrit = objchinu * ndof + freepar * np.log(npix)
+    #BICs =  localchinuser * ndofser + ks * np.log(npixs)
+
+    print("AIC = ",AICrit)  
+    print("BICrit = ",BICrit)  
+
+
+    #    ;  AKAIKE RES CRITERION
+    #    ; AICres = χ2nu * (nres - k)  + 2k
+
+    #AICresbd = localchinu    * (nresbd - kbd) + 2 * kbd
+    #AICress  = localchinuser * (nress - ks) + 2 * ks
+
+    #    ; BAYESIAN RES INFORMATION CRITERION
+    #    ; BICres = χ2nu * (nres - k) + k * ln(nres)
+
+    #BICresbd = localchinu * (nresbd - kbd)   + kbd * np.log( nresbd )
+    #BICress =  localchinuser * (nress - ks)  + ks  * np.log( nress )
+
+    #    ; BAYESIAN RES N INFORMATION CRITERION
+    #    ; BICres = χ2nu * (nres - k) + k * ln(npix)
+
+    #BICresnbd = localchinu * (nresbd - kbd)   + kbd * np.log( npixbd )
+    #BICresns =  localchinuser * (nress - ks)  + ks  * np.log( npixs )
+
+
+    #    ; INFORMATION CRITERION RATIOS
+
+    #    ; akaike
+    #AICrat = AICbd/AICs
+
+    #    ; akaike 10x
+    #AIC10rat = AIC10bd/AIC10s
+
+    #    ; bayesian
+    #BICrat= BICbd/BICs
+
+
+    #    ; akaike res
+    #AICresrat = AICresbd/AICress
+
+
+    #    ; bayesian res
+    #    BICresrat = abs(BICresbd/BICress)
+
+
+    #    ; bayesian res n
+    #BICresnrat = abs(BICresnbd/BICresns)
+
+
+    #    ;  corrrection
+    #    ;BICresrat[2148]=1
+
+
+
+
+
 
 
 
@@ -2107,10 +2210,15 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
     numbump=0
     ndof=0
 
+    rss=0
+
     tidal=0
     objchinu=0
     bump=0
     snr=0
+
+    totsnr=0
+    stdsnr=0
 
 
     xser=galpar.xc
@@ -2121,6 +2229,10 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
 
 
     immodel = galpar.model
+
+    imres = galpar.imres
+
+
 
 
     hdu = fits.open(params.namesig)
@@ -2229,15 +2341,18 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
 
 
         # snr
-        if(np.size(imsigma[ylo - 1:yhi, xlo - 1:xhi][maskm]) > 0):
+        if(np.size(galpar.imsnr[ylo - 1:yhi, xlo - 1:xhi][maskm]) > 0):
 
-            meanflux = sumflux  / np.size(imgal[ylo - 1:yhi, xlo - 1:xhi][maskm])
-            sigma = sumsig / np.size(imsigma[ylo - 1:yhi, xlo - 1:xhi][maskm])
-            snr = meanflux / sigma
+            totsnr=galpar.imsnr[ylo - 1:yhi, xlo - 1:xhi][maskm].sum()
+
+            snr=galpar.imsnr[ylo - 1:yhi, xlo - 1:xhi][maskm].mean()
+            stdsnr=galpar.imsnr[ylo - 1:yhi, xlo - 1:xhi][maskm].std()
 
         else:
+            print("I can't compute SNR")
             snr=-1
-
+            stdsnr=0
+            totsnr=0
         # Tidal parameter
 
         tgal = np.abs((galflux)/(modflux) - 1)
@@ -2275,7 +2390,11 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
             bump=-1
 
 
-    return (tidal,objchinu,bump,snr,ndof)
+    # computing RSS: 
+    rss=(imres[maskm]**2).sum()
+
+
+    return (tidal,objchinu,bump,snr,stdsnr,totsnr,rss,ndof)
 
 
 
