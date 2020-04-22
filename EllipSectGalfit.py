@@ -2060,9 +2060,6 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
             print("Re in kpc ",Rekpc)
 
 
-# lastmod2
-### information criteria
-
 #;############################  INFORMATION CRITERIA ######################################
 
 
@@ -2103,8 +2100,8 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     BICrit = objchinu * ndof + freepar * np.log(npix)
     #BICs =  localchinuser * ndofser + ks * np.log(npixs)
 
-    print("AIC = ",AICrit)  
-    print("BICrit = ",BICrit)  
+    print("Akaike Information Criterion = ",AICrit)  
+    print("Bayesian Information Criterion = ",BICrit)  
 
 
     #    ;  AKAIKE RES CRITERION
@@ -2152,9 +2149,6 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
     #    ;  corrrection
     #    ;BICresrat[2148]=1
-
-
-
 
 
 
@@ -2265,11 +2259,15 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
 
     #    for objchinu, Tidal and SNR
     #    maskm = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
-    maskm =immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
+#    maskm =immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
+
+    maskm =immask == False  # big image coordinates
 
     #   mask including rmin for Bumpiness only
     #    maskbum = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
-    maskbum = immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
+#    maskbum = immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
+    maskbum = immask == False  # big image coordinates
+
 
     #############
 
@@ -2323,6 +2321,9 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
 
         resflux = (galflux - modflux)**2
 
+        rss2=(resflux).sum()
+
+        print("Residual sum squares ",rss2)
     #  local chinu
 
         varchi = sigflux**2
@@ -2391,7 +2392,7 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
 
 
     # computing RSS: 
-    rss=(imres[maskm]**2).sum()
+    rss=(imres[ylo - 1:yhi, xlo - 1:xhi][maskm]**2).sum()
 
 
     return (tidal,objchinu,bump,snr,stdsnr,totsnr,rss,ndof)
@@ -2533,15 +2534,13 @@ def NED(params, galpar, galcomps):
         tablext=votable.get_table_by_id("NED_BasicDataTable") 
         dataext=tablext.array
 
-
-        extband="gal_extinc_"+ band 
-
-
-        if extband in dataext.data[0]: 
+        extband="gal_extinc_" + band 
+        try: 
             GalExt=dataext[extband].data[0] 
-        else:
+        except: 
             print("can't found {} in {} check filter name. GalExt=0 ".format(extband,filened))           
             GalExt=0
+
 
         print("Luminosity distance: (Mpc) ",lumdist)
 
