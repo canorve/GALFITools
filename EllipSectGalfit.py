@@ -49,7 +49,7 @@ def main():
     #class for saving user's parameters
     params=InputParams()
 
-    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--grid','--dpi','--sbout','--noplot','--minlevel','--sectors','--out','--object','--filter']
+    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--grid','--dpi','--sbout','--noplot','--minlevel','--sectors','--out','--object','--filter','--snr']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
@@ -90,6 +90,9 @@ def main():
         params.flagobj=True
     if options['filter'] != None:
         params.flagband=True
+    if options['snr'] != None:
+        params.flagsnr=True
+
 
 
     ################## search arguments after the option:
@@ -233,7 +236,7 @@ def main():
 
 
     params.sboutput=params.namefile + "-sbout"
-    params.output=params.namefile + "-out"
+    params.output=params.namefile + "-out.txt"
 
     params.namened=params.namefile + "-ned.xml"
 
@@ -248,7 +251,7 @@ def main():
         print(msg)
 
     if params.flagout == True: 
-        msg="output photometry file: {} ".format(params.output+".txt")
+        msg="output photometry file: {} ".format(params.output)
         print(msg)
 
 
@@ -266,10 +269,11 @@ def main():
 
     # hdu 1 => image   hdu 2 => model
     hdu = fits.open(galpar.outimage)
-    galpar.img = hdu[1].data
-    galpar.model = hdu[2].data
-    galpar.imres = hdu[3].data
+    galpar.img = (hdu[1].data).astype(float)
+    galpar.model = (hdu[2].data).astype(float)
+    galpar.imres = (hdu[3].data).astype(float)
     hdu.close()
+
 
     # removing background from galaxy and model images 
     galpar.img = galpar.img - galpar.skylevel
@@ -390,6 +394,7 @@ class InputParams:
     flagobj=False
     flagband=False
     flagweb=False # to check connection to ned
+    flagsnr = False
 
 
     #init
@@ -541,7 +546,7 @@ def SectPhot(galpar, params, n_sectors=19, minlevel=0):
 def SectPhotComp(galpar, params, galcomps, n_sectors=19, minlevel=0):
     """ calls to function sectors_photometry for subcomponents """
 
-    if (params.output) and (not(os.path.isfile(params.namesig))):
+    if (params.flagout) and (not(os.path.isfile(params.namesig))):
 
         print("running galfit to create sigma image and individual model images...")
 
@@ -582,10 +587,10 @@ def SectPhotComp(galpar, params, galcomps, n_sectors=19, minlevel=0):
         errmsg="file {} does not exist".format(params.namesub)
         assert os.path.isfile(params.namesub), errmsg
 
-        if (os.path.isfile(params.namesig) and (params.output)):
+        if (os.path.isfile(params.namesig) and (params.flagout)):
             print("using existing sigma image")
 
-##
+    ##
 
     hdu = fits.open(params.namesub)
 
@@ -594,7 +599,7 @@ def SectPhotComp(galpar, params, galcomps, n_sectors=19, minlevel=0):
     cnt=0  # image =0 do not count
     while(cnt<len(galcomps.Comps)):
         if galcomps.Comps[cnt] == True:
-            img = hdu[cnt+2].data
+            img = hdu[cnt+2].data.astype(float)
             subimgs.append(img)
         cnt=cnt+1
     hdu.close()
@@ -1888,10 +1893,10 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
         Flux=10**((galpar.mgzpt -  galcomps.Mag[maskgal])/2.5)
         totFlux=Flux.sum()
         totMag=-2.5*np.log10(totFlux) + galpar.mgzpt
-        print("total magnitud = ",totMag)
-        print("total Flux = ",totFlux)
-    else:
-        print("Total magnitud can be computed with the actual galfit functions")
+        #print("total magnitud = ",totMag)
+        #print("total Flux = ",totFlux)
+    #else:
+    #    print("Total magnitud can not be computed with the actual galfit functions")
 
     maskdisk = (galcomps.NameComp == "expdisk") | (galcomps.NameComp == "edgedisk") 
     maskbulge = (galcomps.NameComp == "sersic") | (galcomps.NameComp == "devauc") | (galcomps.NameComp == "moffat") | (galcomps.NameComp == "ferrer") | (galcomps.NameComp == "king") | (galcomps.NameComp == "gaussian") | (galcomps.NameComp == "psf")
@@ -1901,9 +1906,10 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
         totBulgeF = BulgeFlux.sum()
         totDiskF =  DiskFlux.sum()
         BulgeToTotal= totBulgeF / (totBulgeF + totDiskF)
-        print("BulgeToTotal = ",BulgeToTotal)
+        #print("BulgeToTotal = ",BulgeToTotal)
     else:
-        print("BulgeToTotal = 1")
+        BulgeToTotal = 1
+        #print("BulgeToTotal = 1")
 
 
     Num=len(Flux)
@@ -1921,7 +1927,6 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
         n+=1
 
-
     #####
     
     stidxg = np.argsort(sectgalax.radius)
@@ -1931,7 +1936,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     mgeangle=sectgalax.angle[stidxg]
     mgeanrad=np.deg2rad(mgeangle)
 
-    print("Number of free params ",int(galcomps.freepar.sum()))
+    #print("Number of free params: ",int(galcomps.freepar.sum()))
 
 
     # create sigma image
@@ -1963,15 +1968,12 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     #changing to arc sec
     aellarc=aell*galpar.scale
 
-    print("major axis, minor axis (pix) ",aell,bell)
+    #print("major axis, minor axis (pix) ",aell,bell)
 
     NCol=len(galpar.img[0])
     NRow=len(galpar.img)
 
-    #NCol=2000
-    #NRow=2000
-
-    print("max size ",NCol,NRow)
+    #print("max size ",NCol,NRow)
 
     #Obj.Angle = Obj.Theta - 90
 
@@ -1980,24 +1982,21 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
 
     (xmin, xmax, ymin, ymax) = GetSize(galpar.xc, galpar.yc, aell, Theta, ab, NCol, NRow)
-    #(xmin, xmax, ymin, ymax) = GetSize(galpar.xc, galpar.yc, aell,0, ab, NCol, NRow) #test
 
-    print("size box ",xmin, xmax, ymin, ymax)
+    #print("size box ",xmin, xmax, ymin, ymax)
 
     # call to Tidal
     (tidal,objchinu,bump,snr,stdsnr,totsnr,rss,ndof)=Tidal(params, galpar, galcomps, xmin, xmax, ymin, ymax, 2)
 
     
-    print("Tidal = ",tidal)  
-    print("Local Chinu = ",objchinu)  
-    print("Bumpiness = ",bump)  
-    print("mean SNR = ",snr)  
-    print("std SNR = ",stdsnr)  
-    print("total SNR sum over area = ",totsnr)  
-    print("Residual sum of squares =  ",rss)  
-    print("degrees of freedom = ",ndof)  
-
-    #fitsfile="A85.fits"
+    #print("Tidal = ",tidal)  
+    #print("Local Chinu = ",objchinu)  
+    #print("Bumpiness = ",bump)  
+    #print("mean SNR = ",snr)  
+    #print("std SNR = ",stdsnr)  
+    #print("total SNR sum over area = ",totsnr)  
+    #print("Residual sum of squares =  ",rss)  
+    #print("degrees of freedom = ",ndof)  
    
     header = fits.getheader(galpar.inputimage)
 
@@ -2051,134 +2050,160 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
             AbsMag2=CorMag - DistMod2 # No K correction applied
 
-            print("Magnitud Absoluta",AbsMag)
-            print("Magnitud Absoluta using Distance Modulus independen of z ",AbsMag2)
-            print("check references in ",params.namened)
+            #print("Magnitud Absoluta",AbsMag)
+            #print("Magnitud Absoluta using Distance Modulus independen of z ",AbsMag2)
+            #print("check references in ",params.namened)
 
 
             Rekpc = galcomps.Rad[maskgal] * galpar.scale * Scalekpc
             print("Re in kpc ",Rekpc)
 
 
-#;############################  INFORMATION CRITERIA ######################################
+    ################  INFORMATION CRITERIA ####################
 
-
-    #kbd=11
-    #ks=7
 
     freepar=int(galcomps.freepar.sum())
 
     npix = ndof + freepar
-    #npixs  = ndofser + ks
-
-
-    #    ; Elements of resolution = npix/(!pi*theta**2).     theta=FWHM (pixels)
-
-    #    ;!pi*theta**2 for locos:
-
-    #theta= 19.635
-
-    #nresbd = npixbd/theta
-    #nress =  npixs/theta
-
 
     #    ;  AKAIKE INFORMATION CRITERION
     #    ; AIC = χ2 + 2k
 
     AICrit = objchinu * ndof + 2*freepar
-    #AICs  = localchinuser * ndofser + 2*ks
-
-    #    ;  AKAIKE CRITERION 10x
-    #    ; AIC10 = χ2 + 20k
-
-    #AIC10bd = localchinu * ndof + 20*kbd
-    #AIC10s  = localchinuser * ndofser + 20*ks
+    
 
     #    ; BAYESIAN INFORMATION CRITERION
     #    ; BIC = χ2 + k * ln(n)
 
     BICrit = objchinu * ndof + freepar * np.log(npix)
-    #BICs =  localchinuser * ndofser + ks * np.log(npixs)
-
-    print("Akaike Information Criterion = ",AICrit)  
-    print("Bayesian Information Criterion = ",BICrit)  
 
 
-    #    ;  AKAIKE RES CRITERION
-    #    ; AICres = χ2nu * (nres - k)  + 2k
+    #######  file output:  ######
 
-    #AICresbd = localchinu    * (nresbd - kbd) + 2 * kbd
-    #AICress  = localchinuser * (nress - ks) + 2 * ks
+    print("Creating output photometry file: ",params.output)
 
-    #    ; BAYESIAN RES INFORMATION CRITERION
-    #    ; BICres = χ2nu * (nres - k) + k * ln(nres)
+    OUTPHOT = open (params.output,"w")
 
-    #BICresbd = localchinu * (nresbd - kbd)   + kbd * np.log( nresbd )
-    #BICress =  localchinuser * (nress - ks)  + ks  * np.log( nress )
+    lineout= "#    output photometry used with q={} and pa={} (same as GALFIT) \n".format(galpar.q,galpar.ang)
+    OUTPHOT.write(lineout)
 
-    #    ; BAYESIAN RES N INFORMATION CRITERION
-    #    ; BICres = χ2nu * (nres - k) + k * ln(npix)
+    lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
+    OUTPHOT.write(lineout)
 
-    #BICresnbd = localchinu * (nresbd - kbd)   + kbd * np.log( npixbd )
-    #BICresns =  localchinuser * (nress - ks)  + ks  * np.log( npixs )
+    lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
+    OUTPHOT.write(lineout)
 
 
-    #    ; INFORMATION CRITERION RATIOS
+    lineout = "# most of the photometry analysis in this file is computed within a box: x='{}:{}', y='{}:{}' \n".format(xmin+1,xmax+1,ymin+1,ymax+1)
+    OUTPHOT.write(lineout)
 
-    #    ; akaike
-    #AICrat = AICbd/AICs
+    lineout = "# This box size is computed using an ellipse with mayor axis {} and minos axis {} with center at xc,yc \n".format(aell,bell)
+    OUTPHOT.write(lineout)
 
-    #    ; akaike 10x
-    #AIC10rat = AIC10bd/AIC10s
+    lineout = "# This ellipse is computed using minlevel = {} use --minlevel option to change it \n".format(params.minlevel)
+    OUTPHOT.write(lineout)
 
-    #    ; bayesian
-    #BICrat= BICbd/BICs
+    lineout = "# Correction constants taken from NED:\n"
+    OUTPHOT.write(lineout)
 
+    lineout = "# Galactic Extinction= {} for band {}, Distance Modulus= {} Distance Modulus independent of redshift= {} \n".format(GalExt,params.band,DistMod,DistMod2)
+    OUTPHOT.write(lineout)
 
-    #    ; akaike res
-    #AICresrat = AICresbd/AICress
+    lineout = "# cosmology corrected scale kpc/arcsec =  {}, Surface brightness dimming (mag) = {} \n".format(Scalekpc,SbDim)
+    OUTPHOT.write(lineout)
 
-
-    #    ; bayesian res
-    #    BICresrat = abs(BICresbd/BICress)
-
-
-    #    ; bayesian res n
-    #BICresnrat = abs(BICresnbd/BICresns)
+    lineout = "Check references in ".format(params.namened)
+    OUTPHOT.write(lineout)
 
 
-    #    ;  corrrection
-    #    ;BICresrat[2148]=1
+    if maskgal.any():
+        #Flux=10**((galpar.mgzpt -  galcomps.Mag[maskgal])/2.5)
+        #totFlux=Flux.sum()
+        #totMag=-2.5*np.log10(totFlux) + galpar.mgzpt
+
+        lineout = "total apparent magnitud (without corrections) = {}  \n".format(totMag)
+        OUTPHOT.write(lineout)
+
+        lineout = "total flux (without corrections) = {}  \n".format(totFlux)
+        OUTPHOT.write(lineout)
+    else:
+        lineout="Total magnitude can not be computed with the actual galfit functions"
+        OUTPHOT.write(lineout)
+
+
+    lineout=" Bulge To Total Ratio = {} \n".format(BulgeToTotal)
+    OUTPHOT.write(lineout)
+
+    lineout=" Tidal = {} \n".format(tidal)
+    OUTPHOT.write(lineout)
+
+    lineout="Local Chinu = {} \n ".format(objchinu)
+    OUTPHOT.write(lineout)
+
+    lineout="Bumpiness = {} \n".format(bump)
+    OUTPHOT.write(lineout)
+
+    lineout = "mean SNR = {} \n".format(snr)
+    OUTPHOT.write(lineout)
+
+    lineout = "std SNR = {} \n".format(stdsnr)
+    OUTPHOT.write(lineout)
+
+    lineout = "total SNR sum = {} \n".format(totsnr)  
+    OUTPHOT.write(lineout)
+
+    lineout = "Residual sum of squares = {}  ".format(rss)  
+    OUTPHOT.write(lineout)
+
+    lineout= "degrees of freedom = {} \n".format(ndof)  
+    OUTPHOT.write(lineout)
+
+
+    lineout=" Number of free params = {} \n".format(int(galcomps.freepar.sum()))
+    OUTPHOT.write(lineout)
+   
+
+    if maskgal.any():
+
+        if (params.flagweb and params.flagobj):
+
+            #CorMag = totMag - GalExt # corrected by galactic extinction 
+            
+            #AbsMag=CorMag - DistMod # No K correction applied
+
+            #AbsMag2=CorMag - DistMod2 # No K correction applied
+
+            lineout="Magnitud Absoluta = {} \n".format(AbsMag)
+            OUTPHOT.write(lineout)
+
+            lineout="Magnitud Absoluta using Distance Modulus independent of z = {} \n".format(AbsMag2)
+            OUTPHOT.write(lineout)
+
+
+            #print("Luminosity: ",Lum)
 
 
 
+    lineout= "Akaike Information Criterion = {} \n ".format(AICrit)  
+    OUTPHOT.write(lineout)
+
+    lineout = "Bayesian Information Criterion = {} \n".format(BICrit)  
+    OUTPHOT.write(lineout)
+
+    #lastmod 2
+
+    #for idx, item in enumerate(rtemp):
+    #    lineout= "{0:.3f} {1:.3f} {2:.3f} \n".format(xradq[idx],ysbq[idx],ysberrq[idx])
+    #    OUTPHOT.write(lineout)
+
+    OUTPHOT.close()
 
 
-    #OUTPHOT = open (params.output+".txt","w")
-
-    #lineout= "# output photometry for analysis \n"
-    #OUTPHOT.write(lineout)
-
-    #lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
-    #OUTPHOT.write(lineout)
-
-    #lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel]\n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
-    #OUTPHOT.write(lineout)
-
-    #lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
-    #OUTPHOT.write(lineout)
-
-
-    #for idx, item in enumerate(r):
-     #   lineout= "{0:.3f} {1:.3f} \n".format(r[idx],mgesb[w][idx])
-      #  OUTPHOT.write(lineout)
-
-    #OUTPHOT.close()
 
 
 def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
     "Computes Tidal  values as defined in Tal et al. 2009 AJ. It algo computes Bumpiness"
-    "(Blakeslee 2006 ApJ) value defined between rmin and rkron (see manual)"
+    "(Blakeslee 2006 ApJ) value defined between rmin and radius"
 
     # rmin = minimum radius to compute Tidal and Bumpiness (to avoid PSF Mismatch)
 
@@ -2224,9 +2249,11 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
 
     immodel = galpar.model
 
+
     imres = galpar.imres
 
 
+    immask = galpar.mask
 
 
     hdu = fits.open(params.namesig)
@@ -2234,39 +2261,42 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
     galpar.sigma=hdu[0].data
     #hdu.close()
 
-    imsigma = galpar.sigma
+    imsigma = galpar.sigma.astype(float)
 
 
-    immask =galpar.mask
 
 
     # creates a new image for snr 
     #NCol=len(galpar.img[0])
     #NRow=len(galpar.img)
-
     #MakeImage(params.namesnr, NCol, NRow):
 
-    #hdu = fits.PrimaryHDU()
-    header['TypeIMG'] = ('SNR', 'Signal to Noise Ratio image')
-    hdu[0].header  =header
-    galpar.imsnr=imgal/imsigma
-    hdu[0].data = galpar.imsnr
 
-    hdu.writeto(params.namesnr, overwrite=True)
+    if params.flagsnr:
+        header['TypeIMG'] = ('SNR', 'Signal to Noise Ratio image')
+        hdu[0].header  =header
+        galpar.imsnr=imgal/imsigma
+        hdu[0].data = galpar.imsnr
+        hdu.writeto(params.namesnr, overwrite=True)
+        print("SNR image created.. ",params.namesnr)
+
+
     hdu.close()
 
-    print("SNR image created.. ",params.namesnr)
+
+
+
 
     #    for objchinu, Tidal and SNR
     #    maskm = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
-#    maskm =immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
+    maskm =immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
 
-    maskm =immask == False  # big image coordinates
+    #maskm =immask == False  # big image coordinates
 
     #   mask including rmin for Bumpiness only
     #    maskbum = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
-#    maskbum = immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
-    maskbum = immask == False  # big image coordinates
+    maskbum = immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
+    #maskbum = immask == False  # big image coordinates
 
 
     #############
@@ -2317,17 +2347,20 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
 
         galflux  = imgal[ylo - 1:yhi, xlo - 1:xhi][maskm]
         modflux  = immodel[ylo - 1:yhi, xlo - 1:xhi][maskm]
+
         sigflux  = imsigma[ylo - 1:yhi, xlo - 1:xhi][maskm]
 
         resflux = (galflux - modflux)**2
 
-        rss2=(resflux).sum()
+        #rss2=(resflux).sum()
 
-        print("Residual sum squares ",rss2)
-    #  local chinu
+        #print("Residual sum squares ",rss2)
+        
+        #  local chinu
 
         varchi = sigflux**2
         chinu  = np.sum(resflux/varchi)
+        
 
         pixcountchi = np.size(immodel[ylo - 1:yhi, xlo - 1:xhi][maskm])
 
@@ -2393,8 +2426,8 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
 
     # computing RSS: 
     rss=(imres[ylo - 1:yhi, xlo - 1:xhi][maskm]**2).sum()
-
-
+    
+  
     return (tidal,objchinu,bump,snr,stdsnr,totsnr,rss,ndof)
 
 
