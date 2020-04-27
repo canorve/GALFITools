@@ -19,6 +19,17 @@ from mgefit.sectors_photometry import sectors_photometry
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,NullFormatter,
                                AutoMinorLocator,LogLocator,LinearLocator,AutoLocator)
 
+### Dictionary for Absolute mag of the Sun taken from Willmer 2018
+SunMag = {
+        "U":5.61,"B":5.44,"V": 4.81,"R":4.43,"I":4.1,
+        "J": 3.67,"H": 3.32,"K": 3.27,
+        "u":5.49,"g":5.23,"r": 4.53,"i":4.19,"z":4.01,
+        "L":3.26
+        } 
+
+####
+
+
 
 def main():
 
@@ -173,6 +184,7 @@ def main():
     ########  End of parameter reading #############
     ################################################
     ################################################
+
 
     #class for GALFIT's parameters
     galpar=GalfitParams()
@@ -487,6 +499,20 @@ class GalfitComps:
     PosAng =np.array([])         #10) position angle
     skip=np.array([])            #z)  skip model
     freepar=np.array([])            # Number of free params
+
+    # computed parameters:
+    Rad50=np.array([])
+    SerInd=np.array([])
+    Rad50kpc=np.array([])
+    Rad50sec=np.array([])
+    Rad90=np.array([])
+    AbsMag=np.array([])
+    Lum=np.array([])
+    Flux=np.array([])
+    PerLight=np.array([])
+    me=np.array([])
+    mme=np.array([])
+    kser = np.array([])
 
 
 ##### end of classes
@@ -1887,19 +1913,32 @@ def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
 def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     """ Output photometry for further analysis """
 
-    maskgal=(galcomps.NameComp != "ferrer") & (galcomps.NameComp != "nuker") & (galcomps.NameComp != "edgedisk") & (galcomps.NameComp != "king")
 
-    if maskgal.any():
-        Flux=10**((galpar.mgzpt -  galcomps.Mag[maskgal])/2.5)
-        totFlux=Flux.sum()
+    # masks to identify components: 
+
+    maskmag=(galcomps.NameComp != "ferrer") & (galcomps.NameComp != "nuker") & (galcomps.NameComp != "edgedisk") & (galcomps.NameComp != "king") 
+    maskgalax = (galcomps.NameComp == "sersic") | (galcomps.NameComp == "devauc") | (galcomps.NameComp == "expdisk")  | (galcomps.NameComp == "gaussian") 
+
+
+    maskdisk = (galcomps.NameComp == "expdisk") # ignore this at the moment: #| (galcomps.NameComp == "edgedisk") 
+    maskbulge = (galcomps.NameComp == "sersic") | (galcomps.NameComp == "devauc") | (galcomps.NameComp == "moffat") | (galcomps.NameComp == "ferrer") | (galcomps.NameComp == "king") | (galcomps.NameComp == "gaussian") | (galcomps.NameComp == "psf")
+    masksersic = (galcomps.NameComp == "sersic") 
+    maskexp= (galcomps.NameComp == "expdisk")
+    maskdevauc=(galcomps.NameComp == "devauc")
+    maskgauss=(galcomps.NameComp == "gaussian")
+
+
+    if maskmag.any():
+        galcomps.Flux[maskmag]=10**((galpar.mgzpt -  galcomps.Mag[maskmag])/2.5)
+        totFlux=galcomps.Flux[maskmag].sum()
         totMag=-2.5*np.log10(totFlux) + galpar.mgzpt
         #print("total magnitud = ",totMag)
         #print("total Flux = ",totFlux)
     #else:
     #    print("Total magnitud can not be computed with the actual galfit functions")
 
-    maskdisk = (galcomps.NameComp == "expdisk") | (galcomps.NameComp == "edgedisk") 
-    maskbulge = (galcomps.NameComp == "sersic") | (galcomps.NameComp == "devauc") | (galcomps.NameComp == "moffat") | (galcomps.NameComp == "ferrer") | (galcomps.NameComp == "king") | (galcomps.NameComp == "gaussian") | (galcomps.NameComp == "psf")
+
+
     if maskdisk.any():
         BulgeFlux = 10**((galpar.mgzpt -  galcomps.Mag[maskbulge])/2.5)
         DiskFlux  = 10**((galpar.mgzpt -  galcomps.Mag[maskdisk])/2.5)
@@ -1912,18 +1951,56 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
         #print("BulgeToTotal = 1")
 
 
-    Num=len(Flux)
 
-    PerLight= (Flux / totFlux )*100
-    namecomp=galcomps.NameComp[maskgal]
-    N=galcomps.N[maskgal]
+    ################## Computing component variables ###########
+
+    # sersic index
+    galcomps.SerInd[masksersic] = galcomps.Exp[masksersic] 
+    galcomps.SerInd[maskdevauc] = 4
+    galcomps.SerInd[maskexp]    = 1
+    galcomps.SerInd[maskgauss]  = 0.5
+
+
+    # effective radius
+    galcomps.Rad50[masksersic] = galcomps.Rad[masksersic] 
+    galcomps.Rad50[maskdevauc] = galcomps.Rad[maskdevauc] 
+
+    galcomps.Rad50[maskexp] = 1.678*galcomps.Rad[maskexp] 
+    galcomps.Rad50[maskgauss] = 0.5*galcomps.Rad[maskgauss] 
+
+    ################
+    # computing Rad 90% light with aproximation taken from my Thesis
+
+    galcomps.Rad50sec[maskgalax] = galcomps.Rad50[maskgalax] * galpar.scale 
+
+    galcomps.Rad90[maskgalax] = galcomps.Rad50[maskgalax] * (1.53 + 0.73 * galcomps.SerInd[maskgalax] + 0.07 * galcomps.SerInd[maskgalax]**2) 
+
+    ######
+
+    galcomps.kser[maskgalax]  = GetKAprox(galcomps.SerInd[maskgalax])
+
+    # computing meanme and me 
+    galcomps.mme[maskgalax]  = galcomps.Mag[maskgalax]  + 2.5 * np.log10(2 * np.pi * galcomps.AxRat[maskgalax] * galcomps.Rad50sec[maskgalax]**2 )
+
+
+    fn = (( galcomps.AxRat[maskgalax] * galcomps.SerInd[maskgalax] * np.exp( galcomps.kser[maskgalax])) / (galcomps.kser[maskgalax] ** (2 * galcomps.SerInd[maskgalax] )) ) * ( np.exp(scipy.special.gammaln(2*galcomps.SerInd[maskgalax])) )
+
+    galcomps.me[maskgalax] = galcomps.meanmeser[maskgalax] +  2.5 * np.log10( fn )
+
+
+
+    Num=len(galcomps.Flux[maskmag])
+
+    galcomps.PerLight[maskmag]= (galcomps.Flux[maskmag] / totFlux )*100
+    namecomp=galcomps.NameComp[maskmag]
+    N=galcomps.N[maskmag]
 
     N=N.astype(int)
 
     n=0
     while(n<Num):
 
-        print("Num, componente, %perlight ",N[n],namecomp[n],PerLight[n])
+        print("Num, componente, %perlight ",N[n],namecomp[n],galcomps.PerLight[n])
 
         n+=1
 
@@ -2040,7 +2117,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     if (params.flagobj): 
         (GalExt,DistMod,DistMod2,Scalekpc,SbDim)=NED(params, galpar, galcomps)
 
-    if maskgal.any():
+    if maskmag.any():
 
         if (params.flagweb and params.flagobj):
 
@@ -2050,13 +2127,42 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
             AbsMag2=CorMag - DistMod2 # No K correction applied
 
+            # per component: 
+            CompCorMag = galcomps.Mag[maskmag] - GalExt # corrected by galactic extinction 
+            galcomps.AbsMag[maskmag] = CompCorMag - DistMod # No K correction applied
+        
+
+            if params.band in SunMag:
+                MSun = SunMag[params.band]
+
+                Lum = 10**((MSun - AbsMag)/2.5)
+                # per component 
+                galcomps.Lum[maskmag]= 10**((MSun - galcomps.AbsMag[maskmag])/2.5)
+            else:
+                print("Absolute Magnitude for Band {} was not found. Check filter name ".format(params.band))
+                print("Luminosity will not be computed.")
+
+                Lum = 0
+
             #print("Magnitud Absoluta",AbsMag)
             #print("Magnitud Absoluta using Distance Modulus independen of z ",AbsMag2)
             #print("check references in ",params.namened)
 
 
-            Rekpc = galcomps.Rad[maskgal] * galpar.scale * Scalekpc
-            print("Re in kpc ",Rekpc)
+    if maskgalax.any():
+
+        if (params.flagweb and params.flagobj):
+
+            galcomps.Rad50kpc[maskgalax] = galcomps.Rad50[maskgalax] * galpar.scale * Scalekpc
+
+            galcomps.mme[maskgalax] = galcomps.mme[maskgalax] - GalExt - SbDim
+            galcomps.me[maskgalax] = galcomps.me[maskgalax] - GalExt - SbDim
+ 
+        else:
+            print("mean surface brightness at Re is not corrected for galactic extintion nor surface brightness dimming ")
+
+
+
 
 
     ################  INFORMATION CRITERIA ####################
@@ -2078,6 +2184,9 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     BICrit = objchinu * ndof + freepar * np.log(npix)
 
 
+    #lastmod2
+
+
     #######  file output:  ######
 
     print("Creating output photometry file: ",params.output)
@@ -2086,6 +2195,10 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
     lineout= "#    output photometry used with q={} and pa={} (same as GALFIT) \n".format(galpar.q,galpar.ang)
     OUTPHOT.write(lineout)
+
+    lineout= "#  Total Magnitude and many other variables does not include the following components: ferrer, nuker, edgedisk and king  \n"
+    OUTPHOT.write(lineout)
+
 
     lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
     OUTPHOT.write(lineout)
@@ -2103,25 +2216,31 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     lineout = "# This ellipse is computed using minlevel = {} use --minlevel option to change it \n".format(params.minlevel)
     OUTPHOT.write(lineout)
 
+    lineout = "# All the photometric quantities are computed for band {} \n".format(params.band)
+    OUTPHOT.write(lineout)
+
     lineout = "# Correction constants taken from NED:\n"
     OUTPHOT.write(lineout)
 
-    lineout = "# Galactic Extinction= {} for band {}, Distance Modulus= {} Distance Modulus independent of redshift= {} \n".format(GalExt,params.band,DistMod,DistMod2)
+    lineout = "# Galactic Extinction= {} Distance Modulus= {} Distance Modulus independent of redshift= {} \n".format(GalExt,DistMod,DistMod2)
     OUTPHOT.write(lineout)
 
     lineout = "# cosmology corrected scale kpc/arcsec =  {}, Surface brightness dimming (mag) = {} \n".format(Scalekpc,SbDim)
     OUTPHOT.write(lineout)
 
-    lineout = "Check references in ".format(params.namened)
+    lineout = "# Magnitudes are not corrected by K-Correction \n"
+    OUTPHOT.write(lineout)
+
+    lineout = "# Check references in ".format(params.namened)
     OUTPHOT.write(lineout)
 
 
-    if maskgal.any():
-        #Flux=10**((galpar.mgzpt -  galcomps.Mag[maskgal])/2.5)
+    if maskmag.any():
+        #Flux=10**((galpar.mgzpt -  galcomps.Mag[maskmag])/2.5)
         #totFlux=Flux.sum()
         #totMag=-2.5*np.log10(totFlux) + galpar.mgzpt
 
-        lineout = "total apparent magnitud (without corrections) = {}  \n".format(totMag)
+        lineout = "total apparent magnitude (without corrections) = {}  \n".format(totMag)
         OUTPHOT.write(lineout)
 
         lineout = "total flux (without corrections) = {}  \n".format(totFlux)
@@ -2163,7 +2282,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     OUTPHOT.write(lineout)
    
 
-    if maskgal.any():
+    if maskmag.any():
 
         if (params.flagweb and params.flagobj):
 
@@ -2179,8 +2298,8 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
             lineout="Magnitud Absoluta using Distance Modulus independent of z = {} \n".format(AbsMag2)
             OUTPHOT.write(lineout)
 
-
-            #print("Luminosity: ",Lum)
+            lineout="Luminosity = {} (solar lum) \n".format(Lum)
+            OUTPHOT.write(lineout)
 
 
 
@@ -2190,7 +2309,19 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     lineout = "Bayesian Information Criterion = {} \n".format(BICrit)  
     OUTPHOT.write(lineout)
 
-    #lastmod 2
+
+    lineout = "########################################## \n"  
+    OUTPHOT.write(lineout)
+
+    lineout = "# Photometric properties per component: #\n"  
+    OUTPHOT.write(lineout)
+
+    lineout = "########## Columns: ##################### \n"  
+    OUTPHOT.write(lineout)
+
+    lineout = "# Number Component AbsMag Luminosity Re(kpc) Surface brightness (corrected)  \n"  
+    OUTPHOT.write(lineout)
+
 
     #for idx, item in enumerate(rtemp):
     #    lineout= "{0:.3f} {1:.3f} {2:.3f} \n".format(xradq[idx],ysbq[idx],ysberrq[idx])
@@ -2548,6 +2679,7 @@ def NED(params, galpar, galcomps):
 
     except: 
         print("I can't read file or object name can be found in file")
+        print("check object name or delete NED file for a new web search")
         print("luminosity and absolute magnitude will not be computed")
         params.flagweb=False 
 
@@ -2611,6 +2743,74 @@ def NED(params, galpar, galcomps):
         SbDim=0
 
     return (GalExt,DistMod,DistMod2,Scalekpc,SbDim)
+
+
+def GetK(n):
+    "Solve the Sersic function to get the dependence of K over Sersic index"
+
+## solve the Sersic equation
+# to get the dependence of K over
+# Sersic index
+
+    count = 1
+
+    #limits
+    lima=0
+    limb=100
+
+#fx is the function to solve
+    fxa = fx(n,lima)
+    fxb = fx(n,limb)
+
+    resk= (lima + limb)/2
+
+    fxres=fx(n,resk)
+
+
+    if(fxa * fxb < 0):
+
+        while(np.abs(fxres) > 0.00000001):
+
+            if(fxa * fxres > 0):
+                lima=resk
+            elif(fxa * fxres < 0):
+                limb=resk
+            elif(fxres==0):
+                break
+            resk= (lima + limb)/2
+            fxres=fx(n,resk)
+
+            count+=1
+
+            if (count >= 10000):
+                break
+
+    else:
+        print("no solution in the range: ({},{})\n".format(lima,limb))
+
+    return (resk)
+
+
+def fx(n,k):
+    "function to solve to get the relation between Sersic index and K"
+
+
+    func = np.exp(scipy.special.gammaln(2*n)) - 2 * np.exp(scipy.special.gammaln(2*n)) * scipy.special.gammainc(2*n,k)
+
+
+    return(func)
+
+
+def GetKAprox(n):
+    "Aproximation to solve the dependence of K on the Sersic index"
+
+
+    K = 2 * n - 1/3 + 4/(405*n) + 46 / (25515*n**2) + 131 / (1148175 * n**3) - 2194697 / (30690717750*n**4)
+
+
+    return (K)
+
+
 
 ##############################################
 ##############################################
@@ -3262,14 +3462,13 @@ def GalSersic(magser,reser,nser,qser,paser,angle,radx):
     return radang,yser
 
 
+# duplicated
+#def GetKAprox(n):
+
+ #   K=2*n-1/3+4/(405*n)+46/(25515*n**2)+131/(1148175*n**3)-2194697/(30690717750*n**4)
 
 
-def GetKAprox(n):
-
-    K=2*n-1/3+4/(405*n)+46/(25515*n**2)+131/(1148175*n**3)-2194697/(30690717750*n**4)
-
-
-    return (K)
+ #   return (K)
 
 
 
