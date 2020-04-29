@@ -1877,6 +1877,24 @@ def ReadNComp(inputf,X,Y,galcomps):
 
     GalfitFile.close()
 
+    tot=galcomps.Comps.size
+
+    # computed parameters:
+    galcomps.Rad50=["--"]*tot
+    galcomps.SerInd=["--"]*tot
+    galcomps.Rad50kpc=["--"]*tot
+    galcomps.Rad50sec=["--"]*tot
+    galcomps.Rad90=["--"]*tot
+    galcomps.AbsMag=["--"]*tot
+    galcomps.Lum=["--"]*tot
+    galcomps.Flux=["--"]*tot
+    galcomps.PerLight=["--"]*tot
+    galcomps.me=["--"]*tot
+    galcomps.mme=["--"]*tot
+    galcomps.kser = ["--"]*tot
+
+
+
     galcomps.N.astype(int)
 
     return True
@@ -1985,7 +2003,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
     fn = (( galcomps.AxRat[maskgalax] * galcomps.SerInd[maskgalax] * np.exp( galcomps.kser[maskgalax])) / (galcomps.kser[maskgalax] ** (2 * galcomps.SerInd[maskgalax] )) ) * ( np.exp(scipy.special.gammaln(2*galcomps.SerInd[maskgalax])) )
 
-    galcomps.me[maskgalax] = galcomps.meanmeser[maskgalax] +  2.5 * np.log10( fn )
+    galcomps.me[maskgalax] = galcomps.mme[maskgalax] +  2.5 * np.log10( fn )
 
 
 
@@ -2319,13 +2337,13 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     lineout = "########## Columns: ##################### \n"  
     OUTPHOT.write(lineout)
 
-    lineout = "# Number Component AbsMag Luminosity Re(kpc) Surface brightness (corrected)  \n"  
+    lineout = "# Number Component %PerLight me(mag) <me>(mag) Flux AbsMag Luminosity(SolarLum) Rad90(pix) Re(kpc)   \n"  
     OUTPHOT.write(lineout)
 
 
-    #for idx, item in enumerate(rtemp):
-    #    lineout= "{0:.3f} {1:.3f} {2:.3f} \n".format(xradq[idx],ysbq[idx],ysberrq[idx])
-    #    OUTPHOT.write(lineout)
+    for idx, item in enumerate(galcomps.N) :
+        lineout= "{0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f} {6:.3f} {7:.3f} {8:.3f} {9:.3f} \n".format(galcomps.N[idx],galcomps.NameComp[idx],galcomps.PerLight[idx],galcomps.me[idx],galcomps.mme[idx],galcomps.Flux[idx],galcomps.AbsMag[idx],galcomps.Lum[idx],galcomps.Rad90[idx],galcomps.Rad50kpc[idx])
+        OUTPHOT.write(lineout)
 
     OUTPHOT.close()
 
