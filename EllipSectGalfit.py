@@ -35,32 +35,16 @@ def main():
 
     if (len(sys.argv[1:]) == 0):
         print ('Missing arguments')
-        print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] [--ranx/y Value] [--grid] [--dpi Value] [--noplot] [--out] " % (sys.argv[0]))
-        print ("GALFITOutputFile: GALFIT output file ")
-        print ("logx: activates X-axis as logarithm ")
-        print ("q: introduce axis ratio ")
-        print ("pa: introduce position angle (same as GALFIT) ")
-        print ("sub: plots subcomponents ")
-        print ("pix: plot the top x-axis in pixels ")
-        print ("ranx: constant that multiplies the range of the x axis or xmin-xmax range")
-        print ("rany: constant that multiplies the range of the y axis or ymin-ymax range")
-        print ("grid: display a grid in the plot ")
-        print ("dpi: dots per inch for saving plot ")
-        print ("noplot: do not display images")
-        print ("sbout: creates output file containing the surface brightness profiles")
-
-
-        print ("Example:\n %s galfit.01 --logx" % (sys.argv[0]))
-        print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub --ranx 2 --out " % (sys.argv[0]))
-        print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub --ranx 1-20" % (sys.argv[0]))
-        print ("see https://github.com/canorve/GALFITools/blob/master/docs/Ellipse.md  for more examples")
+        print ("Usage:\n %s [GALFITOutputFile] [--options] " % (sys.argv[0]))
+        print ("use help to display more information about 'options' arguments: ")
+        print ("%s --help " % (sys.argv[0]))
 
         sys.exit()
 
     #class for saving user's parameters
     params=InputParams()
 
-    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--grid','--dpi','--sbout','--noplot','--minlevel','--sectors','--out','--object','--filter','--snr']
+    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--grid','--dpi','--sbout','--noplot','--minlevel','--sectors','--out','--object','--filter','--snr','--help']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
@@ -103,6 +87,9 @@ def main():
         params.flagband=True
     if options['snr'] != None:
         params.flagsnr=True
+    if options['help'] != None:
+        Help()
+
 
 
 
@@ -516,6 +503,38 @@ class GalfitComps:
 
 
 ##### end of classes
+
+def Help():
+
+    print ('Missing arguments')
+    print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] [--ranx/y Value] [--grid] [--dpi Value] [--noplot] [--out] " % (sys.argv[0]))
+    print ("GALFITOutputFile: GALFIT output file ")
+    print ("logx: activates X-axis as logarithm ")
+    print ("q: introduce axis ratio ")
+    print ("pa: introduce position angle (same as GALFIT) ")
+    print ("sub: plots subcomponents ")
+    print ("pix: plot the top x-axis in pixels ")
+    print ("ranx: constant that multiplies the range of the x axis or xmin-xmax range")
+    print ("rany: constant that multiplies the range of the y axis or ymin-ymax range")
+    print ("grid: display a grid in the plot ")
+    print ("dpi: dots per inch for saving plot ")
+    print ("noplot: do not display images")
+    print ("sbout: creates output file containing the surface brightness profiles")
+
+
+    print ("Example:\n %s galfit.01 --logx" % (sys.argv[0]))
+    print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub --ranx 2 --out " % (sys.argv[0]))
+    print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub --ranx 1-20" % (sys.argv[0]))
+    print ("see https://github.com/canorve/GALFITools/blob/master/docs/Ellipse.md  for more examples")
+
+    sys.exit()
+
+
+
+
+
+    return True
+
 
 
 def SectPhot(galpar, params, n_sectors=19, minlevel=0):
@@ -1880,19 +1899,18 @@ def ReadNComp(inputf,X,Y,galcomps):
     tot=galcomps.Comps.size
 
     # computed parameters:
-    galcomps.Rad50=["--"]*tot
-    galcomps.SerInd=["--"]*tot
-    galcomps.Rad50kpc=["--"]*tot
-    galcomps.Rad50sec=["--"]*tot
-    galcomps.Rad90=["--"]*tot
-    galcomps.AbsMag=["--"]*tot
-    galcomps.Lum=["--"]*tot
-    galcomps.Flux=["--"]*tot
-    galcomps.PerLight=["--"]*tot
-    galcomps.me=["--"]*tot
-    galcomps.mme=["--"]*tot
-    galcomps.kser = ["--"]*tot
-
+    galcomps.Rad50=np.array([0.0]*tot)
+    galcomps.SerInd=np.array([0.0]*tot)
+    galcomps.Rad50kpc=np.array([0.0]*tot)
+    galcomps.Rad50sec=np.array([0.0]*tot)
+    galcomps.Rad90=np.array([0.0]*tot)
+    galcomps.AbsMag=np.array([99.0]*tot)
+    galcomps.Lum=np.array([0.0]*tot)
+    galcomps.Flux=np.array([0.0]*tot)
+    galcomps.PerLight=np.array([0.0]*tot)
+    galcomps.me=np.array([99.0]*tot)
+    galcomps.mme=np.array([99.0]*tot)
+    galcomps.kser = np.array([0.0]*tot)
 
 
     galcomps.N.astype(int)
@@ -1947,7 +1965,8 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
 
     if maskmag.any():
-        galcomps.Flux[maskmag]=10**((galpar.mgzpt -  galcomps.Mag[maskmag])/2.5)
+
+        galcomps.Flux[maskmag]=10**((galpar.mgzpt - galcomps.Mag[maskmag])/2.5)
         totFlux=galcomps.Flux[maskmag].sum()
         totMag=-2.5*np.log10(totFlux) + galpar.mgzpt
         #print("total magnitud = ",totMag)
@@ -2342,7 +2361,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
 
     for idx, item in enumerate(galcomps.N) :
-        lineout= "{0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f} {6:.3f} {7:.3f} {8:.3f} {9:.3f} \n".format(galcomps.N[idx],galcomps.NameComp[idx],galcomps.PerLight[idx],galcomps.me[idx],galcomps.mme[idx],galcomps.Flux[idx],galcomps.AbsMag[idx],galcomps.Lum[idx],galcomps.Rad90[idx],galcomps.Rad50kpc[idx])
+        lineout= "{0:.3f} {1} {2:.3f} {3:.3f} {4:.3f} {5:.3f} {6:.3f} {7:.3f} {8:.3f} {9:.3f} \n".format(galcomps.N[idx],galcomps.NameComp[idx],galcomps.PerLight[idx],galcomps.me[idx],galcomps.mme[idx],galcomps.Flux[idx],galcomps.AbsMag[idx],galcomps.Lum[idx],galcomps.Rad90[idx],galcomps.Rad50kpc[idx])
         OUTPHOT.write(lineout)
 
     OUTPHOT.close()
@@ -2413,22 +2432,21 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
     imsigma = galpar.sigma.astype(float)
 
 
-
-
     # creates a new image for snr 
     #NCol=len(galpar.img[0])
     #NRow=len(galpar.img)
     #MakeImage(params.namesnr, NCol, NRow):
 
 
+
+    header['TypeIMG'] = ('SNR', 'Signal to Noise Ratio image')
+    hdu[0].header  =header
+    galpar.imsnr=imgal/imsigma
+    hdu[0].data = galpar.imsnr
+
     if params.flagsnr:
-        header['TypeIMG'] = ('SNR', 'Signal to Noise Ratio image')
-        hdu[0].header  =header
-        galpar.imsnr=imgal/imsigma
-        hdu[0].data = galpar.imsnr
         hdu.writeto(params.namesnr, overwrite=True)
         print("SNR image created.. ",params.namesnr)
-
 
     hdu.close()
 
