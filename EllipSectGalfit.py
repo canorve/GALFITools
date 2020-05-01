@@ -1913,7 +1913,7 @@ def ReadNComp(inputf,X,Y,galcomps):
     galcomps.kser = np.array([0.0]*tot)
 
 
-    galcomps.N.astype(int)
+    galcomps.N=galcomps.N.astype(int)
 
     return True
 
@@ -2230,45 +2230,52 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
     OUTPHOT = open (params.output,"w")
 
-    lineout= "#    output photometry used with q={} and pa={} (same as GALFIT) \n".format(galpar.q,galpar.ang)
+    lineout= "#    Output photometry for {} \n".format(galpar.outimage)
     OUTPHOT.write(lineout)
 
-    lineout= "#  Total Magnitude and many other variables does not include the following components: ferrer, nuker, edgedisk and king  \n"
+    lineout= "#  sector_photometry used with q={} and pa={} (same as GALFIT) \n".format(galpar.q,galpar.ang)
+    OUTPHOT.write(lineout)
+
+    lineout= "# Total Magnitude and many other variables does not include \n"
+    OUTPHOT.write(lineout)
+
+    lineout= "# the following components: ferrer, nuker, edgedisk and king  \n"
     OUTPHOT.write(lineout)
 
 
-    lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
-    OUTPHOT.write(lineout)
-
-    lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
+    lineout= "#  OutImage = {}  Mgzpt = {}  exptime = {}  plate scale = {} ''/pix \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
     OUTPHOT.write(lineout)
 
 
-    lineout = "# most of the photometry analysis in this file is computed within a box: x='{}:{}', y='{}:{}' \n".format(xmin+1,xmax+1,ymin+1,ymax+1)
+    lineout= "#  xc = {}  yc = {}  sky = {:.2f}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
     OUTPHOT.write(lineout)
 
-    lineout = "# This box size is computed using an ellipse with mayor axis {} and minos axis {} with center at xc,yc \n".format(aell,bell)
+
+    lineout = "# most of the photometry is computed within a box: x='{}:{}', y='{}:{}' \n".format(xmin+1,xmax+1,ymin+1,ymax+1)
     OUTPHOT.write(lineout)
 
-    lineout = "# This ellipse is computed using minlevel = {} use --minlevel option to change it \n".format(params.minlevel)
+    lineout = "# This box size is computed using an ellipse with a = {:.2f} and b = {:.2f} centered at xc,yc \n".format(aell,bell)
     OUTPHOT.write(lineout)
 
-    lineout = "# All the photometric quantities are computed for band {} \n".format(params.band)
+    lineout = "# This ellipse is computed using minlevel = {} (use --minlevel option to change it) \n".format(params.minlevel)
     OUTPHOT.write(lineout)
 
-    lineout = "# Correction constants taken from NED:\n"
+    lineout = "# All the photometric quantities are computed for band {} (use --filter option to change it) \n".format(params.band)
     OUTPHOT.write(lineout)
 
-    lineout = "# Galactic Extinction= {} Distance Modulus= {} Distance Modulus independent of redshift= {} \n".format(GalExt,DistMod,DistMod2)
+    lineout = "# correction constants applied here: \n"
     OUTPHOT.write(lineout)
 
-    lineout = "# cosmology corrected scale kpc/arcsec =  {}, Surface brightness dimming (mag) = {} \n".format(Scalekpc,SbDim)
+    lineout = "# Galactic Extinction= {}; Distance Modulus= {}; Distance Modulus independent of z = {} \n".format(GalExt,DistMod,DistMod2)
+    OUTPHOT.write(lineout)
+
+    lineout = "# cosmology corrected scale kpc/arcsec =  {}; Surface brightness dimming (mag) = {} \n".format(Scalekpc,SbDim)
     OUTPHOT.write(lineout)
 
     lineout = "# Magnitudes are not corrected by K-Correction \n"
     OUTPHOT.write(lineout)
 
-    lineout = "# Check references in ".format(params.namened)
+    lineout = "# Check references in NED file {} \n\n".format(params.namened)
     OUTPHOT.write(lineout)
 
 
@@ -2277,45 +2284,45 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
         #totFlux=Flux.sum()
         #totMag=-2.5*np.log10(totFlux) + galpar.mgzpt
 
-        lineout = "total apparent magnitude (without corrections) = {}  \n".format(totMag)
+        lineout = "total apparent magnitude (without corrections) = {:.3f}  \n".format(totMag)
         OUTPHOT.write(lineout)
 
-        lineout = "total flux (without corrections) = {}  \n".format(totFlux)
+        lineout = "total flux (without corrections) = {:.3f}  \n".format(totFlux)
         OUTPHOT.write(lineout)
     else:
-        lineout="Total magnitude can not be computed with the actual galfit functions"
+        lineout="Total magnitude can not be computed with the actual galfit functions \n"
         OUTPHOT.write(lineout)
 
 
-    lineout=" Bulge To Total Ratio = {} \n".format(BulgeToTotal)
+    lineout="Bulge To Total Ratio = {:.3f} \n".format(BulgeToTotal)
     OUTPHOT.write(lineout)
 
-    lineout=" Tidal = {} \n".format(tidal)
+    lineout="Tidal = {:.3f} \n".format(tidal)
     OUTPHOT.write(lineout)
 
-    lineout="Local Chinu = {} \n ".format(objchinu)
+    lineout="Local Chinu = {:.3f} \n".format(objchinu)
     OUTPHOT.write(lineout)
 
-    lineout="Bumpiness = {} \n".format(bump)
+    lineout="Bumpiness = {:.3f} \n".format(bump)
     OUTPHOT.write(lineout)
 
-    lineout = "mean SNR = {} \n".format(snr)
+    lineout = "mean SNR = {:.3f} \n".format(snr)
     OUTPHOT.write(lineout)
 
-    lineout = "std SNR = {} \n".format(stdsnr)
+    lineout = "std SNR = {:.3f} \n".format(stdsnr)
     OUTPHOT.write(lineout)
 
-    lineout = "total SNR sum = {} \n".format(totsnr)  
+    lineout = "total SNR sum = {:.3f} \n".format(totsnr)  
     OUTPHOT.write(lineout)
 
-    lineout = "Residual sum of squares = {}  ".format(rss)  
+    lineout = "Residual sum of squares (RSS) = {:.3f}  \n".format(rss)  
     OUTPHOT.write(lineout)
 
     lineout= "degrees of freedom = {} \n".format(ndof)  
     OUTPHOT.write(lineout)
 
 
-    lineout=" Number of free params = {} \n".format(int(galcomps.freepar.sum()))
+    lineout="Number of free params = {} \n".format(int(galcomps.freepar.sum()))
     OUTPHOT.write(lineout)
    
 
@@ -2329,31 +2336,31 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
             #AbsMag2=CorMag - DistMod2 # No K correction applied
 
-            lineout="Magnitud Absoluta = {} \n".format(AbsMag)
+            lineout="Absolute Magnitud = {:.3f} \n".format(AbsMag)
             OUTPHOT.write(lineout)
 
-            lineout="Magnitud Absoluta using Distance Modulus independent of z = {} \n".format(AbsMag2)
+            lineout="Absolute Magnitud using Dist Mod independent of z = {:.3f} \n".format(AbsMag2)
             OUTPHOT.write(lineout)
 
-            lineout="Luminosity = {} (solar lum) \n".format(Lum)
+            lineout="Luminosity = {:.3f} (solar lum) \n".format(Lum)
             OUTPHOT.write(lineout)
 
 
 
-    lineout= "Akaike Information Criterion = {} \n ".format(AICrit)  
+    lineout= "Akaike Information Criterion = {:.3f} \n".format(AICrit)  
     OUTPHOT.write(lineout)
 
-    lineout = "Bayesian Information Criterion = {} \n".format(BICrit)  
+    lineout = "Bayesian Information Criterion = {:.3f} \n".format(BICrit)  
     OUTPHOT.write(lineout)
 
 
-    lineout = "########################################## \n"  
+    lineout = "#########################################\n"  
     OUTPHOT.write(lineout)
 
     lineout = "# Photometric properties per component: #\n"  
     OUTPHOT.write(lineout)
 
-    lineout = "########## Columns: ##################### \n"  
+    lineout = "########## Columns: #####################\n"  
     OUTPHOT.write(lineout)
 
     lineout = "# Number Component %PerLight me(mag) <me>(mag) Flux AbsMag Luminosity(SolarLum) Rad90(pix) Re(kpc)   \n"  
@@ -2361,7 +2368,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
 
     for idx, item in enumerate(galcomps.N) :
-        lineout= "{0:.3f} {1} {2:.3f} {3:.3f} {4:.3f} {5:.3f} {6:.3f} {7:.3f} {8:.3f} {9:.3f} \n".format(galcomps.N[idx],galcomps.NameComp[idx],galcomps.PerLight[idx],galcomps.me[idx],galcomps.mme[idx],galcomps.Flux[idx],galcomps.AbsMag[idx],galcomps.Lum[idx],galcomps.Rad90[idx],galcomps.Rad50kpc[idx])
+        lineout= "{0} {1} {2:^6.3f} {3:^6.3f} {4:^6.3f} {5:^10.3f} {6:^6.3f} {7:^17.3f} {8:^10.3f} {9:^10.3f} \n".format(galcomps.N[idx],galcomps.NameComp[idx],galcomps.PerLight[idx],galcomps.me[idx],galcomps.mme[idx],galcomps.Flux[idx],galcomps.AbsMag[idx],galcomps.Lum[idx],galcomps.Rad90[idx],galcomps.Rad50kpc[idx])
         OUTPHOT.write(lineout)
 
     OUTPHOT.close()
