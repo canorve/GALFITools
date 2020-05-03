@@ -670,7 +670,9 @@ def SectPhotComp(galpar, params, galcomps, n_sectors=19, minlevel=0):
     while(n<len(galcomps.N)):
 
         subim=subimgs[n]
-        
+        #lastmod3 to check the next two lines:
+        eps=1-galcomps.AxRat[n]
+        angsec=90-galcomps.PosAng[n]
         scmp = sectors_photometry(subim, eps, angsec, xctemp, yctemp,minlevel=minlevel,plot=0, badpixels=maskb, n_sectors=n_sectors)
 
         sectcomps.append(scmp)
@@ -2034,22 +2036,14 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
     N=N.astype(int)
 
-    n=0
-    while(n<Num):
+    #n=0
+    #while(n<Num):
 
-        print("Num, componente, %perlight ",N[n],namecomp[n],galcomps.PerLight[n])
+    #    print("Num, componente, %perlight ",N[n],namecomp[n],galcomps.PerLight[n])
 
-        n+=1
+    #    n+=1
 
-    #####
-    
-    stidxg = np.argsort(sectgalax.radius)
-
-    mgerad=sectgalax.radius[stidxg]
-    mgecount=sectgalax.counts[stidxg]
-    mgeangle=sectgalax.angle[stidxg]
-    mgeanrad=np.deg2rad(mgeangle)
-
+   
     #print("Number of free params: ",int(galcomps.freepar.sum()))
 
 
@@ -2073,34 +2067,9 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
             print("using existing sigma image ")
 
 
-    ab=galpar.q
-
-    aell = mgerad.max() 
-
-    bell = mgerad.max() * ab
-
-    #changing to arc sec
-    aellarc=aell*galpar.scale
-
-    #print("major axis, minor axis (pix) ",aell,bell)
-
-    NCol=len(galpar.img[0])
-    NRow=len(galpar.img)
-
-    #print("max size ",NCol,NRow)
-
-    #Obj.Angle = Obj.Theta - 90
-
-    #angle computed from y-axis to x-axis  
-    Theta=galpar.ang + 90
-
-
-    (xmin, xmax, ymin, ymax) = GetSize(galpar.xc, galpar.yc, aell, Theta, ab, NCol, NRow)
-
-    #print("size box ",xmin, xmax, ymin, ymax)
 
     # call to Tidal
-    (tidal,objchinu,bump,snr,stdsnr,totsnr,rss,ndof)=Tidal(params, galpar, galcomps, xmin, xmax, ymin, ymax, 2)
+    (tidal,objchinu,bump,snr,stdsnr,totsnr,rss,ndof)=Tidal(params, galpar, galcomps, sectgalax, 2)
 
     
     #print("Tidal = ",tidal)  
@@ -2376,7 +2345,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
 
 
-def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
+def Tidal(params, galpar, galcomps, sectgalax, rmin):
     "Computes Tidal  values as defined in Tal et al. 2009 AJ. It algo computes Bumpiness"
     "(Blakeslee 2006 ApJ) value defined between rmin and radius"
 
@@ -2413,6 +2382,47 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
 
     totsnr=0
     stdsnr=0
+    ################
+
+  
+    stidxg = np.argsort(sectgalax.radius)
+
+    mgerad=sectgalax.radius[stidxg]
+    mgecount=sectgalax.counts[stidxg]
+    mgeangle=sectgalax.angle[stidxg]
+    mgeanrad=np.deg2rad(mgeangle)
+
+
+
+    ab=galpar.q
+
+    ell=1-ab
+
+    aell = mgerad.max() 
+
+    bell = mgerad.max() * ab
+
+    #changing to arc sec
+    aellarc=aell*galpar.scale
+
+    #print("major axis, minor axis (pix) ",aell,bell)
+
+    NCol=len(galpar.img[0])
+    NRow=len(galpar.img)
+
+    #print("max size ",NCol,NRow)
+
+    #Obj.Angle = Obj.Theta - 90
+
+    #angle computed from y-axis to x-axis  
+    Theta=galpar.ang + 90
+
+
+    (xlo, xhi, ylo, yhi) = GetSize(galpar.xc, galpar.yc, aell, Theta, ab, NCol, NRow)
+
+    #print("size box ",xmin, xmax, ymin, ymax)
+
+
 
 
     xser=galpar.xc
@@ -2445,7 +2455,6 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
     #MakeImage(params.namesnr, NCol, NRow):
 
 
-
     header['TypeIMG'] = ('SNR', 'Signal to Noise Ratio image')
     hdu[0].header  =header
     galpar.imsnr=imgal/imsigma
@@ -2458,19 +2467,22 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
     hdu.close()
 
 
-
+    imell=immask.copy()
+    imell.fill(False)
 
 
     #    for objchinu, Tidal and SNR
     #    maskm = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
-    maskm =immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
+    #maskm =immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
+    maskm =immask == False  # big image coordinates
+
 
     #maskm =immask == False  # big image coordinates
 
     #   mask including rmin for Bumpiness only
     #    maskbum = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
-    maskbum = immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
-    #maskbum = immask == False  # big image coordinates
+    #maskbum = immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
+    maskbum = immask == False  # big image coordinates
 
 
     #############
@@ -2502,27 +2514,64 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
     mask = dist < dell
 
     #  correcting for rmin
-    maskbum[mask] = False
+    maskbum[ylo - 1:yhi, xlo - 1:xhi][mask] = False
+
+    ## identifying area to compute photometry: 
+    imell = ExtractEllip(imell, True, xser, yser, aell, Theta, ell, xlo, xhi, ylo, yhi)
+    ## xlo, xhi, ylo, yhi makes sure that ellipse will not be outside of this range
+
+
+    #maskm=maskm*imell
+    #maskbum=maskbum*imell
+
+    maskm=maskm[ylo - 1:yhi, xlo - 1:xhi]*imell
+    maskbum=maskbum[ylo - 1:yhi, xlo - 1:xhi]*imell
+
+
+    hdu = fits.open(galpar.tempmask)
+    header=hdu[0].header  
+    hdu[0].data = maskm        
+    hdu.writeto("check.fits", overwrite=True)
+    hdu.close()
+
+
+
 
     if maskbum.any():
 
     # for Bumpiness
 
-        galfluxbum  = imgal[ylo - 1:yhi, xlo - 1:xhi][maskbum]
-        modfluxbum  = immodel[ylo - 1:yhi, xlo - 1:xhi][maskbum]
-        sigfluxbum  = imsigma[ylo - 1:yhi, xlo - 1:xhi][maskbum]
+        #galfluxbum  = imgal[ylo - 1:yhi, xlo - 1:xhi][maskbum]
+        #modfluxbum  = immodel[ylo - 1:yhi, xlo - 1:xhi][maskbum]
+        #sigfluxbum  = imsigma[ylo - 1:yhi, xlo - 1:xhi][maskbum]
+        galfluxbum  = imgal[maskbum]
+        modfluxbum  = immodel[maskbum]
+        sigfluxbum  = imsigma[maskbum]
+
     ####
 
     # for Tidal, SNR, and objchinu
 
     #        sumflux  = np.sum(imgal[ylo - 1:yhi, xlo - 1:xhi][maskm] - sky)
-        sumflux  = np.sum(imgal[ylo - 1:yhi, xlo - 1:xhi][maskm])
-        sumsig   = np.sum(imsigma[ylo - 1:yhi, xlo - 1:xhi][maskm])
+        #sumflux  = np.sum(imgal[ylo - 1:yhi, xlo - 1:xhi][maskm])
+        #sumsig   = np.sum(imsigma[ylo - 1:yhi, xlo - 1:xhi][maskm])
 
-        galflux  = imgal[ylo - 1:yhi, xlo - 1:xhi][maskm]
-        modflux  = immodel[ylo - 1:yhi, xlo - 1:xhi][maskm]
+        #galflux  = imgal[ylo - 1:yhi, xlo - 1:xhi][maskm]
+        #modflux  = immodel[ylo - 1:yhi, xlo - 1:xhi][maskm]
 
-        sigflux  = imsigma[ylo - 1:yhi, xlo - 1:xhi][maskm]
+        #sigflux  = imsigma[ylo - 1:yhi, xlo - 1:xhi][maskm]
+
+
+        sumflux  = np.sum(imgal[maskm])
+        sumsig   = np.sum(imsigma[maskm])
+
+        galflux  = imgal[maskm]
+        modflux  = immodel[maskm]
+
+        sigflux  = imsigma[maskm]
+
+
+
 
         resflux = (galflux - modflux)**2
 
@@ -2536,7 +2585,8 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
         chinu  = np.sum(resflux/varchi)
         
 
-        pixcountchi = np.size(immodel[ylo - 1:yhi, xlo - 1:xhi][maskm])
+        #pixcountchi = np.size(immodel[ylo - 1:yhi, xlo - 1:xhi][maskm])
+        pixcountchi = np.size(immodel[maskm])
 
 
         if(pixcountchi > 11):
@@ -2549,12 +2599,20 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
 
 
         # snr
-        if(np.size(galpar.imsnr[ylo - 1:yhi, xlo - 1:xhi][maskm]) > 0):
+        #if(np.size(galpar.imsnr[ylo - 1:yhi, xlo - 1:xhi][maskm]) > 0):
 
-            totsnr=galpar.imsnr[ylo - 1:yhi, xlo - 1:xhi][maskm].sum()
+         #   totsnr=galpar.imsnr[ylo - 1:yhi, xlo - 1:xhi][maskm].sum()
 
-            snr=galpar.imsnr[ylo - 1:yhi, xlo - 1:xhi][maskm].mean()
-            stdsnr=galpar.imsnr[ylo - 1:yhi, xlo - 1:xhi][maskm].std()
+          #  snr=galpar.imsnr[ylo - 1:yhi, xlo - 1:xhi][maskm].mean()
+           # stdsnr=galpar.imsnr[ylo - 1:yhi, xlo - 1:xhi][maskm].std()
+
+        if(np.size(galpar.imsnr[maskm]) > 0):
+
+            totsnr=galpar.imsnr[maskm].sum()
+
+            snr=galpar.imsnr[maskm].mean()
+            stdsnr=galpar.imsnr[maskm].std()
+
 
         else:
             print("I can't compute SNR")
@@ -2565,7 +2623,9 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
 
         tgal = np.abs((galflux)/(modflux) - 1)
         sumtidal=np.sum(tgal)
-        pixcountid=np.size(immodel[ylo - 1:yhi, xlo - 1:xhi][maskm])
+        #pixcountid=np.size(immodel[ylo - 1:yhi, xlo - 1:xhi][maskm])
+        pixcountid=np.size(immodel[maskm])
+
 
         if pixcountid > 0:
             tidal = (sumtidal / pixcountid)
@@ -2580,7 +2640,8 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
         varres   = sigfluxbum * sigfluxbum
         numbump  = np.sum(resbump - varres)
 
-        pixcountbum=np.size(immodel[ylo - 1:yhi, xlo - 1:xhi][maskbum])
+        #pixcountbum=np.size(immodel[ylo - 1:yhi, xlo - 1:xhi][maskbum])
+        pixcountbum=np.size(immodel[maskbum])
 
 
         # Bumpiness
@@ -2599,10 +2660,56 @@ def Tidal(params, galpar, galcomps, xlo, xhi, ylo, yhi, rmin):
 
 
     # computing RSS: 
-    rss=(imres[ylo - 1:yhi, xlo - 1:xhi][maskm]**2).sum()
+    #rss=(imres[ylo - 1:yhi, xlo - 1:xhi][maskm]**2).sum()
+    rss=(imres[maskm]**2).sum()
     
   
     return (tidal,objchinu,bump,snr,stdsnr,totsnr,rss,ndof)
+
+
+
+def ExtractEllip(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
+    "This subroutine extract an ellipse within an box to compute photometric parameters "
+    "It returns the area of ellipse with idn values. "
+
+
+    xmin = np.int(xmin)
+    xmax = np.int(xmax)
+    ymin = np.int(ymin)
+    ymax = np.int(ymax)
+
+    q = (1 - ell)
+    bim = q * R
+
+    theta = theta * np.pi / 180  # Rads!!!
+
+    ypos, xpos = np.mgrid[ymin - 1:ymax, xmin - 1:xmax]
+
+    dx = xpos - x
+    dy = ypos - y
+
+    landa = np.arctan2(dy, dx)
+
+    mask = landa < 0
+    if mask.any():
+        landa[mask] = landa[mask] + 2 * np.pi
+
+    landa = landa - theta
+
+    angle = np.arctan2(np.sin(landa) / bim, np.cos(landa) / R)
+
+    xell = x + R * np.cos(angle) * np.cos(theta) - bim * \
+        np.sin(angle) * np.sin(theta)
+    yell = y + R * np.cos(angle) * np.sin(theta) + bim * \
+        np.sin(angle) * np.cos(theta)
+
+    dell = np.sqrt((xell - x)**2 + (yell - y)**2)
+    dist = np.sqrt(dx**2 + dy**2)
+
+    mask = dist < dell
+    imagemat[ypos[mask], xpos[mask]] = idn
+
+    return imagemat
 
 
 
