@@ -243,6 +243,8 @@ def main():
 
     params.namesnr=params.namefile + "-snr.fits"
 
+    params.namecheck=params.namefile + "-check.fits"
+
 
 
     if params.flagsbout == True: 
@@ -344,18 +346,19 @@ def main():
     plt.close()
 
 
-    if galpar.tempmask != None:
-        os.remove(galpar.tempmask) # removing temp mask file
-
-
     ########################################################
     ############ Computing output photometry ###############
     ########################################################
 
     #lastmod
+
     if params.flagout:
         print("Computing output photometry ... ")
         OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps)
+
+
+    if galpar.tempmask != None:
+        os.remove(galpar.tempmask) # removing temp mask file
 
 
     ##############       #############
@@ -432,6 +435,7 @@ class InputParams:
     namesig="none-sig.fits"
     namesnr="none-snr.fits"
     namened="none-ned.xml"
+    namecheck="none-check.fits"
 
 
 
@@ -2189,8 +2193,14 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
     BICrit = objchinu * ndof + freepar * np.log(npix)
 
+    ## for output only: 
+    stidxg = np.argsort(sectgalax.radius)
 
-    #lastmod2
+    mgerad=sectgalax.radius[stidxg]
+
+    aell = mgerad.max() 
+    bell = mgerad.max() * galpar.q
+
 
 
     #######  file output:  ######
@@ -2220,7 +2230,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     OUTPHOT.write(lineout)
 
 
-    lineout = "# most of the photometry is computed within a box: x='{}:{}', y='{}:{}' \n".format(xmin+1,xmax+1,ymin+1,ymax+1)
+    lineout = "# most of the photometry is computed within an ellipse defined by sectors_photometry funciton \n"
     OUTPHOT.write(lineout)
 
     lineout = "# This box size is computed using an ellipse with a = {:.2f} and b = {:.2f} centered at xc,yc \n".format(aell,bell)
@@ -2423,8 +2433,6 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
     #print("size box ",xmin, xmax, ymin, ymax)
 
 
-
-
     xser=galpar.xc
     yser=galpar.yc
 
@@ -2516,6 +2524,7 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
     #  correcting for rmin
     maskbum[ylo - 1:yhi, xlo - 1:xhi][mask] = False
 
+
     ## identifying area to compute photometry: 
     imell = ExtractEllip(imell, True, xser, yser, aell, Theta, ell, xlo, xhi, ylo, yhi)
     ## xlo, xhi, ylo, yhi makes sure that ellipse will not be outside of this range
@@ -2524,14 +2533,26 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
     #maskm=maskm*imell
     #maskbum=maskbum*imell
 
-    maskm=maskm[ylo - 1:yhi, xlo - 1:xhi]*imell
-    maskbum=maskbum[ylo - 1:yhi, xlo - 1:xhi]*imell
+    #print("hola ",imell.shape)    
+    #print("hola2 ",ylo,yhi,xlo,xhi)    
+
+    #maskm=maskm[ylo - 1:yhi, xlo - 1:xhi]*imell
+    maskm=maskm*imell
+
+    #maskbum=maskbum[ylo - 1:yhi, xlo - 1:xhi]*imell
+    maskbum=maskbum*imell
+
 
 
     hdu = fits.open(galpar.tempmask)
     header=hdu[0].header  
-    hdu[0].data = maskm        
-    hdu.writeto("check.fits", overwrite=True)
+
+    header['TypeIMG'] = ('Check', 'Check area where output photometry was computed')
+    hdu[0].header  =header
+
+
+    hdu[0].data = (~maskm).astype("int")*1000
+    hdu.writeto(params.namecheck, overwrite=True)
     hdu.close()
 
 
@@ -2767,7 +2788,7 @@ def GetSize(x, y, R, theta, q, ncol, nrow):
             ymax = nrow
 
 
-    return (xmin, xmax, ymin, ymax)
+    return (int(xmin), int(xmax), int(ymin), int(ymax))
 
 def MakeImage(newfits, sizex, sizey):
     "create a new blank Image"
