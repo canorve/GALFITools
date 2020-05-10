@@ -313,7 +313,12 @@ def main():
 
     
     if params.flagsub:
-        sectcomps=SectPhotComp(galpar, params, galcomps, n_sectors=numsectors, minlevel=minlevel)
+        sectcomps,sectmulcomps=SectPhotComp(galpar, params, galcomps, n_sectors=numsectors, minlevel=minlevel)
+
+
+
+    #print("hola1 ",np.unique(sectcomps[3].angle))
+    #print("hola2 mul ",np.unique(sectmulcomps[3].angle))
 
     print("creating plots..")
 
@@ -335,6 +340,8 @@ def main():
     ########################################################
 
     print("creating multi-plots..")
+
+    #MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectmulcomps)
 
     MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps)
 
@@ -667,25 +674,45 @@ def SectPhotComp(galpar, params, galcomps, n_sectors=19, minlevel=0):
     # and angle is different as well:
     angsec=90-galpar.ang
 
+    epsmul=eps
+    angsecmul=angsec
+    #print("eps,angle mul ",epsmul,angsecmul)
     #############
     sectcomps=[]
+    sectmulcomps=[]
     n=0
 
     while(n<len(galcomps.N)):
 
         subim=subimgs[n]
         #lastmod3 to check the next two lines:
+
         eps=1-galcomps.AxRat[n]
         angsec=90-galcomps.PosAng[n]
+
+        #scmp = sectors_photometry(subim, eps, angsec, xctemp, yctemp,minlevel=minlevel,plot=1, badpixels=maskb, n_sectors=n_sectors)
         scmp = sectors_photometry(subim, eps, angsec, xctemp, yctemp,minlevel=minlevel,plot=0, badpixels=maskb, n_sectors=n_sectors)
+        #print("n, eps,angle  ",n,eps,angsec)
+
+        #plt.savefig("C"+str(n)+".png")
+
+
+        scmpmul = sectors_photometry(subim, epsmul, angsecmul, xctemp, yctemp,minlevel=minlevel,plot=0, badpixels=maskb, n_sectors=n_sectors)
+        #scmpmul = sectors_photometry(subim, epsmul, angsecmul, xctemp, yctemp,minlevel=minlevel,plot=1, badpixels=maskb, n_sectors=n_sectors)
+
+
+        #plt.savefig("Cmul"+str(n)+".png")
 
         sectcomps.append(scmp)
+
+        sectmulcomps.append(scmpmul)
+
 
         n=n+1
 
 
 
-    return sectcomps
+    return sectcomps,sectmulcomps
 
 
 def EllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps,n_sectors=19, minlevel=0):
@@ -1154,6 +1181,7 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
         mgesbsub=[]
         mgeradsub=[]
         mgeanglesub=[]
+        sectorsub=[]
 
 
         ###############################
@@ -1180,7 +1208,11 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
             # formula according to cappellary mge manual
             tempmge= galpar.mgzpt - 2.5*np.log10(mgecountsub/galpar.exptime) + 2.5*np.log10(galpar.scale**2) + 0.1
+            
 
+            tempsectorsub = np.unique(tempangle)
+
+            sectorsub.append(tempsectorsub)
             mgesbsub.append(tempmge)
             mgeradsub.append(temprad)
             mgeanglesub.append(tempangle)
@@ -1223,6 +1255,8 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     n = sectors.size
     dn = int(round(n/6.))
     nrows = (n-1)//dn + 1 # integer division
+
+    #print("hola1 ",sectorsub)
 
     plt.clf()
 
@@ -1392,7 +1426,9 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
             while(ii<len(galcomps.N)):
 
-                wtemp = np.nonzero(mgeanglesub[ii] == sectors[j])[0]
+                #wtemp = np.nonzero(mgeanglesub[ii] == sectors[j])[0]
+                wtemp = np.nonzero(mgeanglesub[ii] == sectorsub[ii][j])[0]
+
                 wtemp = wtemp[np.argsort(mgeradsub[ii][wtemp])]
 
                 rtemp = mgeradsub[ii][wtemp]
