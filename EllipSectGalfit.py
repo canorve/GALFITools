@@ -44,7 +44,7 @@ def main():
     #class for saving user's parameters
     params=InputParams()
 
-    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--grid','--dpi','--sbout','--noplot','--minlevel','--sectors','--out','--object','--filter','--snr','--help']
+    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--grid','--dpi','--sbout','--noplot','--minlevel','--sectors','--out','--object','--filter','--snr','--help','--checkimg','--noned','--distmod','--magcor','--scalekpc','--sbdim']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
@@ -87,6 +87,21 @@ def main():
         params.flagband=True
     if options['snr'] != None:
         params.flagsnr=True
+    if options['checkimg'] != None:
+        params.flagcheck=True
+    if options['noned'] != None:
+        params.flagned=True
+    if options['distmod'] != None:
+        params.flagmod=True
+    if options['magcor'] != None:
+        params.flagmag=True
+    if options['scalekpc'] != None:
+        params.flagscale=True
+    if options['sbdim'] != None:
+        params.flagdim=True
+
+
+
     if options['help'] != None:
         Help()
 
@@ -162,6 +177,35 @@ def main():
         OptionHandle="--filter"
         opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         params.band=np.str(opt['filter'])
+
+
+    if params.flagmod == True:
+        opt={}
+        OptionHandle="--distmod"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        params.InDistMod=np.float(opt['distmod'])
+
+
+    if params.flagmag == True:
+        opt={}
+        OptionHandle="--magcor"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        params.InMagCor=np.float(opt['magcor'])
+
+
+    if params.flagscale == True:
+        opt={}
+        OptionHandle="--scalekpc"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        params.InScale=np.float(opt['scalekpc'])
+
+
+    if params.flagdim == True:
+        opt={}
+        OptionHandle="--sbdim"
+        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        params.InSbDim=np.float(opt['sbdim'])
+
 
 
     params.galfile= sys.argv[1]
@@ -313,12 +357,9 @@ def main():
 
     
     if params.flagsub:
-        sectcomps,sectmulcomps=SectPhotComp(galpar, params, galcomps, n_sectors=numsectors, minlevel=minlevel)
+        sectcomps=SectPhotComp(galpar, params, galcomps, n_sectors=numsectors, minlevel=minlevel)
 
 
-
-    #print("hola1 ",np.unique(sectcomps[3].angle))
-    #print("hola2 mul ",np.unique(sectmulcomps[3].angle))
 
     print("creating plots..")
 
@@ -357,7 +398,6 @@ def main():
     ############ Computing output photometry ###############
     ########################################################
 
-    #lastmod
 
     if params.flagout:
         print("Computing output photometry ... ")
@@ -405,6 +445,14 @@ class InputParams:
     flagweb=False # to check connection to ned
     flagsnr = False
 
+    flagcheck=False
+    flagned=False
+
+    flagmod=False
+    flagmag=False
+    flagscale=False
+    flagdim=False
+   
 
     #init
     qarg=1
@@ -432,6 +480,11 @@ class InputParams:
     objname="none"
     band="R"
 
+    InDistMod=0
+    InMagCor=0
+    InScale=1
+    InSbDim=0
+   
 
     namefile="none"
     namepng="none.png"
@@ -679,40 +732,35 @@ def SectPhotComp(galpar, params, galcomps, n_sectors=19, minlevel=0):
     #print("eps,angle mul ",epsmul,angsecmul)
     #############
     sectcomps=[]
-    sectmulcomps=[]
+    #sectmulcomps=[]
     n=0
 
     while(n<len(galcomps.N)):
 
         subim=subimgs[n]
-        #lastmod3 to check the next two lines:
 
         eps=1-galcomps.AxRat[n]
         angsec=90-galcomps.PosAng[n]
 
-        #scmp = sectors_photometry(subim, eps, angsec, xctemp, yctemp,minlevel=minlevel,plot=1, badpixels=maskb, n_sectors=n_sectors)
-        scmp = sectors_photometry(subim, eps, angsec, xctemp, yctemp,minlevel=minlevel,plot=0, badpixels=maskb, n_sectors=n_sectors)
-        #print("n, eps,angle  ",n,eps,angsec)
 
-        #plt.savefig("C"+str(n)+".png")
-
-
-        scmpmul = sectors_photometry(subim, epsmul, angsecmul, xctemp, yctemp,minlevel=minlevel,plot=0, badpixels=maskb, n_sectors=n_sectors)
-        #scmpmul = sectors_photometry(subim, epsmul, angsecmul, xctemp, yctemp,minlevel=minlevel,plot=1, badpixels=maskb, n_sectors=n_sectors)
+        if params.flagcheck:
+            scmp = sectors_photometry(subim, eps, angsec, xctemp, yctemp,minlevel=minlevel,plot=1, badpixels=maskb, n_sectors=n_sectors)
+            plt.savefig("Comp"+str(n)+".png")
+        else:
+            scmp = sectors_photometry(subim, eps, angsec, xctemp, yctemp,minlevel=minlevel,plot=0, badpixels=maskb, n_sectors=n_sectors)
 
 
+        #scmpmul = sectors_photometry(subim, epsmul, angsecmul, xctemp, yctemp,minlevel=minlevel,plot=0, badpixels=maskb, n_sectors=n_sectors)
         #plt.savefig("Cmul"+str(n)+".png")
 
         sectcomps.append(scmp)
 
-        sectmulcomps.append(scmpmul)
-
+        #sectmulcomps.append(scmpmul)
 
         n=n+1
 
 
-
-    return sectcomps,sectmulcomps
+    return sectcomps
 
 
 def EllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps,n_sectors=19, minlevel=0):
@@ -1183,7 +1231,6 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
         mgeanglesub=[]
         sectorsub=[]
 
-
         ###############################
         
         ab=galpar.q
@@ -1256,8 +1303,6 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     dn = int(round(n/6.))
     nrows = (n-1)//dn + 1 # integer division
 
-    #print("hola1 ",sectorsub)
-
     plt.clf()
 
     fig, axsec = plt.subplots(nrows, 2, sharex=True, sharey='col', num=fignum)
@@ -1300,6 +1345,7 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     row = nrows -1
     for j in range(0, n, dn):
         w = np.nonzero(mgeangle == sectors[j])[0]
+
         w = w[np.argsort(mgerad[w])]
         r = mgerad[w]
 
@@ -1427,10 +1473,31 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
             while(ii<len(galcomps.N)):
 
                 #wtemp = np.nonzero(mgeanglesub[ii] == sectors[j])[0]
-                wtemp = np.nonzero(mgeanglesub[ii] == sectorsub[ii][j])[0]
+        
+######################## TEST :############  
+                alpha = sectors[j]
+                angsec2= 90-galcomps.PosAng[ii]
+                if angsec < 0:
+                    angsec = 360 + angsec
+                if angsec2 < 0:
+                    angsec2 = 360 + angsec2
 
+                alpha2 = alpha  + angsec - angsec2 
+
+                jj=(np.abs(sectorsub[ii]-alpha2)).argmin()  
+
+                print("hola C{}: {}; Axrat: {}, angsec: {} alpha2 {} ".format(ii,sectorsub[ii][jj],galcomps.AxRat[ii],90-galcomps.PosAng[ii],alpha2))
+
+
+###############################################
+
+                #El chiste es buscar cual j de sectorsub es
+                #wtemp = np.nonzero(mgeanglesub[ii] == sectorsub[ii][j])[0]
+                wtemp = np.nonzero(mgeanglesub[ii] == sectorsub[ii][jj])[0]
                 wtemp = wtemp[np.argsort(mgeradsub[ii][wtemp])]
 
+
+      
                 rtemp = mgeradsub[ii][wtemp]
 
                 colorval = scalarMap.to_rgba(values[ii])
@@ -1438,10 +1505,7 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
                 #    axsec[row, 0].plot(rtemp, mgesbsub[ii][wtemp],'--',color='skyblue', linewidth=2)
                     axsec[row, 0].plot(rtemp, mgesbsub[ii][wtemp],'--',color=colorval, linewidth=1.5)
-
-
                 else:
-
                     axsec[row, 0].semilogx(rtemp, mgesbsub[ii][wtemp], '--',color=colorval, linewidth=1.5)
 
                 #introduce output 
@@ -1454,8 +1518,12 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
                     lineout= "# Values along radius with ang = {} from major axis \n".format(rtxtang)
                     OUTFH.write(lineout)
 
-                    lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
+                    #lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
+                    #OUTFH.write(lineout)
+
+                    lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galcomps.AxRat[ii],90-galcomps.PosAng[ii])
                     OUTFH.write(lineout)
+
 
                     lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
                     OUTFH.write(lineout)
@@ -1480,7 +1548,6 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
                         OUTFH.write(lineout)
 
                     OUTFH.close()
-
 
 
                 ii+=1
@@ -1987,7 +2054,6 @@ def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
     hdu.close()
 
 
-
 def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     """ Output photometry for further analysis """
 
@@ -2160,12 +2226,15 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     else:
         print("using {} band to correct for galactic extinction ".format(params.band)) 
 
-    if (params.flagobj): 
+    if (params.flagobj and not(params.flagned)): 
         (GalExt,DistMod,DistMod2,Scalekpc,SbDim)=NED(params, galpar, galcomps)
+    else:
+        if params.flagned: 
+            print("No search in NED. Lum and abs Mag will not be computed")
 
     if maskmag.any():
 
-        if (params.flagweb and params.flagobj):
+        if (params.flagweb and params.flagobj and not(params.flagned)):
 
             CorMag = totMag - GalExt # corrected by galactic extinction 
             
@@ -2197,7 +2266,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
     if maskgalax.any():
 
-        if (params.flagweb and params.flagobj):
+        if (params.flagweb and params.flagobj and not(params.flagned)):
 
             galcomps.Rad50kpc[maskgalax] = galcomps.Rad50[maskgalax] * galpar.scale * Scalekpc
 
@@ -2343,7 +2412,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
     if maskmag.any():
 
-        if (params.flagweb and params.flagobj):
+        if (params.flagweb and params.flagobj and not(params.flagned)):
 
             #CorMag = totMag - GalExt # corrected by galactic extinction 
             
@@ -2568,9 +2637,6 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
 
     #maskm=maskm*imell
     #maskbum=maskbum*imell
-
-    #print("hola ",imell.shape)    
-    #print("hola2 ",ylo,yhi,xlo,xhi)    
 
     #maskm=maskm[ylo - 1:yhi, xlo - 1:xhi]*imell
     maskm=maskm*imell
@@ -2858,96 +2924,105 @@ def NED(params, galpar, galcomps):
 
     filened=params.namened
 
-    #checar si el archivo existe para no hacer conexion a internet
+    if params.flagmod or params.flagmag or params.flagscale or params.flagdim:
 
-    if(not(os.path.isfile(filened))):
-
-        # command for wget
-        #wget -O NED_51.xml "https://ned.ipac.caltech.edu/cgi-bin/nph-objsearch?extend=no&of=xml_all&objname=m+51"
-        wgetcmd = 'wget -O {} "{}{}"'.format(filened,nedweb,objname)
-
-        print("Running: ",wgetcmd)
-
-        errwg = sp.run([wgetcmd], shell=True, stdout=sp.PIPE,stderr=sp.PIPE, universal_newlines=True)
-
-        if errwg.returncode != 0:
-            print("can't connect to NED webserver. Is your internet connection working? ")
-            print("Luminosity and absolute magnitude will not be computed") 
-            params.flagweb=False
+        GalExt=params.InMagCor
+        DistMod=params.InDistMod
+        DistMod2=params.InDistMod
+        Scalekpc=params.InScale
+        SbDim=params.InSbDim
     else:
-        print("using existing {} file ".format(filened))
+        #checar si el archivo existe para no hacer conexion a internet
+        if(not(os.path.isfile(filened))):
+
+            # command for wget
+            #wget -O NED_51.xml "https://ned.ipac.caltech.edu/cgi-bin/nph-objsearch?extend=no&of=xml_all&objname=m+51"
+            wgetcmd = 'wget -O {} "{}{}"'.format(filened,nedweb,objname)
+
+            print("Running: ",wgetcmd)
+
+            errwg = sp.run([wgetcmd], shell=True, stdout=sp.PIPE,stderr=sp.PIPE, universal_newlines=True)
+
+            if errwg.returncode != 0:
+                print("can't connect to NED webserver. Is your internet connection working? ")
+                print("Luminosity and absolute magnitude will not be computed") 
+                params.flagweb=False
+        else:
+            print("using existing {} file ".format(filened))
 
 
-    print("reading ",filened)
-    votable=parse(filened,pedantic=False) 
+        print("reading ",filened)
+        votable=parse(filened,pedantic=False) 
 
-    try: 
-        table=votable.get_table_by_index(0) 
-
-    except: 
-        print("I can't read file or object name can be found in file")
-        print("check object name or delete NED file for a new web search")
-        print("luminosity and absolute magnitude will not be computed")
-        params.flagweb=False 
-
-
-    if params.flagweb==True:
-        # si flag == True
-        tablephot=votable.get_table_by_id("NED_DerivedValuesTable") 
-
-        dataphot=tablephot.array
-
-        lumdist=dataphot["luminosity_distance"].data[0] # units in Mpc
-
-        #DistMod= 5 * np.log10(lumdist/10) 
-
-        DistMod=dataphot["luminosity_distance_moduli"].data[0] # units in magnitudes
-
-        tablext=votable.get_table_by_id("NED_BasicDataTable") 
-        dataext=tablext.array
-
-        extband="gal_extinc_" + band 
         try: 
-            GalExt=dataext[extband].data[0] 
+            table=votable.get_table_by_index(0) 
+
         except: 
-            print("can't found {} in {} check filter name. GalExt=0 ".format(extband,filened))           
+            print("I can't read file or object name can be found in file")
+            print("check object name or delete NED file for a new web search")
+            print("luminosity and absolute magnitude will not be computed")
+            params.flagweb=False 
+
+
+        if params.flagweb==True:
+            # si flag == True
+            tablephot=votable.get_table_by_id("NED_DerivedValuesTable") 
+
+            dataphot=tablephot.array
+
+            lumdist=dataphot["luminosity_distance"].data[0] # units in Mpc
+
+            #DistMod= 5 * np.log10(lumdist/10) 
+
+            DistMod=dataphot["luminosity_distance_moduli"].data[0] # units in magnitudes
+
+            tablext=votable.get_table_by_id("NED_BasicDataTable") 
+            dataext=tablext.array
+
+            extband="gal_extinc_" + band 
+            try: 
+                GalExt=dataext[extband].data[0] 
+            except: 
+                print("can't found {} in {} check filter name. GalExt=0 ".format(extband,filened))           
+                GalExt=0
+
+
+            print("Luminosity distance: (Mpc) ",lumdist)
+
+            print("Module Distance (mag): ",DistMod)
+
+
+            print("Galactic Extinction for band {} : {}".format(band,GalExt))
+
+
+            Scalekpc=dataphot["cosmology_corrected_scale_kpc/arcsec"].data[0] # to convert to kpc
+
+            print("Scale kpc/arcsec",Scalekpc)
+
+
+            SbDim=dataphot["surface_brightness_dimming_mag"].data[0] 
+
+            print("SB dimming in mag",SbDim)
+
+
+            ## modulo de distancia calculado en forma independiente del redshift: 
+            tabledist=votable.get_table_by_id("Redshift_IndependentDistances") 
+
+            datadist=tabledist.array
+
+            DistMod2=datadist["DistanceModulus"].data[0] 
+
+            DistMod2=float(DistMod2)
+
+            print("Distance Modulus (z independent) ",DistMod2)
+        else:
             GalExt=0
+            DistMod=0
+            DistMod2=0
+            Scalekpc=0
+            SbDim=0
 
 
-        print("Luminosity distance: (Mpc) ",lumdist)
-
-        print("Module Distance (mag): ",DistMod)
-
-
-        print("Galactic Extinction for band {} : {}".format(band,GalExt))
-
-
-        Scalekpc=dataphot["cosmology_corrected_scale_kpc/arcsec"].data[0] # to convert to kpc
-
-        print("Scale kpc/arcsec",Scalekpc)
-
-
-        SbDim=dataphot["surface_brightness_dimming_mag"].data[0] 
-
-        print("SB dimming in mag",SbDim)
-
-
-        ## modulo de distancia calculado en forma independiente del redshift: 
-        tabledist=votable.get_table_by_id("Redshift_IndependentDistances") 
-
-        datadist=tabledist.array
-
-        DistMod2=datadist["DistanceModulus"].data[0] 
-
-        DistMod2=float(DistMod2)
-
-        print("Distance Modulus (z independent) ",DistMod2)
-    else:
-        GalExt=0
-        DistMod=0
-        DistMod2=0
-        Scalekpc=0
-        SbDim=0
 
     return (GalExt,DistMod,DistMod2,Scalekpc,SbDim)
 
