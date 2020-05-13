@@ -35,19 +35,19 @@ def main():
 
     if (len(sys.argv[1:]) == 0):
         print ('Missing arguments')
-        print ("Usage:\n %s [GALFITOutputFile] [--options] " % (sys.argv[0]))
+        print ("Usage:\n %s [GALFITOutputFile] [-options] " % (sys.argv[0]))
         print ("use help to display more information about 'options' arguments: ")
-        print ("%s --help " % (sys.argv[0]))
+        print ("%s -help " % (sys.argv[0]))
 
         sys.exit()
 
     #class for saving user's parameters
     params=InputParams()
 
-    OptionHandleList = ['--logx', '--q', '--pa','--sub','--pix','--ranx','--rany','--grid','--dpi','--sbout','--noplot','--minlevel','--sectors','--out','--object','--filter','--snr','--help','--checkimg','--noned','--distmod','--magcor','--scalekpc','--sbdim']
+    OptionHandleList = ['-logx', '-q', '-pa','-comp','-pix','-ranx','-rany','-grid','-dpi','-sbout','-noplot','-minlevel','-sectors','-out','-object','-filter','-snr','-help','-checkimg','-noned','-distmod','-magcor','-scalekpc','-sbdim']
     options = {}
     for OptionHandle in OptionHandleList:
-        options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
+        options[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
     if options['logx'] != None:
         params.flaglogx=True
         print("X axis is logarithm")
@@ -65,7 +65,7 @@ def main():
         params.flagrid=True
     if options['dpi'] != None:
         params.flagdpi=True
-    if options['sub'] != None:
+    if options['comp'] != None:
         params.flagsub=True
         print("Plotting subcomponents ")
     if options['noplot'] != None:
@@ -111,20 +111,20 @@ def main():
     ################## search arguments after the option:
     if params.flagpa == True:
         opt={}
-        OptionHandle="--pa"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        OptionHandle="-pa"
+        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         params.parg=np.float(opt['pa'])
 
     if params.flagq == True:
         opt={}
-        OptionHandle="--q"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        OptionHandle="-q"
+        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         params.qarg=np.float(opt['q'])
 
     if params.flagranx[0] == True:
         opt={}
-        OptionHandle="--ranx"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        OptionHandle="-ranx"
+        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
 
         params.rangex=opt["ranx"]
         if "-" in params.rangex:
@@ -135,8 +135,8 @@ def main():
 
     if params.flagrany[0]== True:
         opt={}
-        OptionHandle="--rany"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        OptionHandle="-rany"
+        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
 
         params.rangey=opt["rany"]
         if "-" in params.rangey:
@@ -147,8 +147,8 @@ def main():
 
     if params.flagdpi == True:
         opt={}
-        OptionHandle="--dpi"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        OptionHandle="-dpi"
+        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         params.dpival=np.int(opt['dpi'])
 
     if params.flagnoplot == True:
@@ -156,54 +156,54 @@ def main():
 
     if params.flagminlevel == True:
         opt={}
-        OptionHandle="--minlevel"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        OptionHandle="-minlevel"
+        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         params.minlevel=np.int(opt['minlevel'])
 
     if params.flagsectors == True:
         opt={}
-        OptionHandle="--sectors"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        OptionHandle="-sectors"
+        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         params.minlevel=np.int(opt['sectors'])
 
     if params.flagobj == True:
         opt={}
-        OptionHandle="--object"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        OptionHandle="-object"
+        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         params.objname=np.str(opt['object'])
 
     if params.flagband == True:
         opt={}
-        OptionHandle="--filter"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        OptionHandle="-filter"
+        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         params.band=np.str(opt['filter'])
 
 
     if params.flagmod == True:
         opt={}
-        OptionHandle="--distmod"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        OptionHandle="-distmod"
+        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         params.InDistMod=np.float(opt['distmod'])
 
 
     if params.flagmag == True:
         opt={}
-        OptionHandle="--magcor"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        OptionHandle="-magcor"
+        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         params.InMagCor=np.float(opt['magcor'])
 
 
     if params.flagscale == True:
         opt={}
-        OptionHandle="--scalekpc"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        OptionHandle="-scalekpc"
+        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         params.InScale=np.float(opt['scalekpc'])
 
 
     if params.flagdim == True:
         opt={}
-        OptionHandle="--sbdim"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        OptionHandle="-sbdim"
+        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         params.InSbDim=np.float(opt['sbdim'])
 
 
@@ -571,7 +571,7 @@ class GalfitComps:
 def Help():
 
     print ('Missing arguments')
-    print ("Usage:\n %s [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] [--ranx/y Value] [--grid] [--dpi Value] [--noplot] [--out] " % (sys.argv[0]))
+    print ("Usage:\n %s [GALFITOutputFile] [-logx] [-q AxisRatio] [-pa PositionAngle] [-sub] [-pix] [-ranx/y Value] [-grid] [-dpi Value] [-noplot] [-out] " % (sys.argv[0]))
     print ("GALFITOutputFile: GALFIT output file ")
     print ("logx: activates X-axis as logarithm ")
     print ("q: introduce axis ratio ")
@@ -586,9 +586,9 @@ def Help():
     print ("sbout: creates output file containing the surface brightness profiles")
 
 
-    print ("Example:\n %s galfit.01 --logx" % (sys.argv[0]))
-    print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub --ranx 2 --out " % (sys.argv[0]))
-    print ("or Example:\n %s galfit.02 --q 0.35 --pa 60 --sub --ranx 1-20" % (sys.argv[0]))
+    print ("Example:\n %s galfit.01 -logx" % (sys.argv[0]))
+    print ("or Example:\n %s galfit.02 -q 0.35 -pa 60 -sub -ranx 2 -out " % (sys.argv[0]))
+    print ("or Example:\n %s galfit.02 -q 0.35 -pa 60 -sub -ranx 1-20" % (sys.argv[0]))
     print ("see https://github.com/canorve/GALFITools/blob/master/docs/Ellipse.md  for more examples")
 
     sys.exit()
@@ -845,65 +845,8 @@ def EllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps,n_sec
 
     if params.flagsbout == True: 
 
-        # output for galaxy
-        OUTFH = open (params.sboutput+".gal.txt","w")
-
-        lineout= "#        sectors_photometry used with q={} and pa={} (same as GALFIT) \n".format(galpar.q,galpar.ang)
-        OUTFH.write(lineout)
-
-        lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
-        OUTFH.write(lineout)
-
-        lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
-        OUTFH.write(lineout)
-
-
-        lineout= "#            Galaxy                                   \n"
-        OUTFH.write(lineout)
-
-
-
-        lineout= "#     rad      SB        SBerr       \n"
-        OUTFH.write(lineout)
-
-        lineout= "# (arcsec) (mag/arcsec) (error)   \n"
-        OUTFH.write(lineout)
-
-        for idx, item in reversed(list(enumerate(xradq))):
-            lineout= "{0:.3f} {1:.3f} {2:.3f} \n".format(xradq[idx],ysbq[idx],ysberrq[idx])
-            OUTFH.write(lineout)
-
-        OUTFH.close()
-
-        # output for model 
-        OUTFH = open (params.sboutput+".mod.txt","w")
-
-        lineout= "#        sectors_photometry used with q={} and pa={} (same as GALFIT) \n".format(galpar.q,galpar.ang)
-        OUTFH.write(lineout)
-
-        lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
-        OUTFH.write(lineout)
-
-        lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
-        OUTFH.write(lineout)
-
-
-        lineout= "#           Surface Brightness   Model                \n"
-        OUTFH.write(lineout)
-
-        lineout= "#    rad       SB        SBerr \n"
-        OUTFH.write(lineout)
-
-        lineout= "# (arcsec) (mag/arcsec) (error)  \n"
-        OUTFH.write(lineout)
-
-        for idx, item in reversed(list(enumerate(xradm))):
-            
-            lineout= "{0:.3f} {1:.3f} {2:.3f} \n".format(xradm[idx],ysbm[idx],ysberrm[idx])
-
-            OUTFH.write(lineout)
-
-        OUTFH.close()
+        #print to file    
+        PrintEllFilesGax(params,galpar,xradq,ysbq,ysberrq,xradm,ysbm,ysberrm)
 
 
     #### Creating Subcomponents images with Galfit
@@ -919,6 +862,72 @@ def EllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps,n_sec
     axsec.legend(loc=1)
 
     return limx,limy
+
+
+def PrintEllFilesGax(params,galpar,xradq,ysbq,ysberrq,xradm,ysbm,ysberrm):
+    "print surface brightness of galaxy and model to file"
+
+    # output for galaxy
+    OUTFH = open (params.sboutput+".gal.txt","w")
+
+    lineout= "#        sectors_photometry used with q={} and pa={} (same as GALFIT) \n".format(galpar.q,galpar.ang)
+    OUTFH.write(lineout)
+
+    lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
+    OUTFH.write(lineout)
+
+    lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
+    OUTFH.write(lineout)
+
+    lineout= "#            Galaxy                                   \n"
+    OUTFH.write(lineout)
+
+    lineout= "#     rad      SB        SBerr       \n"
+    OUTFH.write(lineout)
+
+    lineout= "# (arcsec) (mag/arcsec) (error)   \n"
+    OUTFH.write(lineout)
+
+    for idx, item in reversed(list(enumerate(xradq))):
+        lineout= "{0:.3f} {1:.3f} {2:.3f} \n".format(xradq[idx],ysbq[idx],ysberrq[idx])
+        OUTFH.write(lineout)
+
+    OUTFH.close()
+
+    # output for model 
+    OUTFH = open (params.sboutput+".mod.txt","w")
+
+    lineout= "#        sectors_photometry used with q={} and pa={} (same as GALFIT) \n".format(galpar.q,galpar.ang)
+    OUTFH.write(lineout)
+
+    lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
+    OUTFH.write(lineout)
+
+    lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
+    OUTFH.write(lineout)
+
+    lineout= "#           Surface Brightness   Model                \n"
+    OUTFH.write(lineout)
+
+    lineout= "#    rad       SB        SBerr \n"
+    OUTFH.write(lineout)
+
+    lineout= "# (arcsec) (mag/arcsec) (error)  \n"
+    OUTFH.write(lineout)
+
+    for idx, item in reversed(list(enumerate(xradm))):
+            
+        lineout= "{0:.3f} {1:.3f} {2:.3f} \n".format(xradm[idx],ysbm[idx],ysberrm[idx])
+
+        OUTFH.write(lineout)
+
+    OUTFH.close()
+
+
+
+
+
+
 
 
 def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,params,scale):
@@ -1107,41 +1116,47 @@ def SubComp(params, galpar, galcomps, sectcomps, axsec, n_sectors=19):
             ncomp=n+1
             ncomp=str(ncomp)
 
-            #subcomponent model 
+            PrintEllFilesComps(params,galpar,ncomp,xradq,ysbq,ysberrq)
 
-            OUTFH = open (params.sboutput+".sub-"+ncomp+".txt","w")
-
-            lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
-            OUTFH.write(lineout)
-
-            lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
-            OUTFH.write(lineout)
-
-            lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
-            OUTFH.write(lineout)
-
-
-            lineout= "#        Model   component {}            \n".format(ncomp)
-            OUTFH.write(lineout)
-
-            lineout= "#     rad      SB   SBerror  \n"
-            OUTFH.write(lineout)
-
-            lineout= "#   (arcsec) (mag/arcsec) (error) \n"
-            OUTFH.write(lineout)
-
-            for idx, item in reversed(list(enumerate(xradq))):
-
-                lineout= "{0:.3f} {1:.3f} {2:.3f}  \n".format(xradq[idx],ysbq[idx],ysberrq[idx])
-
-                OUTFH.write(lineout)
-
-            OUTFH.close()
 
         n=n+1
 
 
     return  xradq,ysbq,n
+
+def PrintEllFilesComps(params,galpar,ncomp,xradq,ysbq,ysberrq):
+    "Print surface brigthness of components to file "
+    #subcomponent model 
+
+    OUTFH = open (params.sboutput+".sub-"+ncomp+".txt","w")
+
+    lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
+    OUTFH.write(lineout)
+
+    lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
+    OUTFH.write(lineout)
+
+    lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
+    OUTFH.write(lineout)
+
+    lineout= "#        Model   component {}            \n".format(ncomp)
+    OUTFH.write(lineout)
+
+    lineout= "#     rad      SB   SBerror  \n"
+    OUTFH.write(lineout)
+
+    lineout= "#   (arcsec) (mag/arcsec) (error) \n"
+    OUTFH.write(lineout)
+
+    for idx, item in reversed(list(enumerate(xradq))):
+
+        lineout= "{0:.3f} {1:.3f} {2:.3f}  \n".format(xradq[idx],ysbq[idx],ysberrq[idx])
+
+        OUTFH.write(lineout)
+
+    OUTFH.close()
+
+
 
 
 def PlotSub(xradq,ysbq,nsub,axsec,namec,colorval):
@@ -1152,7 +1167,7 @@ def PlotSub(xradq,ysbq,nsub,axsec,namec,colorval):
 
     substr=namec+" "+np.str(nsub+1)
 
-#   axsec.plot(xradq, ysbq,'--',color='skyblue',linewidth=4,markersize=0.7,label=substr)
+    # axsec.plot(xradq, ysbq,'--',color='skyblue',linewidth=4,markersize=0.7,label=substr)
     axsec.plot(xradq, ysbq,'--',color=colorval,linewidth=1.5,markersize=0.7,label=substr)
 
 
@@ -1386,72 +1401,7 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
             rtxtang=np.int(np.round(txtang)) 
 
-            # galaxy
-            OUTFH = open (params.sboutput+"-"+str(rtxtang)+".gal.txt","w")
-
-            lineout= "# Values along radius with ang = {} from major axis \n".format(rtxtang)
-            OUTFH.write(lineout)
-
-            lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
-            OUTFH.write(lineout)
-
-            lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel]\n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
-            OUTFH.write(lineout)
-
-            lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
-            OUTFH.write(lineout)
-
-
-            lineout= "#            Galaxy                                   \n"
-            OUTFH.write(lineout)
-
-            lineout= "#     rad      SB              \n"
-            OUTFH.write(lineout)
-
-            lineout= "# (arcsec) (mag/arcsec)    \n"
-            OUTFH.write(lineout)
-
-            for idx, item in enumerate(r):
-
-                lineout= "{0:.3f} {1:.3f} \n".format(r[idx],mgesb[w][idx])
-
-                OUTFH.write(lineout)
-
-            OUTFH.close()
-
-            #model
-            OUTFH = open (params.sboutput+"-"+str(rtxtang)+".mod.txt","w")
-
-            lineout= "# Values along radius with ang = {} from major axis \n".format(rtxtang)
-            OUTFH.write(lineout)
-
-            lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
-            OUTFH.write(lineout)
-
-            lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
-            OUTFH.write(lineout)
-
-            lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
-            OUTFH.write(lineout)
-
-
-            lineout= "#        Model                \n"
-            OUTFH.write(lineout)
-
-            lineout= "#     rad      SB     \n"
-            OUTFH.write(lineout)
-
-            lineout= "#   (arcsec) (mag/arcsec) \n"
-            OUTFH.write(lineout)
-
-            for idx, item in enumerate(r2):
-
-                lineout= "{0:.3f} {1:.3f}  \n".format(r2[idx],mgemodsb[wmod][idx])
-
-                OUTFH.write(lineout)
-
-            OUTFH.close()
-
+            PrintFilesGax(params,galpar,rtxtang,r,mgesb,w,r2,mgemodsb,wmod)
 
 
         if params.flagrid == True:
@@ -1474,7 +1424,7 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
                 #wtemp = np.nonzero(mgeanglesub[ii] == sectors[j])[0]
         
-######################## TEST :############  
+######################## Patch for angle :############  
                 alpha = sectors[j]
                 angsec2= 90-galcomps.PosAng[ii]
                 if angsec < 0:
@@ -1484,25 +1434,36 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
                 alpha2 = alpha  + angsec - angsec2 
 
+                if alpha2 < 0:
+                    alpha2 = 360 + alpha2
+
+                if alpha2 > 90 and alpha2 <=270:
+                    alpha2 = np.abs(180-alpha2)
+
+                if alpha2 > 270 and alpha2 <=360:
+                    alpha2 = np.abs(360-alpha2)
+
+
+                # search for the nearest angle for subcomponent:
                 jj=(np.abs(sectorsub[ii]-alpha2)).argmin()  
 
-                print("hola C{}: {}; Axrat: {}, angsec: {} alpha2 {} ".format(ii,sectorsub[ii][jj],galcomps.AxRat[ii],90-galcomps.PosAng[ii],alpha2))
+                diffangle =  sectorsub[ii][jj] - alpha2
+
+                print("hola C{}: Axrat: {:.3f}, alpha: {:.3f} angsec: {:.3f} ; theta2: {:.3f} sector {:.3f}; alpha2 {:.3f} ".format(ii,galcomps.AxRat[ii],alpha,angsec,90-galcomps.PosAng[ii],sectorsub[ii][jj],alpha2))
+
 
 
 ###############################################
-
-                #El chiste es buscar cual j de sectorsub es
+                
                 #wtemp = np.nonzero(mgeanglesub[ii] == sectorsub[ii][j])[0]
                 wtemp = np.nonzero(mgeanglesub[ii] == sectorsub[ii][jj])[0]
                 wtemp = wtemp[np.argsort(mgeradsub[ii][wtemp])]
-
 
       
                 rtemp = mgeradsub[ii][wtemp]
 
                 colorval = scalarMap.to_rgba(values[ii])
                 if params.flaglogx == False:
-
                 #    axsec[row, 0].plot(rtemp, mgesbsub[ii][wtemp],'--',color='skyblue', linewidth=2)
                     axsec[row, 0].plot(rtemp, mgesbsub[ii][wtemp],'--',color=colorval, linewidth=1.5)
                 else:
@@ -1512,43 +1473,8 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
                 if params.flagsbout == True:
                     ncomp=ii+1
                     ncomp=str(ncomp)
-                    #subcomponent model 
-                    OUTFH = open (params.sboutput+"-"+str(rtxtang)+".sub-"+ncomp+".txt","w")
 
-                    lineout= "# Values along radius with ang = {} from major axis \n".format(rtxtang)
-                    OUTFH.write(lineout)
-
-                    #lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
-                    #OUTFH.write(lineout)
-
-                    lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galcomps.AxRat[ii],90-galcomps.PosAng[ii])
-                    OUTFH.write(lineout)
-
-
-                    lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
-                    OUTFH.write(lineout)
-
-                    lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
-                    OUTFH.write(lineout)
-
-
-                    lineout= "#        Model   component {}            \n".format(ncomp)
-                    OUTFH.write(lineout)
-
-                    lineout= "#     rad      SB     \n"
-                    OUTFH.write(lineout)
-
-                    lineout= "#   (arcsec) (mag/arcsec) \n"
-                    OUTFH.write(lineout)
-
-                    for idx, item in enumerate(rtemp):
-
-                        lineout= "{0:.3f} {1:.3f}  \n".format(rtemp[idx], mgesbsub[ii][wtemp][idx])
-
-                        OUTFH.write(lineout)
-
-                    OUTFH.close()
-
+                    PrintFilesComps(params,galpar,galcomps,rtxtang,ncomp,diffangle,rtemp,mgesbsub,ii,wtemp)
 
                 ii+=1
 
@@ -1624,6 +1550,117 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
         axpix2.tick_params(which='both', width=2)
         axpix2.tick_params(which='major', length=7)
         axpix2.tick_params(which='minor', length=4, color='r')
+
+
+def PrintFilesGax(params,galpar,rtxtang,r,mgesb,w,r2,mgemodsb,wmod):
+    "Print surface parameters of galaxy and model to outfile "
+
+    # galaxy
+    OUTFH = open (params.sboutput+"-"+str(rtxtang)+".gal.txt","w")
+
+    lineout= "# Values along radius with ang = {} from major axis \n".format(rtxtang)
+    OUTFH.write(lineout)
+
+    lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
+    OUTFH.write(lineout)
+
+    lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel]\n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
+    OUTFH.write(lineout)
+
+    lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
+    OUTFH.write(lineout)
+
+    lineout= "#            Galaxy                                   \n"
+    OUTFH.write(lineout)
+
+    lineout= "#     rad      SB              \n"
+    OUTFH.write(lineout)
+
+    lineout= "# (arcsec) (mag/arcsec)    \n"
+    OUTFH.write(lineout)
+
+    for idx, item in enumerate(r):
+
+        lineout= "{0:.3f} {1:.3f} \n".format(r[idx],mgesb[w][idx])
+
+        OUTFH.write(lineout)
+
+    OUTFH.close()
+
+    #model
+    OUTFH = open (params.sboutput+"-"+str(rtxtang)+".mod.txt","w")
+
+    lineout= "# Values along radius with ang = {} from major axis \n".format(rtxtang)
+    OUTFH.write(lineout)
+
+    lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
+    OUTFH.write(lineout)
+
+    lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
+    OUTFH.write(lineout)
+
+    lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
+    OUTFH.write(lineout)
+
+    lineout= "#        Model                \n"
+    OUTFH.write(lineout)
+
+    lineout= "#     rad      SB     \n"
+    OUTFH.write(lineout)
+
+    lineout= "#   (arcsec) (mag/arcsec) \n"
+    OUTFH.write(lineout)
+
+    for idx, item in enumerate(r2):
+
+        lineout= "{0:.3f} {1:.3f}  \n".format(r2[idx],mgemodsb[wmod][idx])
+
+        OUTFH.write(lineout)
+
+    OUTFH.close()
+
+
+def PrintFilesComps(params,galpar,galcomps,rtxtang,ncomp,diffangle,rtemp,mgesbsub,ii,wtemp):
+
+    #subcomponent model 
+    OUTFH = open (params.sboutput+"-"+str(rtxtang)+".sub-"+ncomp+".txt","w")
+
+    lineout= "# Values along radius with ang = {} from major axis \n".format(rtxtang)
+    OUTFH.write(lineout)
+
+    lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galcomps.AxRat[ii],90-galcomps.PosAng[ii])
+    OUTFH.write(lineout)
+
+    lineout= "# In the multiplot, there is a difference of {:.3f} for the one indicated in the top right corner.\n".format(diffangle)
+    OUTFH.write(lineout)
+
+    lineout= "# The above is due to differences in the sectors_photometry for the galaxy and individual components.\n"
+    OUTFH.write(lineout)
+
+    lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
+    OUTFH.write(lineout)
+
+    lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
+    OUTFH.write(lineout)
+
+    lineout= "#        Model   component {}            \n".format(ncomp)
+    OUTFH.write(lineout)
+
+    lineout= "#     rad      SB     \n"
+    OUTFH.write(lineout)
+
+    lineout= "#   (arcsec) (mag/arcsec) \n"
+    OUTFH.write(lineout)
+
+    for idx, item in enumerate(rtemp):
+
+        lineout= "{0:.3f} {1:.3f}  \n".format(rtemp[idx], mgesbsub[ii][wtemp][idx])
+
+        OUTFH.write(lineout)
+
+    OUTFH.close()
+
+
 
 
 def FindSB(xarcq, ymgeq, numsectors):
@@ -2222,7 +2259,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
             params.band=header["FILTNAM1"] 
         else:
             print("WARNING: filter not found. I will use default filter: ",params.band) 
-            print("use --filter option to change band") 
+            print("use -filter option to change band") 
     else:
         print("using {} band to correct for galactic extinction ".format(params.band)) 
 
@@ -2341,10 +2378,10 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     lineout = "# This box size is computed using an ellipse with a = {:.2f} and b = {:.2f} centered at xc,yc \n".format(aell,bell)
     OUTPHOT.write(lineout)
 
-    lineout = "# This ellipse is computed using minlevel = {} (use --minlevel option to change it) \n".format(params.minlevel)
+    lineout = "# This ellipse is computed using minlevel = {} (use -minlevel option to change it) \n".format(params.minlevel)
     OUTPHOT.write(lineout)
 
-    lineout = "# All the photometric quantities are computed for band {} (use --filter option to change it) \n".format(params.band)
+    lineout = "# All the photometric quantities are computed for band {} (use -filter option to change it) \n".format(params.band)
     OUTPHOT.write(lineout)
 
     lineout = "# correction constants applied here: \n"
