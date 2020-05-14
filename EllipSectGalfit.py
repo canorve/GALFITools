@@ -44,7 +44,7 @@ def main():
     #class for saving user's parameters
     params=InputParams()
 
-    OptionHandleList = ['-logx', '-q', '-pa','-comp','-pix','-ranx','-rany','-grid','-dpi','-sbout','-noplot','-minlevel','-sectors','-out','-object','-filter','-snr','-help','-checkimg','-noned','-distmod','-magcor','-scalekpc','-sbdim']
+    OptionHandleList = ['-logx', '-q', '-pa','-comp','-pix','-ranx','-rany','-grid','-dpi','-sbout','-noplot','-minlevel','-sectors','-phot','-object','-filter','-snr','-help','-checkimg','-noned','-distmod','-magcor','-scalekpc','-sbdim']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
@@ -66,7 +66,7 @@ def main():
     if options['dpi'] != None:
         params.flagdpi=True
     if options['comp'] != None:
-        params.flagsub=True
+        params.flagcomp=True
         print("Plotting subcomponents ")
     if options['noplot'] != None:
         params.flagnoplot=True
@@ -74,8 +74,8 @@ def main():
     if options['sbout'] != None:
         params.flagsbout=True
         print("surface brightness output file will be created")
-    if options['out'] != None:
-        params.flagout=True
+    if options['phot'] != None:
+        params.flagphot=True
         print("output photometry file will be created")
     if options['minlevel'] != None:
         params.flagminlevel=True
@@ -295,7 +295,7 @@ def main():
         msg="surface brightness output file: {} ".format(params.sboutput+".txt")
         print(msg)
 
-    if params.flagout == True: 
+    if params.flagphot == True: 
         msg="output photometry file: {} ".format(params.output)
         print(msg)
 
@@ -356,7 +356,7 @@ def main():
     sectgalax,sectmodel=SectPhot(galpar, params, n_sectors=numsectors, minlevel=minlevel)
 
     
-    if params.flagsub:
+    if params.flagcomp:
         sectcomps=SectPhotComp(galpar, params, galcomps, n_sectors=numsectors, minlevel=minlevel)
 
 
@@ -399,7 +399,7 @@ def main():
     ########################################################
 
 
-    if params.flagout:
+    if params.flagphot:
         print("Computing output photometry ... ")
         OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps)
 
@@ -429,7 +429,7 @@ class InputParams:
     flaglogx=False
     flagq=False
     flagpa=False
-    flagsub=False
+    flagcomp=False
     flagpix=False
     flagranx=[False,False]
     flagrany=[False,False]
@@ -437,7 +437,7 @@ class InputParams:
     flagrid=False
     flagdpi=False
     flagsbout=False
-    flagout=False
+    flagphot=False
     flagminlevel=False
     flagsectors=False
     flagobj=False
@@ -570,31 +570,56 @@ class GalfitComps:
 
 def Help():
 
-    print ('Missing arguments')
-    print ("Usage:\n %s [GALFITOutputFile] [-logx] [-q AxisRatio] [-pa PositionAngle] [-sub] [-pix] [-ranx/y Value] [-grid] [-dpi Value] [-noplot] [-out] " % (sys.argv[0]))
+    print ("Usage:\n %s [GALFITOutputFile] [-logx] [-q AxisRatio] [-pa PositionAngle] [-comp] [-pix] [-ranx/y Value] [-grid] [-dpi Value] [-noplot] [-phot] " % (sys.argv[0]))
+    print ("More options: [-sbout] [-noplot] [-minlevel Value] [-sectors Value] [-object Name] [-filter Name] [-snr] [-help] [-checkimg] [-noned] [-distmod Value] [-magcor Value] [-scalekpc Value][-sbdim Value] ") 
+
     print ("GALFITOutputFile: GALFIT output file ")
     print ("logx: activates X-axis as logarithm ")
     print ("q: introduce axis ratio ")
     print ("pa: introduce position angle (same as GALFIT) ")
-    print ("sub: plots subcomponents ")
+    print ("comp: plots individual components ")
     print ("pix: plot the top x-axis in pixels ")
     print ("ranx: constant that multiplies the range of the x axis or xmin-xmax range")
     print ("rany: constant that multiplies the range of the y axis or ymin-ymax range")
     print ("grid: display a grid in the plot ")
-    print ("dpi: dots per inch for saving plot ")
-    print ("noplot: do not display images")
+    print ("dpi: dots per inch used for images files ")
+    print ("noplot: avoid displaying windows and directly creates images")
     print ("sbout: creates output file containing the surface brightness profiles")
+    print ("snr: Creates Signal to Noise image ")
+
+
+    print ("                OUTPUT               ")
+    print ("phot: Compute photometry. Check the created output file")
+    print ("the below options are used only if 'phot' is enabled ")    
+    print ("      object: used for 'phot' to search in NED  ")
+    print ("      filter: used for 'phot' to indicate band for NED ")
+    print ("      noned: avoid to connect to NED")
+    print ("any of the following options disabled the connection of NED ")    
+    print ("      distmod: Introduce Distance Modulus ")
+    print ("      magcor: Introduce Galactic Extinction ")
+    print ("      scalekpc: Introduce equivalence of ''/kiloparsec ")
+    print ("      sbdim: Introduce surface brightness dimming")
+    print ("                ADVANCED               ")
+    print ("minlevel: parameter given directly to sectors_photometry.")
+    print ("                      It stops when it founds this value")
+
+    print ("sectors: parameter given directly to sectors_photometry. Divide elipse in 'sectors' ")
+    print ("                      Check sectors_photometry manual")
+    print ("checkimg: save the images used for sectors_photometry in individual components")
+
+
+    print ("help: This menu ")
+
 
 
     print ("Example:\n %s galfit.01 -logx" % (sys.argv[0]))
-    print ("or Example:\n %s galfit.02 -q 0.35 -pa 60 -sub -ranx 2 -out " % (sys.argv[0]))
-    print ("or Example:\n %s galfit.02 -q 0.35 -pa 60 -sub -ranx 1-20" % (sys.argv[0]))
+    print ("or Example:\n %s galfit.02 -q 0.35 -pa 60 -comp -ranx 2 -out " % (sys.argv[0]))
+    print ("or Example:\n %s galfit.02 -q 0.35 -pa 60 -comp -ranx 1-20" % (sys.argv[0]))
     print ("see https://github.com/canorve/GALFITools/blob/master/docs/Ellipse.md  for more examples")
 
+
+
     sys.exit()
-
-
-
 
 
     return True
@@ -655,7 +680,7 @@ def SectPhot(galpar, params, n_sectors=19, minlevel=0):
 def SectPhotComp(galpar, params, galcomps, n_sectors=19, minlevel=0):
     """ calls to function sectors_photometry for subcomponents """
 
-    if (params.flagout) and (not(os.path.isfile(params.namesig))):
+    if (params.flagphot) and (not(os.path.isfile(params.namesig))):
 
         print("running galfit to create sigma image and individual model images...")
 
@@ -696,7 +721,7 @@ def SectPhotComp(galpar, params, galcomps, n_sectors=19, minlevel=0):
         errmsg="file {} does not exist".format(params.namesub)
         assert os.path.isfile(params.namesub), errmsg
 
-        if (os.path.isfile(params.namesig) and (params.flagout)):
+        if (os.path.isfile(params.namesig) and (params.flagphot)):
             print("using existing sigma image")
 
     ##
@@ -852,7 +877,7 @@ def EllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps,n_sec
     #### Creating Subcomponents images with Galfit
 
 
-    if params.flagsub:
+    if params.flagcomp:
 
 
         xradq,ysbq,n=SubComp(params, galpar, galcomps, sectcomps, axsec, n_sectors=n_sectors)
@@ -1238,7 +1263,7 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     mgemodsb= galpar.mgzpt - 2.5*np.log10(mgemodcount/galpar.exptime) + 2.5*np.log10(galpar.scale**2) + 0.1
 
 
-    if params.flagsub:
+    if params.flagcomp:
 
         wtemp=[]
         mgesbsub=[]
@@ -1412,7 +1437,7 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
             #  axsec[row,0].grid(True)
 
-        if params.flagsub == True:
+        if params.flagcomp == True:
             ii=0
                 #color value
             values = range(len(galcomps.N))
@@ -2206,7 +2231,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
         errmsg="file {} does not exist".format(params.namesig)
         assert os.path.isfile(params.namesig), errmsg
     else:
-        if not(params.flagsub):
+        if not(params.flagcomp):
             print("using existing sigma image ")
 
 
