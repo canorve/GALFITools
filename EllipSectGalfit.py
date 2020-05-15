@@ -585,12 +585,12 @@ def Help():
     print ("dpi: dots per inch used for images files ")
     print ("noplot: avoid displaying windows and directly creates images")
     print ("sbout: creates output file containing the surface brightness profiles")
-    print ("snr: Creates Signal to Noise image ")
 
 
     print ("                OUTPUT               ")
     print ("phot: Compute photometry. Check the created output file")
     print ("the below options are used only if 'phot' is enabled ")    
+    print ("      snr: Creates Signal to Noise image ")
     print ("      object: used for 'phot' to search in NED  ")
     print ("      filter: used for 'phot' to indicate band for NED ")
     print ("      noned: avoid to connect to NED")
