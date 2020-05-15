@@ -9,30 +9,33 @@ plots for separate angles.
 **Code: [EllipSectGalfit.py](../EllipSectGalfit.py)**
 
 This is a "quick" substitute for IRAF's ellipse
-routine. It creates an "ellipse" profile of the galaxy
+routine. It creates an Surface brightness profile for the galaxy
 and model.
 
 The options to run the code in the terminal (or ipython) are:
 
 ```
- ./EllipSectGalfit.py [GALFITOutputFile] [--logx] [--q AxisRatio] [--pa PositionAngle] [--sub] [--pix] [--ranx Value] [--ranx/y Value] [--grid] [--dpi Value] [--noplot] [--out]
+ ./EllipSectGalfit.py [GALFITOutputFile] [-logx] [-q AxisRatio] [-pa PositionAngle] [-comp] [-pix] [-ranx/y Value] [-grid] [-dpi Value] [-noplot] [-phot] [-sbout] [-noplot] [-minlevel Value] [-sectors Value] [-object Name] [-filter Name] [-snr] [-help] [-checkimg] [-noned] [-distmod Value] [-magcor Value] [-scalekpc Value][-sbdim Value]
  ```
 
 Examples: 
 
 ```
- ./EllipSectGalfit.py galfit.01 --logx
+ ./EllipSectGalfit.py galfit.01 -logx
 ```
 
 *or* 
 
 ```
- ./EllipSectGalfit.py galfit.02 --q 0.35 --pa 60 --sub
+ ./EllipSectGalfit.py galfit.02 -q 0.35 -pa 60 -comp
 ```
-
-## Options 
+### Input
 
 **GALFITOutputFile**: GALFIT output file  (e.g. galfit.01)
+
+## OPTIONS
+
+**help**: Help menu
 
 **logx**: plots X-axis as logarithm
 
@@ -41,7 +44,7 @@ Examples:
 **pa**: position angle value (same as GALFIT). If ignored, it takes the one 
 from the last component in GALFITOutputFile.
 
-**sub**: plots include the model subcomponents
+**comp**: plots include the individual model components
 
 **pix**: plots the top of x-axis in pixels
 
@@ -57,8 +60,47 @@ it can be used as xmin-xmax to change range
 
 **dpi**: dots per inch value to increase/decrease resolution.
 
-**out**: creates output file from the data of the plot. 
+**sbout**: Creates output file containing the surface brightness profiles.
 
+
+### Photometry output options
+
+**phot**: Compute photometry. Check the variables created in output file.
+
+The below options are used only if 'phot' is enabled:
+
+**snr**: Creates a signal to noise image. This is created dividing the galaxy image
+with the one sigma image created by GALFIT
+
+**object**: used for 'phot' to search in NED. For instance, if you are looking
+for photometry data for galaxy m51, then used as "-object m51" the same name 
+that you will used to search in NED.
+
+**filter**: used for 'phot' to indicate band for NED. If you need galactic correction
+for B  filter then used as "-filter B". Band "R" is the default option.  
+
+
+Any of the following options disabled the connection to NED
+
+**noned**: avoid to connect to NED. No luminosity nor absolute magnitude is computed.
+
+**distmod**: manual input for Distance Modulus.  
+
+**magcor**: manual input for Galactic Extinction. 
+
+**scalekpc**: manual input for equivalence of ''/kiloparsec. 
+
+**sbdim**: manual input for surface brightness dimming.
+
+### Advanced 
+
+**minlevel**: Parameter given directly to sectors_photometry.
+                It stops when it founds this value. Check sectors_photometry manual 
+
+**sectors**: parameter given directly to sectors_photometry. Divide ellipse in 'sectors'
+                      Check sectors_photometry manual
+                     
+**checkimg**: save the images used for sectors_photometry in individual components
 
 ## Notes
 
@@ -94,14 +136,16 @@ pip install mgefit
     must be the last GALFIT fit. 
 
 * The angles shown in the multi-plot are measured from the galaxy's major axis.
-    They are not measured from the Y-axis as it is the in GALFIT.
+    They are not measured from the Y-axis as it is the case in GALFIT.
 
 * In order for the program to detect the components, they must share the same 
     center (x,y).
 
-* For the sub option, some odd variations in surface brightness can 
-    be seen along radius for some components (see gaussian 6 in example 3).
-    This is due to differences between q, pa and q, pa of the subcomponent. 
+* For the comp option, It could be some small differences between the angle shown 
+    in the top right corner and the one from each component. This is because
+    *sectors_photometry* is applied different for individual components and the 
+    galaxy itself. They are at different angles. To see the real angle which the 
+    component is measured check the output file at that angle with the *-sbout* option 
 
 ## Examples
 
@@ -120,8 +164,8 @@ with 7 gaussians (images for this galaxy are displayed above).
     ![A85 ](../img/A85.log.png)
     ![A85 ](../img/A85.mul.log.png)
 
-* Example 3: 
-    ./EllipSectGalfit.py galfit.46 --sub
+* Example 3 (UPDATE THIS): 
+    ./EllipSectGalfit.py galfit.46 --comp
     (displays the 7 gaussians)
 
     ![A85 ](../img/A85.sub.png)
