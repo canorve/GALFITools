@@ -159,7 +159,7 @@ Any of the following options disabled the connection to NED
 
      ./EllipSectGalfit.py galfit.02 -q 0.35 -pa 60 
 
-### plot Examples
+### Plot Examples
 
 See the examples below for an elliptical galaxy that was fitted 
 with 7 gaussians (images for this galaxy are displayed above). 
@@ -229,7 +229,7 @@ with 7 gaussians (images for this galaxy are displayed above).
 
     ./EllipSectGalfit.py galfit.46 -comp -sbout 
 
-### phot Examples
+### Phot Examples
 
 *   *EllipSectGalfit* can calculate additional info besides the ones 
     that are already included in the galfit.XX or fit.log files.  
@@ -279,14 +279,14 @@ with 7 gaussians (images for this galaxy are displayed above).
     EllipSectGalfit does not correct by K-correction. 
 
 
-### advanced Examples
+### Advanced Examples
 
-*    The following options requires that the user has already experienced with 
-     the *sectors_photometry* function of the mge library. 
+*   The following options requires that the user has already experienced with 
+    the *sectors_photometry* function of the mge library. 
 
     minlevel is a parameter that is given directly to *sectors_photometry* 
     It indicates when the functions stops. For example, the following command
-    tells to *sectors_photomety* that stops when the sky is 0.
+    tells to *sectors_photometry* that stops when the sky is 0.
 
     ./EllipSectGalfit.py galfit.14 -minlevel 0
 
@@ -297,7 +297,7 @@ with 7 gaussians (images for this galaxy are displayed above).
 
 *   sectors option is another parameter that is given directly to *sectors_photometry*.
     It tells the function in how many sectors it should divide. *sectors_photometry* 
-    use four-fold simmetry.  
+    use four-fold symmetry.  
 
     ./EllipSectGalfit.py galfit.14 -sectors 19
 
