@@ -357,6 +357,7 @@ def main():
 
     
     if params.flagcomp:
+        #change to minlevel =0 ?
         sectcomps=SectPhotComp(galpar, params, galcomps, n_sectors=numsectors, minlevel=minlevel)
 
 
@@ -1474,7 +1475,7 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
                 diffangle =  sectorsub[ii][jj] - alpha2
 
-                print("hola C{}: Axrat: {:.3f}, alpha: {:.3f} angsec: {:.3f} ; theta2: {:.3f} sector {:.3f}; alpha2 {:.3f} ".format(ii,galcomps.AxRat[ii],alpha,angsec,90-galcomps.PosAng[ii],sectorsub[ii][jj],alpha2))
+                #print("Check C{}: Axrat: {:.3f}, alpha: {:.3f} angsec: {:.3f} ; theta2: {:.3f} sector {:.3f}; alpha2 {:.3f} ".format(ii,galcomps.AxRat[ii],alpha,angsec,90-galcomps.PosAng[ii],sectorsub[ii][jj],alpha2))
 
 
 
