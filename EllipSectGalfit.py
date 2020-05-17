@@ -1142,7 +1142,7 @@ def SubComp(params, galpar, galcomps, sectcomps, axsec, n_sectors=19):
             ncomp=n+1
             ncomp=str(ncomp)
 
-            PrintEllFilesComps(params,galpar,ncomp,xradq,ysbq,ysberrq)
+            PrintEllFilesComps(params,galpar,namec,ncomp,xradq,ysbq,ysberrq)
 
 
         n=n+1
@@ -1150,11 +1150,11 @@ def SubComp(params, galpar, galcomps, sectcomps, axsec, n_sectors=19):
 
     return  xradq,ysbq,n
 
-def PrintEllFilesComps(params,galpar,ncomp,xradq,ysbq,ysberrq):
+def PrintEllFilesComps(params,galpar,namecomp,ncomp,xradq,ysbq,ysberrq):
     "Print surface brigthness of components to file "
     #subcomponent model 
 
-    OUTFH = open (params.sboutput+".sub-"+ncomp+".txt","w")
+    OUTFH = open (params.sboutput+".comp-"+ncomp+".txt","w")
 
     lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
     OUTFH.write(lineout)
@@ -1165,7 +1165,7 @@ def PrintEllFilesComps(params,galpar,ncomp,xradq,ysbq,ysberrq):
     lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
     OUTFH.write(lineout)
 
-    lineout= "#        Model   component {}            \n".format(ncomp)
+    lineout= "#        Model  {}   component {}            \n".format(namecomp,ncomp)
     OUTFH.write(lineout)
 
     lineout= "#     rad      SB   SBerror  \n"
