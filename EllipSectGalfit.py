@@ -357,8 +357,10 @@ def main():
 
     
     if params.flagcomp:
-        #change to minlevel =0 ?
-        sectcomps=SectPhotComp(galpar, params, galcomps, n_sectors=numsectors, minlevel=minlevel)
+        #Note: sectors photometry for components always finished 
+        # in minlevel = 0 regardless of the input -minlevel
+        #sectcomps=SectPhotComp(galpar, params, galcomps, n_sectors=numsectors, minlevel=minlevel)
+        sectcomps=SectPhotComp(galpar, params, galcomps, n_sectors=numsectors, minlevel=0)
 
 
 
@@ -663,9 +665,11 @@ def SectPhot(galpar, params, n_sectors=19, minlevel=0):
 
     ###################################################
     
-    #  model:
+    #  model: 
     sectmodel = sectors_photometry(galpar.model, eps, angsec, xctemp, yctemp,minlevel=minlevel,
             plot=params.dplot, badpixels=maskb, n_sectors=n_sectors)
+    #sectmodel = sectors_photometry(galpar.model, eps, angsec, xctemp, yctemp,minlevel=0,
+    #        plot=params.dplot, badpixels=maskb, n_sectors=n_sectors)
 
 
     if params.dplot:
@@ -950,12 +954,6 @@ def PrintEllFilesGax(params,galpar,xradq,ysbq,ysberrq,xradm,ysbm,ysberrm):
     OUTFH.close()
 
 
-
-
-
-
-
-
 def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,params,scale):
     """  Produces final best-fitting plot  """
 
@@ -1193,8 +1191,8 @@ def PlotSub(xradq,ysbq,nsub,axsec,namec,colorval):
 
     substr=namec+" "+np.str(nsub+1)
 
-    # axsec.plot(xradq, ysbq,'--',color='skyblue',linewidth=4,markersize=0.7,label=substr)
-    axsec.plot(xradq, ysbq,'--',color=colorval,linewidth=1.5,markersize=0.7,label=substr)
+    axsec.plot(xradq, ysbq,'--',color=colorval,linewidth=1.7,markersize=0.7,label=substr)
+    #axsec.plot(xradq, ysbq,'--',color=colorval,linewidth=1.5,markersize=0.7,label=substr)
 
 
 
@@ -1450,7 +1448,7 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
                 #wtemp = np.nonzero(mgeanglesub[ii] == sectors[j])[0]
         
-######################## Patch for angle :############  
+                ######################## Patch for angle :############  
                 alpha = sectors[j]
                 angsec2= 90-galcomps.PosAng[ii]
                 if angsec < 0:
@@ -1474,12 +1472,16 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
                 jj=(np.abs(sectorsub[ii]-alpha2)).argmin()  
 
                 diffangle =  sectorsub[ii][jj] - alpha2
-
+                # uncomment below to check angles in multiplot:
                 #print("Check C{}: Axrat: {:.3f}, alpha: {:.3f} angsec: {:.3f} ; theta2: {:.3f} sector {:.3f}; alpha2 {:.3f} ".format(ii,galcomps.AxRat[ii],alpha,angsec,90-galcomps.PosAng[ii],sectorsub[ii][jj],alpha2))
+                # alpha: angle from major axis of galaxy
+                # angsec: position angle of the galaxy
+                # theta2: position angle of the component
+                # alpha2: angle from major axis of component
+                # sectors: angle obtained from sectors_photometry
+                # it is expected that alpha2 and sectors are the closest possible.
 
-
-
-###############################################
+                ###############################################
                 
                 #wtemp = np.nonzero(mgeanglesub[ii] == sectorsub[ii][j])[0]
                 wtemp = np.nonzero(mgeanglesub[ii] == sectorsub[ii][jj])[0]
