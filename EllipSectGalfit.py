@@ -902,7 +902,7 @@ def PrintEllFilesGax(params,galpar,xradq,ysbq,ysberrq,xradm,ysbm,ysberrm):
     lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
     OUTFH.write(lineout)
 
-    lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
+    lineout= "#  xc = {:.2f}  yc = {:.2f}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
     OUTFH.write(lineout)
 
     lineout= "#            Galaxy                                   \n"
@@ -929,7 +929,7 @@ def PrintEllFilesGax(params,galpar,xradq,ysbq,ysberrq,xradm,ysbm,ysberrm):
     lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
     OUTFH.write(lineout)
 
-    lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
+    lineout= "#  xc = {:.2f}  yc = {:.2f}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
     OUTFH.write(lineout)
 
     lineout= "#           Surface Brightness   Model                \n"
@@ -1162,7 +1162,7 @@ def PrintEllFilesComps(params,galpar,namecomp,ncomp,xradq,ysbq,ysberrq):
     lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
     OUTFH.write(lineout)
 
-    lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
+    lineout= "#  xc = {:.2f}  yc = {:.2f}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
     OUTFH.write(lineout)
 
     lineout= "#        Model  {}   component {}            \n".format(namecomp,ncomp)
@@ -1593,7 +1593,7 @@ def PrintFilesGax(params,galpar,rtxtang,r,mgesb,w,r2,mgemodsb,wmod):
     lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel]\n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
     OUTFH.write(lineout)
 
-    lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
+    lineout= "#  xc = {:.2f}  yc = {:.2f}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
     OUTFH.write(lineout)
 
     lineout= "#            Galaxy                                   \n"
@@ -1625,7 +1625,7 @@ def PrintFilesGax(params,galpar,rtxtang,r,mgesb,w,r2,mgemodsb,wmod):
     lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
     OUTFH.write(lineout)
 
-    lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
+    lineout= "#  xc = {:.2f}  yc = {:.2f}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
     OUTFH.write(lineout)
 
     lineout= "#        Model                \n"
@@ -1666,7 +1666,7 @@ def PrintFilesComps(params,galpar,galcomps,rtxtang,ncomp,diffangle,rtemp,mgesbsu
     lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
     OUTFH.write(lineout)
 
-    lineout= "#  xc = {}  yc = {}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
+    lineout= "#  xc = {:.2f}  yc = {:.2f}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
     OUTFH.write(lineout)
 
     lineout= "#        Model   component {}            \n".format(ncomp)
