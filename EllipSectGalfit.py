@@ -1649,7 +1649,7 @@ def PrintFilesGax(params,galpar,rtxtang,r,mgesb,w,r2,mgemodsb,wmod):
 def PrintFilesComps(params,galpar,galcomps,rtxtang,ncomp,diffangle,rtemp,mgesbsub,ii,wtemp):
 
     #subcomponent model 
-    OUTFH = open (params.sboutput+"-"+str(rtxtang)+".sub-"+ncomp+".txt","w")
+    OUTFH = open (params.sboutput+"-"+str(rtxtang)+".comp-"+ncomp+".txt","w")
 
     lineout= "# Values along radius with ang = {} from major axis \n".format(rtxtang)
     OUTFH.write(lineout)
@@ -1669,7 +1669,7 @@ def PrintFilesComps(params,galpar,galcomps,rtxtang,ncomp,diffangle,rtemp,mgesbsu
     lineout= "#  xc = {:.2f}  yc = {:.2f}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
     OUTFH.write(lineout)
 
-    lineout= "#        Model   component {}            \n".format(ncomp)
+    lineout= "#        Model {} component {}            \n".format(galcomps.NameComp[ii],ncomp)
     OUTFH.write(lineout)
 
     lineout= "#     rad      SB     \n"
