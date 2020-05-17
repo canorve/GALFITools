@@ -273,7 +273,7 @@ def main():
     params.namesec=params.namefile + "-gal.png"
     params.namemod=params.namefile + "-mod.png"
     params.namemul=params.namefile + "-mul.png"
-    params.namesub=params.namefile + "-sub.fits"
+    params.namesub=params.namefile + "-comp.fits"
 
     params.namesig=params.namefile + "-sig.fits"
 
