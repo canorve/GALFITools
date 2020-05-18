@@ -201,7 +201,7 @@ with 7 gaussians (images for this galaxy are displayed above).
     ![A85 ](../img/A85.rany1.png)
     ![A85 ](../img/A85.mul.rany1.png)
 
-* X-axis range vary from 1 to 50Example 7: 
+* X-axis range vary from 1 to 50: 
     ./EllipSectGalfit.py galfit.46 -ranx 1-50 
 
     ![A85 ](../img/A85.ranx2.png)
