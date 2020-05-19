@@ -9,7 +9,7 @@ plots for separate angles.
 **Code: [EllipSectGalfit.py](../EllipSectGalfit.py)**
 
 This is a "quick" substitute for IRAF's ellipse routine. It 
-creates an Surface brightness profile for the galaxy and model.
+creates a Surface brightness profile for the galaxy and model.
 
 In addition, *EllipSectGalfit* can compute variables such as Absolute Magnitude, 
 luminosity, Flux, total apparent magnitude, Bulge to Total Ratio, Tidal, Chinu
