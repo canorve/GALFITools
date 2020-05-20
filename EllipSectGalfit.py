@@ -2297,49 +2297,55 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
         if params.flagned: 
             print("No search in NED. Lum and abs Mag will not be computed")
 
+        GalExt=0
+        DistMod=0
+        DistMod2=0
+        Scalekpc=0
+        SbDim=0
+
+
     if maskmag.any():
 
-        if (params.flagweb and params.flagobj and not(params.flagned)):
 
-            CorMag = totMag - GalExt # corrected by galactic extinction 
+        CorMag = totMag - GalExt # corrected by galactic extinction 
             
-            AbsMag=CorMag - DistMod # No K correction applied
+        AbsMag=CorMag - DistMod # No K correction applied
 
-            AbsMag2=CorMag - DistMod2 # No K correction applied
+        AbsMag2=CorMag - DistMod2 # No K correction applied
 
-            # per component: 
-            CompCorMag = galcomps.Mag[maskmag] - GalExt # corrected by galactic extinction 
-            galcomps.AbsMag[maskmag] = CompCorMag - DistMod # No K correction applied
+        # per component: 
+        CompCorMag = galcomps.Mag[maskmag] - GalExt # corrected by galactic extinction 
+        galcomps.AbsMag[maskmag] = CompCorMag - DistMod # No K correction applied
         
 
-            if params.band in SunMag:
-                MSun = SunMag[params.band]
+        if params.band in SunMag:
+            MSun = SunMag[params.band]
 
-                Lum = 10**((MSun - AbsMag)/2.5)
-                # per component 
-                galcomps.Lum[maskmag]= 10**((MSun - galcomps.AbsMag[maskmag])/2.5)
-            else:
-                print("Absolute Magnitude for Band {} was not found. Check filter name ".format(params.band))
-                print("Luminosity will not be computed.")
+            Lum = 10**((MSun - AbsMag)/2.5)
+            # per component 
+            galcomps.Lum[maskmag]= 10**((MSun - galcomps.AbsMag[maskmag])/2.5)
+        else:
+            print("Absolute Magnitude for Band {} was not found. Check filter name ".format(params.band))
+            print("Luminosity will not be computed.")
 
-                Lum = 0
+            Lum = 0
 
-            #print("Magnitud Absoluta",AbsMag)
-            #print("Magnitud Absoluta using Distance Modulus independen of z ",AbsMag2)
-            #print("check references in ",params.namened)
+        #print("Magnitud Absoluta",AbsMag)
+        #print("Magnitud Absoluta using Distance Modulus independen of z ",AbsMag2)
+        #print("check references in ",params.namened)
 
 
     if maskgalax.any():
 
-        if (params.flagweb and params.flagobj and not(params.flagned)):
+        #if (params.flagweb and params.flagobj and not(params.flagned)):
 
-            galcomps.Rad50kpc[maskgalax] = galcomps.Rad50[maskgalax] * galpar.scale * Scalekpc
+        galcomps.Rad50kpc[maskgalax] = galcomps.Rad50[maskgalax] * galpar.scale * Scalekpc
 
-            galcomps.mme[maskgalax] = galcomps.mme[maskgalax] - GalExt - SbDim
-            galcomps.me[maskgalax] = galcomps.me[maskgalax] - GalExt - SbDim
+        galcomps.mme[maskgalax] = galcomps.mme[maskgalax] - GalExt - SbDim
+        galcomps.me[maskgalax] = galcomps.me[maskgalax] - GalExt - SbDim
  
-        else:
-            print("mean surface brightness at Re is not corrected for galactic extintion nor surface brightness dimming ")
+        #else:
+        #    print("mean surface brightness at Re is not corrected for galactic extintion nor surface brightness dimming ")
 
 
 
@@ -2411,6 +2417,8 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
     lineout = "# All the photometric quantities are computed for band {} (use -filter option to change it) \n".format(params.band)
     OUTPHOT.write(lineout)
+
+    
 
     lineout = "# correction constants applied here: \n"
     OUTPHOT.write(lineout)
