@@ -158,7 +158,7 @@ def main():
         opt={}
         OptionHandle="-minlevel"
         opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        params.minlevel=np.int(opt['minlevel'])
+        params.minlevel=np.float(opt['minlevel'])
 
     if params.flagsectors == True:
         opt={}
