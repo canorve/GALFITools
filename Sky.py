@@ -71,9 +71,41 @@ def main():
     img=imgdat[mask]  
 
 
+
     print("mean sky: {:.3f} ".format(img.mean()))
     print("std sky: {:.3f} ".format(img.std()))
     #print("rms sky: {:.3f} ".format(rms(img)))
+
+
+    print("Excluding the top and bottom 20%:") 
+ 
+    flatimg=img.flatten()  
+    flatimg.sort()
+
+    tot=len(flatimg)
+
+    top=round(.8*tot)
+    bot=round(.2*tot)
+
+    img2=flatimg[bot:top]
+
+    mean=img2.mean()
+    sig=img2.std()
+
+    print("mean sky: {:.3f} ".format(mean))
+    print("std sky: {:.3f} ".format(sig))
+
+    print("Sky within 5 sigma:") 
+
+    img3=img2.copy()
+
+    mask2  = np.abs(img3 - mean) <= 5* sig 
+
+    print("mean sky: {:.3f} ".format(img3[mask2].mean()))
+    print("std sky: {:.3f} ".format(img3[mask2].std()))
+    
+
+
 
 ####################################
 #####################################
