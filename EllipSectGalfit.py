@@ -164,7 +164,7 @@ def main():
         opt={}
         OptionHandle="-sectors"
         opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        params.minlevel=np.int(opt['sectors'])
+        params.sectors=np.int(opt['sectors'])
 
     if params.flagobj == True:
         opt={}
@@ -456,7 +456,6 @@ class InputParams:
     flagscale=False
     flagdim=False
    
-
     #init
     qarg=1
     parg=0
@@ -467,7 +466,7 @@ class InputParams:
     dpival=100
 
     minlevel=0
-    sectors=15
+    sectors=19
 
     #input file
     galfile= "galfit.01"
@@ -1933,7 +1932,7 @@ def ReadGALFITout(inputf,galpar):
         GetFits(galpar.maskimage, galpar.tempmask, galpar.xmin, galpar.xmax, galpar.ymin, galpar.ymax)
 
     else:
-        errmsg="Mask file does not exist"
+        errmsg="Unable to find Mask file"
         print(errmsg)
         galpar.tempmask=None
 
@@ -2653,21 +2652,27 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
     hdu.close()
 
 
-    imell=immask.copy()
+    if galpar.tempmask!=None:
+
+        imell=immask.copy()
+    else:
+        imell=imgal.copy()
+
+
     imell.fill(False)
 
 
-    #    for objchinu, Tidal and SNR
-    #    maskm = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
-    #maskm =immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
+        #    for objchinu, Tidal and SNR
+        #    maskm = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
+        #maskm =immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
     maskm =immask == False  # big image coordinates
 
 
-    #maskm =immask == False  # big image coordinates
+        #maskm =immask == False  # big image coordinates
 
-    #   mask including rmin for Bumpiness only
-    #    maskbum = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
-    #maskbum = immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
+        #   mask including rmin for Bumpiness only
+        #    maskbum = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
+        #maskbum = immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
     maskbum = immask == False  # big image coordinates
 
 
@@ -2702,7 +2707,6 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
     #  correcting for rmin
     maskbum[ylo - 1:yhi, xlo - 1:xhi][mask] = False
 
-
     ## identifying area to compute photometry: 
     imell = ExtractEllip(imell, True, xser, yser, aell, Theta, ell, xlo, xhi, ylo, yhi)
     ## xlo, xhi, ylo, yhi makes sure that ellipse will not be outside of this range
@@ -2722,7 +2726,7 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
     hdu = fits.open(galpar.tempmask)
     header=hdu[0].header  
 
-    header['TypeIMG'] = ('Check', 'Check area where output photometry was computed')
+    header['TypeIMG'] = ('Check', 'Use this image to check the area where photometry was computed')
     hdu[0].header  =header
 
 
