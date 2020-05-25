@@ -523,6 +523,14 @@ class GalfitParams:
 
     band="R"
 
+    inputimage="galaxy.fits"
+
+    imgidx="sci"
+    flagidx=False
+    num=1
+    flagnum=False
+
+
     img = np.array([[1,1],[1,1]])
     model = np.array([[1,1],[1,1]])
     imres = np.array([[1,1],[1,1]])
@@ -1886,7 +1894,6 @@ def ReadGALFITout(inputf,galpar):
                     galpar.ang=float(tmp[1])
 
 
-
         if tmp[0] == "0)" and tmp[1] == "sky" :     # plate scale
 
             while (tmp[0] != "Z)"):
@@ -1902,11 +1909,33 @@ def ReadGALFITout(inputf,galpar):
 
     GalfitFile.close()
 
+    ###################
+    chars = set('[]') 
+    numbers=set('1234567890')
+    if any((c in chars) for c in galpar.inputimage): 
+        print("Ext Found") 
+        galpar.flagidx=True
+        (filename,imgidxc) = galpar.inputimage.split("[")
+        (imgidx,trash)=imgidxc.split("]")
+
+        if any((n in numbers) for n in imgidx):
+            galpar.flagnum=True
+            (imgidx,num)=imgidx.split(",")
+            num=int(num)
+
+        galpar.inputimage=filename
+        galpar.imgidx=imgidx
+        galpar.num=num
+
+    #    else: 
+    #       print("Not found") 
+    
+    ####################
 
     errmsg="file {} does not exist".format(galpar.inputimage)
     assert os.path.isfile(galpar.inputimage), errmsg
 
-    galpar.exptime=GetExpTime(galpar.inputimage)
+    galpar.exptime=GetExpTime(galpar.inputimage,galpar.imgidx,galpar.flagidx,galpar.num,galpar.flagnum)
 
 
     #errmsg="xc and yc are unknown "
@@ -2092,11 +2121,17 @@ def ReadNComp(inputf,X,Y,galcomps):
 
 
 
-def GetExpTime(Image):
+def GetExpTime(Image,imgidx,flagidx,num,flagnum):
     "Get exposition time from the image"
 
     hdu = fits.open(Image)
-    exptime = hdu[0].header.get("EXPTIME",1) # return 1 if not found
+    if flagidx:
+        if flagnum:
+            exptime = hdu[imgidx,num].header.get("EXPTIME",1) # return 1 if not found
+        else:    
+            exptime = hdu[imgidx].header.get("EXPTIME",1) # return 1 if not found
+    else:
+        exptime = hdu[0].header.get("EXPTIME",1) # return 1 if not found
 
     hdu.close()
     return exptime
