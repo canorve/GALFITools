@@ -248,6 +248,9 @@ def main():
         galpar.ang=params.parg
 
 
+    #if galpar.skylevel < 0:
+    #    galpar.skylevel=0
+
     str = "q = {} is used ".format(galpar.q)
     print(str)
 
@@ -652,6 +655,7 @@ def Help():
     print ("      scalekpc: Introduce equivalence of ''/kiloparsec ")
     print ("      sbdim: Introduce surface brightness dimming")
     print ("                ADVANCED               ")
+    print ("model: User can introduce his/her own image model.")
     print ("minlevel: parameter given directly to sectors_photometry.")
     print ("                      It stops when it founds this value")
 
@@ -661,7 +665,6 @@ def Help():
 
 
     print ("help: This menu ")
-
 
 
     print ("Example:\n %s galfit.01 -logx" % (sys.argv[0]))
@@ -721,10 +724,12 @@ def SectPhot(galpar, params, n_sectors=19, minlevel=0):
     ###################################################
     
     #  model: 
-    sectmodel = sectors_photometry(galpar.model, eps, angsec, xctemp, yctemp,minlevel=minlevel,
-            plot=params.dplot, badpixels=maskb, n_sectors=n_sectors)
-    #sectmodel = sectors_photometry(galpar.model, eps, angsec, xctemp, yctemp,minlevel=0,
+    # user input minlevel
+    #sectmodel = sectors_photometry(galpar.model, eps, angsec, xctemp, yctemp,minlevel=minlevel,
     #        plot=params.dplot, badpixels=maskb, n_sectors=n_sectors)
+    # minlevel =0
+    sectmodel = sectors_photometry(galpar.model, eps, angsec, xctemp, yctemp,minlevel=0,
+            plot=params.dplot, badpixels=maskb, n_sectors=n_sectors)
 
 
     if params.dplot:
@@ -958,8 +963,12 @@ def PrintEllFilesGax(params,galpar,xradq,ysbq,ysberrq,xradm,ysbm,ysberrm):
     lineout= "#        sectors_photometry used with q={} and pa={} (same as GALFIT) \n".format(galpar.q,galpar.ang)
     OUTFH.write(lineout)
 
-    lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
+    lineout= "#  OutImage = {}  magzpt = {} \n".format(galpar.outimage,galpar.mgzpt)
     OUTFH.write(lineout)
+
+    lineout= "#  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.exptime,galpar.scale)
+    OUTFH.write(lineout)
+
 
     lineout= "#  xc = {:.2f}  yc = {:.2f}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
     OUTFH.write(lineout)
@@ -985,8 +994,12 @@ def PrintEllFilesGax(params,galpar,xradq,ysbq,ysberrq,xradm,ysbm,ysberrm):
     lineout= "#        sectors_photometry used with q={} and pa={} (same as GALFIT) \n".format(galpar.q,galpar.ang)
     OUTFH.write(lineout)
 
-    lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
+    lineout= "#  OutImage = {}  magzpt = {} \n".format(galpar.outimage,galpar.mgzpt)
     OUTFH.write(lineout)
+
+    lineout= "#  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.exptime,galpar.scale)
+    OUTFH.write(lineout)
+
 
     lineout= "#  xc = {:.2f}  yc = {:.2f}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
     OUTFH.write(lineout)
@@ -1212,8 +1225,12 @@ def PrintEllFilesComps(params,galpar,namecomp,ncomp,xradq,ysbq,ysberrq):
     lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
     OUTFH.write(lineout)
 
-    lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
+    lineout= "#  OutImage = {}  magzpt = {}  \n".format(galpar.outimage,galpar.mgzpt)
     OUTFH.write(lineout)
+
+    lineout= "#  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.exptime,galpar.scale)
+    OUTFH.write(lineout)
+
 
     lineout= "#  xc = {:.2f}  yc = {:.2f}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
     OUTFH.write(lineout)
@@ -1647,8 +1664,12 @@ def PrintFilesGax(params,galpar,rtxtang,r,mgesb,w,r2,mgemodsb,wmod):
     lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
     OUTFH.write(lineout)
 
-    lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel]\n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
+    lineout= "#  OutImage = {}  magzpt = {} \n".format(galpar.outimage,galpar.mgzpt)
     OUTFH.write(lineout)
+
+    lineout= "#  exptime = {}  plate scale = {} [arcsec per pixel]\n".format(galpar.exptime,galpar.scale)
+    OUTFH.write(lineout)
+
 
     lineout= "#  xc = {:.2f}  yc = {:.2f}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
     OUTFH.write(lineout)
@@ -1679,8 +1700,12 @@ def PrintFilesGax(params,galpar,rtxtang,r,mgesb,w,r2,mgemodsb,wmod):
     lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
     OUTFH.write(lineout)
 
-    lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
+    lineout= "#  OutImage = {}  magzpt = {} \n".format(galpar.outimage,galpar.mgzpt)
     OUTFH.write(lineout)
+
+    lineout= "#  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.exptime,galpar.scale)
+    OUTFH.write(lineout)
+
 
     lineout= "#  xc = {:.2f}  yc = {:.2f}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
     OUTFH.write(lineout)
@@ -1714,14 +1739,24 @@ def PrintFilesComps(params,galpar,galcomps,rtxtang,ncomp,diffangle,rtemp,mgesbsu
     lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galcomps.AxRat[ii],90-galcomps.PosAng[ii])
     OUTFH.write(lineout)
 
-    lineout= "# In the multiplot, there is a difference of {:.3f} for the one indicated in the top right corner.\n".format(diffangle)
+    lineout= "# In the multiplot, there is a difference of {:.3f} for \n".format(diffangle)
     OUTFH.write(lineout)
 
-    lineout= "# The above is due to differences in the sectors_photometry for the galaxy and individual components.\n"
+    lineout= "# the one indicated in the top right corner.\n"
     OUTFH.write(lineout)
 
-    lineout= "#  OutImage = {}  magzpt = {}  exptime = {}  plate scale = {} [arcsec per pixel] \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
+    lineout= "# The above is due to differences in the sectors_photometry.\n"
     OUTFH.write(lineout)
+
+    lineout= "# for the galaxy and individual components.\n"
+    OUTFH.write(lineout)
+
+    lineout= "#  OutImage = {}  magzpt = {}  \n".format(galpar.outimage,galpar.mgzpt)
+    OUTFH.write(lineout)
+
+    lineout= "# exptime = {} plate scale = {} [arcsec per pixel] \n".format(galpar.exptime,galpar.scale)
+    OUTFH.write(lineout)
+
 
     lineout= "#  xc = {:.2f}  yc = {:.2f}  sky = {}   \n".format(galpar.xc, galpar.yc, galpar.skylevel)
     OUTFH.write(lineout)
@@ -2482,7 +2517,10 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     OUTPHOT.write(lineout)
 
 
-    lineout= "#  OutImage = {}  Mgzpt = {}  exptime = {}  plate scale = {} ''/pix \n".format(galpar.outimage,galpar.mgzpt,galpar.exptime,galpar.scale)
+    lineout= "#  OutImage = {}  Mgzpt = {}  \n".format(galpar.outimage,galpar.mgzpt)
+    OUTPHOT.write(lineout)
+
+    lineout= "#  exptime = {}  plate scale = {} ''/pix \n".format(galpar.exptime,galpar.scale)
     OUTPHOT.write(lineout)
 
 
