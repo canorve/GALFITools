@@ -36,7 +36,7 @@ pip install mgefit
 The options to run the code in the terminal (or ipython) are:
 
 ```
- ./EllipSectGalfit.py [GALFITOutputFile] [-logx] [-q AxisRatio] [-pa PositionAngle] [-comp] [-pix] [-ranx/y Value] [-grid] [-dpi Value] [-noplot] [-phot] [-sbout] [-noplot] [-minlevel Value] [-sectors Value] [-object Name] [-filter Name] [-snr] [-help] [-checkimg] [-noned] [-distmod Value] [-magcor Value] [-scalekpc Value][-sbdim Value]
+ ./EllipSectGalfit.py [GALFITOutputFile] [-logx] [-q AxisRatio] [-pa PositionAngle] [-comp] [-pix] [-ranx/y Value] [-grid] [-dpi Value] [-noplot] [-phot] [-sbout] [-noplot] [-minlevel Value] [-sectors Value] [-object Name] [-filter Name] [-snr] [-help] [-checkimg] [-noned] [-distmod Value] [-magcor Value] [-scalekpc Value][-sbdim Value] [-model ModelImage]
  ```
 
 ### Input File
@@ -109,6 +109,9 @@ Any of the following options disabled the connection to NED
                       Check sectors_photometry manual
                      
 **checkimg**: save the images used in sectors_photometry for individual components
+
+**model**: User can introduce his own model image. SNR quantities will be 
+            inaccurate  for  this option.
 
 
 ## Notes
@@ -281,6 +284,13 @@ with 7 gaussians (images for this galaxy are displayed above).
 
 ### Advanced Examples
 
+*   model option allows the user to introduce his own model image for analysis.
+    EllipSectGalfit will use this image instead of the one created by GALFIT output.
+    If -phot option is enabled, SNR quantities will be inaccurate.
+
+    ./EllipSectGalfit.py galfit.14 -model model.fits
+
+
 *   The following options requires that the user has already experienced with 
     the *sectors_photometry* function of the mge library. 
 
@@ -308,6 +318,9 @@ with 7 gaussians (images for this galaxy are displayed above).
     Use it with the 'comp' option:  
 
     ./EllipSectGalfit.py galfit.14 -comp -checkimg
+
+
+
 
 **EllipSectGalfit.py** uses the mgefit library which is
 described in Cappellari, MNRAS, 333, 400 (2002).
