@@ -44,7 +44,7 @@ def main():
     #class for saving user's parameters
     params=InputParams()
 
-    OptionHandleList = ['-logx', '-q', '-pa','-comp','-pix','-ranx','-rany','-grid','-dpi','-sbout','-noplot','-minlevel','-sectors','-phot','-object','-filter','-snr','-help','-checkimg','-noned','-distmod','-magcor','-scalekpc','-sbdim']
+    OptionHandleList = ['-logx', '-q', '-pa','-comp','-pix','-ranx','-rany','-grid','-dpi','-sbout','-noplot','-minlevel','-sectors','-phot','-object','-filter','-snr','-help','-checkimg','-noned','-distmod','-magcor','-scalekpc','-sbdim','-model']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
@@ -99,6 +99,9 @@ def main():
         params.flagscale=True
     if options['sbdim'] != None:
         params.flagdim=True
+    if options['model'] != None:
+        params.flagmodel=True
+        print("input model image will be used")
 
 
 
@@ -206,6 +209,12 @@ def main():
         opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         params.InSbDim=np.float(opt['sbdim'])
 
+    if params.flagmodel == True:
+        opt={}
+        OptionHandle="-model"
+        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        params.inputmodel=np.str(opt['model'])
+
 
 
     params.galfile= sys.argv[1]
@@ -305,20 +314,39 @@ def main():
     print("Number of components = ",len(galcomps.N))
 
 
-
-
     #reading galaxy and model images from file
     errmsg="file {} does not exist".format(galpar.outimage)
 
     assert os.path.isfile(galpar.outimage), errmsg
 
-    # hdu 1 => image   hdu 2 => model
-    hdu = fits.open(galpar.outimage)
-    galpar.img = (hdu[1].data).astype(float)
-    galpar.model = (hdu[2].data).astype(float)
-    galpar.imres = (hdu[3].data).astype(float)
-    hdu.close()
+    if params.flagmodel == False:
+        # hdu 1 => image   hdu 2 => model
+        hdu = fits.open(galpar.outimage)
+        galpar.img = (hdu[1].data).astype(float)
+        galpar.model = (hdu[2].data).astype(float)
+        galpar.imres = (hdu[3].data).astype(float)
+        hdu.close()
 
+    else:
+        hdu = fits.open(galpar.inputimage)
+
+        if galpar.flagidx:
+            if galpar.flagnum:
+                galpar.img = (hdu[galpar.imgidx,galpar.num].data).astype(float)
+            else:    
+                galpar.img = (hdu[galpar.imgidx].data).astype(float)
+        else:
+            galpar.img = (hdu[0].data).astype(float)
+
+        hdu.close()
+
+
+
+        hdu = fits.open(params.inputmodel)
+        galpar.model = (hdu[0].data).astype(float)
+        hdu.close()
+
+        galpar.imres = galpar.img - galpar.model
 
     # removing background from galaxy and model images 
     galpar.img = galpar.img - galpar.skylevel
@@ -332,10 +360,17 @@ def main():
         errmsg="file {} does not exist".format(galpar.tempmask)
         assert os.path.isfile(galpar.tempmask), errmsg
 
-        hdu = fits.open(galpar.tempmask)
-        mask = hdu[0].data
-        galpar.mask=np.array(mask,dtype=bool)
-        hdu.close()
+        if params.flagmodel == False:
+            hdu = fits.open(galpar.tempmask)
+            mask = hdu[0].data
+            galpar.mask=np.array(mask,dtype=bool)
+            hdu.close()
+        else:
+            hdu = fits.open(galpar.maskimage)
+            mask = hdu[0].data
+            galpar.mask=np.array(mask,dtype=bool)
+            hdu.close()
+
     else:
         galpar.mask=None
     ####
@@ -456,6 +491,8 @@ class InputParams:
     flagscale=False
     flagdim=False
    
+    flagmodel=False
+
     #init
     qarg=1
     parg=0
@@ -476,6 +513,9 @@ class InputParams:
 
     #output file
     output = "out.txt"
+
+    # input image model
+    inputmodel="none.fits"
 
     # object name to search in NED
 
@@ -506,6 +546,8 @@ class GalfitParams:
 
     xc=1        #for sectors_photometry
     yc=1        #for sectors_photometry
+    inxc=1        #same as above xc but used for input image
+    inyc=1        #same as above yc but used for input image
     q=1         #for sectors_photometry
     ang=0       #for sectors_photometry
     skylevel=0
@@ -652,8 +694,14 @@ def SectPhot(galpar, params, n_sectors=19, minlevel=0):
     ############
     # I have to switch x and y values because they are different axes for
     # numpy:
-    yctemp=galpar.xc
-    xctemp=galpar.yc
+    if params.flagmodel == False:
+        yctemp=galpar.xc
+        xctemp=galpar.yc
+    else:
+        yctemp=galpar.inxc
+        xctemp=galpar.inyc
+
+
     # and angle is different as well:
     angsec=90-galpar.ang
     #    angsec=ang
@@ -1943,6 +1991,9 @@ def ReadGALFITout(inputf,galpar):
 
     print("center is at xc, yc = ",galpar.xc,galpar.yc)
 
+    galpar.inxc=galpar.xc
+    galpar.inyc=galpar.yc
+
     # correcting coordinates
     galpar.xc=galpar.xc-galpar.xmin+1
     galpar.yc=galpar.yc-galpar.ymin+1
@@ -1955,7 +2006,6 @@ def ReadGALFITout(inputf,galpar):
 
         errmsg="Sorry the mask file: {}  must be binary, not ASCII ".format(maskimage)
         assert flagbm is True, errmsg
-
 
         galpar.tempmask="tempmask.fits"
         GetFits(galpar.maskimage, galpar.tempmask, galpar.xmin, galpar.xmax, galpar.ymin, galpar.ymax)
@@ -2639,14 +2689,22 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
     #angle computed from y-axis to x-axis  
     Theta=galpar.ang + 90
 
+    if params.flagmodel == False:
 
-    (xlo, xhi, ylo, yhi) = GetSize(galpar.xc, galpar.yc, aell, Theta, ab, NCol, NRow)
+        (xlo, xhi, ylo, yhi) = GetSize(galpar.xc, galpar.yc, aell, Theta, ab, NCol, NRow)
 
-    #print("size box ",xmin, xmax, ymin, ymax)
+        #print("size box ",xmin, xmax, ymin, ymax)
 
 
-    xser=galpar.xc
-    yser=galpar.yc
+        xser=galpar.xc
+        yser=galpar.yc
+    else:
+        (xlo, xhi, ylo, yhi) = GetSize(galpar.inxc, galpar.inyc, aell, Theta, ab, NCol, NRow)
+
+        xser=galpar.inxc
+        yser=galpar.inyc
+
+
 
 
     imgal = galpar.img
@@ -2666,7 +2724,14 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
     galpar.sigma=hdu[0].data
     #hdu.close()
 
-    imsigma = galpar.sigma.astype(float)
+    if params.flagmodel == False:
+        imsigma = galpar.sigma.astype(float)
+    else:
+        imsigma = np.sqrt(np.abs(galpar.img)) #wrong but approx.
+        masksigma = imsigma <= 0
+        imsigma[masksigma] = 1 # avoiding division by zero
+        print("I can't compute SNR. ")
+        print("All SNR quantities will be wrong. ")
 
 
     # creates a new image for snr 
@@ -2678,17 +2743,16 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
     header['TypeIMG'] = ('SNR', 'Signal to Noise Ratio image')
     hdu[0].header  =header
     galpar.imsnr=imgal/imsigma
+    
     hdu[0].data = galpar.imsnr
 
     if params.flagsnr:
         hdu.writeto(params.namesnr, overwrite=True)
         print("SNR image created.. ",params.namesnr)
-
     hdu.close()
 
 
     if galpar.tempmask!=None:
-
         imell=immask.copy()
     else:
         imell=imgal.copy()
