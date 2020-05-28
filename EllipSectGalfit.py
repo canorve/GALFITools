@@ -102,14 +102,16 @@ def main():
     if options['model'] != None:
         params.flagmodel=True
         print("input model image will be used")
-
-
-
     if options['help'] != None:
         Help()
 
+    # check for unrecognized options:
 
-
+    #options[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv
+    sysopts=sys.argv[2:]
+    for idx,key in enumerate(sysopts):
+        if not(key in OptionHandleList): 
+            print("{} option not recognized ".format(key)) 
 
     ################## search arguments after the option:
     if params.flagpa == True:
