@@ -111,7 +111,7 @@ def main():
     sysopts=sys.argv[2:]
     for idx,key in enumerate(sysopts):
         if not(key in OptionHandleList): 
-            print("{} option not recognized ".format(key)) 
+            print("WARNING: {} option not recognized ".format(key)) 
 
     ################## search arguments after the option:
     if params.flagpa == True:
