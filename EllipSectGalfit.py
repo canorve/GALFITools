@@ -41,196 +41,11 @@ def main():
 
         sys.exit()
 
-    #class for saving user's parameters
+    #class for user's parameters
     params=InputParams()
 
-    OptionHandleList = ['-logx', '-q', '-pa','-comp','-pix','-ranx','-rany','-grid','-dpi','-sbout','-noplot','-minlevel','-sectors','-phot','-object','-filter','-snr','-help','-checkimg','-noned','-distmod','-magcor','-scalekpc','-sbdim','-model','-sky']
-    options = {}
-    for OptionHandle in OptionHandleList:
-        options[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
-    if options['logx'] != None:
-        params.flaglogx=True
-        print("X axis is logarithm")
-    if options['q'] != None:
-        params.flagq=True
-    if options['pa'] != None:
-        params.flagpa=True
-    if options['pix'] != None:
-        params.flagpix=True
-    if options['ranx'] != None:
-        params.flagranx[0]=True
-    if options['rany'] != None:
-        params.flagrany[0]=True
-    if options['grid'] != None:
-        params.flagrid=True
-    if options['dpi'] != None:
-        params.flagdpi=True
-    if options['comp'] != None:
-        params.flagcomp=True
-        print("Plotting subcomponents ")
-    if options['noplot'] != None:
-        params.flagnoplot=True
-        print("images will not be displayed")
-    if options['sbout'] != None:
-        params.flagsbout=True
-        print("surface brightness output file will be created")
-    if options['phot'] != None:
-        params.flagphot=True
-        print("output photometry file will be created")
-    if options['minlevel'] != None:
-        params.flagminlevel=True
-    if options['sectors'] != None:
-        params.flagsectors=True
-    if options['object'] != None:
-        params.flagobj=True
-    if options['filter'] != None:
-        params.flagband=True
-    if options['snr'] != None:
-        params.flagsnr=True
-    if options['checkimg'] != None:
-        params.flagcheck=True
-    if options['noned'] != None:
-        params.flagned=True
-    if options['distmod'] != None:
-        params.flagmod=True
-    if options['magcor'] != None:
-        params.flagmag=True
-    if options['scalekpc'] != None:
-        params.flagscale=True
-    if options['sbdim'] != None:
-        params.flagdim=True
-    if options['model'] != None:
-        params.flagmodel=True
-        print("input model image will be used")
-    if options['sky'] != None:
-        params.flagsky=True
-
-    if options['help'] != None:
-        Help()
-
-    # check for unrecognized options:
-
-    #options[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv
-    sysopts=sys.argv[2:]
-    for idx,key in enumerate(sysopts):
-        if not(key in OptionHandleList): 
-            print("WARNING: {} option not recognized ".format(key)) 
-
-    ################## search arguments after the option:
-    if params.flagpa == True:
-        opt={}
-        OptionHandle="-pa"
-        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        params.parg=np.float(opt['pa'])
-
-    if params.flagq == True:
-        opt={}
-        OptionHandle="-q"
-        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        params.qarg=np.float(opt['q'])
-
-    if params.flagranx[0] == True:
-        opt={}
-        OptionHandle="-ranx"
-        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-
-        params.rangex=opt["ranx"]
-        if "-" in params.rangex:
-            params.flagranx[1] = True
-            params.ranx=opt['ranx']
-        else:
-            params.ranx=np.float(opt['ranx'])
-
-    if params.flagrany[0]== True:
-        opt={}
-        OptionHandle="-rany"
-        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-
-        params.rangey=opt["rany"]
-        if "-" in params.rangey:
-            params.flagrany[1] = True
-            params.rany=opt['rany']
-        else:
-            params.rany=np.float(opt['rany'])
-
-    if params.flagdpi == True:
-        opt={}
-        OptionHandle="-dpi"
-        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        params.dpival=np.int(opt['dpi'])
-
-    if params.flagnoplot == True:
-        params.dplot=False
-
-    if params.flagminlevel == True:
-        opt={}
-        OptionHandle="-minlevel"
-        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        params.minlevel=np.float(opt['minlevel'])
-
-    if params.flagsectors == True:
-        opt={}
-        OptionHandle="-sectors"
-        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        params.sectors=np.int(opt['sectors'])
-
-    if params.flagobj == True:
-        opt={}
-        OptionHandle="-object"
-        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        params.objname=np.str(opt['object'])
-
-    if params.flagband == True:
-        opt={}
-        OptionHandle="-filter"
-        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        params.band=np.str(opt['filter'])
-
-
-    if params.flagmod == True:
-        opt={}
-        OptionHandle="-distmod"
-        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        params.InDistMod=np.float(opt['distmod'])
-
-
-    if params.flagmag == True:
-        opt={}
-        OptionHandle="-magcor"
-        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        params.InMagCor=np.float(opt['magcor'])
-
-
-    if params.flagscale == True:
-        opt={}
-        OptionHandle="-scalekpc"
-        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        params.InScale=np.float(opt['scalekpc'])
-
-
-    if params.flagdim == True:
-        opt={}
-        OptionHandle="-sbdim"
-        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        params.InSbDim=np.float(opt['sbdim'])
-
-    if params.flagmodel == True:
-        opt={}
-        OptionHandle="-model"
-        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        params.inputmodel=np.str(opt['model'])
-
-
-    if params.flagsky == True:
-        opt={}
-        OptionHandle="-sky"
-        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        params.insky=np.float(opt['sky'])
-
-
-
-
-    params.galfile= sys.argv[1]
+    # read user's input 
+    InputSys(params,sys.argv)
 
     print("angle in multi-plot is measured from the galaxy's major axis ")
 
@@ -640,6 +455,194 @@ class GalfitComps:
 
 
 ##### end of classes
+
+def InputSys(params,argv):
+    ''' Read user's input '''
+    OptionHandleList = ['-logx', '-q', '-pa','-comp','-pix','-ranx','-rany','-grid','-dpi','-sbout','-noplot','-minlevel','-sectors','-phot','-object','-filter','-snr','-help','-checkimg','-noned','-distmod','-magcor','-scalekpc','-sbdim','-model','-sky']
+    options = {}
+    for OptionHandle in OptionHandleList:
+        options[OptionHandle[1:]] = argv[argv.index(OptionHandle)] if OptionHandle in argv else None
+    if options['logx'] != None:
+        params.flaglogx=True
+        print("X axis is logarithm")
+    if options['q'] != None:
+        params.flagq=True
+    if options['pa'] != None:
+        params.flagpa=True
+    if options['pix'] != None:
+        params.flagpix=True
+    if options['ranx'] != None:
+        params.flagranx[0]=True
+    if options['rany'] != None:
+        params.flagrany[0]=True
+    if options['grid'] != None:
+        params.flagrid=True
+    if options['dpi'] != None:
+        params.flagdpi=True
+    if options['comp'] != None:
+        params.flagcomp=True
+        print("Plotting subcomponents ")
+    if options['noplot'] != None:
+        params.flagnoplot=True
+        print("images will not be displayed")
+    if options['sbout'] != None:
+        params.flagsbout=True
+        print("surface brightness output file will be created")
+    if options['phot'] != None:
+        params.flagphot=True
+        print("output photometry file will be created")
+    if options['minlevel'] != None:
+        params.flagminlevel=True
+    if options['sectors'] != None:
+        params.flagsectors=True
+    if options['object'] != None:
+        params.flagobj=True
+    if options['filter'] != None:
+        params.flagband=True
+    if options['snr'] != None:
+        params.flagsnr=True
+    if options['checkimg'] != None:
+        params.flagcheck=True
+    if options['noned'] != None:
+        params.flagned=True
+    if options['distmod'] != None:
+        params.flagmod=True
+    if options['magcor'] != None:
+        params.flagmag=True
+    if options['scalekpc'] != None:
+        params.flagscale=True
+    if options['sbdim'] != None:
+        params.flagdim=True
+    if options['model'] != None:
+        params.flagmodel=True
+        print("input model image will be used")
+    if options['sky'] != None:
+        params.flagsky=True
+    # check for unrecognized options:
+    sysopts=argv[2:]
+    for idx,key in enumerate(sysopts):
+        if not(key in OptionHandleList): 
+            print("WARNING: {} option not recognized ".format(key)) 
+
+    if options['help'] != None:
+        Help()
+
+    ################## search arguments after the option:
+    if params.flagpa == True:
+        opt={}
+        OptionHandle="-pa"
+        opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
+        params.parg=np.float(opt['pa'])
+
+    if params.flagq == True:
+        opt={}
+        OptionHandle="-q"
+        opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
+        params.qarg=np.float(opt['q'])
+
+    if params.flagranx[0] == True:
+        opt={}
+        OptionHandle="-ranx"
+        opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
+
+        params.rangex=opt["ranx"]
+        if "-" in params.rangex:
+            params.flagranx[1] = True
+            params.ranx=opt['ranx']
+        else:
+            params.ranx=np.float(opt['ranx'])
+
+    if params.flagrany[0]== True:
+        opt={}
+        OptionHandle="-rany"
+        opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
+
+        params.rangey=opt["rany"]
+        if "-" in params.rangey:
+            params.flagrany[1] = True
+            params.rany=opt['rany']
+        else:
+            params.rany=np.float(opt['rany'])
+
+    if params.flagdpi == True:
+        opt={}
+        OptionHandle="-dpi"
+        opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
+        params.dpival=np.int(opt['dpi'])
+
+    if params.flagnoplot == True:
+        params.dplot=False
+
+    if params.flagminlevel == True:
+        opt={}
+        OptionHandle="-minlevel"
+        opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
+        params.minlevel=np.float(opt['minlevel'])
+
+    if params.flagsectors == True:
+        opt={}
+        OptionHandle="-sectors"
+        opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
+        params.sectors=np.int(opt['sectors'])
+
+    if params.flagobj == True:
+        opt={}
+        OptionHandle="-object"
+        opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
+        params.objname=np.str(opt['object'])
+
+    if params.flagband == True:
+        opt={}
+        OptionHandle="-filter"
+        opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
+        params.band=np.str(opt['filter'])
+
+
+    if params.flagmod == True:
+        opt={}
+        OptionHandle="-distmod"
+        opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
+        params.InDistMod=np.float(opt['distmod'])
+
+
+    if params.flagmag == True:
+        opt={}
+        OptionHandle="-magcor"
+        opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
+        params.InMagCor=np.float(opt['magcor'])
+
+
+    if params.flagscale == True:
+        opt={}
+        OptionHandle="-scalekpc"
+        opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
+        params.InScale=np.float(opt['scalekpc'])
+
+
+    if params.flagdim == True:
+        opt={}
+        OptionHandle="-sbdim"
+        opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
+        params.InSbDim=np.float(opt['sbdim'])
+
+    if params.flagmodel == True:
+        opt={}
+        OptionHandle="-model"
+        opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
+        params.inputmodel=np.str(opt['model'])
+
+
+    if params.flagsky == True:
+        opt={}
+        OptionHandle="-sky"
+        opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
+        params.insky=np.float(opt['sky'])
+
+    params.galfile= sys.argv[1]
+
+    return True
+
+
 
 def Help():
 
@@ -2339,7 +2342,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
     Num=len(galcomps.Flux[maskmag])
 
-    galcomps.PerLight[maskmag]= (galcomps.Flux[maskmag] / totFlux )*100
+    galcomps.PerLight[maskmag]= (galcomps.Flux[maskmag] / totFlux )
     namecomp=galcomps.NameComp[maskmag]
     N=galcomps.N[maskmag]
 
@@ -2661,7 +2664,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     lineout = "########## Columns: #####################\n"  
     OUTPHOT.write(lineout)
 
-    lineout = "# Number Component %PerLight me(mag) <me>(mag) Flux AbsMag Luminosity(SolarLum) Rad90(pix) Re(kpc)   \n"  
+    lineout = "# Number Component PerLight me(mag) <me>(mag) Flux AbsMag Luminosity(SolarLum) Rad90(pix) Re(kpc)   \n"  
     OUTPHOT.write(lineout)
 
 
