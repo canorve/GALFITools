@@ -110,9 +110,10 @@ Any of the following options disabled the connection to NED
                      
 **checkimg**: save the images used in sectors_photometry for individual components
 
-**model**: User can introduce his own model image. SNR quantities will be 
+**model**: User can introduce his/her own model image. SNR quantities will be 
             inaccurate  for  this option.
 
+**sky**: User can introduce his/her own sky value. 
 
 ## Notes
 
@@ -289,6 +290,12 @@ with 7 gaussians (images for this galaxy are displayed above).
     If -phot option is enabled, SNR quantities will be inaccurate.
 
     ./EllipSectGalfit.py galfit.14 -model model.fits
+
+*   sky option allows the user to introduce his/her own sky value to substract 
+    from galaxy and model images. User must know what he/she is doing because
+    otherwise EllipSectGalfit will produce wrong outputs.  
+
+    ./EllipSectGalfit.py galfit.01 -sky 300
 
 
 *   The following options requires that the user has already experienced with 

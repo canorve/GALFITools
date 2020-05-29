@@ -44,7 +44,7 @@ def main():
     #class for saving user's parameters
     params=InputParams()
 
-    OptionHandleList = ['-logx', '-q', '-pa','-comp','-pix','-ranx','-rany','-grid','-dpi','-sbout','-noplot','-minlevel','-sectors','-phot','-object','-filter','-snr','-help','-checkimg','-noned','-distmod','-magcor','-scalekpc','-sbdim','-model']
+    OptionHandleList = ['-logx', '-q', '-pa','-comp','-pix','-ranx','-rany','-grid','-dpi','-sbout','-noplot','-minlevel','-sectors','-phot','-object','-filter','-snr','-help','-checkimg','-noned','-distmod','-magcor','-scalekpc','-sbdim','-model','-sky']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
@@ -102,6 +102,9 @@ def main():
     if options['model'] != None:
         params.flagmodel=True
         print("input model image will be used")
+    if options['sky'] != None:
+        params.flagsky=True
+
     if options['help'] != None:
         Help()
 
@@ -218,6 +221,14 @@ def main():
         params.inputmodel=np.str(opt['model'])
 
 
+    if params.flagsky == True:
+        opt={}
+        OptionHandle="-sky"
+        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        params.insky=np.float(opt['sky'])
+
+
+
 
     params.galfile= sys.argv[1]
 
@@ -250,8 +261,8 @@ def main():
         galpar.ang=params.parg
 
 
-    #if galpar.skylevel < 0:
-    #    galpar.skylevel=0
+    if params.flagsky:
+        galpar.skylevel=params.insky
 
     str = "q = {} is used ".format(galpar.q)
     print(str)
@@ -498,6 +509,9 @@ class InputParams:
    
     flagmodel=False
 
+    flagsky=False
+
+
     #init
     qarg=1
     parg=0
@@ -509,6 +523,8 @@ class InputParams:
 
     minlevel=0
     sectors=19
+
+    insky=0
 
     #input file
     galfile= "galfit.01"
@@ -658,6 +674,7 @@ def Help():
     print ("      sbdim: Introduce surface brightness dimming")
     print ("                ADVANCED               ")
     print ("model: User can introduce his/her own image model.")
+    print ("sky: User can introduce his/her own sky value.")
     print ("minlevel: parameter given directly to sectors_photometry.")
     print ("                      It stops when it founds this value")
 
