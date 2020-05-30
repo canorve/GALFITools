@@ -12,6 +12,9 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
 import mimetypes
+import warnings
+
+
 
 from astropy.io.votable import parse
 from mgefit.sectors_photometry import sectors_photometry
@@ -40,6 +43,7 @@ def main():
         print ("%s -help " % (sys.argv[0]))
 
         sys.exit()
+
 
     #class for user's parameters
     params=InputParams()
@@ -522,7 +526,8 @@ def InputSys(params,argv):
     sysopts=argv[2:]
     for idx,key in enumerate(sysopts):
         if not(key in OptionHandleList): 
-            print("WARNING: {} option not recognized ".format(key)) 
+            if key[0] == "-":
+                print("WARNING: {} option not recognized ".format(key)) 
 
     if options['help'] != None:
         Help()
@@ -2394,6 +2399,11 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     #print("degrees of freedom = ",ndof)  
    
     header = fits.getheader(galpar.inputimage)
+    #hdu = fits.open(galpar.inputimage)
+    #header = hdu[0].header
+    #hdu.close()
+
+
 
 
     if not(params.flagobj):
@@ -3152,6 +3162,11 @@ def NED(params, galpar, galcomps):
     objname=params.objname
     band=params.band
 
+    # ignore warnings from lecture of XML file
+    if not sys.warnoptions:
+        warnings.simplefilter("ignore")
+
+
     params.flagweb=True
 
     objname=params.objname
@@ -3257,6 +3272,11 @@ def NED(params, galpar, galcomps):
             DistMod2=0
             Scalekpc=0
             SbDim=0
+
+
+    # returns warnings to normal
+    if not sys.warnoptions:
+        warnings.simplefilter("default")
 
 
 
@@ -4106,4 +4126,5 @@ def GalGauss(magauss,fwhmgauss,qgauss,pagauss,angle,radx):
 
 
 if __name__ == '__main__':
+
     main()
