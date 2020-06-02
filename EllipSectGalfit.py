@@ -1898,7 +1898,11 @@ def ReadGALFITout(inputf,galpar):
             galpar.outimage=tmp[1]
 
         if tmp[0] == "F)":     # mask image
-            galpar.maskimage=tmp[1]
+            try:
+                galpar.maskimage=tmp[1]
+            except IndexError:
+                galpar.maskimage="None"
+
 
         if tmp[0] == "H)":     # region fit box
             galpar.xmin=int(tmp[1])
