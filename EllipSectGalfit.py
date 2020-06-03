@@ -106,6 +106,10 @@ def main():
     print(str)
 
 
+    str = "Plate Scale= {} ".format(galpar.scale)
+    print(str)
+
+
 
     (tmp)=galpar.outimage.split(".")
 
