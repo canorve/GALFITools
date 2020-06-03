@@ -465,7 +465,7 @@ class GalfitComps:
 
 def InputSys(params,argv):
     ''' Read user's input '''
-    OptionHandleList = ['-logx', '-q', '-pa','-comp','-pix','-ranx','-rany','-grid','-dpi','-sbout','-noplot','-minlevel','-sectors','-phot','-object','-filter','-snr','-help','-checkimg','-noned','-distmod','-magcor','-scalekpc','-sbdim','-model','-sky']
+    OptionHandleList = ['-logx', '-q', '-pa','-comp','-pix','-ranx','-rany','-grid','-dpi','-sbout','-noplot','-minlevel','-sectors','-phot','-object','-filter','-snr','-help','-checkimg','-noned','-distmod','-magcor','-scalekpc','-sbdim','-model','-sky','-keep']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[1:]] = argv[argv.index(OptionHandle)] if OptionHandle in argv else None
