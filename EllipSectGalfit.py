@@ -136,6 +136,11 @@ def main():
 
 
     if params.flagsbout == True: 
+
+        if not os.path.exists("sbfiles"):
+            print("Creating directory for  output photometry ... ")
+            os.makedirs("sbfiles")
+
         msg="surface brightness output file: {} ".format(params.sboutput+".txt")
         print(msg)
 
@@ -174,8 +179,6 @@ def main():
             galpar.img = (hdu[0].data).astype(float)
 
         hdu.close()
-
-
 
         hdu = fits.open(params.inputmodel)
         galpar.model = (hdu[0].data).astype(float)
@@ -255,8 +258,6 @@ def main():
 
     print("creating multi-plots..")
 
-    #MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectmulcomps)
-
     MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps)
 
 
@@ -274,6 +275,7 @@ def main():
 
     if params.flagphot:
         print("Computing output photometry ... ")
+
         OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps)
 
 
@@ -329,6 +331,7 @@ class InputParams:
     flagmodel=False
 
     flagsky=False
+    flagkeep=False
 
 
     #init
@@ -522,6 +525,10 @@ def InputSys(params,argv):
         print("input model image will be used")
     if options['sky'] != None:
         params.flagsky=True
+    if options['keep'] != None:
+        params.flagkeep=True
+
+
     # check for unrecognized options:
     sysopts=argv[2:]
     for idx,key in enumerate(sysopts):
@@ -652,7 +659,7 @@ def InputSys(params,argv):
 def Help():
 
     print ("Usage:\n %s [GALFITOutputFile] [-logx] [-q AxisRatio] [-pa PositionAngle] [-comp] [-pix] [-ranx/y Value] [-grid] [-dpi Value] [-noplot] [-phot] " % (sys.argv[0]))
-    print ("More options: [-sbout] [-noplot] [-minlevel Value] [-sectors Value] [-object Name] [-filter Name] [-snr] [-help] [-checkimg] [-noned] [-distmod Value] [-magcor Value] [-scalekpc Value][-sbdim Value] ") 
+    print ("More options: [-sbout] [-noplot] [-minlevel Value] [-sectors Value] [-object Name] [-filter Name] [-snr] [-help] [-checkimg] [-noned] [-distmod Value] [-magcor Value] [-scalekpc Value] [-sbdim Value] [-keep] ") 
 
     print ("GALFITOutputFile: GALFIT output file ")
     print ("logx: activates X-axis as logarithm ")
@@ -666,7 +673,9 @@ def Help():
     print ("dpi: dots per inch used for images files ")
     print ("noplot: avoid displaying windows and directly creates images")
     print ("sbout: creates output file containing the surface brightness profiles")
-
+    print ("       All surface brightness files will be saved in 'sbfiles' directory")
+    print ("keep: use existing file to compute subcomponents ")
+        
 
     print ("                OUTPUT               ")
     print ("phot: Compute photometry. Check the created output file")
@@ -774,44 +783,68 @@ def SectPhotComp(galpar, params, galcomps, n_sectors=19, minlevel=0):
 
     if (params.flagphot) and (not(os.path.isfile(params.namesig))):
 
-        print("running galfit to create sigma image and individual model images...")
+        if ((os.path.isfile(params.namesub)) and (params.flagkeep)):
+            print("using existing subcomponent model image file *-comp.fits")
 
-        rungal = "galfit -o3 -outsig {}".format(params.galfile)
-        errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
-            universal_newlines=True)
+            print("running galfit to create sigma image ...")
 
-        # changing name to subcomponents
-        runchg = "mv subcomps.fits {}".format(params.namesub)
-        errchg = sp.run([runchg], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
-            universal_newlines=True)
+            rungal = "galfit -outsig {}".format(params.galfile)
+            errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
+                universal_newlines=True)
 
-        errmsg="file {} does not exist".format(params.namesub)
-        assert os.path.isfile(params.namesub), errmsg
+            # changing name to sigma image
+            runchg = "mv sigma.fits {}".format(params.namesig)
+            errchg = sp.run([runchg], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
+                universal_newlines=True)
 
-        # changing name to sigma image
+            errmsg="file {} does not exist".format(params.namesig)
+            assert os.path.isfile(params.namesig), errmsg
 
-        runchg = "mv sigma.fits {}".format(params.namesig)
-        errchg = sp.run([runchg], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
-            universal_newlines=True)
+        else:
 
-        errmsg="file {} does not exist".format(params.namesig)
-        assert os.path.isfile(params.namesig), errmsg
+            print("running galfit to create sigma image and individual model images...")
+
+            rungal = "galfit -o3 -outsig {}".format(params.galfile)
+            errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
+                universal_newlines=True)
+
+            # changing name to subcomponents
+            runchg = "mv subcomps.fits {}".format(params.namesub)
+            errchg = sp.run([runchg], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
+                universal_newlines=True)
+
+            errmsg="file {} does not exist".format(params.namesub)
+            assert os.path.isfile(params.namesub), errmsg
+
+            # changing name to sigma image
+
+            runchg = "mv sigma.fits {}".format(params.namesig)
+            errchg = sp.run([runchg], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
+                universal_newlines=True)
+
+            errmsg="file {} does not exist".format(params.namesig)
+            assert os.path.isfile(params.namesig), errmsg
 
     else: 
 
-        print("running galfit to create individual model images...")
+        if ((os.path.isfile(params.namesub)) and (params.flagkeep)):
+            print("using existing subcomponent model image file *-comp.fits")
+        else:
 
-        rungal = "galfit -o3 {}".format(params.galfile)
-        errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
-            universal_newlines=True)
+            print("running galfit to create individual model images...")
 
-        # changing name to subcomponents
-        runchg = "mv subcomps.fits {}".format(params.namesub)
-        errchg = sp.run([runchg], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
-            universal_newlines=True)
+            rungal = "galfit -o3 {}".format(params.galfile)
+            errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
+                universal_newlines=True)
 
-        errmsg="file {} does not exist".format(params.namesub)
-        assert os.path.isfile(params.namesub), errmsg
+            # changing name to subcomponents
+            runchg = "mv subcomps.fits {}".format(params.namesub)
+            errchg = sp.run([runchg], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
+                universal_newlines=True)
+
+            errmsg="file {} does not exist".format(params.namesub)
+            assert os.path.isfile(params.namesub), errmsg
+
 
         if (os.path.isfile(params.namesig) and (params.flagphot)):
             print("using existing sigma image")
@@ -985,7 +1018,8 @@ def PrintEllFilesGax(params,galpar,xradq,ysbq,ysberrq,xradm,ysbm,ysberrm):
     "print surface brightness of galaxy and model to file"
 
     # output for galaxy
-    OUTFH = open (params.sboutput+".gal.txt","w")
+    filegal=params.sboutput+".gal.txt"
+    OUTFH = open (filegal,"w")
 
     lineout= "#        sectors_photometry used with q={} and pa={} (same as GALFIT) \n".format(galpar.q,galpar.ang)
     OUTFH.write(lineout)
@@ -1016,7 +1050,8 @@ def PrintEllFilesGax(params,galpar,xradq,ysbq,ysberrq,xradm,ysbm,ysberrm):
     OUTFH.close()
 
     # output for model 
-    OUTFH = open (params.sboutput+".mod.txt","w")
+    filemodel=params.sboutput+".mod.txt"
+    OUTFH = open (filemodel,"w")
 
     lineout= "#        sectors_photometry used with q={} and pa={} (same as GALFIT) \n".format(galpar.q,galpar.ang)
     OUTFH.write(lineout)
@@ -1047,6 +1082,17 @@ def PrintEllFilesGax(params,galpar,xradq,ysbq,ysberrq,xradm,ysbm,ysberrm):
         OUTFH.write(lineout)
 
     OUTFH.close()
+
+
+    runcmd = "mv  {}  sbfiles/{}".format(filegal,filegal)
+    errmv = sp.run([runcmd], shell=True, stdout=sp.PIPE,
+                       stderr=sp.PIPE, universal_newlines=True)
+
+    runcmd = "mv  {}  sbfiles/{}".format(filemodel,filemodel)
+    errmv = sp.run([runcmd], shell=True, stdout=sp.PIPE,
+                       stderr=sp.PIPE, universal_newlines=True)
+
+
 
 
 def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,params,scale):
@@ -1247,7 +1293,8 @@ def PrintEllFilesComps(params,galpar,namecomp,ncomp,xradq,ysbq,ysberrq):
     "Print surface brigthness of components to file "
     #subcomponent model 
 
-    OUTFH = open (params.sboutput+".comp-"+ncomp+".txt","w")
+    filesub = params.sboutput+".comp-"+ncomp+".txt"
+    OUTFH = open (filesub,"w")
 
     lineout= "# sectors_photometry used with  q = {} and pa = {} (same as GALFIT) \n".format(galpar.q,galpar.ang)
     OUTFH.write(lineout)
@@ -1278,6 +1325,11 @@ def PrintEllFilesComps(params,galpar,namecomp,ncomp,xradq,ysbq,ysberrq):
         OUTFH.write(lineout)
 
     OUTFH.close()
+
+    runcmd = "mv  {}  sbfiles/{}".format(filesub,filesub)
+    errmv = sp.run([runcmd], shell=True, stdout=sp.PIPE,
+                       stderr=sp.PIPE, universal_newlines=True)
+
 
 
 
@@ -1514,6 +1566,8 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
             axsec[row, 0].plot(r, mgesb[w], 'C3o')
 
             axsec[row, 0].plot(r2, mgemodsb[wmod], 'C0-', linewidth=2)
+            
+
 
         else:
             axsec[row, 0].semilogx(r, mgesb[w], 'C3o')
@@ -1683,7 +1737,8 @@ def PrintFilesGax(params,galpar,rtxtang,r,mgesb,w,r2,mgemodsb,wmod):
     "Print surface parameters of galaxy and model to outfile "
 
     # galaxy
-    OUTFH = open (params.sboutput+"-"+str(rtxtang)+".gal.txt","w")
+    filegalax=params.sboutput+"-"+str(rtxtang)+".gal.txt"
+    OUTFH = open (filegalax,"w")
 
     lineout= "# Values along radius with ang = {} from major axis \n".format(rtxtang)
     OUTFH.write(lineout)
@@ -1719,7 +1774,8 @@ def PrintFilesGax(params,galpar,rtxtang,r,mgesb,w,r2,mgemodsb,wmod):
     OUTFH.close()
 
     #model
-    OUTFH = open (params.sboutput+"-"+str(rtxtang)+".mod.txt","w")
+    filemodel=params.sboutput+"-"+str(rtxtang)+".mod.txt"
+    OUTFH = open (filemodel,"w")
 
     lineout= "# Values along radius with ang = {} from major axis \n".format(rtxtang)
     OUTFH.write(lineout)
@@ -1754,11 +1810,22 @@ def PrintFilesGax(params,galpar,rtxtang,r,mgesb,w,r2,mgemodsb,wmod):
 
     OUTFH.close()
 
+    runcmd = "mv  {}  sbfiles/{}".format(filegalax,filegalax)
+    errmv = sp.run([runcmd], shell=True, stdout=sp.PIPE,
+                       stderr=sp.PIPE, universal_newlines=True)
+
+    runcmd = "mv  {}  sbfiles/{}".format(filemodel,filemodel)
+    errmv = sp.run([runcmd], shell=True, stdout=sp.PIPE,
+                       stderr=sp.PIPE, universal_newlines=True)
+
+
 
 def PrintFilesComps(params,galpar,galcomps,rtxtang,ncomp,diffangle,rtemp,mgesbsub,ii,wtemp):
 
     #subcomponent model 
-    OUTFH = open (params.sboutput+"-"+str(rtxtang)+".comp-"+ncomp+".txt","w")
+
+    filesub=params.sboutput+"-"+str(rtxtang)+".comp-"+ncomp+".txt"
+    OUTFH = open (filesub,"w")
 
     lineout= "# Values along radius with ang = {} from major axis \n".format(rtxtang)
     OUTFH.write(lineout)
@@ -1805,6 +1872,9 @@ def PrintFilesComps(params,galpar,galcomps,rtxtang,ncomp,diffangle,rtemp,mgesbsu
 
     OUTFH.close()
 
+    runcmd = "mv  {}  sbfiles/{}".format(filesub,filesub)
+    errmv = sp.run([runcmd], shell=True, stdout=sp.PIPE,
+                       stderr=sp.PIPE, universal_newlines=True)
 
 
 
