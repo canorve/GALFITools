@@ -2547,15 +2547,18 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
         # per component: 
         CompCorMag = galcomps.Mag[maskmag] - GalExt # corrected by galactic extinction 
-        galcomps.AbsMag[maskmag] = CompCorMag - DistMod # No K correction applied
-        
+        #galcomps.AbsMag[maskmag] = CompCorMag - DistMod # No K correction applied
+        #No K correction applied:
+        galcomps.AbsMag[maskmag] = CompCorMag - DistMod2 # AbsMag using distance modulus independent of z 
 
         if params.band in SunMag:
             MSun = SunMag[params.band]
 
-            Lum = 10**((MSun - AbsMag)/2.5)
+            #Lum = 10**((MSun - AbsMag)/2.5) Luminosity will  now be computed using AbsMag2
+            Lum = 10**((MSun - AbsMag2)/2.5)
             # per component 
             galcomps.Lum[maskmag]= 10**((MSun - galcomps.AbsMag[maskmag])/2.5)
+
         else:
             print("Absolute Magnitude for Band {} was not found. Check filter name ".format(params.band))
             print("Luminosity will not be computed.")
@@ -2734,7 +2737,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
             lineout="Absolute Magnitud using Dist Mod independent of z = {:.3f} \n".format(AbsMag2)
             OUTPHOT.write(lineout)
 
-            lineout="Luminosity = {:.3f} (solar lum) \n".format(Lum)
+            lineout="Luminosity = {:.3f} (solar lum) using Dist Mod independent of z  \n".format(Lum)
             OUTPHOT.write(lineout)
 
 
@@ -2755,7 +2758,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     lineout = "########## Columns: #####################\n"  
     OUTPHOT.write(lineout)
 
-    lineout = "# Number Component PerLight me(mag) <me>(mag) Flux AbsMag Luminosity(SolarLum) Rad90(pix) Re(kpc)   \n"  
+    lineout = "# Number Component PerLight me(mag) <me>(mag) ApparentFlux AbsMag Luminosity(SolarLum) Rad90(pix) Re(kpc)   \n"  
     OUTPHOT.write(lineout)
 
 
@@ -3336,17 +3339,22 @@ def NED(params, galpar, galcomps):
 
             print("SB dimming in mag",SbDim)
 
-
             ## modulo de distancia calculado en forma independiente del redshift: 
             tabledist=votable.get_table_by_id("Redshift_IndependentDistances") 
 
             datadist=tabledist.array
 
-            DistMod2=datadist["DistanceModulus"].data[0] 
+            try:
+                DistMod2=datadist["DistanceModulus"].data[0] 
+                DistMod2=float(DistMod2)
+                print("Distance Modulus (z independent) ",DistMod2)
 
-            DistMod2=float(DistMod2)
+            except:
+                print("Distance Modulus, indep. of z, can't be extracted. ")
+                DistMod2=DistMod
+                print("Distance Modulus will be used from luminosity distance  ",DistMod2)
 
-            print("Distance Modulus (z independent) ",DistMod2)
+
         else:
             GalExt=0
             DistMod=0
