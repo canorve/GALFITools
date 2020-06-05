@@ -255,7 +255,6 @@ def main():
     plt.savefig(params.namepng,dpi=params.dpival)
     plt.close()
 
-
     ########################################################
     ################ Multiplots: ###########################
     ########################################################
@@ -1103,6 +1102,7 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,params,scale):
     """  Produces final best-fitting plot  """
 
     # subplot for arc sec axis
+    plt.close('all')
     fig, axsec = plt.subplots()
 
 
