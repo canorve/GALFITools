@@ -1901,13 +1901,16 @@ def FindSB(xarcq, ymgeq, numsectors):
         lima=i-numsectors
         limb=i
 
-        valstd=np.std(xarcq[lima:limb])
-        if valstd < 0.1:
-            numsave=count
+        if xarcq[lima:limb].size == 0:
             break
-        count=count+1
-    init=numsave%numsectors
+        else:
+            valstd=np.std(xarcq[lima:limb])
+            if valstd < 0.1:
+                numsave=count
+                break
+            count=count+1
 
+    init=numsave%numsectors
     n=init
 
     num=np.int((xarcq.size-init)/numsectors)
