@@ -253,7 +253,7 @@ def main():
     if params.dplot:
         plt.pause(1.5)
     plt.savefig(params.namepng,dpi=params.dpival)
-    plt.close()
+    #plt.close()
 
     ########################################################
     ################ Multiplots: ###########################
@@ -2467,9 +2467,12 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
 
     # call to Tidal
-    (tidal,objchinu,bump,snr,stdsnr,totsnr,rss,ndof)=Tidal(params, galpar, galcomps, sectgalax, 2)
+    (tidal,objchinu,bump,snr,stdsnr,totsnr,rss,ndof,magalaper,magmodaper)=Tidal(params, galpar, galcomps, sectgalax, 2)
 
-    
+    print("galaxy mag using sectors aperture = {:.3f} ".format(magalaper))
+    print("Model mag using sectors aperture = {:.3f}".format(magmodaper))
+
+
     #print("Tidal = ",tidal)  
     #print("Local Chinu = ",objchinu)  
     #print("Bumpiness = ",bump)  
@@ -2679,7 +2682,14 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
         #totFlux=Flux.sum()
         #totMag=-2.5*np.log10(totFlux) + galpar.mgzpt
 
-        lineout = "total apparent magnitude (without corrections) = {:.3f}  \n".format(totMag)
+
+        lineout = "total apparent magnitude of galaxy (using sectors aperture) = {:.3f}  \n".format(magalaper)
+        OUTPHOT.write(lineout)
+
+        lineout = "total apparent magnitude of model (using sectors aperture) = {:.3f}  \n".format(magmodaper)
+        OUTPHOT.write(lineout)
+
+        lineout = "total apparent magnitude from model parameters (without corrections) = {:.3f}  \n".format(totMag)
         OUTPHOT.write(lineout)
 
         lineout = "total flux (without corrections) = {:.3f}  \n".format(totFlux)
@@ -2808,6 +2818,11 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
 
     totsnr=0
     stdsnr=0
+
+    magalaper= 99
+    magmodaper = 99
+
+
     ################
 
   
@@ -2958,6 +2973,8 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
     mask = dist < dell
 
     #  correcting for rmin
+    #print("hola ",xlo,ylo,xhi,yhi)
+    #print("mask ",maskbum)
     maskbum[ylo - 1:yhi, xlo - 1:xhi][mask] = False
 
     ## identifying area to compute photometry: 
@@ -2983,7 +3000,7 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
     hdu[0].header  =header
 
 
-    hdu[0].data = (~maskm).astype("int")*1000
+    hdu[0].data = (~maskm).astype("int")*10000
     hdu.writeto(params.namecheck, overwrite=True)
     hdu.close()
 
@@ -3016,7 +3033,9 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
 
 
         sumflux  = np.sum(imgal[maskm])
+        sumfluxmod  = np.sum(immodel[maskm])
         sumsig   = np.sum(imsigma[maskm])
+
 
         galflux  = imgal[maskm]
         modflux  = immodel[maskm]
@@ -3116,8 +3135,16 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
     #rss=(imres[ylo - 1:yhi, xlo - 1:xhi][maskm]**2).sum()
     rss=(imres[maskm]**2).sum()
     
+
+
+    #computing magnitud for galaxy and model using aperture. 
+
+    magalaper= galpar.mgzpt - 2.5*np.log10(sumflux/galpar.exptime)  #+ 0.1
+    magmodaper = galpar.mgzpt - 2.5*np.log10(sumfluxmod/galpar.exptime) # + 0.1
+
+
   
-    return (tidal,objchinu,bump,snr,stdsnr,totsnr,rss,ndof)
+    return (tidal,objchinu,bump,snr,stdsnr,totsnr,rss,ndof,magalaper,magmodaper)
 
 
 
