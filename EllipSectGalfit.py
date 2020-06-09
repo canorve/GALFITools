@@ -2156,7 +2156,19 @@ def ReadGALFITout(inputf,galpar):
     else:
         errmsg="Unable to find Mask file"
         print(errmsg)
-        galpar.tempmask=None
+        GetFits(galpar.inputimage, galpar.tempmask, galpar.xmin, galpar.xmax, galpar.ymin, galpar.ymax)
+
+        hdu = fits.open(galpar.tempmask)
+        mask = hdu[0].data
+        mask.fill(False)
+        mask.astype("bool")
+        hdu[0].data = mask
+        hdu.writeto(galpar.tempmask, overwrite=True)
+
+        hdu.close()
+
+
+
 
     #return xc,yc,q,pa,skylevel,scale,outimage,mgzpt,exptime,mask
 
@@ -2496,13 +2508,15 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
             params.flagobj=True
             print("using object name: {} to search in NED ".format(params.objname))            
 
-        elif "TARGNAME": 
+        elif "TARGNAME" in header:  
             params.objname=header["TARGNAME"] 
             params.flagobj=True
             print("using object name: {} to search in NED ".format(params.objname))            
         else:
             print("WARNING: name for object not found in header nor it was provided by user") 
             print("Luminosity and absolute magnitude will not be computed") 
+            print("Luminosity and absolute magnitude for individual components will have wrong quantities ") 
+
     else:
         print("using object name: {} to search in NED ".format(params.objname))            
 
@@ -2773,7 +2787,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
 
     for idx, item in enumerate(galcomps.N) :
-        lineout= "{0} {1} {2:^6.3f} {3:^6.3f} {4:^6.3f} {5:^10.3f} {6:^6.3f} {7:^17.3f} {8:^10.3f} {9:^10.3f} \n".format(galcomps.N[idx],galcomps.NameComp[idx],galcomps.PerLight[idx],galcomps.me[idx],galcomps.mme[idx],galcomps.Flux[idx],galcomps.AbsMag[idx],galcomps.Lum[idx],galcomps.Rad90[idx],galcomps.Rad50kpc[idx])
+        lineout= "{0:^1} {1:^10} {2:^5.3f} {3:^5.3f} {4:^5.3f} {5:^10.3f} {6:^7.3f} {7:^7.3f} {8:^7.3f} {9:^7.3f} \n".format(galcomps.N[idx],galcomps.NameComp[idx],galcomps.PerLight[idx],galcomps.me[idx],galcomps.mme[idx],galcomps.Flux[idx],galcomps.AbsMag[idx],galcomps.Lum[idx],galcomps.Rad90[idx],galcomps.Rad50kpc[idx])
         OUTPHOT.write(lineout)
 
     OUTPHOT.close()
@@ -2921,10 +2935,10 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
     hdu.close()
 
 
-    if galpar.tempmask!=None:
-        imell=immask.copy()
-    else:
-        imell=imgal.copy()
+    #if galpar.tempmask!=None:
+    imell=immask.copy()
+    #else:
+    #    imell=imgal.copy()
 
 
     imell.fill(False)
@@ -2933,7 +2947,10 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
         #    for objchinu, Tidal and SNR
         #    maskm = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
         #maskm =immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
+    #if galpar.tempmask!=None:
     maskm =immask == False  # big image coordinates
+    #else:
+    #    maskm =imell == False  # big image coordinates
 
 
         #maskm =immask == False  # big image coordinates
@@ -2941,8 +2958,10 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
         #   mask including rmin for Bumpiness only
         #    maskbum = dat[ylo - 1:yhi, xlo - 1:xhi] == num  # big image coordinates
         #maskbum = immask[ylo - 1:yhi, xlo - 1:xhi] == False  # big image coordinates
+    #if galpar.tempmask!=None:
     maskbum = immask == False  # big image coordinates
-
+    #else:
+    #    maskbum = imell == False  # big image coordinates
 
     #############
 
@@ -2973,8 +2992,7 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
     mask = dist < dell
 
     #  correcting for rmin
-    #print("hola ",xlo,ylo,xhi,yhi)
-    #print("mask ",maskbum)
+    
     maskbum[ylo - 1:yhi, xlo - 1:xhi][mask] = False
 
     ## identifying area to compute photometry: 
@@ -2992,15 +3010,18 @@ def Tidal(params, galpar, galcomps, sectgalax, rmin):
     maskbum=maskbum*imell
 
 
-
+    #if galpar.tempmask!=None:
     hdu = fits.open(galpar.tempmask)
+    #else:
+    #    hdu = fits.open(params.namesig)
+
     header=hdu[0].header  
 
     header['TypeIMG'] = ('Check', 'Use this image to check the area where photometry was computed')
     hdu[0].header  =header
 
 
-    hdu[0].data = (~maskm).astype("int")*10000
+    hdu[0].data = (~maskm).astype("int")*100
     hdu.writeto(params.namecheck, overwrite=True)
     hdu.close()
 
