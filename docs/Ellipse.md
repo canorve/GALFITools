@@ -36,7 +36,7 @@ pip install mgefit
 The options to run the code in the terminal (or ipython) are:
 
 ```
- ./EllipSectGalfit.py [GALFITOutputFile] [-logx] [-q AxisRatio] [-pa PositionAngle] [-comp] [-pix] [-ranx/y Value] [-grid] [-dpi Value] [-noplot] [-phot] [-sbout] [-noplot] [-minlevel Value] [-sectors Value] [-object Name] [-filter Name] [-snr] [-help] [-checkimg] [-noned] [-distmod Value] [-magcor Value] [-scalekpc Value][-sbdim Value] [-model ModelImage]
+ ./EllipSectGalfit.py [GALFITOutputFile] [-logx] [-q AxisRatio] [-pa PositionAngle] [-comp] [-pix] [-ranx/y Value] [-grid] [-dpi Value] [-noplot] [-phot] [-sbout] [-noplot] [-minlevel Value] [-sectors Value] [-object Name] [-filter Name] [-snr] [-help] [-checkimg] [-noned] [-distmod Value] [-magcor Value] [-scalekpc Value][-sbdim Value] [-model ModelImage] [-keep] [-ned XmlFile] 
  ```
 
 ### Input File
@@ -114,6 +114,12 @@ Any of the following options disabled the connection to NED
             inaccurate  for  this option.
 
 **sky**: User can introduce his/her own sky value. 
+
+**keep**: Use existing '-comp.fits' file to compute subcomponents. 
+
+**ned**: User can introduce his/her own  ned xml file.
+
+
 
 ## Notes
 

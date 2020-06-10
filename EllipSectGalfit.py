@@ -335,6 +335,7 @@ class InputParams:
 
     flagsky=False
     flagkeep=False
+    flagnedfile=False
 
 
     #init
@@ -385,6 +386,7 @@ class InputParams:
     namened="none-ned.xml"
     namecheck="none-check.fits"
 
+    nedfile="default.xml"
 
 
 ### class for Galfit parameters
@@ -468,7 +470,9 @@ class GalfitComps:
 
 def InputSys(params,argv):
     ''' Read user's input '''
-    OptionHandleList = ['-logx', '-q', '-pa','-comp','-pix','-ranx','-rany','-grid','-dpi','-sbout','-noplot','-minlevel','-sectors','-phot','-object','-filter','-snr','-help','-checkimg','-noned','-distmod','-magcor','-scalekpc','-sbdim','-model','-sky','-keep']
+    OptionHandleList = ['-logx', '-q', '-pa','-comp','-pix','-ranx','-rany','-grid','-dpi','-sbout','-noplot',
+        '-minlevel','-sectors','-phot','-object','-filter','-snr','-help','-checkimg','-noned','-distmod','-magcor',
+        '-scalekpc','-sbdim','-model','-sky','-keep','-ned']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[1:]] = argv[argv.index(OptionHandle)] if OptionHandle in argv else None
@@ -530,6 +534,8 @@ def InputSys(params,argv):
         params.flagsky=True
     if options['keep'] != None:
         params.flagkeep=True
+    if options['ned'] != None:
+        params.flagnedfile=True
 
 
     # check for unrecognized options:
@@ -653,6 +659,14 @@ def InputSys(params,argv):
         opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
         params.insky=np.float(opt['sky'])
 
+
+    if params.flagnedfile == True:
+        opt={}
+        OptionHandle="-ned"
+        opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
+        params.nedfile=np.str(opt['ned'])
+
+
     params.galfile= sys.argv[1]
 
     return True
@@ -662,7 +676,7 @@ def InputSys(params,argv):
 def Help():
 
     print ("Usage:\n %s [GALFITOutputFile] [-logx] [-q AxisRatio] [-pa PositionAngle] [-comp] [-pix] [-ranx/y Value] [-grid] [-dpi Value] [-noplot] [-phot] " % (sys.argv[0]))
-    print ("More options: [-sbout] [-noplot] [-minlevel Value] [-sectors Value] [-object Name] [-filter Name] [-snr] [-help] [-checkimg] [-noned] [-distmod Value] [-magcor Value] [-scalekpc Value] [-sbdim Value] [-keep] ") 
+    print ("More options: [-sbout] [-noplot] [-minlevel Value] [-sectors Value] [-object Name] [-filter Name] [-snr] [-help] [-checkimg] [-noned] [-distmod Value] [-magcor Value] [-scalekpc Value] [-sbdim Value] [-keep] [-ned XmlFile] ") 
 
     print ("GALFITOutputFile: GALFIT output file ")
     print ("logx: activates X-axis as logarithm ")
@@ -686,6 +700,8 @@ def Help():
     print ("      snr: Creates Signal to Noise image ")
     print ("      object: used for 'phot' to search in NED  ")
     print ("      filter: used for 'phot' to indicate band for NED ")
+    print ("      ned: user can introduce his/her own ned xml file")
+
     print ("      noned: avoid to connect to NED")
     print ("any of the following options disabled the connection of NED ")    
     print ("      distmod: Introduce Distance Modulus ")
@@ -3305,7 +3321,10 @@ def NED(params, galpar, galcomps):
 
     nedweb="https://ned.ipac.caltech.edu/cgi-bin/nph-objsearch?extend=no&of=xml_all&objname="
 
-    filened=params.namened
+    if params.flagnedfile:
+        filened = params.nedfile
+    else:
+        filened=params.namened
 
     if params.flagmod or params.flagmag or params.flagscale or params.flagdim:
 
@@ -3318,20 +3337,28 @@ def NED(params, galpar, galcomps):
         #checar si el archivo existe para no hacer conexion a internet
         if(not(os.path.isfile(filened))):
 
-            # command for wget
-            #wget -O NED_51.xml "https://ned.ipac.caltech.edu/cgi-bin/nph-objsearch?extend=no&of=xml_all&objname=m+51"
-            wgetcmd = 'wget -O {} "{}{}"'.format(filened,nedweb,objname)
-
-            print("Running: ",wgetcmd)
-
-            errwg = sp.run([wgetcmd], shell=True, stdout=sp.PIPE,stderr=sp.PIPE, universal_newlines=True)
-
-            if errwg.returncode != 0:
-                print("can't connect to NED webserver. Is your internet connection working? ")
-                print("Luminosity and absolute magnitude will not be computed") 
+            if params.flagnedfile:
+                print("can't find user's ned {} file ".format(filened))
                 params.flagweb=False
+            else:
+                # command for wget
+                #wget -O NED_51.xml "https://ned.ipac.caltech.edu/cgi-bin/nph-objsearch?extend=no&of=xml_all&objname=m+51"
+                wgetcmd = 'wget -O {} "{}{}"'.format(filened,nedweb,objname)
+
+                print("Running: ",wgetcmd)
+
+                errwg = sp.run([wgetcmd], shell=True, stdout=sp.PIPE,stderr=sp.PIPE, universal_newlines=True)
+
+                if errwg.returncode != 0:
+                    print("can't connect to NED webserver. Is your internet connection working? ")
+                    print("Luminosity and absolute magnitude will not be computed") 
+                    params.flagweb=False
         else:
-            print("using existing {} file ".format(filened))
+            if (params.flagnedfile):
+                print("using existing user's {} file ".format(filened))
+            else:
+                print("using existing {} file ".format(filened))
+ 
 
 
         print("reading ",filened)
@@ -3409,7 +3436,6 @@ def NED(params, galpar, galcomps):
             DistMod2=0
             Scalekpc=0
             SbDim=0
-
 
     # returns warnings to normal
     if not sys.warnoptions:
