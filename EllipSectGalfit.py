@@ -675,7 +675,7 @@ def InputSys(params,argv):
 
 def Help():
 
-    print ("Usage:\n %s [GALFITOutputFile] [-logx] [-q AxisRatio] [-pa PositionAngle] [-comp] [-pix] [-ranx/y Value] [-grid] [-dpi Value] [-noplot] [-phot] " % (sys.argv[0]))
+    print ("Usage:\n %s [GALFITOutputFile] [-logx] [-q AxisRatio] [-pa PositionAngle] [-comp] [-pix] [-ranx/y Value] [-grid] [-dpi Value] [-model File] [-phot] [-sky Value] " % (sys.argv[0]))
     print ("More options: [-sbout] [-noplot] [-minlevel Value] [-sectors Value] [-object Name] [-filter Name] [-snr] [-help] [-checkimg] [-noned] [-distmod Value] [-magcor Value] [-scalekpc Value] [-sbdim Value] [-keep] [-ned XmlFile] ") 
 
     print ("GALFITOutputFile: GALFIT output file ")
@@ -723,7 +723,7 @@ def Help():
 
 
     print ("Example:\n %s galfit.01 -logx" % (sys.argv[0]))
-    print ("or Example:\n %s galfit.02 -q 0.35 -pa 60 -comp -ranx 2 -out " % (sys.argv[0]))
+    print ("or Example:\n %s galfit.02 -q 0.35 -pa 60 -comp -ranx 2 -phot " % (sys.argv[0]))
     print ("or Example:\n %s galfit.02 -q 0.35 -pa 60 -comp -ranx 1-20" % (sys.argv[0]))
     print ("see https://github.com/canorve/GALFITools/blob/master/docs/Ellipse.md  for more examples")
 
