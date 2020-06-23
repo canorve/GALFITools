@@ -405,7 +405,7 @@ class GalfitParams:
     maskimage="galaxy-mask.fits"
     mgzpt=25
     exptime=1
-    tempmask="mask.fits"
+    tempmask="tempmask.fits"
     xmin=1
     xmax=2
     ymin=1
@@ -2158,7 +2158,15 @@ def ReadGALFITout(inputf,galpar):
     galpar.yc=galpar.yc-galpar.ymin+1
 
 
-    if os.path.isfile(galpar.maskimage):
+    flagaxis=False
+    col1,row1=GetAxis(galpar.maskimage)
+    col2,row2=GetAxis(galpar.inputimage)
+
+    if (col1 != col2 or row1 != row2):
+        flagaxis=True
+
+
+    if (os.path.isfile(galpar.maskimage)) and (flagaxis==False):
         mime=mimetypes.guess_type(galpar.maskimage)
 
         flagbm = not(mime[0] == "text/plain")
@@ -2166,12 +2174,16 @@ def ReadGALFITout(inputf,galpar):
         errmsg="Sorry the mask file: {}  must be binary, not ASCII ".format(maskimage)
         assert flagbm is True, errmsg
 
-        galpar.tempmask="tempmask.fits"
         GetFits(galpar.maskimage, galpar.tempmask, galpar.xmin, galpar.xmax, galpar.ymin, galpar.ymax)
 
     else:
-        errmsg="Unable to find Mask file"
-        print(errmsg)
+        if flagaxis == True:
+            errmsg="Mask and image do not have the same shape. Ignoring mask"
+            print(errmsg)
+        else:
+            errmsg="Unable to find Mask file"
+            print(errmsg)
+
         GetFits(galpar.inputimage, galpar.tempmask, galpar.xmin, galpar.xmax, galpar.ymin, galpar.ymax)
 
         hdu = fits.open(galpar.tempmask)
@@ -3510,6 +3522,25 @@ def GetKAprox(n):
 
 
     return (K)
+
+
+
+def GetAxis(Image):
+    # k Check
+    "Get number of rows and columns from the image"
+
+    hdu = fits.open(Image)
+#    ncol = hdu[0].header["NAXIS1"]
+#    nrow = hdu[0].header["NAXIS2"]
+    ncol = hdu[0].header.get("NAXIS1",2000) # return 2000 if not found
+    nrow = hdu[0].header.get("NAXIS2",2000) # return 2000 if not found
+    hdu.close()
+
+    #ncol=np.int(ncol)
+    #nrow=np.int(nrow)
+
+    return ncol, nrow
+
 
 
 
