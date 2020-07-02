@@ -15,7 +15,7 @@ import mimetypes
 import warnings
 
 
-
+from scipy import interpolate
 from astropy.io.votable import parse
 from mgefit.sectors_photometry import sectors_photometry
 
@@ -1562,12 +1562,13 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
         wmod = np.nonzero(mgemodangle == sectors[j])[0]
         wmod = wmod[np.argsort(mgemodrad[wmod])]
 
-        if (len(mgemodrad) < len(mgerad)):
-            r2 = mgemodrad[wmod]
-        else:
-            wmod=w
-            r2 = mgemodrad[wmod]
+        #if (len(mgemodrad) < len(mgerad)):
+        #    r2 = mgemodrad[wmod]
+        #else:
+        #    wmod=w
+        #    r2 = mgemodrad[wmod]
 
+        r2 = mgemodrad[wmod]
 
         txtang= sectors[j]
         txt = "$%.f^\circ$" % txtang
@@ -1587,7 +1588,6 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
             axsec[row, 0].plot(r2, mgemodsb[wmod], 'C0-', linewidth=2)
             
-
 
         else:
             axsec[row, 0].semilogx(r, mgesb[w], 'C3o')
@@ -1681,12 +1681,17 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
         axsec[row, 0].text(0.98, 0.95, txt, ha='right', va='top', transform=axsec[row, 0].transAxes)
 
-        if (len(mgemodrad) < len(mgerad)):
-            sberr=1-mgemodsb[wmod]/mgesb[wmod]
-            axsec[row, 1].plot(r2, sberr*100, 'C0o')
-        else:
-            sberr=1-mgemodsb[w]/mgesb[w]
+
+        if (len(mgemodrad) > len(mgerad)):
+
+            mgemodsbnew = Interpol(r2,mgemodsb[wmod],r)
+            sberr=1-mgemodsbnew/mgesb[w]
             axsec[row, 1].plot(r, sberr*100, 'C0o')
+
+        else:
+            mgesbnew = Interpol(r,mgesb[w],r2)
+            sberr=1-mgemodsb[wmod]/mgesbnew
+            axsec[row, 1].plot(r2, sberr*100, 'C0o')
 
 
         axsec[row, 1].axhline(linestyle='--', color='C1', linewidth=2)
@@ -1751,6 +1756,13 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
         axpix2.tick_params(which='both', width=2)
         axpix2.tick_params(which='major', length=7)
         axpix2.tick_params(which='minor', length=4, color='r')
+
+
+def  Interpol(X,Y,X2):
+
+    tck = interpolate.splrep(X, Y)
+    return interpolate.splev(X2, tck)
+
 
 
 def PrintFilesGax(params,galpar,rtxtang,r,mgesb,w,r2,mgemodsb,wmod):
