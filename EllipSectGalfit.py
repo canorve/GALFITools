@@ -1552,7 +1552,9 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
 
     #    row = 7 # old values
-    row = nrows -1
+    #row = nrows -1
+    row = 0  # major axis in first row
+
     for j in range(0, n, dn):
         w = np.nonzero(mgeangle == sectors[j])[0]
 
@@ -1587,8 +1589,6 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
             axsec[row, 0].plot(r, mgesb[w], 'C3o')
 
             axsec[row, 0].plot(r2, mgemodsb[wmod], 'C0-', linewidth=2)
-            
-
         else:
             axsec[row, 0].semilogx(r, mgesb[w], 'C3o')
 
@@ -1699,6 +1699,7 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
         axsec[row, 1].yaxis.set_label_position("right")
         axsec[row, 1].set_ylim([-19.5, 20])
         # axsec[row, 1].set_ylim([-20, 20])
+        axsec[row, 1].text(0.98, 0.95, txt, ha='right', va='top', transform=axsec[row, 1].transAxes)
 
 
         if params.flagranx[1] == False:
@@ -1718,7 +1719,9 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
         axsec[row, 1].tick_params(which='minor', length=4, color='r')
 
 
-        row -= 1
+        # row -= 1
+        row += 1
+
 
     if params.flagpix == True:
         axpix.set_xlabel("(pixels)")
