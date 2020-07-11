@@ -121,7 +121,10 @@ def main():
     print(str)
 
 
-    str = "Plate Scale= {} ".format(galpar.scale)
+    str = "Plate Scale = {} ".format(galpar.scale)
+    print(str)
+
+    str = "Mag zpt = {} ".format(galpar.mgzpt)
     print(str)
 
 
@@ -1067,7 +1070,7 @@ def EllipSectors(params, galpar, galcomps, sectgalax, n_sectors=19, minlevel=0):
 
         idgrad=np.where(ygrad > 0)
 
-        print("gradient method: ")
+        print("1) gradient method: ")
         print("std sky is from averaging over sectors. Do not use it for sigma image ")
 
 
@@ -1078,6 +1081,11 @@ def EllipSectors(params, galpar, galcomps, sectgalax, n_sectors=19, minlevel=0):
             #print("idx: ",idx)
             print("sky: {:.2f}, std: {:.2f} radius: {:.2f} grad: {:.2f} ".format(ysortsbc[idgrad][idx],ysortsbcerr[idgrad][idx],xsortrad[idgrad][idx]*galpar.scale,ygrad[idgrad][idx]))
 
+        print("")
+
+        print("mean sky: {:.2f} mean std: {:.2f} ".format(ysortsbc[idgrad].mean(),ysortsbcerr[idgrad].mean()))
+        idmin=np.where(np.min(ygrad[idgrad]) == ygrad[idgrad])
+        print("mingrad: sky: {:.2f} std: {:.2f} rad: {:.2f} ".format(ysortsbc[idgrad][idmin][0],ysortsbcerr[idgrad][idmin][0],xsortrad[idgrad][idmin][0]*galpar.scale))
 
 
         if params.flagmask == True: 
@@ -1086,8 +1094,8 @@ def EllipSectors(params, galpar, galcomps, sectgalax, n_sectors=19, minlevel=0):
         else:
             img=galpar.img  
 
-
-        print("Excluding the top and bottom 20%:") 
+        print("")
+        print("2) Excluding the top and bottom 20%:") 
     
         flatimg=img.flatten()  
         flatimg.sort()
@@ -1102,8 +1110,8 @@ def EllipSectors(params, galpar, galcomps, sectgalax, n_sectors=19, minlevel=0):
         skymean=np.mean(img2)
         skysig=np.std(img2)
 
-        print("mean sky: {:.3f} ".format(skymean))
-        print("std sky: {:.3f} ".format(skysig))
+        print("mean sky: {:.2f} ".format(skymean))
+        print("std sky: {:.2f} ".format(skysig))
 
 
 
