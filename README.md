@@ -29,6 +29,8 @@ The main programs are:
 - [GetK](./docs/GetK.md)
 - [GalfitSky](./docs/GalfitSky.md)
 - [xy2fits](./docs/xy2fits.md)
+- [sbprof](./docs/sbprof.md)
+
 
 Click in each link to see tutorial and further explanations.
 
