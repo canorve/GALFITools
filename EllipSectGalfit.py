@@ -337,6 +337,8 @@ class InputParams:
     flagkeep=False
     flagnedfile=False
 
+    flagradsky=False
+
 
     #init
     qarg=1
@@ -472,7 +474,7 @@ def InputSys(params,argv):
     ''' Read user's input '''
     OptionHandleList = ['-logx', '-q', '-pa','-comp','-pix','-ranx','-rany','-grid','-dpi','-sbout','-noplot',
         '-minlevel','-sectors','-phot','-object','-filter','-snr','-help','-checkimg','-noned','-distmod','-magcor',
-        '-scalekpc','-sbdim','-model','-sky','-keep','-ned']
+        '-scalekpc','-sbdim','-model','-sky','-keep','-ned','-gradsky']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[1:]] = argv[argv.index(OptionHandle)] if OptionHandle in argv else None
@@ -536,6 +538,8 @@ def InputSys(params,argv):
         params.flagkeep=True
     if options['ned'] != None:
         params.flagnedfile=True
+    if options['gradsky'] != None:
+        params.flagradsky=True
 
 
     # check for unrecognized options:
@@ -676,7 +680,7 @@ def InputSys(params,argv):
 def Help():
 
     print ("Usage:\n %s [GALFITOutputFile] [-logx] [-q AxisRatio] [-pa PositionAngle] [-comp] [-pix] [-ranx/y Value] [-grid] [-dpi Value] [-model File] [-phot] [-sky Value] " % (sys.argv[0]))
-    print ("More options: [-sbout] [-noplot] [-minlevel Value] [-sectors Value] [-object Name] [-filter Name] [-snr] [-help] [-checkimg] [-noned] [-distmod Value] [-magcor Value] [-scalekpc Value] [-sbdim Value] [-keep] [-ned XmlFile] ") 
+    print ("More options: [-sbout] [-noplot] [-minlevel Value] [-sectors Value] [-object Name] [-filter Name] [-snr] [-help] [-checkimg] [-noned] [-distmod Value] [-magcor Value] [-scalekpc Value] [-sbdim Value] [-keep] [-ned XmlFile] [-gradsky ] ") 
 
     print ("GALFITOutputFile: GALFIT output file ")
     print ("logx: activates X-axis as logarithm ")
@@ -717,6 +721,7 @@ def Help():
     print ("sectors: parameter given directly to sectors_photometry. Divide elipse in 'sectors' ")
     print ("                      Check sectors_photometry manual")
     print ("checkimg: save the images used for sectors_photometry in individual components")
+    print ("gradsky: computes sky using the gradient method ")
 
 
     print ("help: This menu ")
@@ -968,9 +973,90 @@ def EllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps,n_sec
     xarcg = aellarcg[stidxq]
     ymgeg = mgesbg[stidxq]
 
+    ymgec = mgecount[stidxq] + galpar.skylevel
+
     #############  Function to order SB along X-axis for galaxy
 
-    xradq, ysbq, ysberrq    = FindSB(xarcg, ymgeg, n_sectors)
+    #xradq, ysbq, ysberrq    = FindSB(xarcg, ymgeg, n_sectors)
+
+    xradq, ysbq, ysberrq, ysbc, ysbcerr  = FindSBCounts(xarcg, ymgeg, ymgec, n_sectors)
+
+
+    # computing sky as a reference.
+    if params.flagradsky:
+
+        print("Computing sky as a reference. This will not be used for output computations.")
+
+        #change sorting 
+        gradidx = np.argsort(xradq)
+
+        xsortrad=xradq[gradidx]
+        ysortsbc=ysbc[gradidx]
+        ysortsbcerr=ysbcerr[gradidx]
+
+        ygrad=np.gradient(ysortsbc)
+
+        idgrad=np.where(ygrad > 0)
+
+        print("hola ",idgrad)
+        
+        print("1) gradient method: ")
+        print("std sky is from averaging over sectors. Do not use it for sigma image ")
+
+        if any(idgrad[0]):
+
+            for idx, item in enumerate(xsortrad[idgrad]):
+
+                #print("sky: {:.2f} , std: {:.2f} ".format(ysbc[idgrad][6],ysbcerr[idgrad][6]))
+                #if idx > 1 and idx < 10:
+                #print("idx: ",idx)
+                print("sky: {:.2f}, std: {:.2f} radius: {:.2f} grad: {:.2f} ".format(ysortsbc[idgrad][idx],ysortsbcerr[idgrad][idx],xsortrad[idgrad][idx]*galpar.scale,ygrad[idgrad][idx]))
+
+            print("")
+
+            print("mean sky: {:.2f} mean std: {:.2f} ".format(ysortsbc[idgrad].mean(),ysortsbcerr[idgrad].mean()))
+            idmin=np.where(np.min(np.abs(ygrad[idgrad])) == np.abs(ygrad[idgrad]))
+            print("mingrad: sky: {:.2f} std: {:.2f} rad: {:.2f} ".format(ysortsbc[idgrad][idmin][0],ysortsbcerr[idgrad][idmin][0],xsortrad[idgrad][idmin][0]*galpar.scale))
+
+        else:
+            print("Can't determine sky because gradient never turns positive ")
+            print("Try increasing the image region to fit ")
+
+
+
+
+        print("")
+        print("2) Excluding the top and bottom 20%:") 
+
+
+        if  (os.path.isfile(galpar.maskimage)): 
+            skymask = galpar.mask == False
+            #img=galpar.img[skymask]  + galpar.skylevel
+            img=galpar.img[skymask].copy()
+            img = img + galpar.skylevel
+        else:
+            #img=galpar.img  + galpar.skylevel
+            img=galpar.img.copy()
+            img = img + galpar.skylevel
+
+
+
+        flatimg=img.flatten()  
+        flatimg.sort()
+
+        tot=len(flatimg)
+
+        top=round(.8*tot)
+        bot=round(.2*tot)
+
+        img2=flatimg[bot:top]
+
+        skymean=np.mean(img2)
+        skysig=np.std(img2)
+
+        print("mean sky: {:.2f} ".format(skymean))
+        print("std sky: {:.2f} ".format(skysig))
+
 
     ################
 
@@ -1958,6 +2044,61 @@ def FindSB(xarcq, ymgeq, numsectors):
         n=n-numsectors
 
     return xradq, ysbq, ysberrq
+
+def FindSBCounts(xarcq, ymgeq, ymgec, numsectors):
+    # the xarcq array must be ordered
+    # use mag instead of counts
+
+    xradq=[]
+    ysbq=[]
+    ysberrq=[]
+    ysbc=[]
+    ysbcerr=[]
+
+    xradq=np.array(xradq)
+    ysbq=np.array(ysbq)
+    ysberrq=np.array(ysberrq)
+    ysbc=np.array(ysbc)
+    ysbcerr=np.array(ysbcerr)
+
+
+    numsave=0
+    tot=xarcq.size
+    count=0
+    for i in range(tot,0,-1):
+
+        lima=i-numsectors
+        limb=i
+
+        if xarcq[lima:limb].size == 0:
+            break
+        else:
+            valstd=np.std(xarcq[lima:limb])
+            if valstd < 0.1:
+                numsave=count
+                break
+            count=count+1
+
+    init=numsave%numsectors
+    n=init
+
+    num=np.int((xarcq.size-init)/numsectors)
+    n=xarcq.size-init
+    for i in range(num,0,-1):
+
+        lima=n-numsectors
+        limb=n
+
+        xradq=np.append(xradq,np.mean(xarcq[lima:limb]))
+        ysbq=np.append(ysbq,np.mean(ymgeq[lima:limb]))
+        ysberrq=np.append(ysberrq,np.std(ymgeq[lima:limb]))
+        ysbc=np.append(ysbc,np.mean(ymgec[lima:limb]))
+        ysbcerr=np.append(ysbcerr,np.std(ymgec[lima:limb]))
+
+        n=n-numsectors
+
+    return xradq, ysbq, ysberrq, ysbc,ysbcerr
+
 
 
 def ReadGALFITout(inputf,galpar):
