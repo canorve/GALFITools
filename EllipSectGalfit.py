@@ -119,8 +119,10 @@ def SectorsGalfit(params):
     str = "number of sectors = {}  ".format(params.sectors)
     print(str)
 
+    str = "Mag zeropoint = {} ".format(galpar.mgzpt)
+    print(str)
 
-    str = "Plate Scale= {} ".format(galpar.scale)
+    str = "Plate Scale = {} ".format(galpar.scale)
     print(str)
 
 
@@ -1522,7 +1524,7 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
     if params.flagcomp:
 
-        wtemp=[]
+        angtemp=[]
         mgesbsub=[]
         mgeradsub=[]
         mgeanglesub=[]
@@ -1643,21 +1645,21 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     row = 0  # major axis in first row
 
     for j in range(0, n, dn):
-        w = np.nonzero(mgeangle == sectors[j])[0]
+        angal = np.nonzero(mgeangle == sectors[j])[0]
 
-        w = w[np.argsort(mgerad[w])]
-        r = mgerad[w]
+        angal = angal[np.argsort(mgerad[angal])]
+        r = mgerad[angal]
 
-        wmod = np.nonzero(mgemodangle == sectors[j])[0]
-        wmod = wmod[np.argsort(mgemodrad[wmod])]
+        angmod = np.nonzero(mgemodangle == sectors[j])[0]
+        angmod = angmod[np.argsort(mgemodrad[angmod])]
 
         #if (len(mgemodrad) < len(mgerad)):
-        #    r2 = mgemodrad[wmod]
+        #    r2 = mgemodrad[angmod]
         #else:
-        #    wmod=w
-        #    r2 = mgemodrad[wmod]
+        #    angmod=w
+        #    r2 = mgemodrad[angmod]
 
-        r2 = mgemodrad[wmod]
+        r2 = mgemodrad[angmod]
 
         txtang= sectors[j]
         txt = "$%.f^\circ$" % txtang
@@ -1673,19 +1675,19 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
             axsec[row, 0].set_ylim(ymax,ymin) #inverted
 
         if params.flaglogx == False:
-            axsec[row, 0].plot(r, mgesb[w], 'C3o')
+            axsec[row, 0].plot(r, mgesb[angal], 'C3o')
 
-            axsec[row, 0].plot(r2, mgemodsb[wmod], 'C0-', linewidth=2)
+            axsec[row, 0].plot(r2, mgemodsb[angmod], 'C0-', linewidth=2)
         else:
-            axsec[row, 0].semilogx(r, mgesb[w], 'C3o')
+            axsec[row, 0].semilogx(r, mgesb[angal], 'C3o')
 
-            axsec[row, 0].semilogx(r2, mgemodsb[wmod], 'C0-', linewidth=2)
+            axsec[row, 0].semilogx(r2, mgemodsb[angmod], 'C0-', linewidth=2)
 
         if params.flagsbout == True: 
 
             rtxtang=np.int(np.round(txtang)) 
 
-            PrintFilesGax(params,galpar,rtxtang,r,mgesb,w,r2,mgemodsb,wmod)
+            PrintFilesGax(params,galpar,rtxtang,r,mgesb,angal,r2,mgemodsb,angmod)
 
 
         if params.flagrid == True:
@@ -1706,7 +1708,7 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
             while(ii<len(galcomps.N)):
 
-                #wtemp = np.nonzero(mgeanglesub[ii] == sectors[j])[0]
+                #angtemp = np.nonzero(mgeanglesub[ii] == sectors[j])[0]
         
                 ######################## Patch for angle :############  
                 alpha = sectors[j]
@@ -1743,26 +1745,26 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
                 ###############################################
                 
-                #wtemp = np.nonzero(mgeanglesub[ii] == sectorsub[ii][j])[0]
-                wtemp = np.nonzero(mgeanglesub[ii] == sectorsub[ii][jj])[0]
-                wtemp = wtemp[np.argsort(mgeradsub[ii][wtemp])]
+                #angtemp = np.nonzero(mgeanglesub[ii] == sectorsub[ii][j])[0]
+                angtemp = np.nonzero(mgeanglesub[ii] == sectorsub[ii][jj])[0]
+                angtemp = angtemp[np.argsort(mgeradsub[ii][angtemp])]
 
       
-                rtemp = mgeradsub[ii][wtemp]
+                rtemp = mgeradsub[ii][angtemp]
 
                 colorval = scalarMap.to_rgba(values[ii])
                 if params.flaglogx == False:
-                #    axsec[row, 0].plot(rtemp, mgesbsub[ii][wtemp],'--',color='skyblue', linewidth=2)
-                    axsec[row, 0].plot(rtemp, mgesbsub[ii][wtemp],'--',color=colorval, linewidth=1.5)
+                #    axsec[row, 0].plot(rtemp, mgesbsub[ii][angtemp],'--',color='skyblue', linewidth=2)
+                    axsec[row, 0].plot(rtemp, mgesbsub[ii][angtemp],'--',color=colorval, linewidth=1.5)
                 else:
-                    axsec[row, 0].semilogx(rtemp, mgesbsub[ii][wtemp], '--',color=colorval, linewidth=1.5)
+                    axsec[row, 0].semilogx(rtemp, mgesbsub[ii][angtemp], '--',color=colorval, linewidth=1.5)
 
                 #introduce output 
                 if params.flagsbout == True:
                     ncomp=ii+1
                     ncomp=str(ncomp)
 
-                    PrintFilesComps(params,galpar,galcomps,rtxtang,ncomp,diffangle,rtemp,mgesbsub,ii,wtemp)
+                    PrintFilesComps(params,galpar,galcomps,rtxtang,ncomp,diffangle,rtemp,mgesbsub,ii,angtemp)
 
                 ii+=1
 
@@ -1771,13 +1773,13 @@ def MulEllipSectors(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
 
         if (len(mgemodrad) > len(mgerad)):
 
-            mgemodsbnew = Interpol(r2,mgemodsb[wmod],r)
-            sberr=1-mgemodsbnew/mgesb[w]
+            mgemodsbnew = Interpol(r2,mgemodsb[angmod],r)
+            sberr=1-mgemodsbnew/mgesb[angal]
             axsec[row, 1].plot(r, sberr*100, 'C0o')
 
         else:
-            mgesbnew = Interpol(r,mgesb[w],r2)
-            sberr=1-mgemodsb[wmod]/mgesbnew
+            mgesbnew = Interpol(r,mgesb[angal],r2)
+            sberr=1-mgemodsb[angmod]/mgesbnew
             axsec[row, 1].plot(r2, sberr*100, 'C0o')
 
 
@@ -1855,7 +1857,7 @@ def  Interpol(X,Y,X2):
 
 
 
-def PrintFilesGax(params,galpar,rtxtang,r,mgesb,w,r2,mgemodsb,wmod):
+def PrintFilesGax(params,galpar,rtxtang,r,mgesb,angal,r2,mgemodsb,angmod):
     "Print surface parameters of galaxy and model to outfile "
 
     # galaxy
@@ -1889,7 +1891,7 @@ def PrintFilesGax(params,galpar,rtxtang,r,mgesb,w,r2,mgemodsb,wmod):
 
     for idx, item in enumerate(r):
 
-        lineout= "{0:.3f} {1:.3f} \n".format(r[idx],mgesb[w][idx])
+        lineout= "{0:.3f} {1:.3f} \n".format(r[idx],mgesb[angal][idx])
 
         OUTFH.write(lineout)
 
@@ -1926,7 +1928,7 @@ def PrintFilesGax(params,galpar,rtxtang,r,mgesb,w,r2,mgemodsb,wmod):
 
     for idx, item in enumerate(r2):
 
-        lineout= "{0:.3f} {1:.3f}  \n".format(r2[idx],mgemodsb[wmod][idx])
+        lineout= "{0:.3f} {1:.3f}  \n".format(r2[idx],mgemodsb[angmod][idx])
 
         OUTFH.write(lineout)
 
@@ -1942,7 +1944,7 @@ def PrintFilesGax(params,galpar,rtxtang,r,mgesb,w,r2,mgemodsb,wmod):
 
 
 
-def PrintFilesComps(params,galpar,galcomps,rtxtang,ncomp,diffangle,rtemp,mgesbsub,ii,wtemp):
+def PrintFilesComps(params,galpar,galcomps,rtxtang,ncomp,diffangle,rtemp,mgesbsub,ii,angtemp):
 
     #subcomponent model 
 
@@ -1988,7 +1990,7 @@ def PrintFilesComps(params,galpar,galcomps,rtxtang,ncomp,diffangle,rtemp,mgesbsu
 
     for idx, item in enumerate(rtemp):
 
-        lineout= "{0:.3f} {1:.3f}  \n".format(rtemp[idx], mgesbsub[ii][wtemp][idx])
+        lineout= "{0:.3f} {1:.3f}  \n".format(rtemp[idx], mgesbsub[ii][angtemp][idx])
 
         OUTFH.write(lineout)
 
