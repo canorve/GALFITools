@@ -2318,7 +2318,11 @@ def ReadGALFITout(inputf,galpar):
 
 
     flagaxis=False
-    col1,row1=GetAxis(galpar.maskimage)
+    if (os.path.isfile(galpar.maskimage)):
+        col1,row1=GetAxis(galpar.maskimage)
+    else:
+        col1=row1=0
+    
     col2,row2=GetAxis(galpar.inputimage)
 
     if (col1 != col2 or row1 != row2):
