@@ -123,6 +123,9 @@ Any of the following options disabled the connection to NED
 
 ## Notes
 
+* EllipSectGalfit works for GALFIT version $> 3.0.7$ Check this because you will
+    have issues for *-comp* option.
+
 * EllipSectGalfit uses the mask image (option "*F*" GALFIT) only if this
     is a **FITS** image. In case your mask is an *ASCII* file, you can convert it to **FITS** using the [xy2fits.py](xy2fits.md) tool.
 
