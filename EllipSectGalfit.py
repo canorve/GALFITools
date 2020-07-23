@@ -2360,7 +2360,7 @@ def ReadGALFITout(inputf,galpar):
         hdu = fits.open(galpar.tempmask)
         mask = hdu[0].data
         mask.fill(False)
-        mask.astype("bool")
+        mask=mask.astype("bool")
         hdu[0].data = mask
         hdu.writeto(galpar.tempmask, overwrite=True)
 
