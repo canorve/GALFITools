@@ -13,6 +13,7 @@ import matplotlib.colors as colors
 import matplotlib.cm as cmx
 import mimetypes
 import warnings
+import platform
 
 
 from scipy import interpolate
@@ -882,10 +883,17 @@ def SectPhotComp(galpar, params, galcomps, n_sectors=19, minlevel=0):
 
     subimgs=[]
 
+    mac=platform.system()
+
+    if mac == 'darwin':
+        initcomp=1
+    else:
+        initcomp=2
+
     cnt=0  # image =0 do not count
     while(cnt<len(galcomps.Comps)):
         if galcomps.Comps[cnt] == True:
-            img = hdu[cnt+2].data.astype(float)
+            img = hdu[cnt+initcomp].data.astype(float)
             subimgs.append(img)
         cnt=cnt+1
     hdu.close()
@@ -2806,13 +2814,13 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     npix = ndof + freepar
 
     #    ;  AKAIKE INFORMATION CRITERION
-    #    ; AIC = χ2 + 2k
+    #    ; AIC = chi^2 + 2k
 
     AICrit = objchinu * ndof + 2*freepar
     
 
     #    ; BAYESIAN INFORMATION CRITERION
-    #    ; BIC = χ2 + k * ln(n)
+    #    ; BIC = chi^2 + k * ln(n)
 
     BICrit = objchinu * ndof + freepar * np.log(npix)
 
