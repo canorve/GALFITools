@@ -885,7 +885,7 @@ def SectPhotComp(galpar, params, galcomps, n_sectors=19, minlevel=0):
 
     mac=platform.system()
 
-    if mac == 'darwin':
+    if mac == 'Darwin':
         initcomp=1
     else:
         initcomp=2
