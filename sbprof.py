@@ -18,6 +18,7 @@ import warnings
 
 from astropy.io.votable import parse
 from mgefit.sectors_photometry import sectors_photometry
+from mgefit.find_galaxy import find_galaxy
 
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,NullFormatter,
                                AutoMinorLocator,LogLocator,LinearLocator,AutoLocator)
@@ -36,9 +37,9 @@ SunMag = {
 
 def main():
 
-    if (len(sys.argv[1:]) <= 2):
+    if (len(sys.argv[1:]) <= 1):
         print ('Missing arguments')
-        print ("Usage:\n %s [ImageFile] [x] [y] [-options] " % (sys.argv[0]))
+        print ("Usage:\n %s [ImageFile] [opt x] [opt y] [-options] " % (sys.argv[0]))
         print ("use help to display more information about 'options' arguments: ")
         print ("%s -help " % (sys.argv[0]))
 
@@ -71,6 +72,8 @@ def main():
     #  xc,yc,q,ang,skylevel,scale,file,mgzpt,exptime,mask=ReadGALFITout(params.galfile,galpars)
     #ReadGALFITout(params.galfile,galpar)
 
+    #assigning variables
+
     galpar.inputimage=params.galfile
 
 
@@ -78,11 +81,50 @@ def main():
 
 
     galpar.mgzpt=params.mgzpt
-
-    galpar.xc = float(sys.argv[2])
-    galpar.yc = float(sys.argv[3])
-
     galpar.scale=params.plate
+
+    galpar.tempmask=params.maskfile
+    ### reading mask image from file
+
+
+    if params.flagsky:
+        galpar.skylevel=params.insky
+
+
+
+    if (params.findgalaxy):
+        ##  using find_galaxy
+    
+        hdu2=fits.open(galpar.inputimage)
+        imgdata=hdu2[0].data
+        hdu2.close()
+
+        if galpar.tempmask is not None:
+            hdu=fits.open(galpar.tempmask)
+            maskdata=hdu[0].data
+            imgmask = maskdata.copy()
+            hdu.close()
+
+            imgmask = imgmask.astype("bool")
+            imgdata = ~imgmask*imgdata
+            masksky = imgdata == 0
+            imgdata[masksky] = galpar.skyvalue
+
+        plt.clf()
+        f = find_galaxy(imgdata, fraction=params.fraction, plot=params.dplot)
+        plt.pause(2)  # Allow plot to appear on the screen
+        plt.clf()
+
+        galpar.xc = f.ypeak  #yes they are different coordinates for numpy
+        galpar.yc = f.xpeak
+        galpar.q = 1 - f.eps
+        galpar.ang= 90 - f.theta
+
+    else:
+        galpar.xc = float(sys.argv[2])
+        galpar.yc = float(sys.argv[3])
+
+
 
 
     ######################################
@@ -94,9 +136,6 @@ def main():
     if params.flagpa == True:
         galpar.ang=params.parg
 
-
-    if params.flagsky:
-        galpar.skylevel=params.insky
 
     str = "q = {} is used ".format(galpar.q)
     print(str)
@@ -349,13 +388,13 @@ class InputParams:
     flagmod=False
     flagmag=False
     flagscale=False
-    flagdim=False
+    flagfraction=False
    
     flagmodel=False
 
     flagsky=False
     flagkeep=False
-    flagnedfile=False
+    findgalaxy=False
 
     flagplate=False
 
@@ -378,6 +417,9 @@ class InputParams:
 
     plate=1.0
 
+    fraction=0.04
+
+
 
     #input file
     galfile= "galfit.01"
@@ -387,6 +429,8 @@ class InputParams:
 
     #output file
     output = "out.txt"
+
+
 
     # input image model
     inputmodel="none.fits"
@@ -500,7 +544,7 @@ def InputSys(params,argv):
     ''' Read user's input '''
     OptionHandleList = ['-logx', '-q', '-mask', '-mgzpt','-pa','-pix','-ranx','-rany','-grid','-dpi','-sbout','-noplot',
         '-minlevel','-sectors','-phot','-object','-filter','-help','-checkimg','-noned','-distmod','-magcor','-plate',
-        '-scalekpc','-sbdim','-sky','-ned']
+        '-scalekpc','-fraction','-sky','-findgalaxy']
     options = {}
     for OptionHandle in OptionHandleList:
         options[OptionHandle[1:]] = argv[argv.index(OptionHandle)] if OptionHandle in argv else None
@@ -554,12 +598,19 @@ def InputSys(params,argv):
         params.flagmag=True
     if options['scalekpc'] != None:
         params.flagscale=True
-    if options['sbdim'] != None:
-        params.flagdim=True
+    if options['fraction'] != None:
+        params.flagfraction=True
     if options['sky'] != None:
         params.flagsky=True
-    if options['ned'] != None:
-        params.flagnedfile=True
+    if options['findgalaxy'] != None:
+        params.findgalaxy=True
+        print("find_galaxy will be used to locate galaxy")
+    if ( (sys.argv[2][0] != '-') and (sys.argv[3][0] != '-')):
+        params.findgalaxy=True
+        print("find_galaxy will be used to locate galaxy")
+
+
+
 
 
     # check for unrecognized options:
@@ -683,24 +734,17 @@ def InputSys(params,argv):
         params.InScale=np.float(opt['scalekpc'])
 
 
-    if params.flagdim == True:
+    if params.flagfraction == True:
         opt={}
-        OptionHandle="-sbdim"
+        OptionHandle="-fraction"
         opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
-        params.InSbDim=np.float(opt['sbdim'])
+        params.InSbDim=np.float(opt['fraction'])
 
     if params.flagsky == True:
         opt={}
         OptionHandle="-sky"
         opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
         params.insky=np.float(opt['sky'])
-
-
-    if params.flagnedfile == True:
-        opt={}
-        OptionHandle="-ned"
-        opt[OptionHandle[1:]] = argv[argv.index(OptionHandle)+1]
-        params.nedfile=np.str(opt['ned'])
 
 
     params.galfile= sys.argv[1]
@@ -711,11 +755,13 @@ def InputSys(params,argv):
 
 def Help():
 
-    print ("Usage:\n %s [ImageFile] [X] [Y] [-mask MaskFile] [-mgzpt Value] [-logx] [-q AxisRatio] [-pa PositionAngle] [-help] [-pix] [-ranx/y Value] [-grid] [-dpi Value] [-noplot] [-phot] " % (sys.argv[0]))
+    print ("Usage:\n %s [ImageFile] [opt X] [opt Y] [-mask MaskFile] [-mgzpt Value] [-logx] [-q AxisRatio] [-pa PositionAngle] [-help] [-pix] [-ranx/y Value] [-grid] [-dpi Value] [-noplot] [-phot] " % (sys.argv[0]))
     print ("More options: [-sbout] [-minlevel Value] [-sectors Value] [-object Name] [-filter Name] [-checkimg] [-noned] [-distmod Value] [-magcor Value] [-scalekpc Value] [-sbdim Value] [-ned XmlFile] ") 
 
     print ("GALFITOutputFile: GALFIT output file ")
     print ("logx: activates X-axis as logarithm ")
+    print ("X: X coordinate image position")
+    print ("Y: Y coordinate image position")
     print ("q: introduce axis ratio ")
     print ("pa: introduce position angle (same as GALFIT) ")
     print ("pix: plot the top x-axis in pixels ")
@@ -2609,7 +2655,7 @@ def OutPhot(params, galpar, galcomps, sectgalax, sectmodel, sectcomps):
     lineout= "#    Output photometry for {} \n".format(galpar.outimage)
     OUTPHOT.write(lineout)
 
-    lineout= "#  sector_photometry used with q={} and pa={} (same as GALFIT) \n".format(galpar.q,galpar.ang)
+    lineout= "#  sectors_photometry used with q={} and pa={} (same as GALFIT) \n".format(galpar.q,galpar.ang)
     OUTPHOT.write(lineout)
 
     lineout= "# Total Magnitude and many other variables does not include \n"
