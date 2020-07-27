@@ -37,12 +37,10 @@ SunMag = {
 
 def main():
 
-    if (len(sys.argv[1:]) <= 1):
+    if (len(sys.argv[1:]) < 1):
         print ('Missing arguments')
         print ("Usage:\n %s [ImageFile] [opt x] [opt y] [-options] " % (sys.argv[0]))
-        print ("use help to display more information about 'options' arguments: ")
-        print ("%s -help " % (sys.argv[0]))
-
+        Help()
         sys.exit()
 
 
@@ -108,7 +106,7 @@ def main():
             imgmask = imgmask.astype("bool")
             imgdata = ~imgmask*imgdata
             masksky = imgdata == 0
-            imgdata[masksky] = galpar.skyvalue
+            imgdata[masksky] = galpar.skylevel
 
         plt.clf()
         f = find_galaxy(imgdata, fraction=params.fraction, plot=params.dplot)
@@ -136,6 +134,9 @@ def main():
     if params.flagpa == True:
         galpar.ang=params.parg
 
+
+    str = "Gal position x = {}, y = {} ".format(galpar.xc,galpar.yc)
+    print(str)
 
     str = "q = {} is used ".format(galpar.q)
     print(str)
@@ -605,12 +606,14 @@ def InputSys(params,argv):
     if options['findgalaxy'] != None:
         params.findgalaxy=True
         print("find_galaxy will be used to locate galaxy")
-    if ( (sys.argv[2][0] != '-') and (sys.argv[3][0] != '-')):
-        params.findgalaxy=True
-        print("find_galaxy will be used to locate galaxy")
 
-
-
+    if (len(sys.argv[1:]) == 3):
+        if ( (sys.argv[2][0] == '-') or (sys.argv[3][0] == '-') ):
+            params.findgalaxy=True
+            print("find_galaxy will be used to locate galaxy")
+    elif(len(sys.argv[1:]) <= 2):
+            params.findgalaxy=True
+            print("find_galaxy will be used to locate galaxy")
 
 
     # check for unrecognized options:
@@ -799,8 +802,6 @@ def Help():
     print ("                      Check sectors_photometry manual")
     #print ("checkimg: save the images used for sectors_photometry in individual components")
 
-
-    print ("help: This menu ")
 
 
     print ("Example:\n %s galfit.01 -logx" % (sys.argv[0]))
