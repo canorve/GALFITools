@@ -8,12 +8,12 @@
 #                 check it out for different images
 # ---------------------------------------------------------------------------
 
-MAG_ZEROPOINT   28.75   # magnitude zero-point
+MAG_ZEROPOINT   29.015   # magnitude zero-point
 MAG_GAMMA       4.0                 # gamma of emulsion (for photographic scans)
-GAIN            7              # detector gain in e-/ADU
-PIXEL_SCALE     0.0455             # size of pixel in arcsec (0=use FITS WCS info)
+GAIN            4.2              # detector gain in e-/ADU
+PIXEL_SCALE     0.68             # size of pixel in arcsec (0=use FITS WCS info)
 SATUR_LEVEL     50000               # level (in ADUs) at which arises saturation
-SEEING_FWHM     0.1365                # stellar FWHM in arcsec
+SEEING_FWHM     1.5                # stellar FWHM in arcsec
 FLAG_IMAGE      flag.fits           # filename for an input FLAG-image
 FLAG_TYPE       OR                  # combination expression for the method for flags on the same object
 DETECT_TYPE     CCD                 # "CCD" or "PHOTO"
