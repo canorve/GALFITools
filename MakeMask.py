@@ -14,22 +14,23 @@ import scipy
 
 def main():
 
-    if len(sys.argv[1:]) != 4:
+    if len(sys.argv[1:]) != 5:
         print ('Missing arguments')
-        print ("Usage:\n %s [SexFile] [ImageFile] [MaskFileOut] [scale]" % sys.argv[0])
-        print ("Example:\n %s sex.cat image.fits mask.fits 1.5" % sys.argv[0])
+        print ("Usage:\n %s [SexFile] [ImageFile] [MaskFileOut] [scale] [SatDs9File]" % sys.argv[0])
+        print ("Example:\n %s sex.cat image.fits mask.fits 1.5 sat.reg" % sys.argv[0])
         sys.exit()
 
     sexfile= sys.argv[1]
     image= sys.argv[2]
     maskfile= sys.argv[3]
     scale= sys.argv[4]
+    satfileout= sys.argv[5]
+
 
     scale = float(scale)
 
 
     sexarsort   = "sexsort.cat"
-    satfileout  = "ds9sat.reg"
 
     satscale = 1
     satoffset = 0
@@ -43,7 +44,10 @@ def main():
 
     print ("Creating sat region files....\n")
 
-    ds9satbox(satfileout,sexfile,satscale,satoffset) # crea archivo  Saturacion reg
+    if not os.path.exists(satfileout):
+        print("Saturation file not found. Creating one")
+        satfileout  = "ds9sat.reg"
+        ds9satbox(satfileout,sexfile,satscale,satoffset) # crea archivo  Saturacion reg
 
 
 ##### segmentation mask
@@ -53,7 +57,7 @@ def main():
     MakeMask(maskfile, sexarsort, scale, 0, satfileout)  # offset set to 0
     MakeSatBox(maskfile, satfileout, Total + 1, NCol, NRow) #make sat region
 
-
+    print("Done. Mask image created ")
 
 def ds9satbox (satfileout,output,satscale,satoffset):
     "Creates a file for ds9 which selects bad saturated regions"
@@ -369,7 +373,6 @@ def CatArSort(SexCat,scale,SexArSort,NCol,NRow):
 
     (sxsmin, sxsmax, sysmin, sysmax) = GetSize(xx, yy, Rwsky, theta, e, NCol,NRow)
 
-
     f_out = open(SexArSort, "w")
 
     index = Area.argsort()
@@ -408,22 +411,36 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     ymax = y + np.sqrt((R**2) * (np.sin(theta))**2 +
                        (bim**2) * (np.cos(theta))**2)
 
+
     mask = xmin < 1
     if mask.any():
-        xmin = 1
+        if isinstance(xmin,np.ndarray):
+            xmin[mask] = 1
+        else:
+            xmin = 1
 
     mask = xmax > ncol
 
     if mask.any():
-        xmax = ncol
+        if isinstance(xmax,np.ndarray):
+            xmax[mask] = ncol
+        else:
+            xmax = ncol
 
     mask = ymin < 1
     if mask.any():
-        ymin = 1
+        if isinstance(ymin,np.ndarray):
+            ymin[mask] = 1
+        else:
+            ymin = 1
 
     mask = ymax > nrow
     if mask.any():
-        ymax = nrow
+        if isinstance(ymax,np.ndarray):
+            ymax[mask] = nrow
+        else:
+            ymax = nrow
+
 
     return (xmin, xmax, ymin, ymax)
 
