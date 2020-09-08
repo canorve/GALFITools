@@ -80,7 +80,7 @@ def main():
         opt={}
         OptionHandle="--m"
         opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        maskfile=np.float(opt['m'])
+        maskfile=np.str(opt['m'])
 
 
 
