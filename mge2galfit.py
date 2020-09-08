@@ -74,7 +74,7 @@ def main():
         opt={}
         OptionHandle="--sky"
         opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        sky=np.int(opt['sky'])
+        sky=np.float(opt['sky'])
 
     if flagmask == True:
         opt={}
@@ -305,7 +305,7 @@ def main():
 ####################
 #####################
 
-    parfile="gaussians.txt"
+    parfile="MGEGALFIT.txt"
     outname=TNAM
 
     rmsname="none"
@@ -678,7 +678,7 @@ def PrintGauss(hdl, ncomp, xpos, ypos, magass, fwhm, axratgass, anglegass, Z, fi
             ncomp)
     line01 = " 0)     gaussian               #  Object type                                     \n"
     line02 = " 1) {:.2f}  {:.2f}  {}  {}            #  position x, y     [pixel]                       \n".format(
-        xpos, ypos, 0, 0)
+        xpos, ypos, fit, fit)
     line03 = " 3) {:.2f}       {}              #  total magnitude                                 \n".format(
         magass, fit)
     line04 = " 4) {:.2f}       {}              #  FWHM         [Pixels]                            \n".format(
