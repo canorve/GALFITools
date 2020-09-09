@@ -244,46 +244,49 @@ def MakeSatBox(maskimage, region, val, ncol, nrow):
 
         for line in lines:
 
-            (box, info) = line.split('(')
+            words = line.split(" ")
+            if (words[0] != "image" and words[0] != "physical" and words[0] != "global"):
 
-            if(box == "box"):
+                (box, info) = line.split('(')
 
-                (xpos, ypos, xlong, ylong, trash) = info.split(',')
+                if(box == "box"):
 
-                xpos = float(xpos)
-                ypos = float(ypos)
-                xlong = float(xlong)
-                ylong = float(ylong)
+                    (xpos, ypos, xlong, ylong, trash) = info.split(',')
 
-                xlo = (xpos - xlong / 2)
-                xhi = (xpos + xlong / 2)
+                    xpos = float(xpos)
+                    ypos = float(ypos)
+                    xlong = float(xlong)
+                    ylong = float(ylong)
 
-                ylo = (ypos - ylong / 2)
-                yhi = (ypos + ylong / 2)
+                    xlo = (xpos - xlong / 2)
+                    xhi = (xpos + xlong / 2)
 
-                xlo = int(xlo)
-                xhi = int(xhi)
+                    ylo = (ypos - ylong / 2)
+                    yhi = (ypos + ylong / 2)
 
-                ylo = int(ylo)
-                yhi = int(yhi)
+                    xlo = int(xlo)
+                    xhi = int(xhi)
 
-                if (xlo < 1):
+                    ylo = int(ylo)
+                    yhi = int(yhi)
 
-                    xlo = 1
+                    if (xlo < 1):
 
-                if (xhi > ncol):
+                        xlo = 1
 
-                    xhi = ncol
+                    if (xhi > ncol):
 
-                if (ylo < 1):
+                        xhi = ncol
 
-                    ylo = 1
+                    if (ylo < 1):
 
-                if (yhi > nrow):
+                        ylo = 1
 
-                    yhi = nrow
+                    if (yhi > nrow):
 
-                img[ylo - 1:yhi, xlo - 1:xhi] = val
+                        yhi = nrow
+
+                    img[ylo - 1:yhi, xlo - 1:xhi] = val
 
     hdu[0].data = img
     hdu.writeto(maskimage, overwrite=True)
@@ -497,8 +500,8 @@ def CheckSatReg(x,y,filein,R,theta,ell):
 
        for line in lines:
 
-
-           if (line != "image"):
+           words = line.split(" ")
+           if (words[0] != "image" and words[0] != "physical" and words[0] != "global"):
 
                (box,info)=line.split('(')
 
