@@ -804,10 +804,10 @@ def Help():
 
 
 
-    print ("Example:\n %s galfit.01 -logx" % (sys.argv[0]))
-    print ("or Example:\n %s galfit.02 -q 0.35 -pa 60 -ranx 2 " % (sys.argv[0]))
-    print ("or Example:\n %s galfit.02 -q 0.35 -pa 60 -ranx 1-20" % (sys.argv[0]))
-    print ("see https://github.com/canorve/GALFITools/blob/master/docs/Ellipse.md  for more examples")
+    #print ("Example:\n %s galfit.01 -logx" % (sys.argv[0]))
+    #print ("or Example:\n %s galfit.02 -q 0.35 -pa 60 -ranx 2 " % (sys.argv[0]))
+    #print ("or Example:\n %s galfit.02 -q 0.35 -pa 60 -ranx 1-20" % (sys.argv[0]))
+    #print ("see https://github.com/canorve/GALFITools/blob/master/docs/Ellipse.md  for more examples")
 
 
 
@@ -1115,35 +1115,50 @@ def EllipSectors(params, galpar, galcomps, sectgalax, n_sectors=19, minlevel=0):
 
         ygrad=np.gradient(ysortsbc)
 
-        idgrad=np.where(ygrad > 0)
+        idgrad=np.where(ygrad >= 0)
 
+        
         print("1) gradient method: ")
         print("std sky is from averaging over sectors. Do not use it for sigma image ")
 
+        if any(idgrad[0]):
 
-        for idx, item in enumerate(xsortrad[idgrad]):
+            for idx, item in enumerate(xsortrad[idgrad]):
 
-            #print("sky: {:.2f} , std: {:.2f} ".format(ysbc[idgrad][6],ysbcerr[idgrad][6]))
-            #if idx > 1 and idx < 10:
-            #print("idx: ",idx)
-            print("sky: {:.2f}, std: {:.2f} radius: {:.2f} grad: {:.2f} ".format(ysortsbc[idgrad][idx],ysortsbcerr[idgrad][idx],xsortrad[idgrad][idx]*galpar.scale,ygrad[idgrad][idx]))
+                #print("sky: {:.2f} , std: {:.2f} ".format(ysbc[idgrad][6],ysbcerr[idgrad][6]))
+                #if idx > 1 and idx < 10:
+                #print("idx: ",idx)
+                print("sky: {:.2f} (ADUs), std: {:.2f} radius: {:.2f} (pix), grad: {:.2f} ".format(ysortsbc[idgrad][idx],ysortsbcerr[idgrad][idx],xsortrad[idgrad][idx],ygrad[idgrad][idx]))
 
-        print("")
+            print("")
 
-        print("mean sky: {:.2f} mean std: {:.2f} ".format(ysortsbc[idgrad].mean(),ysortsbcerr[idgrad].mean()))
-        idmin=np.where(np.min(ygrad[idgrad]) == ygrad[idgrad])
-        print("mingrad: sky: {:.2f} std: {:.2f} rad: {:.2f} ".format(ysortsbc[idgrad][idmin][0],ysortsbcerr[idgrad][idmin][0],xsortrad[idgrad][idmin][0]*galpar.scale))
+            print("mean sky: {:.2f} mean std: {:.2f} ".format(ysortsbc[idgrad].mean(),ysortsbcerr[idgrad].mean()))
+            idmin=np.where(np.min(np.abs(ygrad[idgrad])) == np.abs(ygrad[idgrad]))
+            print("minimum grad: sky: {:.2f} std: {:.2f} rad: {:.2f} ".format(ysortsbc[idgrad][idmin][0],ysortsbcerr[idgrad][idmin][0],xsortrad[idgrad][idmin][0]))
 
-
-        if params.flagmask == True: 
-            skymask = galpar.mask == False
-            img=galpar.img[skymask]  
         else:
-            img=galpar.img  
+            print("Can't determine sky because gradient never turns positive ")
+            print("Try increasing the image region to fit ")
+
+
+
 
         print("")
         print("2) Excluding the top and bottom 20%:") 
-    
+
+
+        if  (os.path.isfile(galpar.maskimage)): 
+            skymask = galpar.mask == False
+            #img=galpar.img[skymask]  + galpar.skylevel
+            img=galpar.img[skymask].copy()
+            img = img + galpar.skylevel
+        else:
+            #img=galpar.img  + galpar.skylevel
+            img=galpar.img.copy()
+            img = img + galpar.skylevel
+
+
+
         flatimg=img.flatten()  
         flatimg.sort()
 
@@ -1157,9 +1172,8 @@ def EllipSectors(params, galpar, galcomps, sectgalax, n_sectors=19, minlevel=0):
         skymean=np.mean(img2)
         skysig=np.std(img2)
 
-        print("mean sky: {:.2f} ".format(skymean))
+        print("mean sky: {:.2f} (ADUs) ".format(skymean))
         print("std sky: {:.2f} ".format(skysig))
-
 
 
 
