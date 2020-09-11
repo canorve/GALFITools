@@ -382,14 +382,14 @@ def main():
         fout2.write(outline2)
 
 
-        PrintGauss(fout1, index, xpeak, ypeak, mgemag, FWHM, qobs, anglegass, Z, fit)
+        PrintGauss(fout1, index+1, xpeak, ypeak, mgemag, FWHM, qobs, anglegass, Z, fit)
 
 
         index+=1
 
 
 
-    PrintSky(fout1, index, sky, Z, skyfit)
+    PrintSky(fout1, index+1, sky, Z, skyfit)
     fout1.close()
     fout2.close()
 
