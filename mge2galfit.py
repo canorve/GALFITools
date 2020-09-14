@@ -27,10 +27,10 @@ def main():
 
     if len(sys.argv[1:]) <= 6:
       print ('Missing arguments')
-      print ("Usage: %s [Image] [X] [Y] [MagZpt] [PSF sigma or File] [Twist 1=yes 0=No] [--sky Sky] [--m Mask] " % (sys.argv[0]))
+      print ("Usage: %s [Image] [X] [Y] [MagZpt] [PSF sigma or File] [Twist 1=yes 0=No] [-sky Sky] [-m Mask] " % (sys.argv[0]))
       print ("Example: %s  image.fits 500 500 25 0.494 0" % (sys.argv[0]))
-      print ("Example: %s  image.fits 500 500 25 0.494 1 --sky 0.5 " % (sys.argv[0]))
-      print ("Example: %s  image.fits 500 500 25 0.494 1 --sky 0.5 --m mask.fits " % (sys.argv[0]))
+      print ("Example: %s  image.fits 500 500 25 0.494 1 -sky 0.5 " % (sys.argv[0]))
+      print ("Example: %s  image.fits 500 500 25 0.494 1 -sky 0.5 -m mask.fits " % (sys.argv[0]))
 
       sys.exit()
 
@@ -38,7 +38,6 @@ def main():
     twist=False
 
     flagpsf=False
-    flagconv=True
 
     imgname= sys.argv[1]
     flagmask=False
@@ -62,10 +61,10 @@ def main():
     flaginit=False
 
 
-    OptionHandleList = ['--m', '--sky']
+    OptionHandleList = ['-m', '-sky']
     options = {}
     for OptionHandle in OptionHandleList:
-        options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
+        options[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
     if options['m'] != None:
         flagmask=True
     if options['sky'] != None:
@@ -73,14 +72,14 @@ def main():
 ################################
     if flagsky == True:
         opt={}
-        OptionHandle="--sky"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        OptionHandle="-sky"
+        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         sky=np.float(opt['sky'])
 
     if flagmask == True:
         opt={}
-        OptionHandle="--m"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
+        OptionHandle="-m"
+        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
         maskfile=np.str(opt['m'])
 
 
@@ -108,10 +107,6 @@ def main():
 
     if flagpsf == True:
         sigpsf=np.float(valpsf)
-
-        if (np.abs(sigpsf) < 0.001 ):
-            flagconv=False
-
     else:
         sigpsf,normpsf=ReadMgePsf(valpsf)
 
@@ -231,14 +226,8 @@ def main():
 #                                      sigmapsf=sigmapsf,normpsf=normpsf, scale=scale, plot=1)
 
         if flagpsf == True:
-            if flagconv:
-                m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
-                                        sigmapsf=sigpsf, scale=scale, plot=1)
-            else:
-                print("No convolution")
-                m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
-                                         scale=scale, plot=1)
-
+            m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
+                                    sigmapsf=sigpsf, scale=scale, plot=1)
         else:
             m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
                                     sigmapsf=sigpsf, normpsf=normpsf ,scale=scale, plot=1)
@@ -272,18 +261,9 @@ def main():
         plt.clf()
 
         if flagpsf == True:
- 
-            if flagconv:
- 
-                m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
-                                    ngauss=ngauss, sigmapsf=sigpsf,
-                                    scale=scale, plot=1, bulge_disk=0, linear=0)
-            else:
-                print("No convolution")
-                m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
-                                    ngauss=ngauss, scale=scale, plot=1, 
-                                    bulge_disk=0, linear=0)
-
+            m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
+                                ngauss=ngauss, sigmapsf=sigpsf,
+                                scale=scale, plot=1, bulge_disk=0, linear=0)
         else:
             m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
                                 ngauss=ngauss, sigmapsf=sigpsf, normpsf=normpsf,
@@ -402,14 +382,14 @@ def main():
         fout2.write(outline2)
 
 
-        PrintGauss(fout1, index+1, xpeak, ypeak, mgemag, FWHM, qobs, anglegass, Z, fit)
+        PrintGauss(fout1, index, xpeak, ypeak, mgemag, FWHM, qobs, anglegass, Z, fit)
 
 
         index+=1
 
 
 
-    PrintSky(fout1, index+1, sky, Z, skyfit)
+    PrintSky(fout1, index, sky, Z, skyfit)
     fout1.close()
     fout2.close()
 

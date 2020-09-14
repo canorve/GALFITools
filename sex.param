@@ -1,8 +1,8 @@
 #   1 NUMBER                 Running object number                                     
 #   2 ALPHA_J2000            Right ascension of barycenter (J2000)                      [deg]
 #   3 DELTA_J2000            Declination of barycenter (J2000)                          [deg]
-#   4 X_IMAGE                Object position along x                                    [pixel]
-#   5 Y_IMAGE                Object position along y                                    [pixel]
+#   4 XPEAK_IMAGE                Object position along x                                    [pixel]
+#   5 YPEAK_IMAGE                Object position along y                                    [pixel]
 #   6 MAG_APER               Fixed aperture magnitude vector                            [mag]
 #   7 KRON_RADIUS            Kron apertures in units of A or B                         
 #   8 FLUX_RADIUS            Fraction-of-light radii                                    [pixel]
@@ -19,8 +19,8 @@ NUMBER
 ALPHA_J2000
 DELTA_J2000
 
-X_IMAGE
-Y_IMAGE
+XPEAK_IMAGE
+YPEAK_IMAGE
 
 MAG_APER
 
