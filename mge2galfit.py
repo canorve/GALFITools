@@ -38,6 +38,7 @@ def main():
     twist=False
 
     flagpsf=False
+    flagconv=True
 
     imgname= sys.argv[1]
     flagmask=False
@@ -107,6 +108,10 @@ def main():
 
     if flagpsf == True:
         sigpsf=np.float(valpsf)
+
+        if (np.abs(sigpsf) < 0.001 ):
+            flagconv=False
+
     else:
         sigpsf,normpsf=ReadMgePsf(valpsf)
 
@@ -226,8 +231,14 @@ def main():
 #                                      sigmapsf=sigmapsf,normpsf=normpsf, scale=scale, plot=1)
 
         if flagpsf == True:
-            m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
-                                    sigmapsf=sigpsf, scale=scale, plot=1)
+            if flagconv:
+                m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
+                                        sigmapsf=sigpsf, scale=scale, plot=1)
+            else:
+                print("No convolution")
+                m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
+                                         scale=scale, plot=1)
+
         else:
             m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
                                     sigmapsf=sigpsf, normpsf=normpsf ,scale=scale, plot=1)
@@ -261,9 +272,18 @@ def main():
         plt.clf()
 
         if flagpsf == True:
-            m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
-                                ngauss=ngauss, sigmapsf=sigpsf,
-                                scale=scale, plot=1, bulge_disk=0, linear=0)
+ 
+            if flagconv:
+ 
+                m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
+                                    ngauss=ngauss, sigmapsf=sigpsf,
+                                    scale=scale, plot=1, bulge_disk=0, linear=0)
+            else:
+                print("No convolution")
+                m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
+                                    ngauss=ngauss, scale=scale, plot=1, 
+                                    bulge_disk=0, linear=0)
+
         else:
             m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
                                 ngauss=ngauss, sigmapsf=sigpsf, normpsf=normpsf,
@@ -382,14 +402,14 @@ def main():
         fout2.write(outline2)
 
 
-        PrintGauss(fout1, index, xpeak, ypeak, mgemag, FWHM, qobs, anglegass, Z, fit)
+        PrintGauss(fout1, index+1, xpeak, ypeak, mgemag, FWHM, qobs, anglegass, Z, fit)
 
 
         index+=1
 
 
 
-    PrintSky(fout1, index, sky, Z, skyfit)
+    PrintSky(fout1, index+1, sky, Z, skyfit)
     fout1.close()
     fout2.close()
 
