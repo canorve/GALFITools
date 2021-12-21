@@ -31,7 +31,7 @@ The main programs are:
 - [xy2fits](./docs/xy2fits.md)
 - [sbprof](./docs/sbprof.md)
 - [MakeSim](./docs/MakeSim.md)
-- [initgal](./docs/initgal.md)
+- [initgal](./docs/InitGal.md)
 
 
 Click in each link to see tutorial and further explanations.
