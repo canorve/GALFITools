@@ -5,6 +5,7 @@ import numpy as np
 import argparse
 import glob
 
+from pathlib import Path
 
 # code to make init galfit files 
 
@@ -162,8 +163,10 @@ def main():
         bashout.write(lineout)
 
 
-
     bashout.close()
+
+    p = Path('rungalfit.sh')
+    p.chmod(0o755)
 
 
     print("rungalfit.sh has been created")
