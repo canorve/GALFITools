@@ -69,7 +69,9 @@ class xy2fits:
 
         self.PutPix(X,Y,Value,maskfits)
 
-        print("done ")
+        print("Ascii -> Fits done ")
+
+        return maskfits
 
     def GetAxis(self,Image):
         "Get number of rows and columns from the image"
