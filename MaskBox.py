@@ -80,10 +80,10 @@ def main():
             x2=x1[4:]
 
 
-            v1.append(np.float(x2))
-            v2.append(np.float(p[1]))
-            v3.append(np.float(p[2]))
-            v4.append(np.float(p[3]))
+            v1.append(float(x2))
+            v2.append(float(p[1]))
+            v3.append(float(p[2]))
+            v4.append(float(p[3]))
 
 
     xpos=np.array(v1)
