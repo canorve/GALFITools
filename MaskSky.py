@@ -30,7 +30,7 @@ def main():
 
     parser.add_argument("-b","--border", action="store_true", help="Mask the borders when their value is zero")
 
-
+    parser.add_argument("-bv","--borValue",default=0,type=float, help="value of the border if it is different from zero")
     args = parser.parse_args()
 
     image = args.ImageFile 
@@ -39,14 +39,15 @@ def main():
     sky_sig = eval(args.skysigma)
 
     bor_flag = args.border
+    borValue = args.borValue
 
 
-    SkyRem(image,mask,sky_mean,sky_sig,bor_flag)
+    SkyRem(image,mask,sky_mean,sky_sig,borValue,bor_flag)
 
 #################################################################
 #################################################################
 
-def SkyRem(imageFile,maskFile,mean,sig,bor_flag=False):
+def SkyRem(imageFile,maskFile,mean,sig,borValue,bor_flag=False):
 
     bor_val = 100
 
@@ -94,7 +95,7 @@ def SkyRem(imageFile,maskFile,mean,sig,bor_flag=False):
 
     if bor_flag:
         print("masking the border")
-        bor_mask = dataImage == 0
+        bor_mask = dataImage == borValue 
 
         if bor_mask.any():
             maskImage[bor_mask] = bor_val 
