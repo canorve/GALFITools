@@ -23,105 +23,91 @@ from mgefit.mge_fit_sectors import mge_fit_sectors
 from mgefit.mge_fit_sectors_twist import mge_fit_sectors_twist
 
 
+
+import argparse
+
+
 def main():
 
-    if len(sys.argv[1:]) <= 6:
-      print ('Missing arguments')
-      print ("Usage: %s [Image] [X] [Y] [MagZpt] [PSF sigma or File] [Twist 1=yes 0=No] [-sky Sky] [-m Mask] " % (sys.argv[0]))
-      print ("Example: %s  image.fits 500 500 25 0.494 0" % (sys.argv[0]))
-      print ("Example: %s  image.fits 500 500 25 0.494 1 -sky 0.5 " % (sys.argv[0]))
-      print ("Example: %s  image.fits 500 500 25 0.494 1 -sky 0.5 -m mask.fits " % (sys.argv[0]))
+    parser = argparse.ArgumentParser(description="fits mge of Cappellari and formats to GALFIT")
 
-      sys.exit()
+    parser.add_argument("image", help="the Mask image file to modify or create")
+    parser.add_argument("Ds9regFile", help="the DS9 ellipse region file containing the galaxy")
+    parser.add_argument("magzpt", help="the magnitude zero point ")
+    parser.add_argument("-t","--twist", action="store_true", help="uses twist option for mge ")
+    parser.add_argument("-p","--psf", type=int, help="the value of PSF sigma ",default=0)
+    parser.add_argument("-s","--sky", type=float, help="the sky background value",default=0)
+    parser.add_argument("-m","--mask", type=str, help="the mask file")
+    parser.add_argument("-ps","--plate", type=float, help="plate scale of the image",default=1)
 
-    flagsky=False
-    twist=False
+    args = parser.parse_args()
 
-    flagpsf=False
-    flagconv=True
+    image = args.image
+    regfile = args.Ds9regFile 
+    magzpt = args.magzpt
+    twist = args.twist
+    maskfile = args.mask
 
-    imgname= sys.argv[1]
-    flagmask=False
-    maskfile="mask.fits"
+    psf = args.psf
+    sky = args.sky
+    scale = args.plate
+
+
+    #flagsky = False
+
+    #flagpsf = False
+    #flagconv=True
+
+    #image= sys.argv[1]
+    #flagmask=False
+
+    #maskfile="mask.fits"
 
     mgeoutfile="mgegas.txt"
+    convbox=100
+
+    #sky=0
+
+    #X = float(sys.argv[2])
+    #Y = float(sys.argv[3])
+
+    ##########################################
+    ############################################
 
 
-    sky=0
-
-    X = np.float(sys.argv[2])
-    Y = np.float(sys.argv[3])
-
-##########################################
-############################################
-
-    flaglogx=False
-    flagq=False
-    flagpa=False
-    flagsub=False
-    flaginit=False
-
-
-    OptionHandleList = ['-m', '-sky']
-    options = {}
-    for OptionHandle in OptionHandleList:
-        options[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
-    if options['m'] != None:
-        flagmask=True
-    if options['sky'] != None:
-        flagsky=True
-################################
-    if flagsky == True:
-        opt={}
-        OptionHandle="-sky"
-        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        sky=np.float(opt['sky'])
-
-    if flagmask == True:
-        opt={}
-        OptionHandle="-m"
-        opt[OptionHandle[1:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        maskfile=np.str(opt['m'])
-
-
-
-######################################
-######################################
-
-    if imgname.find(".") != -1:
-        (timg, trash) = imgname.split(".")
+    if image.find(".") != -1:
+        (timg, trash) = image.split(".")
     else:
-        timg=imgname
+        timg=image
 
     namepng=timg+".png"
 
     sectorspng="sectors.png"
 
 
-    mgzpt= sys.argv[4]
-    mgzpt=np.float(mgzpt)
+    #magzpt= sys.argv[4]
+    magzpt=float(magzpt)
 
-    valpsf= sys.argv[5]
+    #valpsf= sys.argv[5]
 
-#    flagpsf = isinstance(valpsf,str)
-    flagpsf=valpsf.replace(".",'',1).isdigit()
+    #    flagpsf = isinstance(valpsf,str)
+    #flagpsf=valpsf.replace(".",'',1).isdigit()
 
-    if flagpsf == True:
-        sigpsf=np.float(valpsf)
+    #if flagpsf == True:
+    #    sigpsf=float(valpsf)
 
-        if (np.abs(sigpsf) < 0.001 ):
-            flagconv=False
+    #    if (np.abs(sigpsf) < 0.001 ):
+    #        flagconv=False
 
-    else:
-        sigpsf,normpsf=ReadMgePsf(valpsf)
-
-
-    twist = np.bool(np.int(sys.argv[6]))
+    #else:
+    #    sigpsf,normpsf=ReadMgePsf(valpsf)
 
 
-    convbox=100
+    #twist = bool(int(sys.argv[6]))
 
-#    sky=0.55
+
+
+    #   sky=0.55
     fit=1
     skyfit=0
 
@@ -131,44 +117,44 @@ def main():
     ypos=357
     anglegass=35.8
 
-#    scale = 0.0455  # arcsec/pixel
+    # scale = 0.0455  # arcsec/pixel
 
-    scale = 0.68  # arcsec/pixel set to default
+    #scale = 0.68  # arcsec/pixel set to default
 
 
     ###################################################
     #  Create GALFIT input file header to compute sky #
     ###################################################
 
-#    imgname = "ngc4342.fits"
+    #    image = "ngc4342.fits"
 
-    if imgname.find(".") != -1:
-        (TNAM, trash) = imgname.split(".")
+    if image.find(".") != -1:
+        (TNAM, trash) = image.split(".")
     else:
-        TNAM=imgname
+        TNAM=image
 
-    exptime = GetExpTime(imgname)
+    exptime = GetExpTime(image)
 
-##################
-#################
+    ##################
+    #################
 
     # Here we use an accurate four gaussians MGE PSF for
     # the HST/WFPC2/F814W filter, taken from Table 3 of
     # Cappellari et al. (2002, ApJ, 578, 787)
 
-#    sigmapsf = [0.494, 1.44, 4.71, 13.4]      # In PC1 pixels
-#    normpsf = [0.294, 0.559, 0.0813, 0.0657]  # total(normpsf)=1
+    #    sigmapsf = [0.494, 1.44, 4.71, 13.4]      # In PC1 pixels
+    #    normpsf = [0.294, 0.559, 0.0813, 0.0657]  # total(normpsf)=1
 
-#    ang=90-ang
-
-
-
-######################
-#    Mask file
-#################
+    #    ang=90-ang
 
 
-    if flagmask:
+
+    ######################
+    #    Mask file
+    #################
+
+
+    if maskfile:
 
         errmsg="file {} does not exist".format(maskfile)
         assert os.path.isfile(maskfile), errmsg
@@ -178,37 +164,38 @@ def main():
         maskbt=maskb.T
         hdu.close()
 
-######################
-#    sky=back
-#################
+    ######################
+    #    sky=back
+    #################
 
-    hdu = fits.open(imgname)
+    hdu = fits.open(image)
     img = hdu[0].data
 
     img=img.astype(float)
-#    skylev = 0.55   # counts/pixel
+    #    skylev = 0.55   # counts/pixel
 
-    minlevel = 15  # counts/pixel
+    minlevel = 0  
     ngauss = 12
 
     plt.clf()
-#    f = find_galaxy(img, fraction=0.04, plot=1)
+    #    f = find_galaxy(img, fraction=0.04, plot=1)
 
-        # sextractor
-    eps,theta,xpeak,ypeak,back=Sextractor(imgname,X,Y)
+    # sextractor
+    #eps,theta,xpeak,ypeak,back=Sextractor(image,X,Y)
+    eps,theta,xpeak,ypeak=GetInfoEllip(regfile)
     print("galaxy found at ",xpeak,ypeak)
     print("Ellipticity, Angle = ",eps,theta)
 
-    if flagsky == True:
-        print("Sky = ",sky)
-    else:
-        print("Sky = ",back)
-        sky=back
+    #if flagsky == True:
+    print("Sky = ",sky)
+    #else:
+    #    print("Sky = ",back)
+    #    sky=back
 
-#        print(eps,theta,xpeak,ypeak)
-    img -= sky   # subtract sky
+    #        print(eps,theta,xpeak,ypeak)
+    img = img - sky   # subtract sky
 
-# I have to switch x and y coordinates, don't ask me why
+    # I have to switch x and y coordinates, don't ask me why
     xtemp=xpeak
     xpeak=ypeak
     ypeak=xtemp
@@ -216,11 +203,14 @@ def main():
     plt.clf()
 
     if twist:
+        print("twist mode mge fit sectors is used")
                         # Perform galaxy photometry
-        if flagmask:
-            s = sectors_photometry_twist(img, theta, xpeak, ypeak, minlevel=minlevel, badpixels=maskb ,plot=1)
+        if maskfile:
+            s = sectors_photometry_twist(img, theta, xpeak, ypeak, 
+                                         minlevel=minlevel, badpixels=maskb ,plot=1)
         else:
-            s = sectors_photometry_twist(img, theta, xpeak, ypeak, minlevel=minlevel, plot=1)
+            s = sectors_photometry_twist(img, theta, xpeak, ypeak, minlevel=minlevel, 
+                                         plot=1)
 
         plt.savefig(sectorspng)
 
@@ -230,18 +220,17 @@ def main():
 #            m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
 #                                      sigmapsf=sigmapsf,normpsf=normpsf, scale=scale, plot=1)
 
-        if flagpsf == True:
-            if flagconv:
-                m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
-                                        sigmapsf=sigpsf, scale=scale, plot=1)
-            else:
-                print("No convolution")
-                m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
+        if psf == True:
+            m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
+                                        sigmapsf=psf, scale=scale, plot=1)
+        else:
+            print("No convolution")
+            m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
                                          scale=scale, plot=1)
 
-        else:
-            m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
-                                    sigmapsf=sigpsf, normpsf=normpsf ,scale=scale, plot=1)
+        #else:
+            #m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
+            #                        sigmapsf=sigpsf, normpsf=normpsf ,scale=scale, plot=1)
 
 
 
@@ -252,7 +241,7 @@ def main():
 
     elif twist == False:
 
-        if flagmask:
+        if maskfile:
             s = sectors_photometry(img, eps, theta, xpeak, ypeak, minlevel=minlevel, badpixels=maskb ,plot=1)
         else:
 
@@ -266,28 +255,24 @@ def main():
 
     ###########################
 
-#            m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
-#                                ngauss=ngauss, sigmapsf=sigmapsf, normpsf=normpsf,
-#                                scale=scale, plot=1, bulge_disk=0, linear=0)
         plt.clf()
 
-        if flagpsf == True:
+        if psf == True:
  
-            if flagconv:
  
-                m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
-                                    ngauss=ngauss, sigmapsf=sigpsf,
-                                    scale=scale, plot=1, bulge_disk=0, linear=0)
-            else:
-                print("No convolution")
-                m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
-                                    ngauss=ngauss, scale=scale, plot=1, 
-                                    bulge_disk=0, linear=0)
-
-        else:
             m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
-                                ngauss=ngauss, sigmapsf=sigpsf, normpsf=normpsf,
+                                ngauss=ngauss, sigmapsf=psf,
                                 scale=scale, plot=1, bulge_disk=0, linear=0)
+        else:
+            print("No convolution")
+            m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
+                                ngauss=ngauss, scale=scale, plot=1, 
+                                bulge_disk=0, linear=0)
+
+        #else:
+        #    m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
+        #                        ngauss=ngauss, sigmapsf=sigpsf, normpsf=normpsf,
+        #                        scale=scale, plot=1, bulge_disk=0, linear=0)
 
 
         plt.pause(1)  # Allow plot to appear on the screen
@@ -312,18 +297,18 @@ def main():
 
     elif twist == False:
         (counts,sigma,axisrat)=m.sol
-#        if flagsky:
-#            anglegass = f.pa # - 90
-#        else:
+    #        if flagsky:
+    #            anglegass = f.pa # - 90
+    #        else:
         anglegass = 90 - theta
 
 
-#    print(counts)
-#    print(counts[0],sigma[0],axisrat[0])
+    #    print(counts)
+    #    print(counts[0],sigma[0],axisrat[0])
 
-### print GALFIT files
-####################
-#####################
+    ### print GALFIT files
+    ####################
+    #####################
 
     parfile="MGEGALFIT.txt"
     outname=TNAM
@@ -332,7 +317,7 @@ def main():
     psfname="none"
 
 
-# switch back
+    # switch back
     xtemp=xpeak
     xpeak=ypeak
     ypeak=xtemp
@@ -340,16 +325,16 @@ def main():
 
     consfile="constraints"
 
-    T1 = "{}".format(imgname)
+    T1 = "{}".format(image)
     T2 = outname + "-mge.fits"
     T3 = "{}".format(rmsname)
 
     xlo=1
     ylo=1
 
-    (xhi,yhi)=GetAxis(imgname)
+    (xhi,yhi)=GetAxis(image)
 
-#    scale = 0.0455
+    #    scale = 0.0455
 
     fout1 = open(parfile, "w")
     fout2 = open(mgeoutfile, "w")
@@ -360,13 +345,12 @@ def main():
 
 
 
-
     PrintHeader(fout1, T1, T2, T3, psfname, 1, maskfile, consfile, xlo, xhi, ylo,
-                yhi, convbox, convbox, mgzpt, scale, scale, "regular", 0, 0)
+                yhi, convbox, convbox, magzpt, scale, scale, "regular", 0, 0)
 
     index = 0
 
-#    index+=1
+    #    index+=1
 
     while index < len(counts):
 
@@ -375,24 +359,24 @@ def main():
         SigPix =  sigma[index]
         qobs =  axisrat[index]
 
-        TotCounts=np.float(TotCounts)
-        SigPix=np.float(SigPix)
-        qobs=np.float(qobs)
+        TotCounts=float(TotCounts)
+        SigPix=float(SigPix)
+        qobs=float(qobs)
 
         if twist:
             anglegass = alphaf[index] #- 90
-            anglegass=np.float(anglegass)
+            anglegass=float(anglegass)
 
 
         C0=TotCounts/(2*np.pi*qobs*SigPix**2)
 
         Ftot = 2*np.pi*SigPix**2*C0*qobs
 
-        mgemag = mgzpt + 0.1  + 2.5*np.log10(exptime)  - 2.5*np.log10(Ftot)
+        mgemag = magzpt + 0.1  + 2.5*np.log10(exptime)  - 2.5*np.log10(Ftot)
 
         FWHM = 2.35482 * SigPix
 
-    #        mgesb= mgzpt - 2.5*np.log10(mgecount/exptime) + 2.5*np.log10(plate**2) + 0.1
+    #        mgesb= magzpt - 2.5*np.log10(mgecount/exptime) + 2.5*np.log10(plate**2) + 0.1
 
 
         outline = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(mgemag, SigPix, FWHM, qobs, anglegass)
@@ -453,7 +437,7 @@ def Sextractor(filimage,X,Y):
 
 #        index =  Mag.argsort()
 #        i=0
-        dist=20
+        dist=100
 
         for idx, item in enumerate(Num):
 
@@ -495,11 +479,11 @@ def Sextractor(filimage,X,Y):
 
 ############
 
-        XPos=np.round(XPos)
-        YPos=np.round(YPos)
+        XPos=round(XPos)
+        YPos=round(YPos)
 
-        XPos=np.int(XPos)
-        YPos=np.int(YPos)
+        XPos=int(XPos)
+        YPos=int(YPos)
 
     else:
         print("Sextractor cat file not found ")
@@ -797,7 +781,7 @@ def GetExpTime(Image):
     hdu = fits.open(Image)
     exptime = hdu[0].header["EXPTIME"]
     hdu.close()
-    return exptime
+    return float(exptime)
 
 
 def CheckFlag(val, check):
@@ -822,6 +806,77 @@ def CheckFlag(val, check):
         maxx = maxx / 2
 
     return flag
+
+
+def GetInfoEllip(regfile):
+
+    if not os.path.exists(regfile):
+        print ('%s: reg filename does not exist!' %(regfile))
+        sys.exit()
+
+    f1 = open(regfile,'r')
+
+    lines = f1.readlines()
+
+    f1.close()
+
+    flag = False
+    found = False
+
+    #reading reg file
+    for line in lines:
+
+
+        b1 = line.split("(")
+        p = line.split(",")
+
+        x1 = p[0]
+        if b1[0] == "ellipse":
+
+            x0 = "ellipse"
+            x2 = x1[8:]
+            flag = True
+            found = True
+
+        if (flag == True):
+            x3 = p[4]
+            x4 = x3[:-2]
+
+
+            v0=x0
+
+            v1=float(x2)
+            v2=float(p[1])
+            v3=float(p[2])
+            v4=float(p[3])
+            v5=float(x4)
+
+            flag=False
+
+    if found:
+        obj  = v0
+        xpos = v1
+        ypos = v2
+        rx = v3
+        ry = v4
+        angle = v5
+
+        if rx >= ry:
+            axratio = ry/rx 
+            eps = 1 - axratio 
+            theta = angle + 90 
+        else:
+            axratio = rx/ry 
+            eps = 1 - axratio 
+            theta = angle 
+
+        return eps,theta,xpos,ypos
+    else:
+        print("ellipse region was not found in file. Exiting.. ")
+        sys.exit()
+
+    return 0,0,0,0
+
 
 
 #############################################################################
