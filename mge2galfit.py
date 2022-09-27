@@ -13,16 +13,15 @@ import matplotlib.pyplot as plt
 
 import mgefit
 from mgefit.find_galaxy import find_galaxy
-#from mgefit.mge_fit_1d import mge_fit_1d
 from mgefit.sectors_photometry import sectors_photometry
 from mgefit.sectors_photometry_twist import sectors_photometry_twist
 
 
 from mgefit.mge_fit_sectors import mge_fit_sectors
-#from mgefit.mge_print_contours import mge_print_contours
 from mgefit.mge_fit_sectors_twist import mge_fit_sectors_twist
 
-
+from mgefit.mge_fit_sectors_regularized import mge_fit_sectors_regularized 
+from mgefit.mge_fit_sectors_twist_regularized import mge_fit_sectors_twist_regularized 
 
 import argparse
 
@@ -35,6 +34,7 @@ def main():
     parser.add_argument("Ds9regFile", help="the DS9 ellipse region file containing the galaxy")
     parser.add_argument("magzpt", help="the magnitude zero point ")
     parser.add_argument("-t","--twist", action="store_true", help="uses twist option for mge ")
+    parser.add_argument("-r","--regu", action="store_true", help="regularized mode for mge_fit_sectors ")
     parser.add_argument("-p","--psf", type=int, help="the value of PSF sigma ",default=0)
     parser.add_argument("-s","--sky", type=float, help="the sky background value",default=0)
     parser.add_argument("-m","--mask", type=str, help="the mask file")
@@ -46,33 +46,22 @@ def main():
     regfile = args.Ds9regFile 
     magzpt = args.magzpt
     twist = args.twist
+    regu = args.regu
     maskfile = args.mask
 
     psf = args.psf
     sky = args.sky
     scale = args.plate
 
-
-    #flagsky = False
-
-    #flagpsf = False
-    #flagconv=True
-
-    #image= sys.argv[1]
-    #flagmask=False
-
-    #maskfile="mask.fits"
-
     mgeoutfile="mgegas.txt"
     convbox=100
-
-    #sky=0
-
-    #X = float(sys.argv[2])
-    #Y = float(sys.argv[3])
-
+    
     ##########################################
     ############################################
+
+
+    if regu:
+        print('regularization mode activated')
 
 
     if image.find(".") != -1:
@@ -217,21 +206,24 @@ def main():
         plt.pause(1)  # Allow plot to appear on the screen
 
         plt.clf()
-#            m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
-#                                      sigmapsf=sigmapsf,normpsf=normpsf, scale=scale, plot=1)
 
         if psf == True:
-            m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
-                                        sigmapsf=psf, scale=scale, plot=1)
+            if regu:
+                m = mge_fit_sectors_twist_regularized(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
+                                            sigmapsf=psf, scale=scale, plot=1)
+            else:
+                m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
+                                            sigmapsf=psf, scale=scale, plot=1)
+ 
         else:
             print("No convolution")
-            m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
-                                         scale=scale, plot=1)
-
-        #else:
-            #m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
-            #                        sigmapsf=sigpsf, normpsf=normpsf ,scale=scale, plot=1)
-
+            if regu:
+                m = mge_fit_sectors_twist_regularized(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
+                                             scale=scale, plot=1)
+            else:
+                m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
+                                             scale=scale, plot=1)
+ 
 
 
         plt.pause(1)  # Allow plot to appear on the screen
@@ -258,56 +250,51 @@ def main():
         plt.clf()
 
         if psf == True:
+
+            if regu:
  
+                m = mge_fit_sectors_regularized(s.radius, s.angle, s.counts, eps,
+                                    ngauss=ngauss, sigmapsf=psf,
+                                    scale=scale, plot=1, bulge_disk=0, linear=0)
+            else:
+                m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
+                                    ngauss=ngauss, sigmapsf=psf,
+                                    scale=scale, plot=1, bulge_disk=0, linear=0)
  
-            m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
-                                ngauss=ngauss, sigmapsf=psf,
-                                scale=scale, plot=1, bulge_disk=0, linear=0)
+
         else:
             print("No convolution")
-            m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
-                                ngauss=ngauss, scale=scale, plot=1, 
-                                bulge_disk=0, linear=0)
 
-        #else:
-        #    m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
-        #                        ngauss=ngauss, sigmapsf=sigpsf, normpsf=normpsf,
-        #                        scale=scale, plot=1, bulge_disk=0, linear=0)
-
+            if regu:
+                m = mge_fit_sectors_regularized(s.radius, s.angle, s.counts, eps,
+                                    ngauss=ngauss, scale=scale, plot=1, 
+                                    bulge_disk=0, linear=0)
+            else:
+                m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
+                                    ngauss=ngauss, scale=scale, plot=1, 
+                                    bulge_disk=0, linear=0)
+ 
 
         plt.pause(1)  # Allow plot to appear on the screen
 
         plt.savefig(namepng)
 
 
-    #    print(len(m.sol.T))
-    #    print(len(m.sol))
-
     if twist:
 
         (counts,sigma,axisrat,pa)=m.sol
-#        if flagsky:
-#            alpha1= pa - f.pa
-#            alphaf= 180 - alpha1
 
-#        else:
         theta2=270 -theta
         alpha1= pa - theta2
         alphaf= alpha1 - 90
 
     elif twist == False:
         (counts,sigma,axisrat)=m.sol
-    #        if flagsky:
-    #            anglegass = f.pa # - 90
-    #        else:
         anglegass = 90 - theta
 
 
-    #    print(counts)
-    #    print(counts[0],sigma[0],axisrat[0])
-
-    ### print GALFIT files
     ####################
+    ### print GALFIT files
     #####################
 
     parfile="MGEGALFIT.txt"
@@ -334,7 +321,6 @@ def main():
 
     (xhi,yhi)=GetAxis(image)
 
-    #    scale = 0.0455
 
     fout1 = open(parfile, "w")
     fout2 = open(mgeoutfile, "w")
@@ -350,7 +336,6 @@ def main():
 
     index = 0
 
-    #    index+=1
 
     while index < len(counts):
 
@@ -375,8 +360,6 @@ def main():
         mgemag = magzpt + 0.1  + 2.5*np.log10(exptime)  - 2.5*np.log10(Ftot)
 
         FWHM = 2.35482 * SigPix
-
-    #        mgesb= magzpt - 2.5*np.log10(mgecount/exptime) + 2.5*np.log10(plate**2) + 0.1
 
 
         outline = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(mgemag, SigPix, FWHM, qobs, anglegass)
