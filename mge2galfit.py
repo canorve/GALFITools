@@ -282,15 +282,16 @@ def main():
 
     if twist:
 
-        (counts,sigma,axisrat,pa)=m.sol
+        (counts, sigma, axisrat, pa) = m.sol
 
-        theta2=270 -theta
-        alpha1= pa - theta2
-        alphaf= alpha1 - 90
+        theta2 = 270 - theta
+        alpha1 = pa - theta2
+        alphaf = alpha1 - 90
 
     elif twist == False:
-        (counts,sigma,axisrat)=m.sol
-        anglegass = 90 - theta
+        (counts, sigma, axisrat) = m.sol
+        #anglegass = 90 - theta
+        anglegass =  theta
 
 
     ####################
@@ -350,7 +351,7 @@ def main():
 
         if twist:
             anglegass = alphaf[index] #- 90
-            anglegass=float(anglegass)
+            anglegass = float(anglegass)
 
 
         C0=TotCounts/(2*np.pi*qobs*SigPix**2)
@@ -826,15 +827,15 @@ def GetInfoEllip(regfile):
             x4 = x3[:-2]
 
 
-            v0=x0
+            v0 = x0
 
-            v1=float(x2)
-            v2=float(p[1])
-            v3=float(p[2])
-            v4=float(p[3])
-            v5=float(x4)
+            v1 = float(x2)
+            v2 = float(p[1])
+            v3 = float(p[2])
+            v4 = float(p[3])
+            v5 = float(x4)
 
-            flag=False
+            flag = False
 
     if found:
         obj  = v0
@@ -853,12 +854,12 @@ def GetInfoEllip(regfile):
             eps = 1 - axratio 
             theta = angle 
 
-        return eps,theta,xpos,ypos
+        return eps, theta, xpos, ypos
     else:
         print("ellipse region was not found in file. Exiting.. ")
         sys.exit()
 
-    return 0,0,0,0
+    return 0, 0, 0, 0
 
 
 
