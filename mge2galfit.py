@@ -34,8 +34,12 @@ def main():
     parser.add_argument("Ds9regFile", help="the DS9 ellipse region file containing the galaxy")
     parser.add_argument("magzpt", help="the magnitude zero point ")
     parser.add_argument("-t","--twist", action="store_true", help="uses twist option for mge ")
-    parser.add_argument("-r","--regu", action="store_true", help="regularized mode for mge_fit_sectors ")
-    parser.add_argument("-p","--psf", type=int, help="the value of PSF sigma ",default=0)
+    parser.add_argument("-r","--regu", action="store_true", 
+                        help="regularized mode for mge_fit_sectors ")
+    parser.add_argument("-c","--center", action="store_true", 
+                        help="uses the center given in DS9 region file," + 
+                        "otherwise it will found the x,y peaks within DS9 ellipse")
+    parser.add_argument("-p","--psf", type=float, help="the value of PSF sigma ",default=0)
     parser.add_argument("-s","--sky", type=float, help="the sky background value",default=0)
     parser.add_argument("-m","--mask", type=str, help="the mask file")
     parser.add_argument("-ps","--plate", type=float, help="plate scale of the image",default=1)
@@ -47,6 +51,7 @@ def main():
     magzpt = args.magzpt
     twist = args.twist
     regu = args.regu
+    center = args.center
     maskfile = args.mask
 
     psf = args.psf
@@ -169,14 +174,22 @@ def main():
     plt.clf()
     #    f = find_galaxy(img, fraction=0.04, plot=1)
 
-    # sextractor
-    #eps,theta,xpeak,ypeak,back=Sextractor(image,X,Y)
-    eps,theta,xpeak,ypeak=GetInfoEllip(regfile)
-    print("galaxy found at ",xpeak,ypeak)
-    print("Ellipticity, Angle = ",eps,theta)
+    (ncol, nrow) = GetAxis(image)
+    
+    obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
+    xx, yy, Rkron, theta, eps = Ds9ell2Kronell(xpos,ypos,rx,ry,angle)
+    if center:
+        print('center of ds9 ellipse region will be used')
+        xpeak, ypeak = xpos, ypos
+    else:        
+        (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, eps, ncol, nrow)
+        xpeak, ypeak = GetPmax(img, xmin, xmax, ymin, ymax)
+ 
+    print("galaxy found at ", xpeak + 1, ypeak + 1)
+    print("Ellipticity, Angle = ", eps, theta)
 
     #if flagsky == True:
-    print("Sky = ",sky)
+    print("Sky = ", sky)
     #else:
     #    print("Sky = ",back)
     #    sky=back
@@ -320,7 +333,7 @@ def main():
     xlo=1
     ylo=1
 
-    (xhi,yhi)=GetAxis(image)
+    (xhi, yhi) = (ncol, nrow)
 
 
     fout1 = open(parfile, "w")
@@ -370,7 +383,7 @@ def main():
         fout2.write(outline2)
 
 
-        PrintGauss(fout1, index+1, xpeak, ypeak, mgemag, FWHM, qobs, anglegass, Z, fit)
+        PrintGauss(fout1, index+1, xpeak + 1, ypeak + 1, mgemag, FWHM, qobs, anglegass, Z, fit)
 
 
         index+=1
@@ -854,12 +867,116 @@ def GetInfoEllip(regfile):
             eps = 1 - axratio 
             theta = angle 
 
-        return eps, theta, xpos, ypos
+        return obj, xpos, ypos, rx, ry, angle
+        #return eps, theta, xpos, ypos
     else:
         print("ellipse region was not found in file. Exiting.. ")
         sys.exit()
 
     return 0, 0, 0, 0
+
+
+
+##new: 
+
+#Image = MakeEllip(Image,Value,xpos[idx],ypos[idx],rx[idx],ry[idx],angle[idx],ncol,nrow)
+
+#def MakeEllip(Image,Value,xpos,ypos,rx,ry,angle,ncol,nrow):
+#    "Make an ellipse in an image"
+
+#    xx, yy, Rkron, theta, e = Ds9ell2Kronell(xpos,ypos,rx,ry,angle)
+#    (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, e, ncol, nrow)
+#    Image = MakeKron(Image, Value, xx, yy, Rkron, theta, e, xmin, xmax, ymin, ymax)
+
+#    return Image
+
+
+def Ds9ell2Kronell(xpos,ypos,rx,ry,angle):
+
+
+    if rx >= ry:
+
+        q = ry/rx
+        e = 1 - q
+        Rkron = rx
+        theta = angle + 90
+        xx = xpos
+        yy = ypos
+    else:
+        q = rx/ry
+        e = 1 - q
+        Rkron = ry
+        theta = angle# + 90
+        xx = xpos
+        yy = ypos
+ 
+     
+    return xx, yy, Rkron, theta, e 
+
+
+def GetSize(x, y, R, theta, ell, ncol, nrow):
+    "this subroutine get the maximun"
+    "and minimim pixels for Kron and sky ellipse"
+    # k Check
+    q = (1 - ell)
+    bim = q * R
+
+    theta = theta * (np.pi / 180)  # rads!!
+
+# getting size
+
+    xmin = x - np.sqrt((R**2) * (np.cos(theta))**2 +
+                       (bim**2) * (np.sin(theta))**2)
+
+    xmax = x + np.sqrt((R**2) * (np.cos(theta))**2 +
+                       (bim**2) * (np.sin(theta))**2)
+
+    ymin = y - np.sqrt((R**2) * (np.sin(theta))**2 +
+                       (bim**2) * (np.cos(theta))**2)
+
+    ymax = y + np.sqrt((R**2) * (np.sin(theta))**2 +
+                       (bim**2) * (np.cos(theta))**2)
+
+    mask = xmin < 1
+    if mask.any():
+        xmin[mask] = 1
+
+    mask = xmax > ncol
+    if mask.any():
+        xmax[mask] = ncol
+
+    mask = ymin < 1
+    if mask.any():
+        ymin[mask] = 1
+
+    mask = ymax > nrow
+    if mask.any():
+        ymax[mask] = nrow
+
+    return (xmin, xmax, ymin, ymax)
+
+
+
+def GetPmax(image, xmin, xmax, ymin, ymax):
+
+
+    xmin = int(xmin)
+    xmax = int(xmax)
+    ymin = int(ymin)
+    ymax = int(ymax)
+
+
+    chuckimg = image[ymin - 1:ymax, xmin - 1:xmax]
+    
+
+    maxy, maxx = np.where(chuckimg == np.max(chuckimg))
+    
+    xpos = maxx[0] + xmin - 1
+    ypos = maxy[0]  + ymin - 1
+
+    return (xpos, ypos)
+
+
 
 
 
