@@ -10,6 +10,7 @@ from astropy.io import fits
 import scipy
 import scipy.special
 import matplotlib.pyplot as plt
+from scipy.special import gammaincinv
 
 import mgefit
 from mgefit.find_galaxy import find_galaxy
@@ -43,6 +44,7 @@ def main():
     parser.add_argument("-s","--sky", type=float, help="the sky background value",default=0)
     parser.add_argument("-m","--mask", type=str, help="the mask file")
     parser.add_argument("-ps","--plate", type=float, help="plate scale of the image",default=1)
+    parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
 
     args = parser.parse_args()
 
@@ -57,6 +59,7 @@ def main():
     psf = args.psf
     sky = args.sky
     scale = args.plate
+    sersic = args.sersic
 
     mgeoutfile="mgegas.txt"
     convbox=100
@@ -106,14 +109,6 @@ def main():
     skyfit=0
 
     Z=0
-
-    xpos=367
-    ypos=357
-    anglegass=35.8
-
-    # scale = 0.0455  # arcsec/pixel
-
-    #scale = 0.68  # arcsec/pixel set to default
 
 
     ###################################################
@@ -311,7 +306,11 @@ def main():
     ### print GALFIT files
     #####################
 
-    parfile="MGEGALFIT.txt"
+    if sersic:
+        parfile="mseGALFIT.txt"
+    else:
+        parfile="mgeGALFIT.txt"
+
     outname=TNAM
 
     rmsname="none"
@@ -343,7 +342,9 @@ def main():
     outline2 = "# Mag Sig(pixels) FWHM(pixels) q angle \n"
     fout2.write(outline2)
 
+    #sersic K for n = 0.5
 
+    K = gammaincinv(1,0.5)
 
     PrintHeader(fout1, T1, T2, T3, psfname, 1, maskfile, consfile, xlo, xhi, ylo,
                 yhi, convbox, convbox, magzpt, scale, scale, "regular", 0, 0)
@@ -358,32 +359,58 @@ def main():
         SigPix =  sigma[index]
         qobs =  axisrat[index]
 
-        TotCounts=float(TotCounts)
-        SigPix=float(SigPix)
-        qobs=float(qobs)
+        TotCounts = float(TotCounts)
+        SigPix = float(SigPix)
+        qobs = float(qobs)
 
         if twist:
             anglegass = alphaf[index] #- 90
             anglegass = float(anglegass)
 
 
-        C0=TotCounts/(2*np.pi*qobs*SigPix**2)
+        if sersic:
 
-        Ftot = 2*np.pi*SigPix**2*C0*qobs
+            C0=TotCounts/(2*np.pi*qobs*SigPix**2)
 
-        mgemag = magzpt + 0.1  + 2.5*np.log10(exptime)  - 2.5*np.log10(Ftot)
+            Ftot = 2*np.pi*SigPix**2*C0*qobs
 
-        FWHM = 2.35482 * SigPix
+            mgemag = magzpt + 0.1  + 2.5*np.log10(exptime)  - 2.5*np.log10(Ftot)
+            
+            FWHM = 2.35482*SigPix
+
+            h  = np.sqrt(2) * SigPix
+             
+            Re = (K**(0.5))*h
+
+            outline = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f} Re: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(mgemag, SigPix, FWHM, Re, qobs, anglegass)
+            print(outline)
+
+            outline2 = "{:.2f} {:.2f} {:.2f} {:.2f} {:.2f} {:.2f} \n".format(mgemag, SigPix, FWHM, Re,  qobs, anglegass)
+            fout2.write(outline2)
 
 
-        outline = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(mgemag, SigPix, FWHM, qobs, anglegass)
-        print(outline)
-
-        outline2 = "{:.2f} {:.2f} {:.2f} {:.2f} {:.2f} \n".format(mgemag, SigPix, FWHM, qobs, anglegass)
-        fout2.write(outline2)
+            PrintSersic(fout1, index+1, xpeak + 1, ypeak + 1, mgemag, Re, 0.5, qobs, anglegass, Z, fit)
 
 
-        PrintGauss(fout1, index+1, xpeak + 1, ypeak + 1, mgemag, FWHM, qobs, anglegass, Z, fit)
+        else:
+
+            C0=TotCounts/(2*np.pi*qobs*SigPix**2)
+
+            Ftot = 2*np.pi*SigPix**2*C0*qobs
+
+            mgemag = magzpt + 0.1  + 2.5*np.log10(exptime)  - 2.5*np.log10(Ftot)
+
+            FWHM = 2.35482*SigPix
+
+
+            outline = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(mgemag, SigPix, FWHM, qobs, anglegass)
+            print(outline)
+
+            outline2 = "{:.2f} {:.2f} {:.2f} {:.2f} {:.2f} \n".format(mgemag, SigPix, FWHM, qobs, anglegass)
+            fout2.write(outline2)
+
+
+            PrintGauss(fout1, index+1, xpeak + 1, ypeak + 1, mgemag, FWHM, qobs, anglegass, Z, fit)
 
 
         index+=1
@@ -646,14 +673,19 @@ def PrintSersic(hdl, ncomp, xpos, ypos, magser, reser, nser, axratser, angleser,
     line04 = " 4) {:.2f}       {}              #  R_e         [Pixels]                            \n".format(
             reser, fit)
     line05 = " 5) {}       {}              #  Sersic exponent (deVauc=4, expdisk=1)           \n".format(
-        nser, fit)
-    line06 = " 9) {:.2f}       {}              #  axis ratio (b/a)                                \n".format(
+        nser, 0)
+    #line05 = " 5) {}       {}              #  Sersic exponent (deVauc=4, expdisk=1)           \n".format(
+    #    nser, fit)
+    line06 = " 6)  0.0000       0           #  ----------------                                \n"
+    line07 = " 7)  0.0000       0           #  ----------------                                \n"
+    line08 = " 8)  0.0000       0           #  ----------------                                \n"
+    line09 = " 9) {:.2f}       {}              #  axis ratio (b/a)                                \n".format(
         axratser, fit)
-    line07 = "10) {:.2f}       {}              #  position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
+    line10 = "10) {:.2f}       {}              #  position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
         angleser, fit)
-    line08 = " Z) {}                       #  Skip this model in output image?  (yes=1, no=0) \n".format(
+    lineZ = " Z) {}                       #  Skip this model in output image?  (yes=1, no=0) \n".format(
         Z)
-    line09 = "\n"
+    line11 = "\n"
 
     hdl.write(line00)
     hdl.write(line01)
@@ -665,6 +697,9 @@ def PrintSersic(hdl, ncomp, xpos, ypos, magser, reser, nser, axratser, angleser,
     hdl.write(line07)
     hdl.write(line08)
     hdl.write(line09)
+    hdl.write(line10)
+    hdl.write(lineZ)
+    hdl.write(line11)
 
     return True
 
