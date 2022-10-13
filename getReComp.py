@@ -41,12 +41,17 @@ def main() -> None:
 
     num_comp = 1 #select galaxy by the number of component 
     comps = SelectGal(comps,dis,num_comp)
-   
+  
+    N = numComps(comps)
+
+
     if sersic:
         print('using Sersic components to compute Re')
+        print('number of Sersic components: ',N)
         EffRad = GetReSer(head,comps)
     else:
         print('using Gaussian components to compute Re')
+        print('number of Gaussian components: ',N)
         EffRad = GetReGauss(head,comps)
 
     line = 'The effective radius is {:.2f} pixels \n'.format(EffRad)
@@ -78,7 +83,6 @@ class GalHead():
     P = 0
     S = 0
    
-
 
 
 def ReadHead(File: str) -> GalHead:
@@ -209,6 +213,15 @@ class GalComps:
                                    #8)  There is No 8 in any galfit model
     FreeAxRat = np.array([])           #9)  AxisRatio
     FreePosAng = np.array([])          #10) position angle
+
+def numComps(galcomps: GalComps) -> int:
+    '''obtains the number of components'''
+
+    nummask = galcomps.Activate == True
+
+    N = galcomps.Activate[nummask].size
+
+    return N
 
 
 
