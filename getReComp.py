@@ -7,6 +7,7 @@ from astropy.io import fits
 import subprocess as sp
 import scipy
 
+from scipy.special import gamma, gammainc, gammaincinv
 
 from scipy.optimize import bisect
 
@@ -24,9 +25,12 @@ def main() -> None:
 
     parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
 
+    parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
+
     args = parser.parse_args()
     galfitFile = args.GalfitFile
     dis = args.dis
+    sersic = args.sersic
 
     head = ReadHead(galfitFile)
 
@@ -37,9 +41,13 @@ def main() -> None:
 
     num_comp = 1 #select galaxy by the number of component 
     comps = SelectGal(comps,dis,num_comp)
-    
-
-    EffRad = GetReGauss(head,comps)
+   
+    if sersic:
+        print('using Sersic components to compute Re')
+        EffRad = GetReSer(head,comps)
+    else:
+        print('using Gaussian components to compute Re')
+        EffRad = GetReGauss(head,comps)
 
     line = 'The effective radius is {:.2f} pixels \n'.format(EffRad)
     
@@ -429,6 +437,8 @@ def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
     '''changes Flag to true for those components who belongs
         to the same galaxy of n_comp'''
 
+    galcomps.Activate.fill(False)
+
     idx = np.where(galcomps.N ==  n_comp)
 
     assert idx[0].size !=0, 'component not found'
@@ -481,7 +491,7 @@ def Fgauss(R: float, Io:float, sig: float, q: float) -> float:
     h = np.sqrt(2)*sig
     X = (R/h)**2 
     #it is not necessary to multiply by gamma since gamma(2*0.5)=1
-    Fr = 2*np.pi*q*(sig**2)*Io*scipy.special.gammainc(1,X) 
+    Fr = 2*np.pi*q*(sig**2)*Io*gammainc(1,X) 
 
     return Fr
 
@@ -513,6 +523,75 @@ def solveGaussRe(a: float, b: float, Io: list, sig: list, q: list, totFlux: floa
 
     return Re
 
+### Sersic components 
+def GetReSer(galhead: GalHead, galcomps: GalComps) -> float:
+
+
+    maskgal = (galcomps.Activate == True) & (galcomps.NameComp == "sersic")
+    galcomps.Flux = 10**((galhead.mgzpt - galcomps.Mag)/2.5)
+
+    N = galcomps.Exp
+
+    K = gammaincinv(2*galcomps.Exp,0.5)
+
+    AxRat = galcomps.AxRat
+
+    Re = galcomps.Rad
+
+    divfact = 2*np.pi*(Re**2)*np.exp(K)*N*(K**(-2*N))*gamma(2*N)*AxRat
+    #computing extraparameter
+    galcomps.Ie = galcomps.Flux/divfact 
+
+    
+    totFlux = galcomps.Flux[maskgal].sum()
+
+    a = 0.1
+    b = galcomps.Rad[-1] * 10 #hope it doesn't crash
+
+
+
+    Reff = solveSerRe(a, b, galcomps.Ie[maskgal], galcomps.Rad[maskgal], 
+                        galcomps.Exp, galcomps.AxRat[maskgal], totFlux)
+
+    return Reff
+
+def solveSerRe(a: float, b: float, Ie: list, rad: list, n: list, q: list, totFlux: float) -> float:
+    "return the Re of a set of Sersic functions. It uses Bisection"
+
+
+    Re = bisect(funReSer, a, b, args=(Ie,rad,n,q,totFlux))
+
+    return Re
+
+def funReSer(R: float, Ie: list, rad: list, n: list, q: list, totFlux: float) -> float:
+    
+
+    fun = Ftotser(R, Ie, rad, n, q) - totFlux/2
+
+    return fun
+ 
+def Ftotser(R: float, Ie: float, rad: float, n: float, q: float) -> float:
+
+    ftotR = Fser(R, Ie, rad, n, q) 
+
+    return ftotR.sum()
+
+
+
+def Fser(R: float, Ie: float, Re: float, n: float, q: float) -> float:
+    '''sersic flux to a determined R'''
+    
+    k = gammaincinv(2*n,0.5)
+
+    X = k*(R/Re)**(1/n) 
+
+    mulfact = np.exp(k)/(k**(2*n))
+
+    Fr = 2*np.pi*q*n*Ie*(Re**2)*mulfact*gammainc(2*n,X) 
+
+    return Fr
+
+  
 
 
 
