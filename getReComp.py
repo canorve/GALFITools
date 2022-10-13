@@ -6,6 +6,7 @@ import os
 from astropy.io import fits
 import subprocess as sp
 import scipy
+import sys
 
 from scipy.special import gamma, gammainc, gammaincinv
 
@@ -24,13 +25,22 @@ def main() -> None:
     parser.add_argument("GalfitFile", help = "Galfit File containing the Sersics or gaussians components")
 
     parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
+    parser.add_argument("-er","--effrad", type=float, help="percentage of light to compute for radius. default=.5 for effective radius ", default=.5)
 
     parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
 
     args = parser.parse_args()
+
     galfitFile = args.GalfitFile
     dis = args.dis
     sersic = args.sersic
+
+    eff = args.effrad
+
+    
+
+    assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
+
 
     head = ReadHead(galfitFile)
 
@@ -42,19 +52,29 @@ def main() -> None:
     num_comp = 1 #select galaxy by the number of component 
     comps = SelectGal(comps,dis,num_comp)
   
-    N = numComps(comps)
 
 
     if sersic:
         print('using Sersic components to compute Re')
+
+        N = numComps(comps,'sersic')
         print('number of Sersic components: ',N)
-        EffRad = GetReSer(head,comps)
+        if N == 0:
+            print('not enough number of components to compute Re')
+            print('exiting..')
+            sys.exit(1)
+        EffRad = GetReSer(head,comps,eff)
     else:
         print('using Gaussian components to compute Re')
+        N = numComps(comps,'gaussian')
+        if N == 0:
+            print('not enough number of components to compute Re')
+            print('exiting..')
+            sys.exit(1)
         print('number of Gaussian components: ',N)
-        EffRad = GetReGauss(head,comps)
+        EffRad = GetReGauss(head,comps,eff)
 
-    line = 'The effective radius is {:.2f} pixels \n'.format(EffRad)
+    line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
     
     print(line)
 
@@ -214,10 +234,10 @@ class GalComps:
     FreeAxRat = np.array([])           #9)  AxisRatio
     FreePosAng = np.array([])          #10) position angle
 
-def numComps(galcomps: GalComps) -> int:
+def numComps(galcomps: GalComps,name: str) -> int:
     '''obtains the number of components'''
 
-    nummask = galcomps.Activate == True
+    nummask = (galcomps.Activate == True) & (galcomps.NameComp == name)
 
     N = galcomps.Activate[nummask].size
 
@@ -475,7 +495,7 @@ def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
 
     return galcomps
  
-def GetReGauss(galhead: GalHead, galcomps: GalComps) -> float:
+def GetReGauss(galhead: GalHead, galcomps: GalComps, eff: float) -> float:
 
 
     maskgal = (galcomps.Activate == True) & (galcomps.NameComp == "gaussian")
@@ -493,7 +513,7 @@ def GetReGauss(galhead: GalHead, galcomps: GalComps) -> float:
 
 
     Reff = solveGaussRe(a, b, galcomps.Io[maskgal], galcomps.sig[maskgal], 
-                        galcomps.AxRat[maskgal], totFlux)
+                        galcomps.AxRat[maskgal], totFlux, eff)
 
     return Reff
 
@@ -520,24 +540,25 @@ def Ftotgauss(R: float, Io:float, sig: float, q: float) -> float:
 #    Ftot = 2*np.pi*q*(sig**2)*Io
 #    return Ftot
 
-def funReGauss(R: float, Io: list, sig: list, q: list, totFlux: float) -> float:
+def funReGauss(R: float, Io: list, sig: list, q: list, totFlux: float, eff: float) -> float:
     
 
-    fun = Ftotgauss(R, Io, sig, q) - totFlux/2
+    #fun = Ftotgauss(R, Io, sig, q) - totFlux/2
+    fun = Ftotgauss(R, Io, sig, q) - totFlux*eff
 
     return fun
    
 
-def solveGaussRe(a: float, b: float, Io: list, sig: list, q: list, totFlux: float) -> float:
+def solveGaussRe(a: float, b: float, Io: list, sig: list, q: list, totFlux: float, eff: float) -> float:
     "return the Re of a set of Sersic functions. It uses Bisection"
 
 
-    Re = bisect(funReGauss,a,b,args=(Io,sig,q,totFlux))
+    Re = bisect(funReGauss,a,b,args=(Io,sig,q,totFlux,eff))
 
     return Re
 
 ### Sersic components 
-def GetReSer(galhead: GalHead, galcomps: GalComps) -> float:
+def GetReSer(galhead: GalHead, galcomps: GalComps, eff: float) -> float:
 
 
     maskgal = (galcomps.Activate == True) & (galcomps.NameComp == "sersic")
@@ -564,22 +585,22 @@ def GetReSer(galhead: GalHead, galcomps: GalComps) -> float:
 
 
     Reff = solveSerRe(a, b, galcomps.Ie[maskgal], galcomps.Rad[maskgal], 
-                        galcomps.Exp, galcomps.AxRat[maskgal], totFlux)
+                        galcomps.Exp, galcomps.AxRat[maskgal], totFlux, eff)
 
     return Reff
 
-def solveSerRe(a: float, b: float, Ie: list, rad: list, n: list, q: list, totFlux: float) -> float:
+def solveSerRe(a: float, b: float, Ie: list, rad: list, n: list, q: list, totFlux: float, eff: float) -> float:
     "return the Re of a set of Sersic functions. It uses Bisection"
 
 
-    Re = bisect(funReSer, a, b, args=(Ie,rad,n,q,totFlux))
+    Re = bisect(funReSer, a, b, args=(Ie,rad,n,q,totFlux,eff))
 
     return Re
 
-def funReSer(R: float, Ie: list, rad: list, n: list, q: list, totFlux: float) -> float:
+def funReSer(R: float, Ie: list, rad: list, n: list, q: list, totFlux: float, eff: float) -> float:
     
 
-    fun = Ftotser(R, Ie, rad, n, q) - totFlux/2
+    fun = Ftotser(R, Ie, rad, n, q) - totFlux*eff
 
     return fun
  
