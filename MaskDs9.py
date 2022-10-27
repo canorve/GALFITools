@@ -102,8 +102,8 @@ def main():
 
 
             v0.append(x0)
-            v1.append(float(x2))
-            v2.append(float(p[1]))
+            v1.append(float(x2) - 1)
+            v2.append(float(p[1]) - 1)
             v3.append(float(p[2]))
             v4.append(float(p[3]))
             v5.append(float(x4))
@@ -112,7 +112,7 @@ def main():
 
 
     obj  = np.array(v0)
-    xpos = np.array(v1)
+    xpos = np.array(v1) 
     ypos = np.array(v2)
     rx = np.array(v3)
     ry = np.array(v4)
@@ -224,7 +224,7 @@ def Ds9ell2Kronell(xpos,ypos,rx,ry,angle):
 def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     "This subroutine create a Kron ellipse within a box defined by: xmin, xmax, ymin, ymax"
 
-# Check
+    # Check
 
     xmin = int(xmin)
     xmax = int(xmax)
@@ -236,7 +236,7 @@ def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
 
     theta = theta * np.pi / 180  # Rads!!!
 
-    ypos, xpos = np.mgrid[ymin - 1:ymax, xmin - 1:xmax]
+    ypos, xpos = np.mgrid[ymin - 1:ymax + 1, xmin - 1:xmax + 1]
 
     dx = xpos - x
     dy = ypos - y
@@ -245,7 +245,7 @@ def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
 
     mask = landa < 0
     if mask.any():
-        landa[mask] = landa[mask] + 2 * np.pi
+        landa[mask] = landa[mask] + 2*np.pi
 
     landa = landa - theta
 
@@ -259,7 +259,7 @@ def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     dell = np.sqrt((xell - x)**2 + (yell - y)**2)
     dist = np.sqrt(dx**2 + dy**2)
 
-    mask = dist < dell
+    mask = dist <= dell
     imagemat[ypos[mask], xpos[mask]] = idn
 
     return imagemat
@@ -274,19 +274,18 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 
     theta = theta * (np.pi / 180)  # rads!!
 
-# getting size
+    # getting size
 
-    xmin = x - np.sqrt((R**2) * (np.cos(theta))**2 +
-                       (bim**2) * (np.sin(theta))**2)
+    constx =  np.sqrt((R**2)*(np.cos(theta))**2 + (bim**2)*(np.sin(theta))**2)
+    consty =  np.sqrt((R**2)*(np.sin(theta))**2 + (bim**2)*(np.cos(theta))**2)
 
-    xmax = x + np.sqrt((R**2) * (np.cos(theta))**2 +
-                       (bim**2) * (np.sin(theta))**2)
 
-    ymin = y - np.sqrt((R**2) * (np.sin(theta))**2 +
-                       (bim**2) * (np.cos(theta))**2)
 
-    ymax = y + np.sqrt((R**2) * (np.sin(theta))**2 +
-                       (bim**2) * (np.cos(theta))**2)
+    xmin = x - constx                       
+    xmax = x + constx
+    ymin = y - consty
+    ymax = y + consty
+                    
 
     mask = xmin < 1
     if mask.any():
