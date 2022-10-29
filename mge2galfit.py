@@ -215,7 +215,9 @@ def main():
 
         plt.clf()
 
-        if psf == True:
+        tolpsf = 0.001
+
+        if np.abs(psf) > tolpsf:
             if regu:
                 m = mge_fit_sectors_twist_regularized(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
                                             sigmapsf=psf, scale=scale, plot=1)
