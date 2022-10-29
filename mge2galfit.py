@@ -259,7 +259,10 @@ def main():
 
         plt.clf()
 
-        if psf == True:
+
+
+        tolpsf = 0.001
+        if np.abs(psf) > tolpsf:
 
             if regu:
  
