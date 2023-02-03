@@ -66,7 +66,7 @@ def main() -> None:
         print('exiting..')
         sys.exit(1)
 
-    EffRad = GetReSer(head, galcomps, eff)
+    EffRad = GetReff().GetReSer(head, galcomps, eff)
 
     line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
     print(line)
@@ -499,116 +499,115 @@ def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
     return galcomps
  
 ### Sersic components 
-def GetReSer(galhead: GalHead, galcomps: GalComps, eff: float) -> float:
+class GetReff:
+    '''class to obtain the effective radius for the whole galaxy'''
+
+    def GetReSer(self, galhead: GalHead, galcomps: GalComps, eff: float) -> float:
+
+        comps = self.conver2Sersic(galcomps)
+
+        maskgal = (comps.Active == True) 
+
+        comps.Flux = 10**((galhead.mgzpt - comps.Mag)/2.5)
+
+        N = comps.Exp
+
+        K = gammaincinv(2*N, 0.5)
+
+        AxRat = comps.AxRat
+
+        Re = comps.Rad
+
+        divfact = 2*np.pi*(Re**2)*np.exp(K)*N*(K**(-2*N))*gamma(2*N)*AxRat
+        #computing extraparameter
+        comps.Ie = comps.Flux/divfact 
+
+        
+        totFlux = comps.Flux[maskgal].sum()
+
+        a = 0.1
+        b = comps.Rad[maskgal][-1] * 100  # hope it doesn't crash
 
 
-    comps = conver2Sersic(galcomps)
-
-    maskgal = (comps.Active == True) #& (galcomps.NameComp == "sersic")
-
-    comps.Flux = 10**((galhead.mgzpt - comps.Mag)/2.5)
-
-    N = comps.Exp
-
-    K = gammaincinv(2*N, 0.5)
-
-    AxRat = comps.AxRat
-
-    Re = comps.Rad
-
-    divfact = 2*np.pi*(Re**2)*np.exp(K)*N*(K**(-2*N))*gamma(2*N)*AxRat
-    #computing extraparameter
-    comps.Ie = comps.Flux/divfact 
-
-    
-    totFlux = comps.Flux[maskgal].sum()
-
-    a = 0.1
-    b = comps.Rad[maskgal][-1] * 10  # hope it doesn't crash
+        Reff = self.solveSerRe(a, b, comps.Rad[maskgal], comps.Exp[maskgal], 
+                                totFlux, eff)
 
 
-
-    Reff = solveSerRe(a, b, comps.Ie[maskgal], comps.Rad[maskgal], 
-                        comps.Exp[maskgal], comps.AxRat[maskgal], totFlux, eff)
+        return Reff
 
 
-    return Reff
+    def conver2Sersic(self, galcomps: GalComps) -> GalComps:
+        ''' function to convert exponential, gaussian params to Sersic params'''
+
+        comps =  copy.deepcopy(galcomps)
+
+        maskdev = (comps.Active == True) & (comps.NameComp == "devauc")
+        maskexp = (comps.Active == True) & (comps.NameComp == "expdisk")
+        maskgas = (comps.Active == True) & (comps.NameComp == "gaussian")
 
 
-def conver2Sersic(galcomps: GalComps) -> GalComps:
-    ''' function to convert exponential, gaussian params to Sersic params'''
+        K_GAUSS = 0.6931471805599455 #constant k for gaussian
+        K_EXP = 1.6783469900166612 # constant k for expdisk
+        SQ2 = np.sqrt(2) 
 
-    comps =  copy.deepcopy(galcomps)
-
-    maskdev = (comps.Active == True) & (comps.NameComp == "devauc")
-    maskexp = (comps.Active == True) & (comps.NameComp == "expdisk")
-    maskgas = (comps.Active == True) & (comps.NameComp == "gaussian")
-
-
-    K_GAUSS = 0.6931471805599455 #constant k for gaussian
-    SQ2 = np.sqrt(2) 
-
-    #for gaussian functions
-    if maskgas.any():
-        comps.Exp[maskgas] = 0.5 
-        comps.Rad[maskgas] = comps.Rad[maskgas]/2.354 #converting to sigma 
-        comps.Rad[maskgas] = SQ2*(K_GAUSS**0.5)*comps.Rad[maskgas] #converting to Re 
+        #for gaussian functions
+        if maskgas.any():
+            comps.Exp[maskgas] = 0.5 
+            comps.Rad[maskgas] = comps.Rad[maskgas]/2.354 #converting to sigma 
+            comps.Rad[maskgas] = SQ2*(K_GAUSS**0.5)*comps.Rad[maskgas] #converting to Re 
 
 
-    #for de vaucouleurs
-    if maskdev.any():
-        comps.Exp[maskdev] = 4
+        #for de vaucouleurs
+        if maskdev.any():
+            comps.Exp[maskdev] = 4
 
-    #for exponential disks
-    if maskexp.any():
-        comps.Exp[maskexp] = 1
-        comps.Rad[maskexp] = 1.678*comps.Rad[maskexp] #converting to Re
-
-
-
-    return comps
-
+        #for exponential disks
+        if maskexp.any():
+            comps.Exp[maskexp] = 1
+            comps.Rad[maskexp] = K_EXP*comps.Rad[maskexp] #converting to Re
 
 
 
-def solveSerRe(a: float, b: float, Ie: list, rad: list, n: list, q: list, totFlux: float, eff: float) -> float:
-    "return the Re of a set of Sersic functions. It uses Bisection"
-
-
-    Re = bisect(funReSer, a, b, args=(Ie, rad, n, q, totFlux, eff))
-
-    return Re
-
-def funReSer(R: float, Ie: list, rad: list, n: list, q: list, totFlux: float, eff: float) -> float:
-    
-
-    fun = Ftotser(R, Ie, rad, n, q) - totFlux*eff
-
-    return fun
- 
-def Ftotser(R: float, Ie: float, rad: float, n: float, q: float) -> float:
-
-    ftotR = Fser(R, Ie, rad, n, q) 
-
-    return ftotR.sum()
+        return comps
 
 
 
-def Fser(R: float, Ie: float, Re: float, n: float, q: float) -> float:
-    '''sersic flux to a determined R'''
-    
-    k = gammaincinv(2*n,0.5)
+
+    def solveSerRe(self, a: float, b: float, rad: list, n: list, totFlux: float, eff: float) -> float:
+        "return the Re of a set of Sersic functions. It uses Bisection"
 
 
-    X = k*(R/Re)**(1/n) 
+        Re = bisect(self.funReSer, a, b, args=(rad, n, totFlux, eff))
 
-    mulfact = np.exp(k)/(k**(2*n))
+        return Re
 
-    Fr = 2*np.pi*q*n*Ie*(Re**2)*mulfact*gammainc(2*n,X) 
+    def funReSer(self, R: float, rad: list, n: list, totFlux: float, eff: float) -> float:
+        
 
-    return Fr
+        fun = self.Ftotser(R, rad, n, totFlux) - totFlux*eff
 
-  
+        return fun
+     
+    def Ftotser(self, R: float, rad: list, n: list, totFlux: float) -> float:
+
+        ftotR = self.Fser(R, rad, n, totFlux) 
+
+        return ftotR.sum()
+
+
+
+    def Fser(self, R: float, Re: float, n: float, totFlux: float) -> float:
+        '''sersic flux to a determined R'''
+        
+        k = gammaincinv(2*n, 0.5)
+
+        X = k*(R/Re)**(1/n) 
+
+        Fr = totFlux*gammainc(2*n, X) 
+        
+        return Fr
+
+      
 
 
 #############################################################################
