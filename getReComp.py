@@ -7,6 +7,7 @@ from astropy.io import fits
 import subprocess as sp
 import scipy
 import sys
+import copy
 
 from scipy.special import gamma, gammainc, gammaincinv
 
@@ -25,15 +26,16 @@ def main() -> None:
     parser.add_argument("GalfitFile", help = "Galfit File containing the Sersics or gaussians components")
 
     parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
-    parser.add_argument("-er","--effrad", type=float, help="percentage of light to compute for radius. default=.5 for effective radius ", default=.5)
+    parser.add_argument("-er","--effrad", type=float, 
+                        help="percentage of light to compute for radius. default=.5 for effective radius ", default=.5)
 
-    parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
+    #parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
 
     args = parser.parse_args()
 
     galfitFile = args.GalfitFile
     dis = args.dis
-    sersic = args.sersic
+    #sersic = args.sersic
 
     eff = args.effrad
 
@@ -45,37 +47,28 @@ def main() -> None:
     head = ReadHead(galfitFile)
 
 
-    comps = ReadComps(galfitFile)
+    galcomps = ReadComps(galfitFile)
 
 
 
     num_comp = 1 #select galaxy by the number of component 
-    comps = SelectGal(comps,dis,num_comp)
+    galcomps = SelectGal(galcomps, dis, num_comp)
   
 
 
-    if sersic:
-        print('using Sersic components to compute Re')
+    #if sersic:
+    print('using Sersic components to compute Re')
 
-        N = numComps(comps,'sersic')
-        print('number of Sersic components: ',N)
-        if N == 0:
-            print('not enough number of components to compute Re')
-            print('exiting..')
-            sys.exit(1)
-        EffRad = GetReSer(head,comps,eff)
-    else:
-        print('using Gaussian components to compute Re')
-        N = numComps(comps,'gaussian')
-        if N == 0:
-            print('not enough number of components to compute Re')
-            print('exiting..')
-            sys.exit(1)
-        print('number of Gaussian components: ',N)
-        EffRad = GetReGauss(head,comps,eff)
+    N = numComps(galcomps,'all')
+    print('number of model components: ',N)
+    if N == 0:
+        print('not enough number of components to compute Re')
+        print('exiting..')
+        sys.exit(1)
+
+    EffRad = GetReSer(head, galcomps, eff)
 
     line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
-    
     print(line)
 
     return None
@@ -220,7 +213,7 @@ class GalComps:
     PosAng = np.array([])          #10) position angle
     skip = np.array([])            #z)  skip model
 
-    Activate = np.array([])            #activate component  for galaxy
+    Active = np.array([])            #activate component  for galaxy
 
     # store the flags related to parameters
     FreePosX = np.array([])            #1)   
@@ -234,12 +227,22 @@ class GalComps:
     FreeAxRat = np.array([])           #9)  AxisRatio
     FreePosAng = np.array([])          #10) position angle
 
-def numComps(galcomps: GalComps,name: str) -> int:
+def numComps(galcomps: GalComps, name: str) -> int:
     '''obtains the number of components'''
 
-    nummask = (galcomps.Activate == True) & (galcomps.NameComp == name)
 
-    N = galcomps.Activate[nummask].size
+    if name == 'all':
+        nummask = (galcomps.Active == True) & ( (galcomps.NameComp == 'sersic') 
+                    | (galcomps.NameComp == 'expdisk') | (galcomps.NameComp == 'gaussian')
+                    | (galcomps.NameComp == 'devauc'))
+
+    else:
+        nummask = (galcomps.Active == True) & (galcomps.NameComp == name)
+
+
+
+
+    N = galcomps.Active[nummask].size
 
     return N
 
@@ -349,7 +352,7 @@ def ReadComps(File: str) -> GalComps:
             galcomps.AxRat = np.append(galcomps.AxRat, AxRat)
             galcomps.PosAng = np.append(galcomps.PosAng, PosAng)
             galcomps.skip = np.append(galcomps.skip, skip)
-            galcomps.Activate = np.append(galcomps.Activate, flagcomp)
+            galcomps.Active = np.append(galcomps.Active, flagcomp)
 
 
             galcomps.FreePosX = np.append(galcomps.FreePosX, freeX)
@@ -470,7 +473,7 @@ def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
     '''changes Flag to true for those components who belongs
         to the same galaxy of n_comp'''
 
-    galcomps.Activate.fill(False)
+    galcomps.Active.fill(False)
 
     idx = np.where(galcomps.N ==  n_comp)
 
@@ -479,7 +482,7 @@ def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
     n_idx = idx[0].item(0)
 
 
-    galcomps.Activate[n_idx] = True #main component
+    galcomps.Active[n_idx] = True #main component
 
     posx = galcomps.PosX[n_idx] 
     posy = galcomps.PosY[n_idx]      
@@ -491,109 +494,88 @@ def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
 
     maskdist = (dist <= distmax ) 
 
-    galcomps.Activate[maskdist] = True
+    galcomps.Active[maskdist] = True
 
     return galcomps
  
-def GetReGauss(galhead: GalHead, galcomps: GalComps, eff: float) -> float:
-
-
-    maskgal = (galcomps.Activate == True) & (galcomps.NameComp == "gaussian")
-    #computing extra parameters of 
-    galcomps.sig = galcomps.Rad / 2.354      
-    galcomps.Flux = 10**((galhead.mgzpt - galcomps.Mag)/2.5)
-    galcomps.Io = galcomps.Flux/(2*np.pi*galcomps.AxRat*galcomps.sig**2) 
-
-    
-    totFlux = galcomps.Flux[maskgal].sum()
-
-    a = 0.1
-    b = galcomps.Rad[-1] * 10 #hope it doesn't crash
-
-
-
-    Reff = solveGaussRe(a, b, galcomps.Io[maskgal], galcomps.sig[maskgal], 
-                        galcomps.AxRat[maskgal], totFlux, eff)
-
-    return Reff
-
-
-def Fgauss(R: float, Io:float, sig: float, q: float) -> float:
-    '''gauss flux to a determined R'''
-    k = 0.6931471805599455 # k sersic constant for gaussian n = 0.5
-    h = np.sqrt(2)*sig
-    X = (R/h)**2 
-    #it is not necessary to multiply by gamma since gamma(2*0.5)=1
-    Fr = 2*np.pi*q*(sig**2)*Io*gammainc(1,X) 
-
-    return Fr
-
-def Ftotgauss(R: float, Io:float, sig: float, q: float) -> float:
-
-   #it is not necessary to multiply by gamma since gamma(2*0.5)=1
-    ftotR = Fgauss(R, Io, sig, q) 
-
-    return ftotR.sum()
-
-
-#def Ftotgauss(Io:float, sig: float, q: float) -> float:
-#    Ftot = 2*np.pi*q*(sig**2)*Io
-#    return Ftot
-
-def funReGauss(R: float, Io: list, sig: list, q: list, totFlux: float, eff: float) -> float:
-    
-
-    #fun = Ftotgauss(R, Io, sig, q) - totFlux/2
-    fun = Ftotgauss(R, Io, sig, q) - totFlux*eff
-
-    return fun
-   
-
-def solveGaussRe(a: float, b: float, Io: list, sig: list, q: list, totFlux: float, eff: float) -> float:
-    "return the Re of a set of Sersic functions. It uses Bisection"
-
-
-    Re = bisect(funReGauss,a,b,args=(Io,sig,q,totFlux,eff))
-
-    return Re
-
 ### Sersic components 
 def GetReSer(galhead: GalHead, galcomps: GalComps, eff: float) -> float:
 
 
-    maskgal = (galcomps.Activate == True) & (galcomps.NameComp == "sersic")
-    galcomps.Flux = 10**((galhead.mgzpt - galcomps.Mag)/2.5)
+    comps = conver2Sersic(galcomps)
 
-    N = galcomps.Exp
+    maskgal = (comps.Active == True) #& (galcomps.NameComp == "sersic")
 
-    K = gammaincinv(2*galcomps.Exp,0.5)
+    comps.Flux = 10**((galhead.mgzpt - comps.Mag)/2.5)
 
-    AxRat = galcomps.AxRat
+    N = comps.Exp
 
-    Re = galcomps.Rad
+    K = gammaincinv(2*N, 0.5)
+
+    AxRat = comps.AxRat
+
+    Re = comps.Rad
 
     divfact = 2*np.pi*(Re**2)*np.exp(K)*N*(K**(-2*N))*gamma(2*N)*AxRat
     #computing extraparameter
-    galcomps.Ie = galcomps.Flux/divfact 
+    comps.Ie = comps.Flux/divfact 
 
     
-    totFlux = galcomps.Flux[maskgal].sum()
+    totFlux = comps.Flux[maskgal].sum()
 
     a = 0.1
-    b = galcomps.Rad[-1] * 10 #hope it doesn't crash
+    b = comps.Rad[maskgal][-1] * 10  # hope it doesn't crash
 
 
 
-    Reff = solveSerRe(a, b, galcomps.Ie[maskgal], galcomps.Rad[maskgal], 
-                        galcomps.Exp, galcomps.AxRat[maskgal], totFlux, eff)
+    Reff = solveSerRe(a, b, comps.Ie[maskgal], comps.Rad[maskgal], 
+                        comps.Exp[maskgal], comps.AxRat[maskgal], totFlux, eff)
+
 
     return Reff
+
+
+def conver2Sersic(galcomps: GalComps) -> GalComps:
+    ''' function to convert exponential, gaussian params to Sersic params'''
+
+    comps =  copy.deepcopy(galcomps)
+
+    maskdev = (comps.Active == True) & (comps.NameComp == "devauc")
+    maskexp = (comps.Active == True) & (comps.NameComp == "expdisk")
+    maskgas = (comps.Active == True) & (comps.NameComp == "gaussian")
+
+
+    K_GAUSS = 0.6931471805599455 #constant k for gaussian
+    SQ2 = np.sqrt(2) 
+
+    #for gaussian functions
+    if maskgas.any():
+        comps.Exp[maskgas] = 0.5 
+        comps.Rad[maskgas] = comps.Rad[maskgas]/2.354 #converting to sigma 
+        comps.Rad[maskgas] = SQ2*(K_GAUSS**0.5)*comps.Rad[maskgas] #converting to Re 
+
+
+    #for de vaucouleurs
+    if maskdev.any():
+        comps.Exp[maskdev] = 4
+
+    #for exponential disks
+    if maskexp.any():
+        comps.Exp[maskexp] = 1
+        comps.Rad[maskexp] = 1.678*comps.Rad[maskexp] #converting to Re
+
+
+
+    return comps
+
+
+
 
 def solveSerRe(a: float, b: float, Ie: list, rad: list, n: list, q: list, totFlux: float, eff: float) -> float:
     "return the Re of a set of Sersic functions. It uses Bisection"
 
 
-    Re = bisect(funReSer, a, b, args=(Ie,rad,n,q,totFlux,eff))
+    Re = bisect(funReSer, a, b, args=(Ie, rad, n, q, totFlux, eff))
 
     return Re
 
@@ -617,6 +599,7 @@ def Fser(R: float, Ie: float, Re: float, n: float, q: float) -> float:
     
     k = gammaincinv(2*n,0.5)
 
+
     X = k*(R/Re)**(1/n) 
 
     mulfact = np.exp(k)/(k**(2*n))
@@ -626,7 +609,6 @@ def Fser(R: float, Ie: float, Re: float, n: float, q: float) -> float:
     return Fr
 
   
-
 
 
 #############################################################################
