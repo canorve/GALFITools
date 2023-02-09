@@ -236,7 +236,7 @@ def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
 
     theta = theta * np.pi / 180  # Rads!!!
 
-    ypos, xpos = np.mgrid[ymin - 1:ymax + 1, xmin - 1:xmax + 1]
+    ypos, xpos = np.mgrid[ymin - 1 : ymax, xmin - 1: xmax]
 
     dx = xpos - x
     dy = ypos - y
@@ -303,7 +303,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     if mask.any():
         ymax[mask] = nrow
 
-    return (xmin, xmax, ymin, ymax)
+    return (round(xmin), round(xmax), round(ymin), round(ymax))
 
 
 
