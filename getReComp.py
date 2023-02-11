@@ -64,7 +64,11 @@ def main() -> None:
         print('exiting..')
         sys.exit(1)
 
-    EffRad = GetReff().GetReSer(head, galcomps, eff)
+    EffRad, totmag = GetReff().GetReSer(head, galcomps, eff)
+
+    line = 'Total Magnitude of the galaxy: {:.2f} pixels \n'.format(totmag)
+    print(line)
+
 
     line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
     print(line)
@@ -508,10 +512,10 @@ class GetReff:
 
         comps.Flux = 10**((galhead.mgzpt - comps.Mag)/2.5)
 
-
-
         
         totFlux = comps.Flux[maskgal].sum()
+
+        totmag = -2.5*np.log10(totFlux) + galhead.mgzpt
 
         a = 0.1
         b = comps.Rad[maskgal][-1] * 1000  # hope it doesn't crash
@@ -520,7 +524,7 @@ class GetReff:
                 comps.Exp[maskgal], totFlux, eff)
 
 
-        return Reff
+        return Reff, totmag
 
 
     def conver2Sersic(self, galcomps: GalComps) -> GalComps:
