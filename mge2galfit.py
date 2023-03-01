@@ -178,7 +178,7 @@ def main():
         xpeak, ypeak = xpos, ypos
     else:        
         (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, eps, ncol, nrow)
-        xpeak, ypeak = GetPmax(img, xmin, xmax, ymin, ymax)
+        xpeak, ypeak = GetPmax(img, mask, xmin, xmax, ymin, ymax)
  
     print("galaxy found at ", xpeak + 1, ypeak + 1)
     print("Ellipticity, Angle = ", eps, theta)
@@ -997,7 +997,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 
 
 
-def GetPmax(image, xmin, xmax, ymin, ymax):
+def GetPmax(image, mask, xmin, xmax, ymin, ymax):
 
 
     xmin = int(xmin)
@@ -1005,14 +1005,19 @@ def GetPmax(image, xmin, xmax, ymin, ymax):
     ymin = int(ymin)
     ymax = int(ymax)
 
-
     chuckimg = image[ymin - 1:ymax, xmin - 1:xmax]
-    
+    chuckmsk = mask[ymin - 1:ymax, xmin - 1:xmax]
+
+    invmask = np.logical_not(chuckmsk)
+
+    invmask = invmask*1
+
+    chuckimg = chuckimg*invmask
 
     maxy, maxx = np.where(chuckimg == np.max(chuckimg))
     
     xpos = maxx[0] + xmin - 1
-    ypos = maxy[0]  + ymin - 1
+    ypos = maxy[0] + ymin - 1
 
     return (xpos, ypos)
 
