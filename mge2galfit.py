@@ -72,10 +72,9 @@ def main():
         print('regularization mode activated')
 
 
-    if image.find(".") != -1:
-        (timg, trash) = image.split(".")
-    else:
-        timg=image
+    root_ext = os.path.splitext(image)
+    timg= root_ext[0]
+
 
     namepng=timg+".png"
 
@@ -117,10 +116,11 @@ def main():
 
     #    image = "ngc4342.fits"
 
-    if image.find(".") != -1:
-        (TNAM, trash) = image.split(".")
-    else:
-        TNAM=image
+    root_ext = os.path.splitext(image)
+    TNAM= root_ext[0]
+
+
+
 
     exptime = GetExpTime(image)
 
