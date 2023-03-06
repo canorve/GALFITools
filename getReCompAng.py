@@ -86,7 +86,7 @@ def main() -> None:
         print('exiting..')
         sys.exit(1)
 
-    line = 'Using a theta value of : {:.2f} pixels \n'.format(theta)
+    line = 'Using a theta value of : {:.2f} degrees \n'.format(theta)
     print(line)
 
 
