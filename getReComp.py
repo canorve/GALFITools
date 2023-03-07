@@ -163,7 +163,11 @@ def ReadHead(File: str) -> GalHead:
                 galhead.maskimage = "None"
 
         if tmp[0] == "G)":  # psf file 
-            galhead.constraints = tmp[1]
+            try:
+                galhead.constraints = tmp[1]
+            except IndexError:
+                galhead.constraints = "None"
+
 
 
         if tmp[0] == "H)":     # region fit box
