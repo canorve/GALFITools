@@ -24,7 +24,7 @@ def main():
     parser.add_argument("ImageFile", help="the Mask image file to modify or create")
     parser.add_argument("RegFile", help="the DS9 region file")
 
-    parser.add_argument("-n","--number", type=int, help="the value in counts to fill into the Ds9 regions",default=0)
+    parser.add_argument("-n","--number", type=int, help="the value in counts to fill into the Ds9 regions. Default = 0 (remove)",default=0)
 
 
     args = parser.parse_args()
@@ -289,19 +289,19 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 
     mask = xmin < 1
     if mask.any():
-        xmin[mask] = 1
+        xmin = 1
 
     mask = xmax > ncol
     if mask.any():
-        xmax[mask] = ncol
+        xmax = ncol
 
     mask = ymin < 1
     if mask.any():
-        ymin[mask] = 1
+        ymin = 1
 
     mask = ymax > nrow
     if mask.any():
-        ymax[mask] = nrow
+        ymax = nrow
 
     return (round(xmin), round(xmax), round(ymin), round(ymax))
 
