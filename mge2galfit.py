@@ -153,6 +153,9 @@ def main():
         maskbt=maskb.T
         hdu.close()
 
+    else:
+        mask="none"
+
     ######################
     #    sky=back
     #################
@@ -815,9 +818,12 @@ def GetExpTime(Image):
     # k Check
     "Get exposition time from the image"
 
-    hdu = fits.open(Image)
-    exptime = hdu[0].header["EXPTIME"]
-    hdu.close()
+    try:
+        hdu = fits.open(Image)
+        exptime = hdu[0].header["EXPTIME"]
+        hdu.close()
+    except: 
+        exptime = 1
     return float(exptime)
 
 
@@ -1006,13 +1012,14 @@ def GetPmax(image, mask, xmin, xmax, ymin, ymax):
     ymax = int(ymax)
 
     chuckimg = image[ymin - 1:ymax, xmin - 1:xmax]
-    chuckmsk = mask[ymin - 1:ymax, xmin - 1:xmax]
+    if mask != "none":
+        chuckmsk = mask[ymin - 1:ymax, xmin - 1:xmax]
 
-    invmask = np.logical_not(chuckmsk)
+        invmask = np.logical_not(chuckmsk)
 
-    invmask = invmask*1
+        invmask = invmask*1
 
-    chuckimg = chuckimg*invmask
+        chuckimg = chuckimg*invmask
 
     maxy, maxx = np.where(chuckimg == np.max(chuckimg))
     
