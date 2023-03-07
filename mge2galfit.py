@@ -154,7 +154,7 @@ def main():
         hdu.close()
 
     else:
-        mask="none"
+        mask=np.array([])
 
     ######################
     #    sky=back
@@ -1012,7 +1012,7 @@ def GetPmax(image, mask, xmin, xmax, ymin, ymax):
     ymax = int(ymax)
 
     chuckimg = image[ymin - 1:ymax, xmin - 1:xmax]
-    if mask != "none":
+    if mask.any():
         chuckmsk = mask[ymin - 1:ymax, xmin - 1:xmax]
 
         invmask = np.logical_not(chuckmsk)
