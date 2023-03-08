@@ -93,7 +93,7 @@ def main() -> None:
 
     EffRad, totmag = GetReff().GetReSer(head, comps, eff, theta)
 
-    line = 'Total Magnitude of the galaxy: {:.2f} pixels \n'.format(totmag)
+    line = 'Total Magnitude of the galaxy: {:.2f} \n'.format(totmag)
     print(line)
 
 
