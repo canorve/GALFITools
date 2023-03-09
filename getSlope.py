@@ -61,38 +61,41 @@ def main() -> None:
 
 
 
-
     head = ReadHead(galfitFile)
 
 
     galcomps = ReadComps(galfitFile)
 
-    galcomps.Flux = 10**((-galcomps.Mag)/2.5)
+    #convert all exp, gaussian and de vaucouleurs to Sersic format
+    comps = conver2Sersic(galcomps) 
 
-    k = gammaincinv(2*galcomps.Exp, 0.5)
 
-    denom1 = (2*np.pi*galcomps.Rad**2)*(np.exp(k))
-    denom2 = (galcomps.Exp)*(k**(-2*galcomps.Exp))
-    denom3 = (gamma(2*galcomps.Exp))*(galcomps.AxRat) 
+
+    comps.Flux = 10**((-comps.Mag)/2.5)
+
+    k = gammaincinv(2*comps.Exp, 0.5)
+
+    denom1 = (2*np.pi*comps.Rad**2)*(np.exp(k))
+    denom2 = (comps.Exp)*(k**(-2*comps.Exp))
+    denom3 = (gamma(2*comps.Exp))*(comps.AxRat) 
 
     denom = denom1*denom2*denom3 
     
-    galcomps.Ie = galcomps.Flux/denom
+    comps.Ie = comps.Flux/denom
 
-    galcomps = SelectGal(galcomps, dis, num_comp)
+
+
+    comps = SelectGal(comps, dis, num_comp)
 
     #taking the last component position angle for the whole galaxy
 
-    maskgal = (galcomps.Active == True) 
+    maskgal = (comps.Active == True) 
     if args.angle:
         theta = args.angle
     else:
-        theta = galcomps.PosAng[maskgal][-1]  
+        theta = comps.PosAng[maskgal][-1]  
 
 
-
-    #convert all exp, gaussian and de vaucouleurs to Sersic format
-    comps = conver2Sersic(galcomps) 
 
 
     N = numComps(comps,'all')
@@ -115,7 +118,6 @@ def main() -> None:
 
     R = np.arange(0,100,.1)
 
-
     gam = GetSlope().GalSlope(R, comps, theta) 
 
 
@@ -123,10 +125,10 @@ def main() -> None:
     plt.savefig("slope.png")
 
 
-    #rgam = GetSlope().FindSlope(comps, theta, slope) 
+    rgam = GetSlope().FindSlope(comps, theta, slope) 
 
-    #line = 'The radius with slope {:.2f} is {:.2f} pixels \n'.format(slope,rgam)
-    #print(line)
+    line = 'The radius with slope {:.2f} is {:.2f} pixels \n'.format(slope,rgam)
+    print(line)
 
 
     return None
@@ -601,8 +603,9 @@ def conver2Sersic(galcomps: GalComps) -> GalComps:
 class GetSlope:
     '''class to obtain the effective radius for the whole galaxy'''
 
-    def FullSlopeSer(self, R: float, Re: list, n: list, q: list, pa: list, theta: float) -> float:
 
+
+    def FullSlopeSer(self, R: float, Re: list, n: list, q: list, pa: list, theta: float) -> float:
 
 
         SlptotR = self.SlopeSer(R, Re, n, q, pa, theta) 
@@ -619,16 +622,18 @@ class GetSlope:
         for r in R:
 
             slp = self.SlopeSer(r, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta)
-
             gam = np.append(gam, slp)
+
+
 
         return gam
 
 
+    def funGalSlopeSer(self, R: float, Ie: list, Re: list, n: list, q: list, pa: list, theta: float, slope: float) -> float:
 
-    def funGalSlopeSer(self, R: float, Re: list, n: list, q: list, pa: list, theta: float, slope: float) -> float:
 
-        fun = self.FullSlopeSer(R, Re, n, q, pa, theta) - slope
+        fun = self.SlopeSer(R, Ie, Re, n, q, pa, theta)  - slope
+
 
         return fun
      
@@ -644,7 +649,7 @@ class GetSlope:
         b = comps.Rad[maskgal][-1] * 10  # hope it doesn't crash
 
 
-        Radslp = bisect(self.funGalSlopeSer, a, b, args=(comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta, slope))
+        Radslp = bisect(self.funGalSlopeSer, a, b, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta, slope))
 
         return Radslp 
 
