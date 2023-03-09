@@ -67,6 +67,18 @@ def main() -> None:
 
     galcomps = ReadComps(galfitFile)
 
+    galcomps.Flux = 10**((-galcomps.Mag)/2.5)
+
+    k = gammaincinv(2*galcomps.Exp, 0.5)
+
+    denom1 = (2*np.pi*galcomps.Rad**2)*(np.exp(k))
+    denom2 = (galcomps.Exp)*(k**(-2*galcomps.Exp))
+    denom3 = (gamma(2*galcomps.Exp))*(galcomps.AxRat) 
+
+    denom = denom1*denom2*denom3 
+    
+    galcomps.Ie = galcomps.Flux/denom
+
     galcomps = SelectGal(galcomps, dis, num_comp)
 
     #taking the last component position angle for the whole galaxy
@@ -77,7 +89,6 @@ def main() -> None:
     else:
         theta = galcomps.PosAng[maskgal][-1]  
 
-    #theta = 18.2534 
 
 
     #convert all exp, gaussian and de vaucouleurs to Sersic format
@@ -102,7 +113,7 @@ def main() -> None:
     #########################
 
 
-    R = np.arange(0,10,.1)
+    R = np.arange(0,100,.1)
 
 
     gam = GetSlope().GalSlope(R, comps, theta) 
@@ -112,10 +123,10 @@ def main() -> None:
     plt.savefig("slope.png")
 
 
-    rgam = GetSlope().FindSlope(comps, theta, slope) 
+    #rgam = GetSlope().FindSlope(comps, theta, slope) 
 
-    line = 'The radius with slope {:.2f} is {:.2f} pixels \n'.format(slope,rgam)
-    print(line)
+    #line = 'The radius with slope {:.2f} is {:.2f} pixels \n'.format(slope,rgam)
+    #print(line)
 
 
     return None
@@ -262,6 +273,9 @@ class GalComps:
     skip = np.array([])            #z)  skip model
 
     Active = np.array([])            #activate component  for galaxy
+
+    Ie = np.array([])            # surface brightness at effective radius
+    Flux = np.array([])         # Flux galax  
 
     # store the flags related to parameters
     FreePosX = np.array([])            #1)   
@@ -587,18 +601,6 @@ def conver2Sersic(galcomps: GalComps) -> GalComps:
 class GetSlope:
     '''class to obtain the effective radius for the whole galaxy'''
 
-    def SlopeSer(self, R: float, Re: list, n: list, q: list, pa: list, theta: float) -> float:
-        '''slope from sersic function to a determined R'''
-            
-        k = gammaincinv(2*n, 0.5)
-        
-
-        Rcor = GetRadAng(R, q, pa, theta) 
-
-        Slp = (k/n)*(Rcor/Re)**(1/n) 
-            
-        return Slp
-
     def FullSlopeSer(self, R: float, Re: list, n: list, q: list, pa: list, theta: float) -> float:
 
 
@@ -616,7 +618,8 @@ class GetSlope:
 
         for r in R:
 
-            slp = self.FullSlopeSer(r, comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta)
+            slp = self.SlopeSer(r, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta)
+
             gam = np.append(gam, slp)
 
         return gam
@@ -644,6 +647,53 @@ class GetSlope:
         Radslp = bisect(self.funGalSlopeSer, a, b, args=(comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta, slope))
 
         return Radslp 
+
+
+    def var_X(self, R: float, Re: list, n: list):
+
+        k = gammaincinv(2*n, 0.5)
+
+        varx = k*((R/Re)**(1/n) - 1)
+
+
+        return varx
+
+    def var_Xprim(self, R: float, Re: list, n: list):
+
+        k = gammaincinv(2*n, 0.5)
+
+        varxpr = (k/n)*((R/Re)**(1/n - 1))*(1/Re) 
+
+
+        return varxpr
+
+    def var_S(self, R: float, Ie: list,  Re: list, n: list, X: list):
+
+        S = Ie*np.exp(-X)
+
+        return S.sum()
+
+    def var_Sprim(self, R: float, Ie: list,  Re: list, n: list, X: list, Xprim: list):
+
+        Sprim = Ie*np.exp(-X)*Xprim
+
+        return Sprim.sum()
+
+    def SlopeSer(self, R: float, Ie: list, Re: list, n: list, q: list, pa: list, theta: float) -> float:
+        '''slope from sersic function to a determined R'''
+            
+        Rcor = GetRadAng(R, q, pa, theta) 
+
+        X = self.var_X(Rcor, Re, n)
+        Xprim = self.var_Xprim(Rcor, Re, n)
+
+        S = self.var_S(Rcor, Ie,  Re, n, X)
+        Sprim = self.var_Sprim(Rcor, Ie,  Re, n, X, Xprim)
+
+        Slp = (Sprim/S)*R 
+
+
+        return Slp
 
 
 
