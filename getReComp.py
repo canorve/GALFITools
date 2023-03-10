@@ -142,16 +142,32 @@ def ReadHead(File: str) -> GalHead:
         line = lines[index]
         (tmp) = line.split()
         if tmp[0] == "A)":     # input image
-            galhead.inputimage=tmp[1]
+            try:
+                galhead.inputimage = tmp[1]
+            except IndexError:
+                galhead.inputimage = "None"
+
 
         if tmp[0] == "B)":     # out image
-            galhead.outimage = tmp[1]
+            try:
+                galhead.outimage = tmp[1]
+            except IndexError:
+                galhead.outimage = "None"
+
 
         if tmp[0] == "C)":   # sigma 
-            galhead.sigimage = tmp[1]
+            try:
+                galhead.sigimage = tmp[1]
+            except IndexError:
+                galhead.sigimage = "None"
+
 
         if tmp[0] == "D)":  # psf file 
-            galhead.psfimage = tmp[1]
+            try:
+                galhead.psfimage = tmp[1]
+            except IndexError:
+                galhead.psfimage = "None"
+
 
         if tmp[0] == "E)":  #psf sampling 
             galhead.psfsamp = int(tmp[1])
@@ -162,7 +178,7 @@ def ReadHead(File: str) -> GalHead:
             except IndexError:
                 galhead.maskimage = "None"
 
-        if tmp[0] == "G)":  # psf file 
+        if tmp[0] == "G)":  # constraints 
             try:
                 galhead.constraints = tmp[1]
             except IndexError:
