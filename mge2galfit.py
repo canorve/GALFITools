@@ -22,7 +22,6 @@ from mgefit.mge_fit_sectors import mge_fit_sectors
 from mgefit.mge_fit_sectors_twist import mge_fit_sectors_twist
 
 from mgefit.mge_fit_sectors_regularized import mge_fit_sectors_regularized 
-from mgefit.mge_fit_sectors_twist_regularized import mge_fit_sectors_twist_regularized 
 
 import argparse
 
@@ -64,6 +63,15 @@ def main():
     mgeoutfile="mgegas.txt"
     convbox=100
     
+
+    if args.regu:
+        try:
+            from mgefit.mge_fit_sectors_twist_regularized import mge_fit_sectors_twist_regularized 
+
+        except: 
+            print("mge_fit_sectors_twist_regularized is not installed. Regu desactivated")
+            regu = False
+
     ##########################################
     ############################################
 
@@ -80,30 +88,10 @@ def main():
 
     sectorspng="sectors.png"
 
-
-    #magzpt= sys.argv[4]
     magzpt=float(magzpt)
 
-    #valpsf= sys.argv[5]
-
-    #    flagpsf = isinstance(valpsf,str)
-    #flagpsf=valpsf.replace(".",'',1).isdigit()
-
-    #if flagpsf == True:
-    #    sigpsf=float(valpsf)
-
-    #    if (np.abs(sigpsf) < 0.001 ):
-    #        flagconv=False
-
-    #else:
-    #    sigpsf,normpsf=ReadMgePsf(valpsf)
 
 
-    #twist = bool(int(sys.argv[6]))
-
-
-
-    #   sky=0.55
     fit=1
     skyfit=0
 
@@ -123,18 +111,6 @@ def main():
 
 
     exptime = GetExpTime(image)
-
-    ##################
-    #################
-
-    # Here we use an accurate four gaussians MGE PSF for
-    # the HST/WFPC2/F814W filter, taken from Table 3 of
-    # Cappellari et al. (2002, ApJ, 578, 787)
-
-    #    sigmapsf = [0.494, 1.44, 4.71, 13.4]      # In PC1 pixels
-    #    normpsf = [0.294, 0.559, 0.0813, 0.0657]  # total(normpsf)=1
-
-    #    ang=90-ang
 
 
 
@@ -158,19 +134,17 @@ def main():
 
     ######################
     #    sky=back
-    #################
+    ######################
 
     hdu = fits.open(image)
     img = hdu[0].data
 
     img=img.astype(float)
-    #    skylev = 0.55   # counts/pixel
 
     minlevel = 0  
     ngauss = 12
 
     plt.clf()
-    #    f = find_galaxy(img, fraction=0.04, plot=1)
 
     (ncol, nrow) = GetAxis(image)
     
@@ -186,13 +160,8 @@ def main():
     print("galaxy found at ", xpeak + 1, ypeak + 1)
     print("Ellipticity, Angle = ", eps, theta)
 
-    #if flagsky == True:
     print("Sky = ", sky)
-    #else:
-    #    print("Sky = ",back)
-    #    sky=back
 
-    #        print(eps,theta,xpeak,ypeak)
     img = img - sky   # subtract sky
 
     # I have to switch x and y coordinates, don't ask me why
@@ -331,7 +300,7 @@ def main():
     ypeak=xtemp
 
 
-    consfile="constraints"
+    consfile="constraints.txt"
 
     T1 = "{}".format(image)
     T2 = outname + "-mge.fits"
@@ -429,6 +398,7 @@ def main():
     fout1.close()
     fout2.close()
 
+    makeConstraints(consfile, len(counts))
 
     print("Done. Gaussians are stored in {}, and {} for galfit format ".format(mgeoutfile,parfile))
 
@@ -825,6 +795,43 @@ def GetExpTime(Image):
     except: 
         exptime = 1
     return float(exptime)
+
+def makeConstraints(consfile: str, numcomp: int) -> True:
+    "creates a contraints file with the number of components"
+
+
+    fout = open(consfile, "w")
+
+
+    line00 = "#Component/    parameter   constraint	Comment           \n"
+    line01 = "# operation	(see below)   range         \n"
+
+    linempty = "                  \n"				
+
+    comp = np.arange(2,numcomp+1)
+
+    cad = "1"
+    for idx, item in enumerate(comp):
+        cad = cad + "_" + str(item)
+
+    line02 = "    " + cad + "    " + "x" + "    "  + "offset \n"				
+    line03 = "    " + cad + "    " + "y" + "    "  + "offset \n"				
+
+
+    fout.write(line00)
+    fout.write(line01)
+    fout.write(linempty)
+    fout.write(line02)
+    fout.write(line03)
+
+    fout.close()
+
+
+
+    return True
+
+
+
 
 
 def CheckFlag(val, check):
