@@ -614,7 +614,7 @@ class GetReff:
 
         X = k*(R/Re)**(1/n) 
 
-        Fr = Flux*gammainc(2*n, X) ##esta funcion esta mal 
+        Fr = Flux*gammainc(2*n, X) 
         
         return Fr
 

@@ -100,8 +100,87 @@ def main() -> None:
     line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
     print(line)
 
+    q = comps.AxRat[-1]
+    meanme = GetMe().MeanMe(totmag, EffRad*head.scale, q)
+    me = GetMe().Me(head, comps, EffRad*head.scale, theta)
+
+    line = 'Mean Surface Brightness at effective radius: {:.2f} mag/\" \n'.format(meanme)
+    print(line)
+
+
+    line = 'Surface brightness at effective radius {:.2f} mag/\" \n'.format(me)
+    print(line)
+
+
 
     return None
+
+
+
+class GetMe:
+    '''Class to obtain the surface brightness at effective radius'''
+
+    def MeanMe(self, magtot: float, effrad: float, axrat: float) -> float:
+
+        meanme = magtot + 2.5*np.log10(2*axrat*np.pi*effrad**2)
+
+        return meanme
+
+
+    def Me(self, head, comps, EffRad, theta):
+
+        comps.Rad = comps.Rad*head.scale
+        comps.Flux = 10**((-comps.Mag)/2.5)
+
+        k = gammaincinv(2*comps.Exp, 0.5)
+
+        denom1 = (2*np.pi*comps.Rad**2)*(np.exp(k))
+        denom2 = (comps.Exp)*(k**(-2*comps.Exp))
+        denom3 = (gamma(2*comps.Exp))*(comps.AxRat) 
+
+        denom = denom1*denom2*denom3 
+        
+        comps.Ie = comps.Flux/denom
+
+
+        Itotr = self.Itotser(EffRad, comps.Ie, comps.Rad, comps.Exp, comps.AxRat, comps.PosAng, theta) 
+
+        me = -2.5*np.log10(Itotr)
+
+        return me
+
+     
+    def Itotser(self, R: float, Ie: list, rad: list, n: list, q: list, pa: list, theta: float) -> float:
+
+        ItotR = self.Iser(R, Ie, rad, n, q, pa, theta) 
+
+        return ItotR.sum()
+
+
+
+    def Iser(self, R: float, Ie: list, Re: list, n: list, q: list, pa: list, theta: float) -> float:
+        '''sersic flux to a determined R'''
+
+
+        k = gammaincinv(2*n, 0.5)
+
+        Rcor = GetRadAng(R, q, pa, theta) 
+
+        Ir = Ie*np.exp(-k*((Rcor/Re)**(1/n) - 1))
+
+        
+        return Ir
+
+
+
+
+
+
+
+
+
+
+
 
 
 class GalHead():
@@ -610,7 +689,7 @@ class GetReff:
 
         X = k*(Rcor/Re)**(1/n) 
 
-        Fr = Flux*gammainc(2*n, X) ##esta funcion esta mal 
+        Fr = Flux*gammainc(2*n, X) 
         
         return Fr
 
