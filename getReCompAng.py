@@ -100,8 +100,7 @@ def main() -> None:
     line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
     print(line)
 
-    q = comps.AxRat[-1]
-    meanme = GetMe().MeanMe(totmag, EffRad*head.scale, q)
+    meanme = GetMe().MeanMe(totmag, EffRad*head.scale)
     me = GetMe().Me(head, comps, EffRad*head.scale, theta)
 
     line = 'Mean Surface Brightness at effective radius: {:.2f} mag/\" \n'.format(meanme)
@@ -120,9 +119,9 @@ def main() -> None:
 class GetMe:
     '''Class to obtain the surface brightness at effective radius'''
 
-    def MeanMe(self, magtot: float, effrad: float, axrat: float) -> float:
+    def MeanMe(self, magtot: float, effrad: float) -> float:
 
-        meanme = magtot + 2.5*np.log10(2*axrat*np.pi*effrad**2)
+        meanme = magtot + 2.5*np.log10(2*np.pi*effrad**2)
 
         return meanme
 
