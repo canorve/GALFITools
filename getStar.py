@@ -1,27 +1,13 @@
 #!/usr/bin/env python3
 
-import numpy as np
-import sys
+
+
 import os
-import stat
+import numpy as np
+from astropy.io import fits
+import sys
 import subprocess as sp
 import os.path
-from astropy.io import fits
-import scipy
-import scipy.special
-import matplotlib.pyplot as plt
-from scipy.special import gammaincinv
-
-import mgefit
-from mgefit.find_galaxy import find_galaxy
-from mgefit.sectors_photometry import sectors_photometry
-from mgefit.sectors_photometry_twist import sectors_photometry_twist
-
-
-from mgefit.mge_fit_sectors import mge_fit_sectors
-from mgefit.mge_fit_sectors_twist import mge_fit_sectors_twist
-
-from mgefit.mge_fit_sectors_regularized import mge_fit_sectors_regularized 
 
 import argparse
 
@@ -54,7 +40,11 @@ def main():
 
 
     ##########################################
-    ############################################
+    ######Internal flags #####################
+    even = False
+    ##########################################
+    ##########################################
+
 
     #root_ext = os.path.splitext(image)
     #timg= root_ext[0]
@@ -85,13 +75,30 @@ def main():
 
     print("Sky = ", sky)
 
-    length = int(imsize/2)
 
-    xlo = xpeak - length + 1   
-    xhi = xpeak + length + 1   
+    if imsize % 2 == 0:
+        even = True
 
-    ylo = ypeak - length + 1   
-    yhi = ypeak + length + 1   
+    
+    if even:
+        lx = int(imsize/2)
+
+        xlo = xpeak - lx + 1 
+        ylo = ypeak - lx + 1 
+
+        xhi = xpeak + lx 
+        yhi = ypeak + lx
+        
+    else:
+        lx = int(imsize/2 + 0.5)
+
+        xlo = xpeak - lx + 2 
+        ylo = ypeak - lx + 2
+
+        xhi = xpeak + lx 
+        yhi = ypeak + lx 
+ 
+
 
 
     GetFits(image, imout, sky, xlo, xhi, ylo, yhi)
