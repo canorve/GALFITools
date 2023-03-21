@@ -53,7 +53,7 @@ def main() -> None:
 
     # init variables
 
-    eff90 = 0.9
+    frac = 0.8
 
     eff = 0.5
 
@@ -103,10 +103,10 @@ def main() -> None:
 
 
 
-    EffRad90, totmag = GetReff().GetReSer(head, comps, eff90, theta)
+    EffRadfrac, totmag = GetReff().GetReSer(head, comps, frac, theta)
 
 
-    line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff90*100,EffRad90)
+    line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(frac*100, EffRadfrac)
     print(line)
 
 
@@ -129,7 +129,7 @@ def main() -> None:
     print(line)
 
 
-    sersic2= GetN().ReR90(EffRad, EffRad90)
+    sersic2 = GetN().ReRfrac(EffRad, EffRadfrac, frac)
 
     line = 'Sersic index with the method of effective radius: {:.2f}  \n'.format(sersic2)
     print(line)
@@ -189,36 +189,35 @@ class GetN:
         return fn
 
 
-    def ReR90(self, Re: float, R90: float) -> float:
+    def ReRfrac(self, Re: float, Rfrac: float, frac: float) -> float:
 
         a = 0.1
         b = 12
 
 
-        Sersic = self.solveSerRe(a, b, Re, R90)
+        Sersic = self.solveSerRe(a, b, Re, Rfrac, frac)
 
 
         return Sersic
 
 
 
-    def solveSerRe(self, a: float, b: float, Re: float, R90: float) -> float:
+    def solveSerRe(self, a: float, b: float, Re: float, Rfrac: float, frac: float) -> float:
         "return the sersic index. It uses Bisection"
 
 
-        N = bisect(self.funReR90, a, b, args=(Re, R90))
+        N = bisect(self.funReRfrac, a, b, args=(Re, Rfrac, frac))
 
         return N 
 
 
-    def funReR90(self, n: float, Re: float, R90: float) -> float:
+    def funReRfrac(self, n: float, Re: float, Rfrac: float, frac: float) -> float:
         
 
         k = gammaincinv(2*n, 0.5)
 
-        frac = 0.9
 
-        x = k*(R90/Re)**(1/n)
+        x = k*(Rfrac/Re)**(1/n)
         
 
         result = frac*gamma(2*n) - gamma(2*n)*gammainc(2*n, x) 
