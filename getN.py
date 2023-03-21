@@ -240,6 +240,9 @@ class GetMe:
 
     def Me(self, head, comps, EffRad, theta):
 
+
+
+
         comps.Rad = comps.Rad*head.scale
         comps.Flux = 10**((-comps.Mag)/2.5)
 
@@ -253,8 +256,9 @@ class GetMe:
         
         comps.Ie = comps.Flux/denom
 
+        maskgal = (comps.Active == True) 
 
-        Itotr = self.Itotser(EffRad, comps.Ie, comps.Rad, comps.Exp, comps.AxRat, comps.PosAng, theta) 
+        Itotr = self.Itotser(EffRad, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta) 
 
         me = -2.5*np.log10(Itotr)
 
