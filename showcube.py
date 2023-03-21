@@ -8,37 +8,121 @@ from astropy.io import fits
 from scipy import stats
 from matplotlib.patches import Ellipse
 
+from astropy import units as U
+
+import argparse
+
+
 def main():
 
 
+    parser = argparse.ArgumentParser(description="show the cube fits of the galfit output")
 
-    # uncomment to see the examples run with your own GALFIT files
+    parser.add_argument("cubeimage", help="the cube GALFIT image")
+    parser.add_argument("-o","--outimage", type=str, help="the output png file",default="cube.png")
 
-    #ShowCube("A1656-509-bar.fits",namepng="A1656-509-bar.png")
-    #ShowCube("A85gal.fits",namepng="A85gal.png",frac=1)
-    #ShowCube("A2256  -576.fits",namepng="A2256-576.png")
 
-    #ell1=Ellipse((399, 385), width=25, height=14,angle=113,
-    #                 edgecolor='red',
-    #                 facecolor='none',
-    #                 linewidth=2)
+    #### 
+    parser.add_argument("-br","--brightness", type=float, 
+                        help="brightness of the image. Only for galaxy and model. Default = 0. Preferible range goes from -1 to 1", default=0)
+    parser.add_argument("-co","--contrast", type=float, 
+                        help="contrast of the image. Only for galaxy and model. Default = 1. Preferible range goes from 0 to 1",default=1)
 
-    #ell2=Ellipse((399, 385), width=55, height=24,angle=113,
-    #                 edgecolor='blue',
-    #                 facecolor='none',
-    #                 linewidth=2)
+
+
+    parser.add_argument("-cm","--cmap", type=str, help="cmap to be used for the cube image ",default="viridis")
+
+    parser.add_argument("-dpi","--dotsinch", type=int, help="dots per inch used for images files ",default=100)
+    parser.add_argument("-s","--scale", type=float, help="plate scale of the image. Default = 1",default=1)
+
+
+    parser.add_argument("-np","--noplot", action="store_true", help="it doesn\'t show plotting window")
+
+
+    args = parser.parse_args()
+
+    cubeimage = args.cubeimage
+    namecube = args.outimage 
+    dpival = args.dotsinch 
+    brightness = args.brightness
+    contrast = args.contrast 
+    cmap = args.cmap 
+    scale = args.scale  
+    noplot = args.noplot
+
+
+    ######################
+    #shows the image cube#
+    ######################{
+
+    linewidth = 1.2
+
+    ell=[]
+
+
+    ShowCube(cubeimage, namepng = namecube, dpival 
+             = dpival, bri = brightness, con = contrast, 
+              cmap = cmap, ellipse = ell, plate = scale)
+
+
+    if noplot is False:
+        plt.pause(1.5)
  
-    #ell=[ell1,ell2]
+    plt.close()
+
+    #}
+    #####################
 
 
-    #ShowCube("A2029cD.fits",namepng="A2029cD.png",frac=0.3,ellipse=ell)
+def Comp2Ellip(galhead, galcomps, N, lw=1):
+    ''' converts galfit component parameter into an Ellipse object''' 
+
+
+    ellipses = [] 
+
+    #color value
+    values = range(N)
+    jet = cm = plt.get_cmap('jet') 
+    cNorm  = colors.Normalize(vmin=0, vmax=values[-1])
+    scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
+
+    
+    for idx, item in enumerate(galcomps.N):
+
+        if galcomps.Active[idx] == True:
+            # correcting coordinates
+            xc = galcomps.PosX[idx] - galhead.xmin + 1
+            yc = galcomps.PosY[idx] - galhead.ymin + 1
+
+
+            pa = galcomps.PosAng[idx] + 90
+
+            w = galcomps.Rad[idx]
+            h = galcomps.Rad[idx]*galcomps.AxRat[idx]
+
+
+            colorVal = scalarMap.to_rgba(values[idx])
+
+
+            ell=Ellipse((xc, yc), width = w, height = h, angle = pa,
+                         edgecolor = colorVal,
+                         facecolor = 'none',
+                         linewidth = lw)
+
+            ellipses.append(ell)
+
+
+    return ellipses
+
+
 
 
 
 
 class ShowCube:
 
-    def __init__(self, cubeimg: str,namepng="cubeout.png",dpival=100,frac= 0.2,cmap='viridis',ellipse=[]):
+    def __init__(self, cubeimg: str, namepng="cubeout.png", dpival=100, 
+                bri = 0, con = 1, cmap='viridis', ellipse=[], plate = 1):
         """
         This routine shows the GALFIT output cube image: galaxy, model and residual    
         """
@@ -50,62 +134,110 @@ class ShowCube:
         residual = (hdu[3].data.copy()).astype(float)
         hdu.close()
 
-        flatmodimg=model.flatten()  
-        flatresimg=residual.flatten()  
+        flatmodimg = model.flatten()  
+        flatresimg = residual.flatten()  
 
         flatmodimg.sort()
         flatresimg.sort()
 
-        restot=len(flatresimg)
+        restot = len(flatresimg)
 
-        restop=round(.9*restot)
-        resbot=round(.1*restot)
+        restop = round(.9*restot)
+        resbot = round(.1*restot)
 
-        modimgpatch=flatmodimg#[modbot:modtop]
-        resimgpatch=flatresimg[resbot:restop]
+        modtot = len(flatmodimg)
 
-        modmin = np.min(modimgpatch)
-        modmax = np.max(modimgpatch)
-
-        if frac  < 1:
-            modmin = (1-frac)*modmin 
-            modmax = frac*modmax
+        modtop = round(.9*modtot)
+        modbot = round(.1*modtot)
 
 
-        if (modmin > modmax):
-            modmin, modmax = modmax, modmin
 
+        modimgpatch = flatmodimg#[modbot:modtop]
+        resimgpatch = flatresimg[resbot:restop]
 
         resmin = np.min(resimgpatch)
         resmax = np.max(resimgpatch)
 
 
+        modmin = np.min(modimgpatch)
+        modmax = np.max(modimgpatch)
+
+
+        data = data.clip(modmax/1e4,modmax)
+        model = model.clip(modmax/1e4)
+
+        modmin = modmax/1e4
+
+
+        middle = (modmax - modmin)/2
+
+
+        #brightness auto-adjust according to the contrast value 
+
+        Autobri = middle*(con -1) + modmin*(1-con) 
+
+
+        #user can re-adjust brightness in addition to Autobri
+        newdata = con*(data - middle) + middle + Autobri + bri*(modmax-middle)
+        newmodel = con*(model - middle) + middle + Autobri + bri*(modmax-middle)
+
+
+
         mask=data < 0 
         data[mask] = 1 # avoids problems in log
      
-        fig, (ax1, ax2, ax3) = plt.subplots(figsize=(14, 5), nrows=1, ncols=3)
+        fig, (ax1, ax2, ax3) = plt.subplots(figsize=(14, 5), nrows = 1, ncols = 3)
         fig.subplots_adjust(left=0.04, right=0.98, bottom=0.02, top=0.98)
 
-        #ax1.imshow(data, origin='lower',vmin=modmin, vmax=modmax,cmap=cmap)
-        ax1.imshow(data, origin='lower',norm=colors.LogNorm(vmin=modmin, vmax=modmax),cmap=cmap)
+        im = ax1.imshow(newdata, origin ='lower', interpolation='nearest', norm 
+                    = colors.LogNorm(vmin=modmin, vmax=modmax), cmap = cmap)
+
+
         ax1.set_title('Data')
 
+        y,x = data.shape
+
+        xt = .02*x
+        yt = .02*y
+
+        lxline = round(.1*x)
+        lyline = round(.1*y)
+        x1 = [xt, xt+lxline]
+        y1 = [lyline, lyline]
+
+        arcsec = lxline*plate*U.arcsec 
+
+
+        if arcsec.value >= 60:
+            lxlinearc = arcsec.to("arcmin").value
+            s = "{}\'".format(round(lxlinearc))
+        else:
+            lxlinearc = arcsec.value
+            s = "{}\'\'".format(round(lxlinearc))
+ 
+        ax1.plot(x1, y1, color="white", linewidth=3)
+
+        ax1.text(xt+round(lxline/5),lyline+yt,s,color='white',fontsize=14)
+    
+        #ax1.set_xlabel(r'$\circ$')
+        #ax2.set_ylabel('23\"')
 
         for ell in ellipse:
             ax1.add_patch(ell)
 
 
-        ax2.imshow(model, origin='lower',norm=colors.LogNorm(vmin=modmin, vmax=modmax),cmap=cmap)
-        #ax2.imshow(model, origin='lower',vmin=modmin, vmax=modmax,cmap=cmap)
+        ax2.imshow(newmodel, origin='lower', interpolation='nearest', norm 
+                    = colors.LogNorm(vmin = modmin, vmax = modmax), cmap = cmap)
+
+
         ax2.set_title('GALFIT Model')
 
-        ax3.imshow(residual, origin='lower',vmin=resmin, vmax=resmax,cmap=cmap)
+        ax3.imshow(residual, origin='lower', vmin = resmin, vmax = resmax, cmap = cmap)
         ax3.set_title('Residual')
 
-        plt.savefig(namepng,dpi=dpival)
-     
-        plt.show()
 
+        plt.savefig(namepng, dpi = dpival)
+    
 
 
 #end of program
