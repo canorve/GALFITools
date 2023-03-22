@@ -135,14 +135,16 @@ class GetMe:
 
         denom1 = (2*np.pi*comps.Rad**2)*(np.exp(k))
         denom2 = (comps.Exp)*(k**(-2*comps.Exp))
-        denom3 = (gamma(2*comps.Exp))*(comps.AxRat) 
+        #denom3 = (gamma(2*comps.Exp))*(comps.AxRat) 
+        denom3 = (gamma(2*comps.Exp))
 
         denom = denom1*denom2*denom3 
         
         comps.Ie = comps.Flux/denom
 
 
-        Itotr = self.Itotser(EffRad, comps.Ie, comps.Rad, comps.Exp, comps.AxRat, comps.PosAng, theta) 
+        maskgal = (comps.Active == True) 
+        Itotr = self.Itotser(EffRad, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta) 
 
         me = -2.5*np.log10(Itotr)
 

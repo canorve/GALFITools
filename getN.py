@@ -111,9 +111,7 @@ def main() -> None:
 
 
 
-
-    q = comps.AxRat[-1]
-    meanme = GetMe().MeanMe(totmag, EffRad*head.scale, q)
+    meanme = GetMe().MeanMe(totmag, EffRad*head.scale)
     me = GetMe().Me(head, comps, EffRad*head.scale, theta)
 
     line = 'Mean Surface Brightness at effective radius: {:.2f} mag/\" \n'.format(meanme)
@@ -231,16 +229,14 @@ class GetN:
 
 class GetMe:
 
-    def MeanMe(self, magtot: float, effrad: float, axrat: float) -> float:
+    def MeanMe(self, magtot: float, effrad: float) -> float:
 
-        meanme = magtot + 2.5*np.log10(2*axrat*np.pi*effrad**2)
+        meanme = magtot + 2.5*np.log10(2*np.pi*effrad**2)
 
         return meanme
 
 
     def Me(self, head, comps, EffRad, theta):
-
-
 
 
         comps.Rad = comps.Rad*head.scale
@@ -250,13 +246,15 @@ class GetMe:
 
         denom1 = (2*np.pi*comps.Rad**2)*(np.exp(k))
         denom2 = (comps.Exp)*(k**(-2*comps.Exp))
-        denom3 = (gamma(2*comps.Exp))*(comps.AxRat) 
+        #denom3 = (gamma(2*comps.Exp))*(comps.AxRat) 
+        denom3 = (gamma(2*comps.Exp))
 
         denom = denom1*denom2*denom3 
         
         comps.Ie = comps.Flux/denom
 
         maskgal = (comps.Active == True) 
+
 
         Itotr = self.Itotser(EffRad, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta) 
 
