@@ -116,7 +116,7 @@ def main() -> None:
     #########################
 
 
-    R = np.arange(0,100,.1)
+    R = np.arange(0.1,100,.1)
 
     gam = GetSlope().GalSlope(R, comps, theta) 
 
@@ -665,9 +665,8 @@ class GetSlope:
 
         maskgal = (comps.Active == True) #using active components only 
 
-        a = 0 
+        a = 0.1 
         b = comps.Rad[maskgal][-1] * 10  # hope it doesn't crash
-
 
         Radslp = bisect(self.funGalSlopeSer, a, b, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta, slope))
 
