@@ -291,7 +291,7 @@ def main():
     outname=TNAM
 
     rmsname="none"
-    psfname="none"
+    psfname="psf.fits"
 
 
     # switch back
