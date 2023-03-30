@@ -37,7 +37,7 @@ def main() -> None:
 
     parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
 
-    parser.add_argument("-a","--angle", type=float, 
+    parser.add_argument("-pa","--angle", type=float, 
                         help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components. Angle measured from Y-Axis as same as GALFIT. ")
 
 

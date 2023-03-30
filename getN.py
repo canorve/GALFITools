@@ -35,10 +35,11 @@ def main() -> None:
 
     parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
 
-    parser.add_argument("-a","--angle", type=float, 
+    parser.add_argument("-pa","--angle", type=float, 
                         help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components. Angle measured from Y-Axis as same as GALFIT. ")
 
 
+    parser.add_argument("-rf","--radfrac", type=float, help="fraction of light radius. Default = .2 ", default=.2)
 
     ## parsing variables
 
@@ -51,9 +52,10 @@ def main() -> None:
    
     num_comp =  args.numcomp
 
+    frac = args.radfrac
+
     # init variables
 
-    frac = 0.8
 
     eff = 0.5
 
