@@ -26,7 +26,8 @@ def main():
     parser.add_argument("ImageFile", help="original data image ")
     parser.add_argument("MaskFile", help="Name of the new Mask file")
     parser.add_argument("-sm","--skymean",default=0,type=float, help="mean of the sky background")
-    parser.add_argument("-ss","--skysigma",default=0,type=str, help="sigma of the sky background")
+    parser.add_argument("-ss","--skysigma",default=0,type=float, help="sigma of the sky background")
+    parser.add_argument("-ns","--numbersig",default=1,type=float, help="number of times that the sigma of the sky will be multiplied to remove the sky background")
 
     parser.add_argument("-b","--border", action="store_true", help="Mask the borders when their value is zero")
 
@@ -36,18 +37,19 @@ def main():
     image = args.ImageFile 
     mask = args.MaskFile
     sky_mean = args.skymean
-    sky_sig = eval(args.skysigma)
+    sky_sig = args.skysigma
+    nsig = args.numbersig
 
     bor_flag = args.border
     borValue = args.borValue
 
 
-    SkyRem(image,mask,sky_mean,sky_sig,borValue,bor_flag)
+    SkyRem(image, mask, sky_mean, sky_sig, nsig, borValue, bor_flag)
 
 #################################################################
 #################################################################
 
-def SkyRem(imageFile,maskFile,mean,sig,borValue,bor_flag=False):
+def SkyRem(imageFile,maskFile,mean,sig, nsig,borValue,bor_flag=False):
 
     bor_val = 100
 
@@ -80,7 +82,7 @@ def SkyRem(imageFile,maskFile,mean,sig,borValue,bor_flag=False):
     maskImage = hdu2[0].data
 
 
-    topsky = mean + sig
+    topsky = mean + sig*nsig
 
 
     mask = dataImage >= topsky 
