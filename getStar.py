@@ -27,6 +27,13 @@ def main():
     parser.add_argument("-o","--out", type=str, 
                         help="the image output.",default="star.fits")
 
+    parser.add_argument("-sig","--sigma", type=str, 
+                        help="introduce the sigma image")
+
+    parser.add_argument("-so","--sigout", type=str, 
+                        help="the sigma image output.",default="sigma.fits")
+
+
 
     args = parser.parse_args()
 
@@ -37,6 +44,9 @@ def main():
 
     sky = args.sky
     imout = args.out
+
+    sigma = args.sigma
+    sigout = args.sigout
 
 
     ##########################################
@@ -105,6 +115,11 @@ def main():
 
 
     print("Done. Object fits file: {} created ".format(imout))
+
+
+    if sigma:
+        GetFits(sigma, sigout, 0, xlo, xhi, ylo, yhi)
+        print("Done. sigma fits file: {} created ".format(imout))
 
 ####################################################
 ####################################################
