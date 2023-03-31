@@ -43,7 +43,17 @@ def main():
     parser.add_argument("-s","--sky", type=float, help="the sky background value",default=0)
     parser.add_argument("-m","--mask", type=str, help="the mask file")
     parser.add_argument("-ps","--plate", type=float, help="plate scale of the image",default=1)
-    parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
+    parser.add_argument("-gas","--gauss", action="store_true", help="uses gauss function for galfit file")
+
+    parser.add_argument("-fser","--freeser", action="store_true", help="leaves the sersic index as a free parameter to fit")
+    parser.add_argument("-fsk","--freesky", action="store_true", help="leaves the sky as a free parameter to fit")
+
+    parser.add_argument("-pf","--psfile", type=str, help="name of the psf file for GALFIT. default = psf.fits",default="psf.fits")
+    
+    parser.add_argument("-sf","--sigfile", type=str, help="name of the sigma image for GALFIT. default = sigma.fits",default="sigma.fits")
+
+
+
 
     args = parser.parse_args()
 
@@ -58,7 +68,14 @@ def main():
     psf = args.psf
     sky = args.sky
     scale = args.plate
-    sersic = args.sersic
+    gauss = args.gauss
+
+    psfile = args.psfile
+    sigfile = args.sigfile
+
+    freeser = args.freeser
+    freesky = args.freesky
+
 
     mgeoutfile="mgegas.txt"
     convbox=100
@@ -67,7 +84,6 @@ def main():
     if args.regu:
         try:
             from mgefit.mge_fit_sectors_twist_regularized import mge_fit_sectors_twist_regularized 
-
         except: 
             print("mge_fit_sectors_twist_regularized is not installed. Regu desactivated")
             regu = False
@@ -283,15 +299,15 @@ def main():
     ### print GALFIT files
     #####################
 
-    if sersic:
-        parfile="mseGALFIT.txt"
-    else:
+    if gauss:
         parfile="mgeGALFIT.txt"
+    else:
+        parfile="mseGALFIT.txt"
 
     outname=TNAM
 
-    rmsname="none"
-    psfname="psf.fits"
+    rmsname = sigfile 
+    psfname = psfile
 
 
     # switch back
@@ -328,6 +344,11 @@ def main():
 
     index = 0
 
+    if freeser:
+        fit = 1
+    else:
+        fit = 0
+
 
     while index < len(counts):
 
@@ -345,8 +366,28 @@ def main():
             anglegass = float(anglegass)
 
 
-        if sersic:
+        if gauss:
+            
+            C0=TotCounts/(2*np.pi*qobs*SigPix**2)
 
+            Ftot = 2*np.pi*SigPix**2*C0*qobs
+
+            mgemag = magzpt + 0.1  + 2.5*np.log10(exptime)  - 2.5*np.log10(Ftot)
+
+            FWHM = 2.35482*SigPix
+
+            outline = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(mgemag, SigPix, FWHM, qobs, anglegass)
+            print(outline)
+
+            outline2 = "{:.2f} {:.2f} {:.2f} {:.2f} {:.2f} \n".format(mgemag, SigPix, FWHM, qobs, anglegass)
+            fout2.write(outline2)
+
+
+            PrintGauss(fout1, index+1, xpeak + 1, ypeak + 1, mgemag, FWHM, qobs, anglegass, Z, fit)
+
+
+
+        else:
             C0=TotCounts/(2*np.pi*qobs*SigPix**2)
 
             Ftot = 2*np.pi*SigPix**2*C0*qobs
@@ -369,30 +410,14 @@ def main():
             PrintSersic(fout1, index+1, xpeak + 1, ypeak + 1, mgemag, Re, 0.5, qobs, anglegass, Z, fit)
 
 
-        else:
-
-            C0=TotCounts/(2*np.pi*qobs*SigPix**2)
-
-            Ftot = 2*np.pi*SigPix**2*C0*qobs
-
-            mgemag = magzpt + 0.1  + 2.5*np.log10(exptime)  - 2.5*np.log10(Ftot)
-
-            FWHM = 2.35482*SigPix
-
-
-            outline = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(mgemag, SigPix, FWHM, qobs, anglegass)
-            print(outline)
-
-            outline2 = "{:.2f} {:.2f} {:.2f} {:.2f} {:.2f} \n".format(mgemag, SigPix, FWHM, qobs, anglegass)
-            fout2.write(outline2)
-
-
-            PrintGauss(fout1, index+1, xpeak + 1, ypeak + 1, mgemag, FWHM, qobs, anglegass, Z, fit)
-
 
         index+=1
 
 
+    if freesky:
+        skyfit = 1
+    else:
+        skyfit = 0
 
     PrintSky(fout1, index+1, sky, Z, skyfit)
     fout1.close()
