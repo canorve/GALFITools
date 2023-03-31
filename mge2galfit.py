@@ -109,6 +109,7 @@ def main():
 
 
     fit=1
+    serfit=0
     skyfit=0
 
     Z=0
@@ -345,9 +346,9 @@ def main():
     index = 0
 
     if freeser:
-        fit = 1
+        serfit = 1
     else:
-        fit = 0
+        serfit = 0
 
 
     while index < len(counts):
@@ -407,7 +408,7 @@ def main():
             fout2.write(outline2)
 
 
-            PrintSersic(fout1, index+1, xpeak + 1, ypeak + 1, mgemag, Re, 0.5, qobs, anglegass, Z, fit)
+            PrintSersic(fout1, index+1, xpeak + 1, ypeak + 1, mgemag, Re, 0.5, qobs, anglegass, Z, fit, serfit)
 
 
 
@@ -658,7 +659,7 @@ def PrintSky(hdl, ncomp, sky, Z, fit):
     return True
 
 
-def PrintSersic(hdl, ncomp, xpos, ypos, magser, reser, nser, axratser, angleser, Z, fit):
+def PrintSersic(hdl, ncomp, xpos, ypos, magser, reser, nser, axratser, angleser, Z, fit, serfit):
     "print GALFIT Sersic function to filehandle"
     # k Check
 
@@ -676,7 +677,7 @@ def PrintSersic(hdl, ncomp, xpos, ypos, magser, reser, nser, axratser, angleser,
     line04 = " 4) {:.2f}       {}              #  R_e         [Pixels]                            \n".format(
             reser, fit)
     line05 = " 5) {}       {}              #  Sersic exponent (deVauc=4, expdisk=1)           \n".format(
-        nser, 0)
+        nser, serfit)
     #line05 = " 5) {}       {}              #  Sersic exponent (deVauc=4, expdisk=1)           \n".format(
     #    nser, fit)
     line06 = " 6)  0.0000       0           #  ----------------                                \n"
