@@ -21,38 +21,49 @@ def main():
 
     parser = argparse.ArgumentParser(description="creates (or modify) a mask image for GALFIT from a Ds9 region file ")
 
-    parser.add_argument("ImageFile", help="the Mask image file to modify or create")
+    parser.add_argument("MaskFile", help="the Mask image file to modify or create")
     parser.add_argument("RegFile", help="the DS9 region file")
 
     parser.add_argument("-n","--number", type=int, help="the value in counts to fill into the Ds9 regions. Default = 0 (remove)",default=0)
 
+    parser.add_argument("-i","--image", type=str, help="image to obtain the size  ")
+
+
+
+
 
     args = parser.parse_args()
 
-    ImageFile = args.ImageFile 
+    MaskFile = args.MaskFile 
     RegFile = args.RegFile 
     Value = args.number
+    image = args.image
 
-    if not os.path.exists(ImageFile):
+    if not os.path.exists(MaskFile):
 
         print ('%s: image filename does not exist!' %(sys.argv[1]))
         print ('Creating a new image file ')
 
         hdu=fits.PrimaryHDU()
-        nx = input("enter numbers of pixels in X ") 
-        ny = input("enter numbers of pixels in Y ") 
 
-        nx = np.int64(nx)
-        ny = np.int64(ny)
+        if image:
+            (ncol, nrow) = GetAxis(image)
+        else:
+            nx = input("enter numbers of pixels in X ") 
+            ny = input("enter numbers of pixels in Y ") 
+
+            nx = np.int64(nx)
+            ny = np.int64(ny)
+
         Image = np.zeros([ny,nx])
         hdu.data=Image
-        hdu.writeto(ImageFile,overwrite=True) 
+        hdu.writeto(MaskFile,overwrite=True) 
 
 
-    (ncol, nrow) = GetAxis(ImageFile)
+    (ncol, nrow) = GetAxis(MaskFile)
 
 
-    hdu=fits.open(ImageFile)
+    hdu=fits.open(MaskFile)
 
     Image = hdu[0].data
 
@@ -140,7 +151,7 @@ def main():
     #writing mask file
 
     hdu.data=Image
-    hdu.writeto(ImageFile,overwrite=True) 
+    hdu.writeto(MaskFile,overwrite=True) 
     hdu.close()
 
 
