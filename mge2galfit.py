@@ -55,6 +55,8 @@ def main():
 
     parser.add_argument("-ng","--numgauss", type=int, help="number of gaussians that will be used for galfit.Starting from the first one")
 
+    parser.add_argument("-ig","--initgauss", type=int, help="number of gaussians to be used in mge_fit_sectors",default=12)
+
 
     args = parser.parse_args()
 
@@ -76,6 +78,9 @@ def main():
 
     freeser = args.freeser
     freesky = args.freesky
+
+
+    initgauss = args.initgauss
 
     numgauss = args.numgauss 
 
@@ -162,7 +167,6 @@ def main():
     img=img.astype(float)
 
     minlevel = 0  
-    ngauss = 12
 
     plt.clf()
 
@@ -211,19 +215,19 @@ def main():
 
         if np.abs(psf) > tolpsf:
             if regu:
-                m = mge_fit_sectors_twist_regularized(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
+                m = mge_fit_sectors_twist_regularized(s.radius, s.angle, s.counts, eps, ngauss=initgauss,
                                             sigmapsf=psf, scale=scale, plot=1)
             else:
-                m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
+                m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=initgauss,
                                             sigmapsf=psf, scale=scale, plot=1)
  
         else:
             print("No convolution")
             if regu:
-                m = mge_fit_sectors_twist_regularized(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
+                m = mge_fit_sectors_twist_regularized(s.radius, s.angle, s.counts, eps, ngauss=initgauss,
                                              scale=scale, plot=1)
             else:
-                m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=ngauss,
+                m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=initgauss,
                                              scale=scale, plot=1)
  
 
@@ -259,11 +263,11 @@ def main():
             if regu:
  
                 m = mge_fit_sectors_regularized(s.radius, s.angle, s.counts, eps,
-                                    ngauss=ngauss, sigmapsf=psf,
+                                    ngauss=initgauss, sigmapsf=psf,
                                     scale=scale, plot=1, bulge_disk=0, linear=0)
             else:
                 m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
-                                    ngauss=ngauss, sigmapsf=psf,
+                                    ngauss=initgauss, sigmapsf=psf,
                                     scale=scale, plot=1, bulge_disk=0, linear=0)
  
 
@@ -272,11 +276,11 @@ def main():
 
             if regu:
                 m = mge_fit_sectors_regularized(s.radius, s.angle, s.counts, eps,
-                                    ngauss=ngauss, scale=scale, plot=1, 
+                                    ngauss=initgauss, scale=scale, plot=1, 
                                     bulge_disk=0, linear=0)
             else:
                 m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
-                                    ngauss=ngauss, scale=scale, plot=1, 
+                                    ngauss=initgauss, scale=scale, plot=1, 
                                     bulge_disk=0, linear=0)
  
 
