@@ -47,6 +47,10 @@ class InitGal:
         parser.add_argument("-p10", "--param10", nargs=2, type=float, help="range of values to give to the 10) model's parameter in format [min max]")
 
 
+
+        parser.add_argument("-nc","--numcomp", type=int, help="the component number which parameters will be changed")
+
+
         args = parser.parse_args()
 
 
@@ -63,6 +67,7 @@ class InitGal:
         self.param10 = args.param10
 
 
+        self.numcomp = args.numcomp
 #############################################################
     #end of parser argument section
 
@@ -86,77 +91,158 @@ class InitGal:
 
 
             index = 0
+            comp = 0
+
             while index < len(lines):
 
                 line = lines[index]
                 (tmp) = line.split()
-                if (tmp[0] == "3)") and (flagsky3  == False):     # input image
-                    if self.param3:
-                        c3min, c3max = self.param3[0],self.param3[1]
-                        c3 = np.random.default_rng().uniform(c3min,c3max,1)
-                        tmp[1] = str(np.round(c3[0],2))
-                        line= " ".join(tmp)
-                        line= " " + line 
 
-                if tmp[0] == "4)":     # input image
-                    if self.param4:
-                        c4min, c4max = self.param4[0],self.param4[1]
-                        c4 = np.random.default_rng().uniform(c4min,c4max,1)
-                        tmp[1] = str(np.round(c4[0],2))
-                        line= " ".join(tmp)
-                        line= " " + line 
+                if (tmp[0] == "0)"):
+                    comp = comp + 1
 
+                if self.numcomp:
 
-                if tmp[0] == "5)":     # input image
-                    if self.param5:
-                        c5min, c5max = self.param5[0],self.param5[1]
-                        c5 = np.random.default_rng().uniform(c5min,c5max,1)
-                        tmp[1] = str(np.round(c5[0],2))
-                        line= " ".join(tmp)
-                        line= " " + line 
+                    if self.numcomp == comp:
 
-                       
-                if tmp[0] == "6)":     # input image
-                    if self.param6:
-                        c6min, c6max = self.param6[0],self.param6[1]
-                        c6 = np.random.default_rng().uniform(c6min,c6max,1)
-                        tmp[1] = str(np.round(c6[0],2))
-                        line= " ".join(tmp)
-                        line= " " + line 
+                        if (tmp[0] == "3)") and (flagsky3  == False):     # input image
+                            if self.param3:
+                                c3min, c3max = self.param3[0],self.param3[1]
+                                c3 = np.random.default_rng().uniform(c3min,c3max,1)
+                                tmp[1] = str(np.round(c3[0],2))
+                                line= " ".join(tmp)
+                                line= " " + line 
+
+                        if tmp[0] == "4)":     # input image
+                            if self.param4:
+                                c4min, c4max = self.param4[0],self.param4[1]
+                                c4 = np.random.default_rng().uniform(c4min,c4max,1)
+                                tmp[1] = str(np.round(c4[0],2))
+                                line= " ".join(tmp)
+                                line= " " + line 
 
 
-                if tmp[0] == "7)":     # input image
-                    if self.param7:
-                        c7min, c7max = self.param7[0],self.param7[1]
-                        c7 = np.random.default_rng().uniform(c7min,c7max,1)
-                        tmp[1] = str(np.round(c7[0],2))
-                        line= " ".join(tmp)
-                        line= " " + line 
+                        if tmp[0] == "5)":     # input image
+                            if self.param5:
+                                c5min, c5max = self.param5[0],self.param5[1]
+                                c5 = np.random.default_rng().uniform(c5min,c5max,1)
+                                tmp[1] = str(np.round(c5[0],2))
+                                line= " ".join(tmp)
+                                line= " " + line 
 
-                if tmp[0] == "8)":     # input image
-                    if self.param8:
-                        c8min, c8max = self.param8[0],self.param8[1]
-                        c8 = np.random.default_rng().uniform(c8min,c8max,1)
-                        tmp[1] = str(np.round(c8[0],2))
-                        line= " ".join(tmp)
-                        line= " " + line 
+                               
+                        if tmp[0] == "6)":     # input image
+                            if self.param6:
+                                c6min, c6max = self.param6[0],self.param6[1]
+                                c6 = np.random.default_rng().uniform(c6min,c6max,1)
+                                tmp[1] = str(np.round(c6[0],2))
+                                line= " ".join(tmp)
+                                line= " " + line 
 
-                if tmp[0] == "9)":     # input image
-                    if self.param9:
-                        c9min, c9max = self.param9[0],self.param9[1]
-                        c9 = np.random.default_rng().uniform(c9min,c9max,1)
-                        tmp[1] = str(np.round(c9[0],2))
-                        line= " ".join(tmp)
-                        line= " " + line 
 
-                if tmp[0] == "10)":     # input image
-                    if self.param10:
-                        c10min, c10max = self.param10[0],self.param10[1]
-                        c10 = np.random.default_rng().uniform(c10min,c10max,1)
-                        tmp[1] = str(np.round(c10[0],2))
-                        line= " ".join(tmp)
+                        if tmp[0] == "7)":     # input image
+                            if self.param7:
+                                c7min, c7max = self.param7[0],self.param7[1]
+                                c7 = np.random.default_rng().uniform(c7min,c7max,1)
+                                tmp[1] = str(np.round(c7[0],2))
+                                line= " ".join(tmp)
+                                line= " " + line 
 
-                lineout= line + "\n"
+                        if tmp[0] == "8)":     # input image
+                            if self.param8:
+                                c8min, c8max = self.param8[0],self.param8[1]
+                                c8 = np.random.default_rng().uniform(c8min,c8max,1)
+                                tmp[1] = str(np.round(c8[0],2))
+                                line= " ".join(tmp)
+                                line= " " + line 
+
+                        if tmp[0] == "9)":     # input image
+                            if self.param9:
+                                c9min, c9max = self.param9[0],self.param9[1]
+                                c9 = np.random.default_rng().uniform(c9min,c9max,1)
+                                tmp[1] = str(np.round(c9[0],2))
+                                line= " ".join(tmp)
+                                line= " " + line 
+
+                        if tmp[0] == "10)":     # input image
+                            if self.param10:
+                                c10min, c10max = self.param10[0],self.param10[1]
+                                c10 = np.random.default_rng().uniform(c10min,c10max,1)
+                                tmp[1] = str(np.round(c10[0],2))
+                                line= " ".join(tmp)
+
+                else:
+
+                    if (tmp[0] == "3)") and (flagsky3  == False):     # input image
+                        if self.param3:
+                            c3min, c3max = self.param3[0],self.param3[1]
+                            c3 = np.random.default_rng().uniform(c3min,c3max,1)
+                            tmp[1] = str(np.round(c3[0],2))
+                            line= " ".join(tmp)
+                            line= " " + line 
+
+                    if tmp[0] == "4)":     # input image
+                        if self.param4:
+                            c4min, c4max = self.param4[0],self.param4[1]
+                            c4 = np.random.default_rng().uniform(c4min,c4max,1)
+                            tmp[1] = str(np.round(c4[0],2))
+                            line= " ".join(tmp)
+                            line= " " + line 
+
+
+                    if tmp[0] == "5)":     # input image
+                        if self.param5:
+                            c5min, c5max = self.param5[0],self.param5[1]
+                            c5 = np.random.default_rng().uniform(c5min,c5max,1)
+                            tmp[1] = str(np.round(c5[0],2))
+                            line= " ".join(tmp)
+                            line= " " + line 
+
+                           
+                    if tmp[0] == "6)":     # input image
+                        if self.param6:
+                            c6min, c6max = self.param6[0],self.param6[1]
+                            c6 = np.random.default_rng().uniform(c6min,c6max,1)
+                            tmp[1] = str(np.round(c6[0],2))
+                            line= " ".join(tmp)
+                            line= " " + line 
+
+
+                    if tmp[0] == "7)":     # input image
+                        if self.param7:
+                            c7min, c7max = self.param7[0],self.param7[1]
+                            c7 = np.random.default_rng().uniform(c7min,c7max,1)
+                            tmp[1] = str(np.round(c7[0],2))
+                            line= " ".join(tmp)
+                            line= " " + line 
+
+                    if tmp[0] == "8)":     # input image
+                        if self.param8:
+                            c8min, c8max = self.param8[0],self.param8[1]
+                            c8 = np.random.default_rng().uniform(c8min,c8max,1)
+                            tmp[1] = str(np.round(c8[0],2))
+                            line= " ".join(tmp)
+                            line= " " + line 
+
+                    if tmp[0] == "9)":     # input image
+                        if self.param9:
+                            c9min, c9max = self.param9[0],self.param9[1]
+                            c9 = np.random.default_rng().uniform(c9min,c9max,1)
+                            tmp[1] = str(np.round(c9[0],2))
+                            line= " ".join(tmp)
+                            line= " " + line 
+
+                    if tmp[0] == "10)":     # input image
+                        if self.param10:
+                            c10min, c10max = self.param10[0],self.param10[1]
+                            c10 = np.random.default_rng().uniform(c10min,c10max,1)
+                            tmp[1] = str(np.round(c10[0],2))
+                            line= " ".join(tmp)
+
+
+
+
+                lineout = line + "\n"
                 fileout.write(lineout)
 
                 if (tmp[0] == "0)") and (tmp[1] == "sky") :     # avoids to write in sky component
