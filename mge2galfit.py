@@ -53,6 +53,7 @@ def main():
     parser.add_argument("-sf","--sigfile", type=str, help="name of the sigma image for GALFIT. default = sigma.fits",default="sigma.fits")
 
 
+    parser.add_argument("-ng","--numgauss", type=int, help="number of gaussians that will be used for galfit.Starting from the first one")
 
 
     args = parser.parse_args()
@@ -75,6 +76,8 @@ def main():
 
     freeser = args.freeser
     freesky = args.freesky
+
+    numgauss = args.numgauss 
 
 
     mgeoutfile="mgegas.txt"
@@ -343,7 +346,6 @@ def main():
     PrintHeader(fout1, T1, T2, T3, psfname, 1, maskfile, consfile, xlo, xhi, ylo,
                 yhi, convbox, convbox, magzpt, scale, scale, "regular", 0, 0)
 
-    index = 0
 
     if freeser:
         serfit = 1
@@ -351,7 +353,26 @@ def main():
         serfit = 0
 
 
-    while index < len(counts):
+    #removing the last components:
+    totGauss = len(counts)
+
+    if not(numgauss):
+        numgauss = totGauss
+
+    print("total number of gaussians by mge_fit_sectors: ", totGauss)
+
+    if numgauss > totGauss:
+        print("number of gaussians is greater than the ones fitted by mge_fit_sectors")
+        print("total number of gaussians of mge_fit_sectors will be used instead")
+        numgauss = totGauss
+
+    print("total number of gaussians used by GALFIT: ", numgauss)
+
+
+
+    index = 0
+
+    while index < numgauss: 
 
 
         TotCounts = counts[index]
@@ -387,8 +408,8 @@ def main():
             PrintGauss(fout1, index+1, xpeak + 1, ypeak + 1, mgemag, FWHM, qobs, anglegass, Z, fit)
 
 
-
         else:
+
             C0=TotCounts/(2*np.pi*qobs*SigPix**2)
 
             Ftot = 2*np.pi*SigPix**2*C0*qobs
