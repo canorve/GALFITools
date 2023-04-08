@@ -568,12 +568,13 @@ class getFWHM:
 
         K_GAUSS = 0.6931471805599455 #constant k for gaussian
         K_EXP = 1.6783469900166612 # constant k for expdisk
+        SIG2FW = 2*np.sqrt(2*np.log(2)) 
         SQ2 = np.sqrt(2) 
 
         #for gaussian functions
         if maskgas.any():
             comps.Exp[maskgas] = 0.5 
-            comps.Rad[maskgas] = comps.Rad[maskgas]/2.354 #converting to sigma 
+            comps.Rad[maskgas] = comps.Rad[maskgas]/SIG2FW #converting to sigma 
             comps.Rad[maskgas] = SQ2*(K_GAUSS**0.5)*comps.Rad[maskgas] #converting to Re 
 
 
