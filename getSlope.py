@@ -19,11 +19,11 @@ import matplotlib.pyplot as plt
 
 #console scripts
 def main() -> None: 
-    '''gets the effective radius from a set of Sersics'''
+    '''gets the slope radius from a set of Sersics'''
 
     #reading argument parsing
 
-    parser = argparse.ArgumentParser(description = "getReComp: gets the effective radius from a set of Sersics ")
+    parser = argparse.ArgumentParser(description = "getSlope: gets the slope radius from a set of Sersics ")
 
 
     # required arguments
