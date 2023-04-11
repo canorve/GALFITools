@@ -24,7 +24,7 @@ def main():
     parser.add_argument("MaskFile", help="the Mask image file to modify or create")
     parser.add_argument("RegFile", help="the DS9 region file")
 
-    parser.add_argument("-n","--number", type=int, help="the value in counts to fill into the Ds9 regions. Default = 0 (remove)",default=0)
+    parser.add_argument("-f","--fill", type=int, help="the value in counts to fill into the Ds9 regions. Default = 0 (remove)",default=0)
 
     parser.add_argument("-i","--image", type=str, help="image to obtain the size  ")
 
@@ -36,7 +36,7 @@ def main():
 
     MaskFile = args.MaskFile 
     RegFile = args.RegFile 
-    Value = args.number
+    fill = args.fill
     image = args.image
 
     if not os.path.exists(MaskFile):
@@ -138,13 +138,13 @@ def main():
         if obj[idx] == "ellipse":
 
             
-            Image = MakeEllip(Image,Value,xpos[idx],ypos[idx],rx[idx],ry[idx],angle[idx],ncol,nrow)
+            Image = MakeEllip(Image,fill,xpos[idx],ypos[idx],rx[idx],ry[idx],angle[idx],ncol,nrow)
 
 
         if obj[idx] == "box":
 
 
-            Image = MakeBox(Image,Value,xpos[idx],ypos[idx],rx[idx],ry[idx],angle[idx],ncol,nrow)
+            Image = MakeBox(Image,fill,xpos[idx],ypos[idx],rx[idx],ry[idx],angle[idx],ncol,nrow)
 
 
 
@@ -155,17 +155,17 @@ def main():
     hdu.close()
 
 
-def MakeEllip(Image,Value,xpos,ypos,rx,ry,angle,ncol,nrow):
+def MakeEllip(Image,fill,xpos,ypos,rx,ry,angle,ncol,nrow):
     "Make an ellipse in an image"
 
     xx, yy, Rkron, theta, e = Ds9ell2Kronell(xpos,ypos,rx,ry,angle)
     (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, e, ncol, nrow)
-    Image = MakeKron(Image, Value, xx, yy, Rkron, theta, e, xmin, xmax, ymin, ymax)
+    Image = MakeKron(Image, fill, xx, yy, Rkron, theta, e, xmin, xmax, ymin, ymax)
 
     return Image
 
 
-def MakeBox(Image,Value,xpos,ypos,rx,ry,angle,ncol,nrow):
+def MakeBox(Image,fill,xpos,ypos,rx,ry,angle,ncol,nrow):
     "Make a box in an image"
 
     xlo = xpos - rx/2.
@@ -191,7 +191,7 @@ def MakeBox(Image,Value,xpos,ypos,rx,ry,angle,ncol,nrow):
     ylo=int(np.round(ylo))
     yhi=int(np.round(yhi))
 
-    Image[ylo-1:yhi,xlo-1:xhi]=Value
+    Image[ylo-1:yhi,xlo-1:xhi]=fill
 
     return Image
 
