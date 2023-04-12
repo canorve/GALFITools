@@ -2,16 +2,14 @@
 
 import numpy as np
 import sys
-import os
-import stat
-import subprocess as sp
 import os.path
 from astropy.io import fits
-import scipy
-import scipy.special
-import matplotlib.pyplot as plt
 
 import argparse
+
+from matplotlib.path import Path
+from shapely.geometry import Point, Polygon
+
 
 
 # programa que hace parches (mascaras) en una seccion de una imagen FITS
@@ -19,7 +17,7 @@ import argparse
 def main(): 
 
 
-    parser = argparse.ArgumentParser(description="creates (or modify) a mask image for GALFIT from a Ds9 region file ")
+    parser = argparse.ArgumentParser(description="creates (or modify) a mask image for GALFIT from a Ds9 region file: Box, Ellipses and Polygons ")
 
     parser.add_argument("MaskFile", help="the Mask image file to modify or create")
     parser.add_argument("RegFile", help="the DS9 region file")
@@ -27,8 +25,6 @@ def main():
     parser.add_argument("-f","--fill", type=int, help="the value in counts to fill into the Ds9 regions. Default = 0 (remove)",default=0)
 
     parser.add_argument("-i","--image", type=str, help="image to obtain the size  ")
-
-
 
 
 
@@ -56,14 +52,14 @@ def main():
             ny = np.int64(ny)
 
         Image = np.zeros([ny,nx])
-        hdu.data=Image
+        hdu.data = Image
         hdu.writeto(MaskFile,overwrite=True) 
 
 
     (ncol, nrow) = GetAxis(MaskFile)
 
 
-    hdu=fits.open(MaskFile)
+    hdu = fits.open(MaskFile)
 
     Image = hdu[0].data
 
@@ -73,12 +69,16 @@ def main():
         print ('%s: reg filename does not exist!' %(sys.argv[2]))
         sys.exit()
 
-    v0=[]
-    v1=[]
-    v2=[]
-    v3=[]
-    v4=[]
-    v5=[]
+    v0 = []
+    v1 = []
+    v2 = []
+    v3 = []
+    v4 = []
+    v5 = []
+
+    tupVerts = []
+    Pol = []
+
 
     f1 = open(RegFile,'r')
 
@@ -86,7 +86,8 @@ def main():
 
     f1.close()
 
-    flag=False
+    flag = False
+    flagpoly = False
     #reading reg file
     for line in lines:
 
@@ -107,10 +108,39 @@ def main():
             x2 = x1[4:]
             flag = True
 
+
+        if b1[0] == "polygon":
+
+            polv = line.split(")")
+            pol, ver = polv[0].split("(")
+
+
+            points = ver.split(",")
+
+            N = len(points)
+
+            i=0
+
+            x = np.array([])
+            y = np.array([])
+
+            x = x.astype(float)
+            y = y.astype(float)
+
+            verts = []
+
+            #make tuple for vertices
+            while i < N:
+
+                verts = verts + [(round(float(points[i])-1),round(float(points[i+1])-1)) ]
+                i = i + 2
+
+            flagpoly = True
+
         if (flag == True):
+
             x3 = p[4]
             x4 = x3[:-2]
-
 
             v0.append(x0)
             v1.append(float(x2) - 1)
@@ -119,8 +149,13 @@ def main():
             v4.append(float(p[3]))
             v5.append(float(x4))
 
-            flag=False
+            flag = False
 
+        if (flagpoly  == True):
+
+            Pol.append(pol) 
+            tupVerts.append(verts)
+            flagpoly = False
 
     obj  = np.array(v0)
     xpos = np.array(v1) 
@@ -129,7 +164,7 @@ def main():
     ry = np.array(v4)
     angle = np.array(v5)
 
-
+    Pol = np.array(Pol)
 
     for idx, item in enumerate(obj):
 
@@ -137,14 +172,26 @@ def main():
 
         if obj[idx] == "ellipse":
 
-            
-            Image = MakeEllip(Image,fill,xpos[idx],ypos[idx],rx[idx],ry[idx],angle[idx],ncol,nrow)
+            Image = MakeEllip(Image, fill, xpos[idx], ypos[idx], rx[idx], 
+                                ry[idx], angle[idx], ncol, nrow)
 
 
         if obj[idx] == "box":
 
 
-            Image = MakeBox(Image,fill,xpos[idx],ypos[idx],rx[idx],ry[idx],angle[idx],ncol,nrow)
+            Image = MakeBox(Image, fill, xpos[idx], ypos[idx], rx[idx], 
+                            ry[idx], angle[idx], ncol, nrow)
+
+
+
+    for idx, item in enumerate(Pol):
+
+        #converting ellipse from DS9 ell to kron ellipse
+
+        if Pol[idx] == "polygon":
+
+            Image = MakePolygon(Image, fill, tupVerts[idx], ncol, nrow)
+
 
 
 
@@ -163,6 +210,30 @@ def MakeEllip(Image,fill,xpos,ypos,rx,ry,angle,ncol,nrow):
     Image = MakeKron(Image, fill, xx, yy, Rkron, theta, e, xmin, xmax, ymin, ymax)
 
     return Image
+
+def MakePolygon(Image,fill,tupVerts,ncol,nrow):
+    "Make a polygon in an image"
+
+
+    poly = Polygon(tupVerts)
+
+
+    x, y = np.meshgrid(np.arange(ncol), np.arange(nrow)) # make a canvas with coordinates
+    x, y = x.flatten(), y.flatten()
+    points = np.vstack((x,y)).T 
+    p = Path(tupVerts) # make a polygon
+
+    grid = p.contains_points(points)
+    mask = grid.reshape(nrow, ncol) # now you have a mask with points inside a polygon
+
+
+    Image[mask] = fill
+
+
+
+    return Image
+
+
 
 
 def MakeBox(Image,fill,xpos,ypos,rx,ry,angle,ncol,nrow):
