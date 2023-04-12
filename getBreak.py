@@ -11,7 +11,7 @@ import copy
 
 from scipy.special import gamma, gammainc, gammaincinv
 
-from scipy.optimize import bisect
+from scipy.optimize import bisect, fmin
 
 import matplotlib.pyplot as plt
 
@@ -41,6 +41,7 @@ def main() -> None:
                         help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components")
 
 
+    parser.add_argument("-ni","--numinitial", type=int, help="Number of component where it'll obtain the initial parameter to search break radius, default = 2 ", default=2)
 #    parser.add_argument("-s","--slope", type=float, 
 #                        help="value of slope to find. default=.5 ", default=.5)
 
@@ -53,6 +54,7 @@ def main() -> None:
     dis = args.dis
 
     eff = args.effrad
+    inicomp = args.numinitial
     #slope = args.slope
 
     assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
@@ -121,13 +123,15 @@ def main() -> None:
 
 
     plt.plot(R, gam)
+    plt.grid(True)
+    plt.minorticks_on()
     plt.savefig("Break.png")
 
 
-    #rgam = GetSlope().FindSlope(comps, theta, slope) 
+    rbreak = GetBreak().FindBreak(comps, theta, inicomp) 
 
-    #line = 'The radius with slope {:.2f} is {:.2f} pixels \n'.format(slope,rgam)
-    #print(line)
+    line = 'The break radius  is {:.2f} pixels \n'.format(rbreak)
+    print(line)
 
 
     return None
@@ -653,7 +657,7 @@ class GetBreak:
 
 
             kappa = np.append(kappa, kap)
-
+            #kappa = np.append(kappa, beta)
 
 
         return kappa 
@@ -668,6 +672,32 @@ class GetBreak:
         return fun
      
 
+    def FindBreak(self, comps: GalComps, theta: float, initial_comp: int) -> float:
+        "return the break radius of a set of Sersic functions"
+
+        maskgal = (comps.Active == True) #using active components only 
+
+        init = comps.Rad[maskgal][initial_comp] #component as initial value, hope it works 
+
+        breakrad = scipy.optimize.fmin(self.funGalBreakSer, init, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta))
+
+
+        return breakrad[0] 
+  
+
+    def funGalBreakSer(self, R, Ie, Re, n, q, pa, theta):
+
+
+
+        beta = self.BreakSer(R, Ie, Re, n, q, pa, theta)
+
+        gam = self.SlopeSer(R, Ie, Re, n, q, pa, theta)
+           
+        kappa = np.abs(beta)/(1 + gam**2)**(3/2)
+
+
+        return -kappa 
+        #return beta 
 
 
     def FindSlope(self, comps: GalComps, theta: float, slope: float) -> float:
@@ -738,8 +768,8 @@ class GetBreak:
         Xprim2 = self.var_Xprim2(Rcor, Re, n)
 
         S = self.var_S(Rcor, Ie,  Re, n, X)
-        Sprim = self.var_Sprim(Rcor, Ie,  Re, n, X, Xprim)
-        Sprim2 = self.var_Sprim2(Rcor, Ie,  Re, n, X, Xprim, Xprim2)
+        Sprim = self.var_Sprim(Rcor, Ie, Re, n, X, Xprim)
+        Sprim2 = self.var_Sprim2(Rcor, Ie, Re, n, X, Xprim, Xprim2)
 
         Break = (Sprim/S)*(R/np.log10(np.e)) + (
                     (Sprim2*S - Sprim**2)/S**2)*(R**2/np.log10(np.e)) 
