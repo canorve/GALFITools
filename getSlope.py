@@ -122,6 +122,8 @@ def main() -> None:
 
 
     plt.plot(R, gam)
+    plt.grid(True)
+    plt.minorticks_on()
     plt.savefig("slope.png")
 
 

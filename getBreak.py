@@ -656,8 +656,7 @@ class GetBreak:
             kap = np.abs(beta)/(1 + gam**2)**(3/2)
 
 
-            kappa = np.append(kappa, kap)
-            #kappa = np.append(kappa, beta)
+            kappa = np.append(kappa, beta)
 
 
         return kappa 
@@ -688,16 +687,13 @@ class GetBreak:
     def funGalBreakSer(self, R, Ie, Re, n, q, pa, theta):
 
 
-
         beta = self.BreakSer(R, Ie, Re, n, q, pa, theta)
 
         gam = self.SlopeSer(R, Ie, Re, n, q, pa, theta)
            
         kappa = np.abs(beta)/(1 + gam**2)**(3/2)
 
-
-        return -kappa 
-        #return beta 
+        return beta 
 
 
     def FindSlope(self, comps: GalComps, theta: float, slope: float) -> float:
