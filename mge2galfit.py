@@ -86,7 +86,10 @@ def main():
 
 
     mgeoutfile="mgegas.txt"
+
+    #default convolution box sizes:
     convbox=100
+    convboxy=100
     
 
     if args.regu:
@@ -347,8 +350,16 @@ def main():
 
     K = gammaincinv(1,0.5)
 
+
+    if psfile:
+        (ncol, nrow) = GetAxis(psfname)
+        convbox = ncol
+        convboxy = nrow
+
+
+
     PrintHeader(fout1, T1, T2, T3, psfname, 1, maskfile, consfile, xlo, xhi, ylo,
-                yhi, convbox, convbox, magzpt, scale, scale, "regular", 0, 0)
+                yhi, convbox, convboxy, magzpt, scale, scale, "regular", 0, 0)
 
 
     if freeser:
