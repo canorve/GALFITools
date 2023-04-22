@@ -48,7 +48,7 @@ def main():
     parser.add_argument("-fser","--freeser", action="store_true", help="leaves the sersic index as a free parameter to fit")
     parser.add_argument("-fsk","--freesky", action="store_true", help="leaves the sky as a free parameter to fit")
 
-    parser.add_argument("-pf","--psfile", type=str, help="name of the psf file for GALFIT. default = psf.fits",default="psf.fits")
+    parser.add_argument("-pf","--psfile", type=str, help="name of the psf file for GALFIT. default = psf.fits")
     
     parser.add_argument("-sf","--sigfile", type=str, help="name of the sigma image for GALFIT. default = sigma.fits",default="sigma.fits")
 
@@ -318,7 +318,10 @@ def main():
     outname=TNAM
 
     rmsname = sigfile 
-    psfname = psfile
+    if psfile:
+        psfname = psfile
+    else:
+        psfname = "psf.fits"
 
 
     # switch back
