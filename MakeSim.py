@@ -16,10 +16,10 @@ def main():
         sys.exit()
 
     image = sys.argv[1]
-    GAIN = np.float(sys.argv[2])
+    GAIN = float(sys.argv[2])
 
-    skymean= np.float(sys.argv[3])
-    skystd =  np.float(sys.argv[4])
+    skymean= float(sys.argv[3])
+    skystd =  float(sys.argv[4])
 
     newimage = sys.argv[5]
 
