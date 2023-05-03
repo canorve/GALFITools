@@ -356,8 +356,8 @@ def main():
 
     if psfile:
         (ncol, nrow) = GetAxis(psfname)
-        convbox = ncol
-        convboxy = nrow
+        convbox = ncol + 1
+        convboxy = nrow + 1
 
 
 
