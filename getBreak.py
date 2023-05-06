@@ -41,9 +41,15 @@ def main() -> None:
                         help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components")
 
 
-    parser.add_argument("-ni","--numinitial", type=int, help="Number of component where it'll obtain the initial parameter to search break radius, default = 2 ", default=2)
+    parser.add_argument("-ni","--numinitial", type=int, help="Number of component where it'll obtain the initial parameter to search break radius or to generated random initial radius. ", default=2)
 #    parser.add_argument("-s","--slope", type=float, 
 #                        help="value of slope to find. default=.5 ", default=.5)
+
+
+    parser.add_argument("-q","--quick", action="store_true", help='evaluate in position only (given by -ni parameter') 
+
+
+    parser.add_argument("-r","--random", type=int, help="Number of random radius as initial parameters to search for the minimum. It will generated random radius from 0 to effective radius of the component indicated by parameter -ni ")
 
 
 
@@ -56,6 +62,8 @@ def main() -> None:
     eff = args.effrad
     inicomp = args.numinitial
     #slope = args.slope
+    quick = args.quick
+    random = args.random
 
     assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
    
@@ -128,13 +136,61 @@ def main() -> None:
     plt.savefig("Break.png")
 
 
-    rbreak = GetBreak().FindBreak(comps, theta, inicomp) 
+    if quick:
 
-    line = 'The break radius  is {:.2f} pixels \n'.format(rbreak)
-    print(line)
+        rbreak = GetBreak().FindBreak(comps, theta, inicomp) 
+
+        line = 'The break radius  is {:.2f} pixels \n'.format(rbreak)
+        print(line)
+
+    else:
+
+        if random:
+
+            radius = np.random.random(random)*comps.Rad[maskgal][inicomp] #hope it works
+            print('The initial search radius are: ',radius)
+
+        else:
+    
+            radius = comps.Rad[maskgal]
+            print('The initial search radius are the effective radius of the components')
+
+
+        rbreak = MulFindBreak(comps, theta, radius) 
+
+        line = 'The break radius  is {:.2f} pixels \n'.format(rbreak)
+        print(line)
+
 
 
     return None
+
+
+def MulFindBreak(comps, theta, radius):
+
+    maskgal = (comps.Active == True) 
+
+    radsbreak = GetBreak().MulFindBreak(comps, theta, radius) 
+
+    betas = np.array([])
+
+    print('finding global minium')
+
+    for r in radsbreak:
+
+        beta = GetBreak().BreakSer(r, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta)
+
+        
+        betas = np.append(betas, beta)
+
+
+    radmask = (radsbreak < radius[-1]) #hope it works
+
+    idx = np.where(betas == min(betas))  
+
+    
+    return radsbreak[idx][0]
+
 
 
 class GalHead():
@@ -649,12 +705,6 @@ class GetBreak:
             beta = self.BreakSer(r, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta)
 
 
-            gam = self.SlopeSer(r, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta)
-
-           
-
-            kap = np.abs(beta)/(1 + gam**2)**(3/2)
-
 
             kappa = np.append(kappa, beta)
 
@@ -672,7 +722,7 @@ class GetBreak:
      
 
     def FindBreak(self, comps: GalComps, theta: float, initial_comp: int) -> float:
-        "return the break radius of a set of Sersic functions"
+        "return the break radii of a set of Sersic functions"
 
         maskgal = (comps.Active == True) #using active components only 
 
@@ -682,16 +732,38 @@ class GetBreak:
 
 
         return breakrad[0] 
-  
+
+
+    def MulFindBreak(self, comps: GalComps, theta: float, radius: list) -> float:
+        "return the break radius evaluated at different effective radius"
+
+
+        brads = np.array([])
+
+        maskgal = (comps.Active == True) #using active components only 
+
+
+        for idx, item in enumerate(radius):
+
+            init = item 
+
+            breakrad = scipy.optimize.fmin(self.funGalBreakSer, init, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta))
+
+
+            brads = np.append(brads, breakrad[0])
+
+
+        return brads 
+ 
+
+
 
     def funGalBreakSer(self, R, Ie, Re, n, q, pa, theta):
 
 
         beta = self.BreakSer(R, Ie, Re, n, q, pa, theta)
 
-        gam = self.SlopeSer(R, Ie, Re, n, q, pa, theta)
            
-        kappa = np.abs(beta)/(1 + gam**2)**(3/2)
 
         return beta 
 
