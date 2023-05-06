@@ -41,9 +41,15 @@ def main() -> None:
                         help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components")
 
 
-    parser.add_argument("-ni","--numinitial", type=int, help="Number of component where it'll obtain the initial parameter to search kappa radius, default = 2 ", default=2)
-#    parser.add_argument("-s","--slope", type=float, 
-#                        help="value of slope to find. default=.5 ", default=.5)
+    parser.add_argument("-ni","--numinitial", type=int, help="Number of component where it'll obtain the initial parameter to search break radius or to generated random initial radius. ", default=2)
+
+
+    parser.add_argument("-q","--quick", action="store_true", help='evaluate in position only (given by -ni parameter') 
+
+
+    parser.add_argument("-r","--random", type=int, help="Number of random radius as initial parameters to search for the minimum. It will generated random radius from 0 to effective radius of the component indicated by parameter -ni ")
+
+
 
 
 
@@ -55,7 +61,10 @@ def main() -> None:
 
     eff = args.effrad
     inicomp = args.numinitial
-    #slope = args.slope
+
+    quick = args.quick
+    random = args.random
+
 
     assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
    
@@ -128,13 +137,67 @@ def main() -> None:
     plt.savefig("Kappa.png")
 
 
-    rbreak = GetKappa().FindKappa(comps, theta, inicomp) 
 
-    line = 'The break radius  is {:.2f} pixels \n'.format(rbreak)
-    print(line)
+
+    if quick:
+
+        rbreak = GetBreak().FindKappa(comps, theta, inicomp) 
+
+        line = 'The Kappa radius  is {:.2f} pixels \n'.format(rbreak)
+        print(line)
+
+    else:
+
+        if random:
+
+            radius = np.random.random(random)*comps.Rad[maskgal][inicomp] 
+            print('The initial search radius are: ',radius)
+
+        else:
+    
+            radius = comps.Rad[maskgal]
+            print('The initial search radius are the effective radius of the components')
+
+
+        rkappa = MulFindKappa(comps, theta, radius) 
+
+        line = 'The Kappa radius  is {:.2f} pixels \n'.format(rkappa)
+        print(line)
+
 
 
     return None
+
+
+def MulFindKappa(comps, theta, radius):
+
+
+    maskgal = (comps.Active == True) 
+
+    radskappa = GetKappa().MulFindKappa(comps, theta, radius) 
+
+    kappas = np.array([])
+
+    print('finding global minium:')
+
+    for r in radskappa:
+
+        kappa = GetKappa().KappaSer(r, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta)
+
+        
+        kappas = np.append(kappas, kappa)
+
+
+    radmask = (radskappa < radius[-1]) #hope it works
+
+    idx = np.where(kappas == min(kappas))  
+
+    
+    return radskappa[idx][0]
+
+
+
+
 
 
 class GalHead():
@@ -692,6 +755,36 @@ class GetKappa:
 
 
         return -kappa 
+
+
+    def MulFindKappa(self, comps: GalComps, theta: float, radius: list) -> float:
+        "return the kappa radius evaluated at different effective radius"
+
+
+        krads = np.array([])
+
+        maskgal = (comps.Active == True) #using only active components 
+
+
+        for idx, item in enumerate(radius):
+
+            init = item 
+
+            kapparad = scipy.optimize.fmin(self.funGalKappaSer, init, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta))
+
+            
+            line = 'Optimized radius: {:.2f} \n '.format(kapparad[0])
+            print(line)
+
+            krads = np.append(krads, kapparad[0])
+
+
+        return krads 
+ 
+
+
+
+
 
 
     def FindSlope(self, comps: GalComps, theta: float, slope: float) -> float:

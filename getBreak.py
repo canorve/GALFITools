@@ -42,8 +42,6 @@ def main() -> None:
 
 
     parser.add_argument("-ni","--numinitial", type=int, help="Number of component where it'll obtain the initial parameter to search break radius or to generated random initial radius. ", default=2)
-#    parser.add_argument("-s","--slope", type=float, 
-#                        help="value of slope to find. default=.5 ", default=.5)
 
 
     parser.add_argument("-q","--quick", action="store_true", help='evaluate in position only (given by -ni parameter') 
@@ -61,7 +59,7 @@ def main() -> None:
 
     eff = args.effrad
     inicomp = args.numinitial
-    #slope = args.slope
+
     quick = args.quick
     random = args.random
 
@@ -147,7 +145,7 @@ def main() -> None:
 
         if random:
 
-            radius = np.random.random(random)*comps.Rad[maskgal][inicomp] #hope it works
+            radius = np.random.random(random)*comps.Rad[maskgal][inicomp] 
             print('The initial search radius are: ',radius)
 
         else:
@@ -748,6 +746,10 @@ class GetBreak:
             init = item 
 
             breakrad = scipy.optimize.fmin(self.funGalBreakSer, init, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta))
+
+
+            line = 'Optimized radius: {:.2f} \n '.format(breakrad[0])
+            print(line)
 
 
             brads = np.append(brads, breakrad[0])
