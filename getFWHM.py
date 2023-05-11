@@ -13,11 +13,15 @@ from scipy.special import gamma, gammainc, gammaincinv
 
 from scipy.optimize import bisect
 
+import matplotlib.pyplot as plt
+
 
 
 #console scripts
 def main() -> None: 
     '''gets the FWHM from a set of Sersics'''
+
+    #reading argument parsing
 
     parser = argparse.ArgumentParser(description = "getFWHM: gets the FWHM from a set of Sersics ")
 
@@ -26,14 +30,26 @@ def main() -> None:
     parser.add_argument("GalfitFile", help = "Galfit File containing the Sersics or gaussians components")
 
     parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
-
     #parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
+
+    parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
+
+    parser.add_argument("-a","--angle", type=float, 
+                        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components")
+
+
+
+
 
     args = parser.parse_args()
 
     galfitFile = args.GalfitFile
     dis = args.dis
-    #sersic = args.sersic
+
+
+   
+    num_comp =  args.numcomp
+
 
 
     head = ReadHead(galfitFile)
@@ -41,31 +57,65 @@ def main() -> None:
 
     galcomps = ReadComps(galfitFile)
 
-
-
-    num_comp = 1 #select galaxy by the number of component 
-    galcomps = SelectGal(galcomps, dis, num_comp)
-  
+    #convert all exp, gaussian and de vaucouleurs to Sersic format
+    comps = conver2Sersic(galcomps) 
 
 
 
-    N = numComps(galcomps,'all')
+    comps.Flux = 10**((-comps.Mag)/2.5)
+
+    k = gammaincinv(2*comps.Exp, 0.5)
+
+    denom1 = (2*np.pi*comps.Rad**2)*(np.exp(k))
+    denom2 = (comps.Exp)*(k**(-2*comps.Exp))
+    denom3 = (gamma(2*comps.Exp))*(comps.AxRat) 
+
+    denom = denom1*denom2*denom3 
+    
+    comps.Ie = comps.Flux/denom
+
+
+
+    comps = SelectGal(comps, dis, num_comp)
+
+    #taking the last component position angle for the whole galaxy
+
+    maskgal = (comps.Active == True) 
+    if args.angle:
+        theta = args.angle
+    else:
+        theta = comps.PosAng[maskgal][-1]  
+
+
+
+
+    N = numComps(comps,'all')
     print('number of model components: ',N)
+
     if N == 0:
-        print('not enough number of components to compute Re')
+        print('not enough number of components to compute FWHM')
         print('exiting..')
         sys.exit(1)
 
-    FWHM, totmag = getFWHM().getFWHMSer(head, galcomps)
-
-    line = 'Total Magnitude of the object: {:.2f} \n'.format(totmag)
+    line = 'Using a theta value of : {:.2f} degrees\n'.format(theta)
     print(line)
 
 
-    line = 'The FWHM is {:.2f} pixels \n'.format(FWHM)
+
+    #########################
+    ### computing the slope
+    #########################
+
+
+
+    fwhm = GetFWHM().FindFWHM(comps, theta) 
+
+    line = 'The FWHM is {:.2f} pixels \n'.format(fwhm)
     print(line)
+
 
     return None
+
 
 class GalHead():
     '''store the header of galfit file'''
@@ -170,7 +220,7 @@ def ReadHead(File: str) -> GalHead:
             except IndexError:
                 galhead.maskimage = "None"
 
-        if tmp[0] == "G)":  # constraints 
+        if tmp[0] == "G)":  # constraints file 
             try:
                 galhead.constraints = tmp[1]
             except IndexError:
@@ -228,6 +278,9 @@ class GalComps:
     skip = np.array([])            #z)  skip model
 
     Active = np.array([])            #activate component  for galaxy
+
+    Ie = np.array([])            # surface brightness at effective radius
+    Flux = np.array([])         # Flux galax  
 
     # store the flags related to parameters
     FreePosX = np.array([])            #1)   
@@ -512,121 +565,182 @@ def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
 
     return galcomps
  
-### Sersic components 
-class getFWHM:
-    '''class to obtain the FWHM of the object'''
-
-    def getFWHMSer(self, galhead: GalHead, galcomps: GalComps) -> float:
-
-        comps = self.conver2Sersic(galcomps)
-
-        maskgal = (comps.Active == True) 
-
-        comps.Flux = 10**((galhead.mgzpt - comps.Mag)/2.5)
-
-        #comps.Flux = 10**((-comps.Mag)/2.5)
-        
-        totFlux = comps.Flux[maskgal].sum()
-
-        totmag = -2.5*np.log10(totFlux) + galhead.mgzpt
-        #totmag = -2.5*np.log10(totFlux) 
-
-
-        comps.Radarc = comps.Rad*galhead.scale
-
-        k = gammaincinv(2*comps.Exp, 0.5)
-
-        denom1 = (2*np.pi*comps.Rad**2)*(np.exp(k))
-        denom2 = (comps.Exp)*(k**(-2*comps.Exp))
-        #denom3 = (gamma(2*comps.Exp))*(comps.AxRat) 
-        denom3 = (gamma(2*comps.Exp))
-        denom = denom1*denom2*denom3 
-        comps.Ie = comps.Flux/denom
-
-        Itot0 = self.Itotser(0, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal])
-
-        Itot0b = (comps.Ie[maskgal]*np.exp(k[maskgal])).sum()
-
-        a = 0
-        b = comps.Rad[maskgal][-1] * 1000  # hope it doesn't crash
-        fwhm = self.solveFWHM(a, b, comps.Ie[maskgal], comps.Rad[maskgal], 
-                comps.Exp[maskgal], Itot0 )
-
-
-        return fwhm, totmag
-
-
-    def conver2Sersic(self, galcomps: GalComps) -> GalComps:
-        ''' function to convert exponential, gaussian params to Sersic params'''
-
-        comps =  copy.deepcopy(galcomps)
-
-        maskdev = (comps.Active == True) & (comps.NameComp == "devauc")
-        maskexp = (comps.Active == True) & (comps.NameComp == "expdisk")
-        maskgas = (comps.Active == True) & (comps.NameComp == "gaussian")
-
-
-        K_GAUSS = 0.6931471805599455 #constant k for gaussian
-        K_EXP = 1.6783469900166612 # constant k for expdisk
-        SIG2FW = 2*np.sqrt(2*np.log(2)) 
-        SQ2 = np.sqrt(2) 
-
-        #for gaussian functions
-        if maskgas.any():
-            comps.Exp[maskgas] = 0.5 
-            comps.Rad[maskgas] = comps.Rad[maskgas]/SIG2FW #converting to sigma 
-            comps.Rad[maskgas] = SQ2*(K_GAUSS**0.5)*comps.Rad[maskgas] #converting to Re 
-
-
-        #for de vaucouleurs
-        if maskdev.any():
-            comps.Exp[maskdev] = 4
-
-        #for exponential disks
-        if maskexp.any():
-            comps.Exp[maskexp] = 1
-            comps.Rad[maskexp] = K_EXP*comps.Rad[maskexp] #converting to Re
-
-
-        return comps
 
 
 
-    def solveFWHM(self, a: float, b: float, Ie: list, Re: list, n: list, Itot0: float) -> float:
-        "return the fwhm of a set of Sersic functions. It uses Bisection"
+def conver2Sersic(galcomps: GalComps) -> GalComps:
+    ''' function to convert exponential, gaussian params to Sersic params'''
 
-        fwhm = bisect(self.funFWHMSer, a, b, args=(Ie, Re, n, Itot0))
+    comps =  copy.deepcopy(galcomps)
 
-        return 2*fwhm 
+    maskdev = comps.NameComp == "devauc"
+    maskexp = comps.NameComp == "expdisk"
+    maskgas = comps.NameComp == "gaussian"
 
-    def funFWHMSer(self, R: float, Ie: list, Re: list, n: list, Itot0: float) -> float:
-        
-        fun = self.Itotser(R, Ie, Re, n) - Itot0/2
+
+    K_GAUSS = 0.6931471805599455 #constant k for gaussian
+    K_EXP = 1.6783469900166612 # constant k for expdisk
+    SQ2 = np.sqrt(2) 
+    SIG2FW = 2*np.sqrt(2*np.log(2)) 
+
+    #for gaussian functions
+    if maskgas.any():
+        comps.Exp[maskgas] = 0.5 
+        comps.Rad[maskgas] = comps.Rad[maskgas]/SIG2FW#converting to sigma 
+        comps.Rad[maskgas] = SQ2*(K_GAUSS**0.5)*comps.Rad[maskgas] #converting to Re 
+
+
+    #for de vaucouleurs
+    if maskdev.any():
+        comps.Exp[maskdev] = 4
+
+    #for exponential disks
+    if maskexp.any():
+        comps.Exp[maskexp] = 1
+        comps.Rad[maskexp] = K_EXP*comps.Rad[maskexp] #converting to Re
+
+
+    return comps
+
+
+
+class GetFWHM:
+    '''class to obtain the FWHM for the whole galaxy'''
+
+
+
+    def FullFWHMSer(self, R: float, Re: list, n: list, q: list, pa: list, theta: float) -> float:
+
+
+        SlptotR = self.FWHMSer(R, Re, n, q, pa, theta) 
+
+        return SlptotR.sum()
+
+
+    def GalFWHM(self, R: list, comps: GalComps, theta: float) -> float:
+
+        maskgal = (comps.Active == True) #using active components only 
+
+        gam = np.array([])
+
+        for r in R:
+
+            slp = self.FWHM(r, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta)
+            gam = np.append(gam, slp)
+
+
+
+        return gam
+
+
+    def funGalFWHMSer(self, R: float, S0: float, Ie: list, Re: list, n: list, q: list, pa: list, theta: float) -> float:
+
+
+        fun = self.FWHMSer(R, Ie, Re, n, q, pa, theta)  -  S0/2  
+
 
         return fun
+     
 
 
-    def Itotser(self, R: float, Ie: list, Re: list, n: list) -> float:
+
+    def FindFWHM(self, comps: GalComps, theta: float) -> float:
+        "return the fwhm of a set of Sersic functions. It uses Bisection"
+
+        maskgal = (comps.Active == True) #using active components only 
+
+        #find the surface brightness at S(R=0)
+        X = self.var_X(0, comps.Rad[maskgal], comps.Exp[maskgal])
+        S0 = self.var_S(0, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], X)
+ 
 
 
-        ItotR = self.Iser(R, Ie, Re, n) 
 
-        return ItotR.sum()
+        a = 0.001 
+        b = comps.Rad[maskgal][-1] * 10  # hope it doesn't crash
+
+        Radslp = bisect(self.funGalFWHMSer, a, b, args=(S0,comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta ))
+
+        return 2*Radslp 
 
 
-    def Iser(self, R: float, Ie: list, Re: list, n: list) -> float:
-        '''sersic Surface brightness to a determined R'''
-        
+    def var_X(self, R: float, Re: list, n: list):
+
         k = gammaincinv(2*n, 0.5)
 
-        X = k*(R/Re)**(1/n) 
+        varx = k*((R/Re)**(1/n) - 1)
 
-        Ir = Ie*np.exp(k)*np.exp(-X)
-        
+        return varx
 
-        return Ir
+    def var_Xprim(self, R: float, Re: list, n: list):
 
-      
+        k = gammaincinv(2*n, 0.5)
+
+        varxpr = (k/n)*((R/Re)**(1/n - 1))*(1/Re) 
+
+        return varxpr
+
+    def var_S(self, R: float, Ie: list,  Re: list, n: list, X: list):
+
+        S = Ie*np.exp(-X)
+
+        return S.sum()
+
+    def var_Sprim(self, R: float, Ie: list,  Re: list, n: list, X: list, Xprim: list):
+
+        Sprim = Ie*np.exp(-X)*Xprim
+
+        return Sprim.sum()
+
+    def FWHMSer(self, R: float, Ie: list, Re: list, n: list, q: list, pa: list, theta: float) -> float:
+        '''I(R) from sersic function to a determined R'''
+            
+        Rcor = GetRadAng(R, q, pa, theta) 
+
+        X = self.var_X(Rcor, Re, n)
+        #Xprim = self.var_Xprim(Rcor, Re, n)
+
+        S = self.var_S(Rcor, Ie,  Re, n, X)
+        #Sprim = self.var_Sprim(Rcor, Ie,  Re, n, X, Xprim)
+
+        Ifwhm = S 
+
+
+        return Ifwhm 
+
+
+
+
+def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
+    '''Given an ellipse and an angle it returns the radius in angle direction. 
+    Theta are the values for the galaxy and the others for every component'''
+
+
+    #changing measured angle from y-axis to x-axis
+    # and changing to rads:
+    newpa = (pa + 90)*np.pi/180 #angle of every component
+    theta = (theta + 90)*np.pi/180 #angle of direction of R 
+
+    #bim = q * R
+
+    ecc = np.sqrt(1 - q**2)
+
+    alpha = theta - newpa #this is the direction 
+
+
+    bell =  R*np.sqrt(1 - (ecc*np.cos(alpha))**2)
+
+
+    aell = bell/q  #rad to evalue for every component
+
+
+
+    return aell 
+
+
+
+
+
 
 
 #############################################################################
