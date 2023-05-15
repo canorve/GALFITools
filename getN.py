@@ -131,15 +131,15 @@ def main() -> None:
 
     sersic2 = GetN().ReRfrac(EffRad, EffRadfrac, frac)
 
-    line = 'Sersic index with the method of effective radius: {:.2f}  \n'.format(sersic2)
+    line = 'Sersic index with the method of fraction of light at {:.2f}: {:.2f}  \n'.format(frac,sersic2)
     print(line)
 
 
 
     #computing the Sersic indexes for different radius
 
-    Fa = np.arange(0.1, .45, .05)
-    Fb = np.arange(.55,.9,.05)
+    Fa = np.arange(0.1, .5, .05)
+    Fb = np.arange(.55,.95,.05)
     F = np.concatenate((Fa,Fb))
 
     R = GetReff().GetRfracSer(head, comps, F, theta)
@@ -157,10 +157,14 @@ def main() -> None:
     plt.savefig("Serind.png")
 
 
-    print("Sersic index evaluated at different fraction of light radius: ")
-    print(ns)
+    print("Sersic index computed at different fraction of light radius: ")
 
-    line = 'Sersic index mean: {:.2f}  Standard deviation: {:.2f}  \n'.format(np.mean(ns),np.std(ns))
+
+    for idx, item in enumerate(F):
+        line = 'Fraction of light: {:.2f} ; Sersic index: {:.2f} '.format(F[idx],ns[idx])
+        print(line)
+
+    line = '\nSersic index mean: {:.2f}  Standard deviation: {:.2f}  '.format(np.mean(ns),np.std(ns))
     print(line)
 
 
