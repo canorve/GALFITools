@@ -136,11 +136,63 @@ def main() -> None:
 
 
 
+    #computing the Sersic indexes for different radius
+
+    Fa = np.arange(0.1, .45, .05)
+    Fb = np.arange(.55,.9,.05)
+    F = np.concatenate((Fa,Fb))
+
+    R = GetReff().GetRfracSer(head, comps, F, theta)
+
+
+
+    ns = GetN().GalNs(EffRad, R, F) 
+
+
+    plt.plot(F, ns)
+    plt.grid(True)
+    plt.minorticks_on()
+    plt.xlabel("Fraction of light")
+    plt.ylabel("Sersic index")
+    plt.savefig("Serind.png")
+
+
+    print("Sersic index evaluated at different fraction of light radius: ")
+    print(ns)
+
+    line = 'Sersic index mean: {:.2f}  Standard deviation: {:.2f}  \n'.format(np.mean(ns),np.std(ns))
+    print(line)
+
+
+    
+
+
     return None
 
 
 class GetN:
     '''Class to compute the Sersic index from photometric parameters'''
+
+
+
+    def GalNs(self, EffRad, EffRadfrac, F):
+
+
+
+        sers = np.array([])
+
+        for idx, f in  enumerate(F):
+
+
+            n = self.ReRfrac(EffRad, EffRadfrac[idx], f)
+
+            sers = np.append(sers, n)
+
+
+
+        return sers 
+
+
 
 
 
@@ -748,6 +800,28 @@ def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
 ### Sersic components 
 class GetReff:
     '''class to obtain the effective radius for the whole galaxy'''
+
+
+    def GetRfracSer(self, head, comps, F, theta):
+
+
+
+        rads = np.array([])
+
+        for f in F:
+
+
+            r, totmag = GetReff().GetReSer(head, comps, f, theta)
+
+            rads = np.append(rads, r)
+
+
+
+        return rads 
+
+
+
+
 
     def GetReSer(self, galhead: GalHead, comps: GalComps, eff: float, theta: float) -> float:
 
