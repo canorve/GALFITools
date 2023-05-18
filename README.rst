@@ -36,6 +36,10 @@ GALFITools
 
     A library of useful scripts for GALFIT
 
+GALFITools is a collection of Python
+scripts that improve the input and 
+output analysis of GALFIT.
+
 
 This is a set of routines which help the GALFIT's  user to make 
 masks, cut stars, create multiple initial parameters, simulate 
