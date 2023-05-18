@@ -13,11 +13,15 @@ from scipy.special import gamma, gammainc, gammaincinv
 
 from scipy.optimize import bisect
 
+import matplotlib.pyplot as plt
+
 
 
 #console scripts
 def main() -> None: 
     '''gets the effective radius from a set of Sersics'''
+
+    #reading arguments parsing
 
     parser = argparse.ArgumentParser(description = "getReComp: gets the effective radius from a set of Sersics ")
 
@@ -31,17 +35,25 @@ def main() -> None:
 
     #parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
 
+    parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
+
+    parser.add_argument("-pa","--angle", type=float, 
+                        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components. Angle measured from Y-Axis as same as GALFIT. ")
+
+
+
+
+
     args = parser.parse_args()
 
     galfitFile = args.GalfitFile
     dis = args.dis
-    #sersic = args.sersic
 
     eff = args.effrad
 
-    
-
     assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
+   
+    num_comp =  args.numcomp
 
 
     head = ReadHead(galfitFile)
@@ -49,31 +61,128 @@ def main() -> None:
 
     galcomps = ReadComps(galfitFile)
 
-
-
-    num_comp = 1 #select galaxy by the number of component 
     galcomps = SelectGal(galcomps, dis, num_comp)
-  
+
+    #taking the last component position angle for the whole galaxy
+
+    maskgal = (galcomps.Active == True) 
+    if args.angle:
+        theta = args.angle
+    else:
+        theta = galcomps.PosAng[maskgal][-1]  
+
+    #theta = 18.2534 
 
 
+    #convert all exp, gaussian and de vaucouleurs to Sersic format
+    comps = conver2Sersic(galcomps) 
 
-    N = numComps(galcomps,'all')
+
+    N = numComps(comps,'all')
     print('number of model components: ',N)
+
     if N == 0:
         print('not enough number of components to compute Re')
         print('exiting..')
         sys.exit(1)
 
-    EffRad, totmag = GetReff().GetReSer(head, galcomps, eff)
+    line = 'Using a theta value of : {:.2f} degrees \n'.format(theta)
+    print(line)
 
-    line = 'Total Magnitude of the galaxy: {:.2f} pixels \n'.format(totmag)
+
+
+    EffRad, totmag = GetReff().GetReSer(head, comps, eff, theta)
+
+    line = 'Total Magnitude of the galaxy: {:.2f} \n'.format(totmag)
     print(line)
 
 
     line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
     print(line)
 
+    meanme = GetMe().MeanMe(totmag, EffRad*head.scale)
+    me = GetMe().Me(head, comps, EffRad*head.scale, theta)
+
+    line = 'Mean Surface Brightness at effective radius: {:.2f} mag/\" \n'.format(meanme)
+    print(line)
+
+
+    line = 'Surface brightness at effective radius {:.2f} mag/\" \n'.format(me)
+    print(line)
+
+
+
     return None
+
+
+
+class GetMe:
+    '''Class to obtain the surface brightness at effective radius'''
+
+    def MeanMe(self, magtot: float, effrad: float) -> float:
+
+        meanme = magtot + 2.5*np.log10(2*np.pi*effrad**2)
+
+        return meanme
+
+
+    def Me(self, head, comps, EffRad, theta):
+
+        comps.Rad = comps.Rad*head.scale
+        comps.Flux = 10**((-comps.Mag)/2.5)
+
+        k = gammaincinv(2*comps.Exp, 0.5)
+
+        denom1 = (2*np.pi*comps.Rad**2)*(np.exp(k))
+        denom2 = (comps.Exp)*(k**(-2*comps.Exp))
+        #denom3 = (gamma(2*comps.Exp))*(comps.AxRat) 
+        denom3 = (gamma(2*comps.Exp))
+
+        denom = denom1*denom2*denom3 
+        
+        comps.Ie = comps.Flux/denom
+
+
+        maskgal = (comps.Active == True) 
+        Itotr = self.Itotser(EffRad, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta) 
+
+        me = -2.5*np.log10(Itotr)
+
+        return me
+
+     
+    def Itotser(self, R: float, Ie: list, rad: list, n: list, q: list, pa: list, theta: float) -> float:
+
+        ItotR = self.Iser(R, Ie, rad, n, q, pa, theta) 
+
+        return ItotR.sum()
+
+
+
+    def Iser(self, R: float, Ie: list, Re: list, n: list, q: list, pa: list, theta: float) -> float:
+        '''sersic flux to a determined R'''
+
+
+        k = gammaincinv(2*n, 0.5)
+
+        Rcor = GetRadAng(R, q, pa, theta) 
+
+        Ir = Ie*np.exp(-k*((Rcor/Re)**(1/n) - 1))
+
+        
+        return Ir
+
+
+
+
+
+
+
+
+
+
+
+
 
 class GalHead():
     '''store the header of galfit file'''
@@ -178,7 +287,7 @@ def ReadHead(File: str) -> GalHead:
             except IndexError:
                 galhead.maskimage = "None"
 
-        if tmp[0] == "G)":  # constraints 
+        if tmp[0] == "G)":  # constraints
             try:
                 galhead.constraints = tmp[1]
             except IndexError:
@@ -520,106 +629,142 @@ def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
 
     return galcomps
  
+
+
 ### Sersic components 
 class GetReff:
     '''class to obtain the effective radius for the whole galaxy'''
 
-    def GetReSer(self, galhead: GalHead, galcomps: GalComps, eff: float) -> float:
+    def GetReSer(self, galhead: GalHead, comps: GalComps, eff: float, theta: float) -> float:
 
-        comps = self.conver2Sersic(galcomps)
 
         maskgal = (comps.Active == True) 
 
         comps.Flux = 10**((galhead.mgzpt - comps.Mag)/2.5)
 
-        
         totFlux = comps.Flux[maskgal].sum()
 
         totmag = -2.5*np.log10(totFlux) + galhead.mgzpt
 
         a = 0.1
         b = comps.Rad[maskgal][-1] * 1000  # hope it doesn't crash
-        
+
         Reff = self.solveSerRe(a, b, comps.Flux[maskgal], comps.Rad[maskgal], 
-                comps.Exp[maskgal], totFlux, eff)
+                comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], totFlux, eff, theta)
 
 
         return Reff, totmag
 
 
-    def conver2Sersic(self, galcomps: GalComps) -> GalComps:
-        ''' function to convert exponential, gaussian params to Sersic params'''
 
-        comps =  copy.deepcopy(galcomps)
-
-        maskdev = (comps.Active == True) & (comps.NameComp == "devauc")
-        maskexp = (comps.Active == True) & (comps.NameComp == "expdisk")
-        maskgas = (comps.Active == True) & (comps.NameComp == "gaussian")
-
-
-        K_GAUSS = 0.6931471805599455 #constant k for gaussian
-        K_EXP = 1.6783469900166612 # constant k for expdisk
-        SQ2 = np.sqrt(2) 
-        SIG2FW = 2*np.sqrt(2*np.log(2)) 
-
-        #for gaussian functions
-        if maskgas.any():
-            comps.Exp[maskgas] = 0.5 
-            comps.Rad[maskgas] = comps.Rad[maskgas]/SIG2FW #converting to sigma 
-            comps.Rad[maskgas] = SQ2*(K_GAUSS**0.5)*comps.Rad[maskgas] #converting to Re 
-
-
-        #for de vaucouleurs
-        if maskdev.any():
-            comps.Exp[maskdev] = 4
-
-        #for exponential disks
-        if maskexp.any():
-            comps.Exp[maskexp] = 1
-            comps.Rad[maskexp] = K_EXP*comps.Rad[maskexp] #converting to Re
-
-
-
-        return comps
-
-
-
-
-    def solveSerRe(self, a: float, b: float, flux: list, rad: list, n: list, totFlux: float, eff: float) -> float:
+    def solveSerRe(self, a: float, b: float, flux: list, rad: list, n: list, q: list, pa: list, totFlux: float, eff: float, theta: float) -> float:
         "return the Re of a set of Sersic functions. It uses Bisection"
 
 
-        Re = bisect(self.funReSer, a, b, args=(flux, rad, n, totFlux, eff))
+        Re = bisect(self.funReSer, a, b, args=(flux, rad, n, q, pa, totFlux, eff, theta))
 
         return Re
 
-    def funReSer(self, R: float, flux: list, rad: list, n: list, totFlux: float, eff: float) -> float:
+
+    def funReSer(self, R: float, flux: list, rad: list, n: list, q: list, pa: list, totFlux: float, eff: float, theta: float) -> float:
         
 
-        fun = self.Ftotser(R, flux, rad, n) - totFlux*eff
+        fun = self.Ftotser(R, flux, rad, n, q, pa, theta) - totFlux*eff
 
         return fun
      
-    def Ftotser(self, R: float, flux: list, rad: list, n: list) -> float:
+    def Ftotser(self, R: float, flux: list, rad: list, n: list, q: list, pa: list, theta: float) -> float:
 
-        ftotR = self.Fser(R, flux, rad, n) 
+        ftotR = self.Fser(R, flux, rad, n, q, pa, theta) 
 
         return ftotR.sum()
 
 
 
-    def Fser(self, R: float, Flux: list, Re: list, n: list) -> float:
+    def Fser(self, R: float, Flux: list, Re: list, n: list, q: list, pa: list, theta: float) -> float:
         '''sersic flux to a determined R'''
         
         k = gammaincinv(2*n, 0.5)
 
-        X = k*(R/Re)**(1/n) 
+        Rcor = GetRadAng(R, q, pa, theta) 
+
+        X = k*(Rcor/Re)**(1/n) 
 
         Fr = Flux*gammainc(2*n, X) 
         
         return Fr
 
-      
+
+
+def conver2Sersic(galcomps: GalComps) -> GalComps:
+    ''' function to convert exponential, gaussian params to Sersic params'''
+
+    comps =  copy.deepcopy(galcomps)
+
+    maskdev = comps.NameComp == "devauc"
+    maskexp = comps.NameComp == "expdisk"
+    maskgas = comps.NameComp == "gaussian"
+
+
+    K_GAUSS = 0.6931471805599455 #constant k for gaussian
+    K_EXP = 1.6783469900166612 # constant k for expdisk
+    SQ2 = np.sqrt(2) 
+    SIG2FW = 2*np.sqrt(2*np.log(2)) 
+
+    #for gaussian functions
+    if maskgas.any():
+        comps.Exp[maskgas] = 0.5 
+        comps.Rad[maskgas] = comps.Rad[maskgas]/SIG2FW #converting to sigma 
+        comps.Rad[maskgas] = SQ2*(K_GAUSS**0.5)*comps.Rad[maskgas] #converting to Re 
+
+
+    #for de vaucouleurs
+    if maskdev.any():
+        comps.Exp[maskdev] = 4
+
+    #for exponential disks
+    if maskexp.any():
+        comps.Exp[maskexp] = 1
+        comps.Rad[maskexp] = K_EXP*comps.Rad[maskexp] #converting to Re
+
+
+    return comps
+
+
+
+
+
+def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
+    '''Given an ellipse and an angle it returns the radius in angle direction. 
+    Theta are the values for the galaxy and the others for every component'''
+
+
+
+    #changing measured angle from y-axis to x-axis
+    # and changing to rads:
+    newpa = (pa + 90)*np.pi/180 #angle of every component
+    theta = (theta + 90)*np.pi/180 #angle of direction of R 
+
+    #bim = q * R
+
+    ecc = np.sqrt(1 - q**2)
+
+    alpha = theta - newpa #this is the direction 
+
+
+    bell =  R*np.sqrt(1 - (ecc*np.cos(alpha))**2)
+
+
+    aell = bell/q  #rad to evalue for every component
+
+
+
+    return aell 
+
+
+
+
+
 
 
 #############################################################################
