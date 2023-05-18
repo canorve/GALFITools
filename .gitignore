@@ -48,6 +48,12 @@ docs/_build/*
 cover/*
 MANIFEST
 
+
+.gitignore
+.coveragerc
+.readthedocs.yml
+
+
 # Per-project virtualenvs
 .venv*/
 .conda*/
