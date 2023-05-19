@@ -19,7 +19,6 @@ import matplotlib.pyplot as plt
 
 #console scripts
 def main() -> None: 
-    '''gets the slope radius from a set of Sersics'''
 
     #reading argument parsing
 
@@ -55,11 +54,18 @@ def main() -> None:
     eff = args.effrad
     slope = args.slope
 
-    assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
-   
     num_comp =  args.numcomp
 
+    angle = args.angle
+   
+    getSlope(galfitFile, dis, eff, slope, angle, num_comp)
 
+
+def getSlope(galfitFile: str, dis: int, eff: float, slope: float, angle: float, num_comp: int)-> float:
+    '''gets the slope radius from a set of Sersics'''
+
+
+    assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
 
     head = ReadHead(galfitFile)
 
@@ -90,8 +96,9 @@ def main() -> None:
     #taking the last component position angle for the whole galaxy
 
     maskgal = (comps.Active == True) 
-    if args.angle:
-        theta = args.angle
+
+    if angle:
+        theta = angle
     else:
         theta = comps.PosAng[maskgal][-1]  
 

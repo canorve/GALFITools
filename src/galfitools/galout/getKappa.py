@@ -19,7 +19,6 @@ import matplotlib.pyplot as plt
 
 #console scripts
 def main() -> None: 
-    '''gets the Kappa radius from a set of Sersics'''
 
     #reading argument parsing
 
@@ -50,10 +49,6 @@ def main() -> None:
     parser.add_argument("-r","--random", type=int, help="Number of random radius as initial parameters to search for the minimum. It will generated random radius from 0 to effective radius of the component indicated by parameter -ni ")
 
 
-
-
-
-
     args = parser.parse_args()
 
     galfitFile = args.GalfitFile
@@ -64,11 +59,22 @@ def main() -> None:
 
     quick = args.quick
     random = args.random
+    angle = args.angle
+
+
+    num_comp =  args.numcomp
+
+
+    getKappa(galfitFile, dis, eff, inicomp, quick, random, angle, num_comp) 
+
+def getKappa(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, random: int, angle: float, num_comp: int) -> float:
+    '''gets the Kappa radius from a set of Sersics'''
+
+
 
 
     assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
    
-    num_comp =  args.numcomp
 
 
 
@@ -100,8 +106,8 @@ def main() -> None:
     #taking the last component position angle for the whole galaxy
 
     maskgal = (comps.Active == True) 
-    if args.angle:
-        theta = args.angle
+    if angle:
+        theta = angle
     else:
         theta = comps.PosAng[maskgal][-1]  
 
@@ -166,7 +172,7 @@ def main() -> None:
 
 
 
-    return None
+    return rkappa 
 
 
 def MulFindKappa(comps, theta, radius):

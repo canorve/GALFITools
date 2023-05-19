@@ -19,7 +19,6 @@ import matplotlib.pyplot as plt
 
 #console scripts
 def main() -> None: 
-    '''gets the break radius from a set of Sersics'''
 
     #reading argument parsing
 
@@ -63,9 +62,19 @@ def main() -> None:
     quick = args.quick
     random = args.random
 
+    num_comp =  args.numcomp
+
+
+    getBreak(galfitfile, dis, eff, inicomp, quick, random, num_comp)
+
+
+
+def getBreak(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, random: int, num_comp: int)-> float:
+    '''gets the break radius from a set of Sersics'''
+
+
     assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
    
-    num_comp =  args.numcomp
 
 
 
@@ -161,7 +170,7 @@ def main() -> None:
 
 
 
-    return None
+    return rbreak 
 
 
 def MulFindBreak(comps, theta, radius):

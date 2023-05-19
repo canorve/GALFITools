@@ -19,10 +19,8 @@ import matplotlib.pyplot as plt
 
 #console scripts
 def main() -> None: 
-    '''gets the effective radius from a set of Sersics'''
 
     #reading arguments parsing
-
     parser = argparse.ArgumentParser(description = "getReComp: gets the effective radius from a set of Sersics ")
 
 
@@ -42,20 +40,24 @@ def main() -> None:
 
 
 
-
-
     args = parser.parse_args()
+
 
     galfitFile = args.GalfitFile
     dis = args.dis
-
     eff = args.effrad
+    num_comp =  args.numcomp
+    angle = args.angle
+
+    getReComp(galfitFile, dis, eff, angle, num_comp)
+
+
+
+def getReComp(galfitFile: str, dis: int, eff: float, angle: float, num_comp: int)-> float:
+    '''gets the effective radius from a set of Sersics'''
+
 
     assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
-   
-    num_comp =  args.numcomp
-
-
     head = ReadHead(galfitFile)
 
 
@@ -66,8 +68,8 @@ def main() -> None:
     #taking the last component position angle for the whole galaxy
 
     maskgal = (galcomps.Active == True) 
-    if args.angle:
-        theta = args.angle
+    if angle:
+        theta = angle
     else:
         theta = galcomps.PosAng[maskgal][-1]  
 

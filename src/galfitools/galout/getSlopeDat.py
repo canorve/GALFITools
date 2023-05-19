@@ -23,7 +23,7 @@ def main() -> None:
 
     #reading argument parsing
 
-    parser = argparse.ArgumentParser(description = "getSlopeDat: gets the slope an store in a file ")
+    parser = argparse.ArgumentParser(description = "getSlopeDat: gets the slope and store it in a file ")
 
 
     # required arguments

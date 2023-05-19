@@ -28,16 +28,10 @@ def main():
     parser.add_argument("-co","--contrast", type=float, 
                         help="contrast of the image. Only for galaxy and model. Default = 1. Preferible range goes from 0 to 1",default=1)
 
-
-
     parser.add_argument("-cm","--cmap", type=str, help="cmap to be used for the cube image ",default="viridis")
-
     parser.add_argument("-dpi","--dotsinch", type=int, help="dots per inch used for images files ",default=100)
     parser.add_argument("-s","--scale", type=float, help="plate scale of the image. Default = 1",default=1)
-
-
     parser.add_argument("-np","--noplot", action="store_true", help="it doesn\'t show plotting window")
-
 
     args = parser.parse_args()
 
@@ -51,11 +45,18 @@ def main():
     noplot = args.noplot
 
 
+    displayCube(cubeimage, namecube, dpival, brightness, contrast, cmap, scale, noplot)
+
+
+
+
+def displayCube(cubeimage: str, namecube: str, dpival; int, brightness: float, contrast:float, cmap: str, scale: float, noplot: bool) -> None:
+
+
     ######################
     #shows the image cube#
     ######################{
 
-    linewidth = 1.2
 
     ell=[]
 
@@ -187,7 +188,6 @@ class ShowCube:
         data[mask] = 1 # avoids problems in log
      
         fig, (ax1, ax2, ax3) = plt.subplots(figsize=(14, 5), nrows = 1, ncols = 3)
-        fig.subplots_adjust(left=0.04, right=0.98, bottom=0.02, top=0.98)
 
         im = ax1.imshow(newdata, origin ='lower', interpolation='nearest', norm 
                     = colors.LogNorm(vmin=modmin, vmax=modmax), cmap = cmap)
@@ -235,7 +235,7 @@ class ShowCube:
         ax3.imshow(residual, origin='lower', vmin = resmin, vmax = resmax, cmap = cmap)
         ax3.set_title('Residual')
 
-
+        fig.subplots_adjust(left=0.04, right=0.98, bottom=0.02, top=0.98)
         plt.savefig(namepng, dpi = dpival)
     
 

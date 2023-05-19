@@ -19,7 +19,6 @@ import matplotlib.pyplot as plt
 
 #console scripts
 def main() -> None: 
-    '''gets the effective radius from a set of Sersics'''
 
     #reading arguments parsing
 
@@ -54,6 +53,18 @@ def main() -> None:
 
     frac = args.radfrac
 
+
+    angle = args.angle
+
+
+    getN(galfitFile, dis, frac, angle, num_comp)
+
+
+
+def getN(galfitFile: str, dis: int, frac: float, angle: float, num_comp: int) -> float:
+    '''gets the effective radius from a set of Sersics'''
+
+
     # init variables
 
 
@@ -69,8 +80,8 @@ def main() -> None:
     #taking the last component position angle for the whole galaxy
 
     maskgal = (galcomps.Active == True) 
-    if args.angle:
-        theta = args.angle
+    if angle:
+        theta = angle
     else:
         theta = galcomps.PosAng[maskgal][-1]  
 
@@ -169,9 +180,9 @@ def main() -> None:
 
 
     
+    #separate in two functions:
 
-
-    return None
+    return sersic, np.mean(ns), np.std(ns) 
 
 
 class GetN:

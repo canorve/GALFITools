@@ -19,7 +19,6 @@ import matplotlib.pyplot as plt
 
 #console scripts
 def main() -> None: 
-    '''gets the FWHM from a set of Sersics'''
 
     #reading argument parsing
 
@@ -45,11 +44,17 @@ def main() -> None:
 
     galfitFile = args.GalfitFile
     dis = args.dis
+    angle = args.angle
 
 
    
     num_comp =  args.numcomp
 
+    getFWHM(galfitFile, dis, angle, num_comp)
+
+
+def getFWHM(galfitFile: str, dis: int, angle: float, num_comp: int):
+    '''gets the FWHM from a set of Sersics'''
 
 
     head = ReadHead(galfitFile)
@@ -81,8 +86,9 @@ def main() -> None:
     #taking the last component position angle for the whole galaxy
 
     maskgal = (comps.Active == True) 
-    if args.angle:
-        theta = args.angle
+
+    if angle:
+        theta = angle
     else:
         theta = comps.PosAng[maskgal][-1]  
 
