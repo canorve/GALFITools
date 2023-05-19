@@ -45,6 +45,14 @@ def main():
     imgname= sys.argv[1]
     maskimage= sys.argv[2]
 
+
+    Sky(imgname, maskimage, filereg, xmin, xmax, ymin, ymax)
+
+
+def Sky(imgname, maskimage, filereg, xmin, xmax, ymin, ymax) -> None:
+
+
+
     ################################################
     ################################################
 

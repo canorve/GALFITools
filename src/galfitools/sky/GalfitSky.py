@@ -40,6 +40,7 @@ def main():
     mgzpt= sys.argv[2]
     mgzpt=np.float(mgzpt)
 
+
 ################################################
 ################################################
 
@@ -83,6 +84,13 @@ def main():
 
 ################################
 
+
+
+    galfitSky(imgname, maskfile, mgzpt, scale, X, Y)
+
+
+def galfitSky(imgname, maskfile, mgzpt, scale, X, Y)-> None:
+    
 
 
 
