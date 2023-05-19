@@ -79,10 +79,20 @@ def main():
     freeser = args.freeser
     freesky = args.freesky
 
+    regu = args.regu
 
     initgauss = args.initgauss
 
     numgauss = args.numgauss 
+
+
+    mge2gal(image, regfile, magzpt, twist, regu, center, maskfile, psf, sky, scale, gauss, psfile, sigfile, freeser, freesky, regu, initgauss, numgauss) 
+
+
+
+def mge2gal(image, regfile, magzpt, twist, regu, center, maskfile, psf, sky, scale, gauss, psfile, sigfile, freeser, freesky, regu, initgauss, numgauss) -> None:
+
+
 
 
     mgeoutfile="mgegas.txt"
@@ -92,7 +102,7 @@ def main():
     convboxy=100
     
 
-    if args.regu:
+    if regu:
         try:
             from mgefit.mge_fit_sectors_twist_regularized import mge_fit_sectors_twist_regularized 
         except: 
