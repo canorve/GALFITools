@@ -30,6 +30,18 @@ def main():
     scale = float(scale)
 
 
+
+
+    MakeMask(sexfile, image, maskfile, scale, satfileout)
+    
+
+
+
+def MakeMask(sexfile: str, image: str, maskfile: str, scale: float, satfileout: str) -> None:
+
+
+
+
     sexarsort   = "sexsort.cat"
 
     satscale = 1
@@ -58,6 +70,8 @@ def main():
     MakeSatBox(maskfile, satfileout, Total + 1, NCol, NRow) #make sat region
 
     print("Done. Mask image created ")
+
+
 
 def ds9satbox (satfileout,output,satscale,satoffset):
     "Creates a file for ds9 which selects bad saturated regions"

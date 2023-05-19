@@ -48,6 +48,13 @@ def main():
     sigma = args.sigma
     sigout = args.sigout
 
+    getStar(image, regfile, imsize, center, sky, imout, sigma, sigout)
+
+
+
+def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imout: str, sigma: str sigout: str)-> None: 
+
+
 
     ##########################################
     ######Internal flags #####################

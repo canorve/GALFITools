@@ -35,6 +35,10 @@ def main():
     fill = args.fill
     image = args.image
 
+
+
+def MaskDs9(MaskFile: str, RegFile: str, fill: bool, image: str) -> None:
+
     if not os.path.exists(MaskFile):
 
         print ('%s: image filename does not exist!' %(sys.argv[1]))
