@@ -23,6 +23,12 @@ def main():
 
     newimage = sys.argv[5]
 
+    MakeSim(image, GAIN, skymean, skystd, newimage)
+
+
+
+
+def MakeSim(image, GAIN, skymean, skystd, newimage)-> None: 
 
 
     sizex,sizey =GetAxis(image) 
