@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import UnivariateSpline
 import numpy as np
 
+#check modify
 
 #rad,me=np.genfromtxt("Blackout.txt",unpack=True)
 rad,me=np.genfromtxt("Blueout.txt",unpack=True)

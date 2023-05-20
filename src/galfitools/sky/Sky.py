@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 
 # computes sky 
 
+#check modify argparse
+#introducir sky box y sky ring
 def main():
 
 

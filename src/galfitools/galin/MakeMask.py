@@ -12,6 +12,9 @@ import scipy
 # a combination of two runs of Sextractor with
 # different configuration parameters
 
+
+
+#check modify
 def main():
 
     if len(sys.argv[1:]) != 5:

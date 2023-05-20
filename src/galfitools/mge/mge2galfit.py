@@ -25,7 +25,7 @@ from mgefit.mge_fit_sectors_regularized import mge_fit_sectors_regularized
 
 import argparse
 
-
+#check modify: remove initgauss
 def main():
 
     parser = argparse.ArgumentParser(description="fits mge of Cappellari and formats to GALFIT")

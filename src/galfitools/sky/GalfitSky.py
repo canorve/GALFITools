@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 
 # computes sky using GALFIT
 
+#check modify argparse
 def main():
 
 

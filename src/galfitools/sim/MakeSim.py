@@ -6,7 +6,7 @@ import sys
 from astropy.io import fits
 
 
-
+#check modidy argparse 
 def main():
 
     if len(sys.argv[1:]) != 5:

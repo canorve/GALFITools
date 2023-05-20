@@ -16,9 +16,10 @@
 
 
 
-from ellipsect.lib.libs import *
+from astropy.io import fits
+import numpy as np
 
-from ellipsect import *
+from astropy import fits
 
 
 import copy
