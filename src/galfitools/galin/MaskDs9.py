@@ -240,13 +240,14 @@ def MakePolygon(Image,fill,tupVerts,ncol,nrow):
 
 
 
+
 def MakeBox(Image,fill,xpos,ypos,rx,ry,angle,ncol,nrow):
     "Make a box in an image"
 
-    xlo = xpos - rx/2.
+    xlo = xpos - rx/2 + 1.
     xhi = xpos + rx/2.
 
-    ylo = ypos - ry/2.
+    ylo = ypos - ry/2 + 1.
     yhi = ypos + ry/2.
 
     if xlo  < 1:
@@ -255,10 +256,10 @@ def MakeBox(Image,fill,xpos,ypos,rx,ry,angle,ncol,nrow):
         ylo = 1
 
     if xhi  > ncol:
-        xhi = ncol 
+        xhi = ncol - 1 
  
     if yhi  > nrow:
-        yhi = nrow
+        yhi = nrow - 1
  
     xlo=int(np.round(xlo))
     xhi=int(np.round(xhi))
@@ -266,7 +267,7 @@ def MakeBox(Image,fill,xpos,ypos,rx,ry,angle,ncol,nrow):
     ylo=int(np.round(ylo))
     yhi=int(np.round(yhi))
 
-    Image[ylo-1:yhi,xlo-1:xhi]=fill
+    Image[ylo - 1: yhi + 1, xlo - 1: xhi + 1] = fill
 
     return Image
 
@@ -379,7 +380,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 
     mask = xmax > ncol
     if mask.any():
-        xmax = ncol
+        xmax = ncol - 1
 
     mask = ymin < 1
     if mask.any():
@@ -387,7 +388,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 
     mask = ymax > nrow
     if mask.any():
-        ymax = nrow
+        ymax = nrow - 1
 
     return (round(xmin), round(xmax), round(ymin), round(ymax))
 
