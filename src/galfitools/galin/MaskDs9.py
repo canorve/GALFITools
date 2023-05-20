@@ -47,7 +47,7 @@ def MaskDs9(MaskFile: str, RegFile: str, fill: bool, image: str) -> None:
         hdu=fits.PrimaryHDU()
 
         if image:
-            (ncol, nrow) = GetAxis(image)
+            (nx, ny) = GetAxis(image)
         else:
             nx = input("enter numbers of pixels in X ") 
             ny = input("enter numbers of pixels in Y ") 
