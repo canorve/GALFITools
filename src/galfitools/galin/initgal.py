@@ -12,11 +12,9 @@ from pathlib import Path
 
 def main(): 
 
-    #check modify
 
 
-
-        #parser argument section
+   #parser argument section
 
     parser = argparse.ArgumentParser(description="Creates GALFIT's input files with different initial parameters")
 

@@ -7,6 +7,7 @@ import subprocess as sp
 from astropy.io import fits
 import os.path
 import scipy
+import argparse
 
 # This program creates a catalog of Sextractor with
 # a combination of two runs of Sextractor with
@@ -17,20 +18,28 @@ import scipy
 #check modify
 def main():
 
-    if len(sys.argv[1:]) != 5:
-        print ('Missing arguments')
-        print ("Usage:\n %s [SexFile] [ImageFile] [MaskFileOut] [scale] [SatDs9File]" % sys.argv[0])
-        print ("Example:\n %s sex.cat image.fits mask.fits 1.5 sat.reg" % sys.argv[0])
-        sys.exit()
 
-    sexfile= sys.argv[1]
-    image= sys.argv[2]
-    maskfile= sys.argv[3]
-    scale= sys.argv[4]
-    satfileout= sys.argv[5]
+    parser = argparse.ArgumentParser(description="creates mask file from a catalog of Sextractor")
+
+    parser.add_argument("Sexfile", help="Sextractor catalog file ")
+    parser.add_argument("ImageFile", help="Image file")
+
+    parser.add_argument("-o","--maskout", type=str, help="the output mask file name  ",default='masksex.fits')
+    parser.add_argument("-sf","--satds9", type=str, help="ds9 saturation file",default='ds9sat.reg')
+        
+    parser.add_argument("-s","--scale", type=float, help="scale factor to increase the ellipses",)
+ 
 
 
-    scale = float(scale)
+    args = parser.parse_args()
+
+
+    sexfile = args.Sexfile 
+    image = args.ImageFile  
+    maskfile = args.maskout  
+    scale = args.scale 
+    satfileout = args.satds9
+
 
 
 
