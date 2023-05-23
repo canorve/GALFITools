@@ -50,6 +50,13 @@ def main():
 
     getStar(image, regfile, imsize, center, sky, imout, sigma, sigout)
 
+    print("Done. Object fits file: {} created ".format(imout))
+
+
+    if sigma:
+        GetFits(sigma, sigout, 0, xlo, xhi, ylo, yhi)
+        print("Done. sigma fits file: {} created ".format(imout))
+
 
 
 def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imout: str, sigma: str sigout: str)-> None: 
@@ -120,13 +127,6 @@ def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imo
 
     GetFits(image, imout, sky, xlo, xhi, ylo, yhi)
 
-
-    print("Done. Object fits file: {} created ".format(imout))
-
-
-    if sigma:
-        GetFits(sigma, sigout, 0, xlo, xhi, ylo, yhi)
-        print("Done. sigma fits file: {} created ".format(imout))
 
 ####################################################
 ####################################################
