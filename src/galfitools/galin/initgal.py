@@ -10,7 +10,7 @@ from pathlib import Path
 # code to make init galfit files 
 
 
-def main(): 
+def mainInitGal(): 
 
 
 
@@ -326,6 +326,6 @@ class InitGal:
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
 if __name__ == '__main__':
-  main()
+  mainInitGal()
 
 

@@ -10,7 +10,7 @@ import os.path
 import argparse
 
 
-def main_getStar():
+def mainGetStar():
 
     parser = argparse.ArgumentParser(description="gets a image slice centered on the object peak")
 
@@ -340,4 +340,4 @@ def GetPmax(image, mask, xmin, xmax, ymin, ymax):
 ##############################################################################
 
 if __name__ == '__main__':
-    main_getStar()
+    mainGetStar()

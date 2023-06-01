@@ -12,12 +12,11 @@ from shapely.geometry import Point, Polygon
 
 
 
-# programa que hace parches (mascaras) en una seccion de una imagen FITS
 
-def main(): 
+def mainMaskDs9(): 
 
 
-    parser = argparse.ArgumentParser(description="creates (or modify) a mask image for GALFIT from a Ds9 region file: Box, Ellipses and Polygons ")
+    parser = argparse.ArgumentParser(description="creates (or modify) a mask image for GALFIT using Ds9 regions such as Boxes, Ellipses and Polygons ")
 
     parser.add_argument("MaskFile", help="the Mask image file to modify or create")
     parser.add_argument("RegFile", help="the DS9 region file")
@@ -34,6 +33,13 @@ def main():
     RegFile = args.RegFile 
     fill = args.fill
     image = args.image
+
+
+
+    MaskDs9(MaskFile, RegFile, fill, image) 
+
+    print('Done. Mask {} created (or modified)'.format(MaskFile))
+
 
 
 
@@ -407,6 +413,6 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
 if __name__ == '__main__':
-  main()
+  mainMaskDs9()
 
 
