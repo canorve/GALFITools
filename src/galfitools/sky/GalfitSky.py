@@ -11,6 +11,9 @@ import scipy
 import scipy.special
 import matplotlib.pyplot as plt
 
+
+import argparse
+
 #import mgefit
 #from mgefit.find_galaxy import find_galaxy
 #from mgefit.mge_fit_1d import mge_fit_1d
@@ -24,66 +27,32 @@ import matplotlib.pyplot as plt
 #check modify argparse
 def main():
 
+    parser = argparse.ArgumentParser(description="computes the sky using GALFIT")
 
-    if len(sys.argv[1:]) == 0 or len(sys.argv[1:]) == 1 or len(sys.argv[1:]) == 2:
-        print ('Missing arguments')
-        print ("Usage:\n %s [ImageFile] [Magzpt] [--s scale] [--X x] [--Y y]" % sys.argv[0])
-        print ("Example:\n %s image.fits 25 --s 1.5" % sys.argv[0])
-        print ("Example:\n %s image.fits 25 --s 1.5 --X 353 --Y 245" % sys.argv[0])
-
-        sys.exit()
-
-    flagpos=False
-
-    imgname= sys.argv[1]
-    maskfile= "masksky.fits"
-
-    mgzpt= sys.argv[2]
-    mgzpt=np.float(mgzpt)
+    parser.add_argument("image", help="the image file")
+    parser.add_argument("mask", help="the GALFIT mask file")
 
 
-################################################
-################################################
+    parser.add_argument("-s","--scale", type=float, help="the plate scale. default = 1", default=1)
 
-    flagx=False
-    flagy=False
-    flagscale=False
+    parser.add_argument("-zp","--mgzpt", type=float, help="the magnitud zero point. default=25",default = 25)
 
-    OptionHandleList = ['--X',"--Y","--s"]
-    options = {}
-    for OptionHandle in OptionHandleList:
-        options[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)] if OptionHandle in sys.argv else None
-    if options['X'] != None:
-        flagx=True
-    if options['Y'] != None:
-        flagy=True
-    if options['s'] != None:
-        flagscale=True
-
-    if flagx == True:
-        opt={}
-        OptionHandle="--X"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        X=np.int(opt['X'])
-
-    if flagy == True:
-        opt={}
-        OptionHandle="--Y"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        Y=np.int(opt['Y'])
-
-    if flagscale == True:
-        opt={}
-        OptionHandle="--s"
-        opt[OptionHandle[2:]] = sys.argv[sys.argv.index(OptionHandle)+1]
-        scale=np.float(opt['s'])
+    parser.add_argument("-x","--xpos", type=float, help="the x position. default=1",default = 1)
+    parser.add_argument("-y","--ypos", type=float, help="the y position. default=1",default = 1)
 
 
-#    scale= sys.argv[3]
-#    scale = np.float(scale)
 
+    args = parser.parse_args()
 
-################################
+    imgname =  args.image
+    maskfile = args.mask 
+
+    mgzpt = args.mgzpt 
+    scale = args.scale
+
+    X = args.xpos
+    Y = args.ypos
+
 
 
 
@@ -93,6 +62,7 @@ def main():
 def galfitSky(imgname, maskfile, mgzpt, scale, X, Y)-> None:
     
 
+    flagpos=False
 
 
     sexfile = "sim.cat"
