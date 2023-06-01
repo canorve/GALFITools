@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 
-
-import os
 import numpy as np
 from astropy.io import fits
 import sys
@@ -12,7 +10,7 @@ import os.path
 import argparse
 
 
-def main():
+def main_getStar():
 
     parser = argparse.ArgumentParser(description="gets a image slice centered on the object peak")
 
@@ -53,14 +51,9 @@ def main():
     print("Done. Object fits file: {} created ".format(imout))
 
 
-    if sigma:
-        GetFits(sigma, sigout, 0, xlo, xhi, ylo, yhi)
-        print("Done. sigma fits file: {} created ".format(imout))
-
 
 
 def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imout: str, sigma: str sigout: str)-> None: 
-
 
 
     ##########################################
@@ -126,6 +119,11 @@ def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imo
 
 
     GetFits(image, imout, sky, xlo, xhi, ylo, yhi)
+
+    if sigma:
+        GetFits(sigma, sigout, 0, xlo, xhi, ylo, yhi)
+        print("Done. sigma fits file: {} created ".format(imout))
+
 
 
 ####################################################
@@ -342,4 +340,4 @@ def GetPmax(image, mask, xmin, xmax, ymin, ymax):
 ##############################################################################
 
 if __name__ == '__main__':
-    main()
+    main_getStar()
