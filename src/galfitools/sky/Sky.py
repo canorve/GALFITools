@@ -15,6 +15,8 @@ import matplotlib.pyplot as plt
 
 #check modify argparse
 #introducir sky box y sky ring
+#use maskds9 para obtener los pixeles de las regiones
+
 def main():
 
 

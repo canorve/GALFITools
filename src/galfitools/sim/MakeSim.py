@@ -5,23 +5,37 @@ import matplotlib.pyplot as plt
 import sys
 from astropy.io import fits
 
+import argparse
 
 #check modidy argparse 
 def main():
 
-    if len(sys.argv[1:]) != 5:
-        print ('Missing arguments')
-        print ("Usage:\n %s [ImageFile] [GAIN] [skymean] [skystd] [newimage]" % sys.argv[0])
-        print ("Example:\n %s mod.fits 10 0.11 3.2 sim.fits " % sys.argv[0])
-        sys.exit()
 
-    image = sys.argv[1]
-    GAIN = float(sys.argv[2])
+    parser = argparse.ArgumentParser(description="simulates a observed galaxy from a GALFIT model")
 
-    skymean= float(sys.argv[3])
-    skystd =  float(sys.argv[4])
+    parser.add_argument("image", help="the GALFIT galaxy model")
+    parser.add_argument("newimage", help="the name of the new galaxy image")
 
-    newimage = sys.argv[5]
+
+    parser.add_argument("-s","--sky", type=float, help="the sky background value. default = 0", default=0)
+    parser.add_argument("-std","--std", type=float, help="the sky standard deviation. default = 1", default=1)
+
+    parser.add_argument("-g","--gain", type=float, help="the gain value of the image. default =  1", default=1)
+
+
+
+    args = parser.parse_args()
+
+    image = args.image 
+    GAIN = args.gain 
+
+    skymean = args.sky
+    skystd = args.std 
+
+    newimage = args.newimage 
+
+
+
 
     MakeSim(image, GAIN, skymean, skystd, newimage)
 
