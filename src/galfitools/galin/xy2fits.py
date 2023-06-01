@@ -13,22 +13,8 @@ import argparse
 # code to convert ASCII xy positions to FTIS mask 
 
 
-def main(): 
+def mainxy2fits(): 
 
-
-    args = ReadParser()
-
-    ImageFile= args.ImageFile
-    AsciiFile= args.AsciiMask
-    Value = args.val 
-
-    xy2fits().MakeFits(ImageFile, AsciiFile, Value)
-
-
-def ReadParser():
-
-
-    #parser argument section
 
     parser = argparse.ArgumentParser(description="code to convert ASCII x,y positions to FTIS mask")
 
@@ -39,19 +25,29 @@ def ReadParser():
     args = parser.parse_args()
 
 
-    return args
+
+
+    ImageFile= args.ImageFile
+    AsciiFile= args.AsciiMask
+    Value = args.val 
+
+    xy2fits().MakeFits(ImageFile, AsciiFile, Value)
+
+    print("Ascii -> Fits done ")
+
 
 
 class xy2fits:
 
 
-    def MakeFits(self,ImageFile, AsciiFile, Value):
+    def MakeFits(self, ImageFile, AsciiFile, Value):
         
-        (tmp)=AsciiFile.split(".")
 
-        namefile=tmp[0]
+        root_ext = os.path.splitext(AsciiFile)
+        namefile = root_ext[0]
 
-        maskfits=namefile + ".fits"
+
+        maskfits = namefile + ".fits"
 
 
         (ncol, nrow) = self.GetAxis(ImageFile)
@@ -69,7 +65,6 @@ class xy2fits:
 
         self.PutPix(X,Y,Value,maskfits)
 
-        print("Ascii -> Fits done ")
 
         return maskfits
 
@@ -122,21 +117,6 @@ class xy2fits:
 
 
 
-#############################################################################
-######################### End of program  ###################################
-#     ______________________________________________________________________
-#    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
-#   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
-#   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/|
-#   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
-#   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/|
-#   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
-#   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
-##############################################################################
-
-
-
-
 
 
 
@@ -153,6 +133,6 @@ class xy2fits:
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
 if __name__ == '__main__':
-  main()
+  mainxy2fits()
 
 
