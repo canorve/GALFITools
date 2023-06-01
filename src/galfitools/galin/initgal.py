@@ -54,13 +54,10 @@ def main():
     numcomp = args.numcomp
 
 
-    InitGal(GalfitFile: str, number: int, param3: float, param4: float, param5: float, param6: float, param7: float, param8: float, param9: float, param10: float, numcomp: int)
+    InitGal(GalfitFile, number, param3, param4, param5, param6, param7, param8, param9, param10, numcomp)
 
 
-
-
-
-
+    print("rungalfit.sh has been created")
 
 
 
@@ -68,7 +65,7 @@ def main():
 class InitGal:
 
 
-    def __init__(self, GalfitFile, number, param3, param4, param5, param6, param7, param8, param9, param10, numcomp):
+    def __init__(self, GalfitFile: str, number: int, param3: float, param4: float, param5: float, param6: float, param7: float, param8: float, param9: float, param10: float, numcomp: int):
 
         self.GalfitFile = GalfitFile 
         self.number = number
@@ -87,7 +84,6 @@ class InitGal:
         self.MakeParams()
         self.MakeBash()
 
-        print("rungalfit.sh has been created")
 
 
 
