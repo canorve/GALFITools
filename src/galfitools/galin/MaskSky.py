@@ -14,11 +14,9 @@ import matplotlib.pyplot as plt
 import argparse
 
 
-# programa que hace parches (mascaras) en una seccion de una imagen FITS
 
-def main(): 
+def mainMaskSky(): 
 
-    bor_flag = False
 
     parser = argparse.ArgumentParser(description="creates a mask image for GALFIT using original image and sky mean and sigma")
 
@@ -45,6 +43,8 @@ def main():
 
 
     SkyRem(image, mask, sky_mean, sky_sig, nsig, borValue, bor_flag)
+
+    print('Done. Mask file {} created'.format(mask))
 
 #################################################################
 #################################################################
@@ -162,6 +162,6 @@ def MakeImage(newfits, sizex, sizey):
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
 if __name__ == '__main__':
-  main()
+  mainMaskSky()
 
 
