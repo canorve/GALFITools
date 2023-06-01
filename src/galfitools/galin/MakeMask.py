@@ -9,14 +9,9 @@ import os.path
 import scipy
 import argparse
 
-# This program creates a catalog of Sextractor with
-# a combination of two runs of Sextractor with
-# different configuration parameters
 
 
-
-#check modify
-def main():
+def mainMakeMask():
 
 
     parser = argparse.ArgumentParser(description="creates mask file from a catalog of Sextractor")
@@ -44,13 +39,13 @@ def main():
 
 
 
-    MakeMask(sexfile, image, maskfile, scale, satfileout)
+    MakeMaskFiles(sexfile, image, maskfile, scale, satfileout)
     
 
+    print("Done. Mask image created ")
 
 
-def MakeMask(sexfile: str, image: str, maskfile: str, scale: float, satfileout: str) -> None:
-
+def MakeMaskFiles(sexfile: str, image: str, maskfile: str, scale: float, satfileout: str) -> None:
 
 
 
@@ -74,14 +69,13 @@ def MakeMask(sexfile: str, image: str, maskfile: str, scale: float, satfileout: 
         ds9satbox(satfileout,sexfile,satscale,satoffset) # crea archivo  Saturacion reg
 
 
-##### segmentation mask
+    ##### segmentation mask
 
     MakeImage(maskfile, NCol, NRow)
 
     MakeMask(maskfile, sexarsort, scale, 0, satfileout)  # offset set to 0
     MakeSatBox(maskfile, satfileout, Total + 1, NCol, NRow) #make sat region
 
-    print("Done. Mask image created ")
 
 
 
@@ -150,7 +144,7 @@ def ds9satbox (satfileout,output,satscale,satoffset):
 
 def MakeMask(maskimage, catfile, scale, offset, regfile):
     "Create a mask image using ellipses for every Object of catfile. Now includes offset"
-# k Check
+    # k Check
 
     checkflag = 0
     flagsat = 4  # flag value when object is saturated (or close to)
@@ -203,7 +197,7 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
 def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     "This subroutine create a Kron ellipse within a box defined by: xmin, xmax, ymin, ymax"
 
-# Check
+    # Check
 
     xmin = np.int(xmin)
     xmax = np.int(xmax)
@@ -248,9 +242,9 @@ def MakeSatBox(maskimage, region, val, ncol, nrow):
     "Create a mask for saturated regions"
     "Regions must be in DS9 box regions format"
 
-# k Check
+    # k Check
 
-#	fileflag=1
+    #	fileflag=1
 
     hdu = fits.open(maskimage)
     img = hdu[0].data
@@ -258,8 +252,6 @@ def MakeSatBox(maskimage, region, val, ncol, nrow):
     with open(region) as f_in:
 
         next(f_in)
-#        next(f_in)
-#        next(f_in)
 
         # All lines including the blank ones
         lines = (line.rstrip() for line in f_in)
@@ -325,7 +317,7 @@ def MakeSatBox(maskimage, region, val, ncol, nrow):
 
 def MakeImage(newfits, sizex, sizey):
     "create a new blank Image"
-# k Check
+    # k Check
     if os.path.isfile(newfits):
         print("{} deleted; a new one is created \n".format(newfits))
     hdu = fits.PrimaryHDU()
@@ -426,7 +418,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 
     theta = theta * (np.pi / 180)  # rads!!
 
-# getting size
+    # getting size
 
     xmin = x - np.sqrt((R**2) * (np.cos(theta))**2 +
                        (bim**2) * (np.sin(theta))**2)
@@ -501,9 +493,8 @@ def CheckFlag(val,check,max):
 
 def CheckSatReg(x,y,filein,R,theta,ell):
    "Check if object is inside of saturated region. returns True if at least one pixel is inside"
-## check if object is inside of
-## saturaded region as indicated by ds9 box region
-## returns 1 if object center is in saturaded region
+    ## saturaded region as indicated by ds9 box region
+    ## returns 1 if object center is in saturaded region
 
 
    q = (1 - ell)
@@ -584,7 +575,6 @@ def CheckSatReg(x,y,filein,R,theta,ell):
 
 
 
-
 #end of program
 if __name__ == '__main__':
-    main()
+    mainMakeMask()
