@@ -7,7 +7,6 @@ from astropy.io import fits
 
 import argparse
 
-#check modidy argparse 
 def main():
 
 
