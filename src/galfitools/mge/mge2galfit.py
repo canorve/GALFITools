@@ -60,6 +60,14 @@ def main():
 
     args = parser.parse_args()
 
+
+    mge2gal(args) 
+
+
+
+def mge2gal(args) -> None:
+
+
     image = args.image
     regfile = args.Ds9regFile 
     magzpt = args.magzpt
@@ -84,14 +92,6 @@ def main():
     initgauss = args.initgauss
 
     numgauss = args.numgauss 
-
-
-    mge2gal(image, regfile, magzpt, twist, regu, center, maskfile, psf, sky, scale, gauss, psfile, sigfile, freeser, freesky, regu, initgauss, numgauss) 
-
-
-
-def mge2gal(image, regfile, magzpt, twist, regu, center, maskfile, psf, sky, scale, gauss, psfile, sigfile, freeser, freesky, regu, initgauss, numgauss) -> None:
-
 
 
 
