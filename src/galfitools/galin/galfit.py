@@ -592,19 +592,26 @@ def numParFree(galcomps: GalComps) -> int:
 
 
 
-
-def numComps(galcomps: GalComps, name: str = 'none') -> int:
+def numComps(galcomps: GalComps, name: str) -> int:
     '''obtains the number of components'''
 
-    if name == 'none':
-        nummask = (galcomps.Active == True) 
-        N = galcomps.Active[nummask].size
+
+    if name == 'all':
+        nummask = (galcomps.Active == True) & ( (galcomps.NameComp == 'sersic') 
+                    | (galcomps.NameComp == 'expdisk') | (galcomps.NameComp == 'gaussian')
+                    | (galcomps.NameComp == 'devauc'))
 
     else:
         nummask = (galcomps.Active == True) & (galcomps.NameComp == name)
-        N = galcomps.Active[nummask].size
+
+
+
+
+    N = galcomps.Active[nummask].size
 
     return N
+
+
 
 
 
