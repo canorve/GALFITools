@@ -16,9 +16,8 @@ from scipy.optimize import bisect, fmin
 import matplotlib.pyplot as plt
 
 
-#from GALFITools.galin import 
+from galfitools.galin.galfit import Galfit, conver2sersic, SelectGal, numComps
 
-# getSlope.py 
 
 #console scripts
 def mainGetBreak() -> None: 
@@ -67,22 +66,29 @@ def mainGetBreak() -> None:
 
     num_comp =  args.numcomp
 
+    angle = args.angle
 
-    getBreak(galfitfile, dis, eff, inicomp, quick, random, num_comp)
+
+    getBreak(galfitfile, dis, eff, inicomp, quick, random, num_comp, angle)
 
 
-def getBreak(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, random: int, num_comp: int)-> float:
+def getBreak(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, random: int, num_comp: int, angle: float)-> float:
     '''gets the break radius from a set of Sersics'''
 
 
     assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
    
 
+    #head = ReadHead(galfitFile)
+    #galcomps = ReadComps(galfitFile)
 
 
-    head = ReadHead(galfitFile)
+    galfit = Galfit(galfitFile)
 
-    galcomps = ReadComps(galfitFile)
+    head = galfit.ReadHead()
+    galcomps = galfit.ReadComps()
+
+
 
     #convert all exp, gaussian and de vaucouleurs to Sersic format
     comps = conver2Sersic(galcomps) 
@@ -108,8 +114,9 @@ def getBreak(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, r
     #taking the last component position angle for the whole galaxy
 
     maskgal = (comps.Active == True) 
-    if args.angle:
-        theta = args.angle
+
+    if angle:
+        theta = angle
     else:
         theta = comps.PosAng[maskgal][-1]  
 
@@ -224,8 +231,6 @@ class GetBreak:
         for r in R:
 
             beta = self.BreakSer(r, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta)
-
-
 
             kappa = np.append(kappa, beta)
 
@@ -429,10 +434,16 @@ def getFWHM(galfitFile: str, dis: int, angle: float, num_comp: int):
     '''gets the FWHM from a set of Sersics'''
 
 
-    head = ReadHead(galfitFile)
+    #head = ReadHead(galfitFile)
+    #galcomps = ReadComps(galfitFile)
 
 
-    galcomps = ReadComps(galfitFile)
+    galfit = Galfit(galfitFile)
+
+    head = galfit.ReadHead()
+    galcomps = galfit.ReadComps()
+ 
+
 
     #convert all exp, gaussian and de vaucouleurs to Sersic format
     comps = conver2Sersic(galcomps) 
@@ -667,9 +678,18 @@ def getKappa(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, r
 
 
 
-    head = ReadHead(galfitFile)
+    #head = ReadHead(galfitFile)
+    #galcomps = ReadComps(galfitFile)
 
-    galcomps = ReadComps(galfitFile)
+
+    galfit = Galfit(galfitFile)
+
+    head = galfit.ReadHead()
+    galcomps = galfit.ReadComps()
+ 
+
+
+
 
     #convert all exp, gaussian and de vaucouleurs to Sersic format
     comps = conver2Sersic(galcomps) 
@@ -1031,10 +1051,20 @@ def getReComp(galfitFile: str, dis: int, eff: float, angle: float, num_comp: int
 
 
     assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
-    head = ReadHead(galfitFile)
 
 
-    galcomps = ReadComps(galfitFile)
+
+    #head = ReadHead(galfitFile)
+    #galcomps = ReadComps(galfitFile)
+
+    galfit = Galfit(galfitFile)
+
+    head = galfit.ReadHead()
+    galcomps = galfit.ReadComps()
+ 
+
+
+
 
     galcomps = SelectGal(galcomps, dis, num_comp)
 
@@ -1268,11 +1298,14 @@ def getSlope(galfitFile: str, dis: int, eff: float, slope: float, angle: float, 
 
     assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
 
-    head = ReadHead(galfitFile)
+    #head = ReadHead(galfitFile)
+    #galcomps = ReadComps(galfitFile)
 
+    galfit = Galfit(galfitFile)
 
-    galcomps = ReadComps(galfitFile)
-
+    head = galfit.ReadHead()
+    galcomps = galfit.ReadComps()
+ 
     #convert all exp, gaussian and de vaucouleurs to Sersic format
     comps = conver2Sersic(galcomps) 
 
