@@ -11,14 +11,21 @@ import scipy
 import scipy.special
 import matplotlib.pyplot as plt
 
-# computes sky 
 
-#check modify argparse
+import argparse
+
 #introducir sky box y sky ring
 #use maskds9 para obtener los pixeles de las regiones
 
 def main():
 
+
+    parser = argparse.ArgumentParser(description="computes sky from a ds9 region box file")
+
+    parser.add_argument("image", help="the Mask image file to modify or create")
+    parser.add_argument("maskfile", help="the Mask image file to modify or create")
+    parser.add_argument("Ds9regFile", help="the DS9 ellipse region file containing the galaxy")
+ 
 
     if len(sys.argv[1:]) != 2 and len(sys.argv[1:]) != 6 and len(sys.argv[1:]) != 3:
         print ('Missing arguments')
@@ -43,20 +50,28 @@ def main():
     if len(sys.argv[1:]) == 3:
         flagreg=True
         filereg=sys.argv[3]
-        xlo,xhi,ylo,yhi=GetRegionDs9(filereg)
 
    
-    imgname= sys.argv[1]
-    maskimage= sys.argv[2]
+    args = parser.parse_args()
+
+    imgname = args.image 
+    maskimage = args.maskfile 
+    filereg = args.Ds9regFile
 
 
-    Sky(imgname, maskimage, filereg, xmin, xmax, ymin, ymax)
+    mean, sig = Sky(imgname, maskimage, filereg)
+
+    print("Sky within 3 sigma:") 
+
+    print("mean sky: {:.3f} ".format(mean))
+    print("std sky: {:.3f} ".format(sig))
 
 
-def Sky(imgname, maskimage, filereg, xmin, xmax, ymin, ymax) -> None:
+def Sky(imgname, maskimage, filereg) -> None:
 
 
 
+    xlo,xhi,ylo,yhi = GetRegionDs9(filereg)
     ################################################
     ################################################
 
@@ -84,44 +99,45 @@ def Sky(imgname, maskimage, filereg, xmin, xmax, ymin, ymax) -> None:
 
 
 
-    print("mean sky: {:.3f} ".format(img.mean()))
-    print("std sky: {:.3f} ".format(img.std()))
+    #print("mean sky: {:.3f} ".format(img.mean()))
+    #print("std sky: {:.3f} ".format(img.std()))
     #print("rms sky: {:.3f} ".format(rms(img)))
 
 
-    print("Excluding the top and bottom 20%:") 
+    #print("Excluding the top and bottom 20%:") 
  
-    flatimg=img.flatten()  
+    flatimg = img.flatten()  
     flatimg.sort()
 
-    tot=len(flatimg)
+    tot = len(flatimg)
 
-    top=round(.8*tot)
-    bot=round(.2*tot)
+    top = round(.8*tot)
+    bot = round(.2*tot)
 
-    img2=flatimg[bot:top]
+    img2 = flatimg[bot:top]
 
-    mean=img2.mean()
-    sig=img2.std()
+    mean = img2.mean()
+    sig = img2.std()
 
-    print("mean sky: {:.3f} ".format(mean))
-    print("std sky: {:.3f} ".format(sig))
 
-    print("Sky within 5 sigma:") 
+    return mean, sig
 
-    img3=img2.copy()
 
-    mask2  = np.abs(img3 - mean) <= 5* sig 
+    #print("mean sky: {:.3f} ".format(mean))
+    #print("std sky: {:.3f} ".format(sig))
 
-    print("mean sky: {:.3f} ".format(img3[mask2].mean()))
-    print("std sky: {:.3f} ".format(img3[mask2].std()))
+
+    #img3=img2.copy()
+
+    #mask2  = np.abs(img3 - mean) <= 3* sig 
+
+    #msky = img3[mask2].mean()
+    #ssky = img3[mask2].std()
+
+    #return msky, ssky 
     
 
 
-
-####################################
-#####################################
-######################################
 
 def rms(array):
    return np.sqrt(np.mean(array ** 2))
