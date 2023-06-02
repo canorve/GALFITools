@@ -579,6 +579,170 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,ellconf,scale):
     return xran,yran,axret
 
 
+
+## class for parameters
+class EllipSectConfig:
+
+    #flags
+    flaglogx=False
+    flagq=False
+    flagpa=False
+    flagcomp=False
+    flagpix=False
+    flagranx=False
+    flagrany=False
+    flagnoplot=False
+    flagrid=False
+    flagdpi=False
+    flagsbout=False
+    flagphot=False
+    flagminlevel=False
+    flagsectors=False
+    flagobj=False
+    flagband=False
+    flagweb=False # to check connection to ned
+    flagsnr = False
+    flagchi = False
+
+    flagcheck=False
+    flagned=False
+
+    flagmod=False
+    flagmag=False
+    flagscale=False
+    flagdim=False
+   
+    flagmodel=False
+
+    flagsky=False
+    flagkeep=False
+    flagalax=False
+
+    flagnedfile=False
+
+    flagradsky=False
+    flagrandboxsky=False
+
+
+    flagskyRad = False
+    flagskyRadmax = False
+    flagskybox =  False
+    flagskynum = False
+    flagskywidth = False
+    
+    flagdistmax = False
+
+    flagfwhm = False
+
+    #flagcent = False 
+
+    flagrmsky=True
+
+
+
+    #init
+    xc = 1 
+    yc = 1 
+    inxc=1    #same as above xc but used for input image
+    inyc=1    #same as above yc but used for input image
+ 
+    qarg=1
+    parg=0
+    ranx=1
+    rany=1
+    dplot=True
+
+    dpival=100
+
+    minlevel=0
+    sectors=19
+
+
+
+    #input file
+    galfile= "galfit.01"
+
+    #sb output file
+    sboutput = "sbout.txt"
+
+    #output file
+    output = "out.txt"
+
+    # input image model
+    inputmodel="none.fits"
+
+    # object name to search in NED
+
+    objname="none"
+    band="R"
+
+    InDistMod=0
+    InMagCor=0
+    InScale=1
+    InSbDim=0
+   
+
+    namefile = "none"
+    namepng = "none.png"
+    namesec = "none-gal.png"
+    namemod = "none-mod.png"
+    namemul = "none-mul.png"
+    namesub = "none-sub.fits"
+    namesig = "none-sig.fits"
+    namesnr = "none-snr.fits"
+    namechi = "none-chi.fits"
+    namened = "none-ned.xml"
+    namecheck = "none-check.fits"
+    namering = "none-ring.fits"
+    nameringmask = "none-ringmask.fits"
+
+    namecube = "none-cub.png"
+
+
+    nedfile = "default.xml"
+
+
+    # sky parameters:
+    skylevel = 0
+
+
+    skyRad = 50 # minimum radius
+    skybox = 20
+    skynum = 20
+    skywidth = 20
+
+    fwhm = 2
+
+    distmax = 10
+
+    brightness = 0 
+    contrast = 1 
+
+    cmap="viridis"
+
+
+    numcomp = 1
+    tot = 0 # total number of components
+
+
+    # for computed gradsky
+    gradskymean = 0
+    gradskystd = 0
+    gradskymed = 0
+
+    randskymean = 0
+    randskystd = 0
+    randskymed = 0
+
+    Aext = 0  # surface brightness correction for plots
+
+    hconst = 67.8 
+    omegam  = 0.308
+    omegav = 0.692
+
+
+
+
 if __name__ == '__main__':
 
     mainSbProf()
