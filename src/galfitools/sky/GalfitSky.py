@@ -14,18 +14,10 @@ import matplotlib.pyplot as plt
 
 import argparse
 
-#import mgefit
-#from mgefit.find_galaxy import find_galaxy
-#from mgefit.mge_fit_1d import mge_fit_1d
-#from mgefit.sectors_photometry import sectors_photometry
-#from mgefit.mge_fit_sectors import mge_fit_sectors
-#from mgefit.mge_print_contours import mge_print_contours
-#from mgefit.mge_fit_sectors_twist import mge_fit_sectors_twist
-
 # computes sky using GALFIT
 
 #check modify argparse
-def main():
+def mainGalfitSky():
 
     parser = argparse.ArgumentParser(description="computes the sky using GALFIT")
 
@@ -73,14 +65,14 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y)-> None:
     satoffset = 0
 
 
- # running sextractor
-    eps,theta,xpeak,ypeak,back=Sextractor(imgname)
+     # running sextractor
+    eps,theta,xpeak,ypeak,back = Sextractor(imgname)
 
 
-#    ang=90-ang
-######################
+    #    ang=90-ang
+    ######################
     sky=back
-#################
+    #################
 
     # comparison between different methods
     print(eps,theta,xpeak,ypeak,back)
@@ -98,7 +90,7 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y)-> None:
     ds9satbox(satfileout,sexfile,satscale,satoffset) # crea archivo  Saturacion reg
 
 
-##### segmentation mask
+    ##### segmentation mask
 
     MakeImage(maskfile, NCol, NRow)
 
@@ -107,14 +99,9 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y)-> None:
 
 
 
-#####################333
-###########################
-################################
-#######################333333333333333333333
-
     convbox=100
 
-#    sky=0.55
+    #    sky=0.55
     fit=1
     Z=0
 
@@ -123,13 +110,13 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y)-> None:
     anglegass=35.8
 
 
-#    scale = 0.0455  # arcsec/pixel
+    #    scale = 0.0455  # arcsec/pixel
 
     ###################################################
     #  Create GALFIT input file header to compute sky #
     ###################################################
 
-#    imgname = "ngc4342.fits"
+    #    imgname = "ngc4342.fits"
 
     if imgname.find(".") != -1:
         (TNAM, trash) = imgname.split(".")
@@ -138,69 +125,28 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y)-> None:
 
     exptime = GetExpTime(imgname)
 
-##################
-#################
+    ##################
+    #################
 
     # Here we use an accurate four gaussians MGE PSF for
     # the HST/WFPC2/F814W filter, taken from Table 3 of
     # Cappellari et al. (2002, ApJ, 578, 787)
 
-#    sigmapsf = [0.494, 1.44, 4.71, 13.4]      # In PC1 pixels
-#    normpsf = [0.294, 0.559, 0.0813, 0.0657]  # total(normpsf)=1
+    #    sigmapsf = [0.494, 1.44, 4.71, 13.4]      # In PC1 pixels
+    #    normpsf = [0.294, 0.559, 0.0813, 0.0657]  # total(normpsf)=1
 
-############################
+    ############################
 
     FitBox=6
 
     Num, RA, Dec, XPos, YPos, Mag, Kron, FluxRad, IsoArea, AIm, E, Theta, Background, Class, Flag, XMin, XMax, YMin, YMax, XSMin, XSMax, YSMin, YSMax = np.genfromtxt(
 	    sexarsort, delimiter="", unpack=True)  # sorted
 
-##
-#    Obj.Angle = Obj.Theta - 90
-#    Obj.AR = 1 - Obj.E
-#    Obj.RKron = ParVar.KronScale * Obj.AIm * Obj.Kron
+    ##
+    #    Obj.Angle = Obj.Theta - 90
+    #    Obj.AR = 1 - Obj.E
+    #    Obj.RKron = ParVar.KronScale * Obj.AIm * Obj.Kron
     Sky = Background
-
-#    Obj.Num = Obj.Num.astype(int)
-#    Obj.Flag = Obj.Flag.astype(int)
-
-# other stuff:
-
-#    Tot = len(Obj.Num)
-#    Tot = ParVar.Total
-
-#    Obj.Sersic = [ParVar.NSer] * Tot
-#    Obj.Sersic = np.array(Obj.Sersic)
-
-#    Obj.RSky = ParVar.SkyScale * Obj.AIm * Obj.Kron + ParVar.Offset + ParVar.SkyWidth
-#    Obj.RKron = ParVar.KronScale * Obj.AIm * Obj.Kron
-
-
-#    masky = Obj.RSky <= 0
-#    if masky.any():
-#        Obj.RSky[masky] = 1
-
-#    maskron = Obj.RKron <= 0
-#    if maskron.any():
-#        Obj.RKron[maskron] = 1
-
-#    Obj.SkyFlag = [True] * Tot
-#    Obj.SkyFlag = np.array(Obj.SkyFlag)
-
-#    Obj.Neighbors = Obj.Num
-
-
-# subpanel stuff:
-
-#    Obj.IX = (Obj.XPos / XChunk) + 1
-#    Obj.IY = (Obj.YPos / YChunk) + 1
-
-#    Obj.IX = Obj.IX.astype(int)
-#    Obj.IY = Obj.IY.astype(int)
-
-
-#    XPos = XPos.astype(int)
-#    YPos = YPos.astype(int)
 
 
     XMin = XMin.astype(int)
@@ -215,65 +161,16 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y)-> None:
 
 
 
-#    maskblkx = Obj.IX > ParVar.Split
-#    if maskblkx.any():
-#        Obj.IX[maskblkx]= Obj.IX[maskblkx] -1
-
-
-#    maskblky = Obj.IY > ParVar.Split
-#    if maskblky.any():
-#        Obj.IY[maskblky]= Obj.IY[maskblky] -1
-
-
-#   Make sure the object coordinate in the subpanel is correct
-
-# create arrays
-
-#    Obj.XBuffer=np.array([0]*Tot)
-#    Obj.YBuffer=np.array([0]*Tot)
-
-
-#    maskix = Obj.IX == 1
-#    if maskix.any():
-#        Obj.XBuffer[maskix] = 0
-
-#    maskix = Obj.IX != 1
-#    if maskix.any():
-#        Obj.XBuffer[maskix] = ParVar.Buffer
-
-#    maskiy = Obj.IY == 1
-#    if maskiy.any():
-#        Obj.YBuffer[maskiy] = 0
-
-#    maskiy = Obj.IY != 1
-#    if maskiy.any():
-#        Obj.YBuffer[maskiy] = ParVar.Buffer
-
-# Obj.OFFX and Obj.OFFY transform coordinates
-#  from big image to tile image --> IM-X-Y.fits
-#    Obj.OFFX = (Obj.IX - 1) * XChunk - Obj.XBuffer
-#    Obj.OFFY = (Obj.IY - 1) * YChunk - Obj.YBuffer
-
-
-##############################################################
-##############################################################
-# creating empty arrays
-
-#    Obj.gXMIN = np.array([0]*Tot)
-#    Obj.gXMAX = np.array([0]*Tot)
-#    Obj.gYMIN = np.array([0]*Tot)
-#    Obj.gYMAX = np.array([0]*Tot)
-
 
     XSize = XMax - XMin
     YSize = YMax - YMin
 
-#   enlarge fit area
+    #   enlarge fit area
 
     XSize = FitBox * XSize
     YSize = FitBox * YSize
 
-##  30 pixels is the minimum area to fit (arbitrary number):
+    ##  30 pixels is the minimum area to fit (arbitrary number):
 
     masksize = XSize < 30
 
@@ -324,7 +221,7 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y)-> None:
     if maskxy.any():
         YHi[maskxy] = NRow
 
-####### find galax
+    ####### find galax
 
     if flagpos == True:
 
@@ -333,7 +230,6 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y)-> None:
         dist=15
 
         for idx, item in enumerate(Num):
-    #        for i in index:
 
             dx= XPos[idx] - X
             dy= YPos[idx] - Y
@@ -357,73 +253,12 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y)-> None:
         yhi=YHi[sindex]
 
 
-#    Background=Background[sindex]
-
-##
-#        Angle = np.abs(Theta)
-#        AR = 1 - E
-#        RKron = KronScale * AIm * Kron
-#        Sky = Background
-
-
-
-#    XPos=np.round(XPos)
-#    YPos=np.round(YPos)
-
-#    XPos=np.int(XPos)
-#    YPos=np.int(YPos)
-
-##########
-
-
-
-
-##################################
-## I have to switch x and y coordinates
-#    xtemp=xpeak
-#    xpeak=ypeak
-#    ypeak=xtemp
-#
-
-
-###########################
-    # Perform galaxy photometry
-#    plt.clf()
-#    print("angulo ", f.theta)
-
-# sextractor
-#    s = sectors_photometry(img, eps, theta, xpeak, ypeak, minlevel=minlevel, plot=1)
-
-# find galaxy
-#    s = sectors_photometry(img, f.eps, f.theta, f.xpeak, f.ypeak, minlevel=minlevel, plot=1)
-
-
-#    plt.pause(2)  # Allow plot to appear on the screen
-
-#    plt.clf()
-#    m = mge_fit_sectors(s.radius, s.angle, s.counts, f.eps,
-#                        ngauss=ngauss, sigmapsf=sigmapsf, normpsf=normpsf,
-#                        scale=scale, plot=1, bulge_disk=0, linear=0)
-
-#    print(len(m.sol.T))
-#    print(len(m.sol))
-
-#    (counts,sigma,axisrat)=m.sol
-
-#    print(counts)
-
-#    print(counts[0],sigma[0],axisrat[0])
-
-####################
-#####################
-
     parfile="sky.txt"
     outname=TNAM
 
     rmsname="none"
     psfname="none"
 
-#    maskfile="none"
     consfile="none"
 
     T1 = "{}".format(imgname)
@@ -437,7 +272,6 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y)-> None:
         (xhi,yhi)=GetAxis(imgname)
 
     plate=1
-#    scale = 0.0455
 
     fout1 = open(parfile, "w")
 
@@ -447,34 +281,6 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y)-> None:
     index = 0
 
     index+=1
-
-#    while index < len(counts):
-
-#        TotCounts = counts[index]
-#        SigPix =  sigma[index]
-#        qobs =  axisrat[index]
-
-
-#        TotCounts=np.float(TotCounts)
-#        SigPix=np.float(SigPix)
-#        qobs=np.float(qobs)
-
-#        C0=TotCounts/(2*np.pi*qobs*SigPix**2)
-
-#        Ftot = 2*np.pi*SigPix**2*C0*qobs
-
-#        mgemag = mgzpt + 0.1  + 2.5*np.log10(exptime)  - 2.5*np.log10(Ftot)
-
-#        FWHM = 2.35482 * SigPix
-
-#        mgesb= mgzpt - 2.5*np.log10(mgecount/exptime) + 2.5*np.log10(plate**2) + 0.1
-
-#        outline = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f}  q: {} \n".format(mgemag, SigPix, FWHM, qobs)
-#        print(outline)
-
-#        PrintGauss(fout1, index, xpos, ypos, mgemag, FWHM, qobs, anglegass, Z, fit)
-
-#        index+=1
 
 
 
@@ -984,7 +790,7 @@ def CheckSatReg(x,y,filein,R,theta,ell):
 
 def Sextractor(filimage):
 
-    sexfile="default.sex"
+    sexfile="../config/default.sex"
     CatSex="sim.cat"
 
     runcmd="sextractor -c {} {} ".format(sexfile,filimage)
@@ -1375,4 +1181,4 @@ def CheckFlag(val, check):
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
 if __name__ == '__main__':
-    main()
+    mainGalfitSky()
