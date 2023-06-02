@@ -13,8 +13,7 @@ from astropy import units as U
 import argparse
 
 
-#check modify
-def main():
+def mainShowCube():
 
 
     parser = argparse.ArgumentParser(description="show the cube fits of the galfit output")
@@ -243,4 +242,4 @@ class ShowCube:
 
 #end of program
 if __name__ == '__main__':
-    main()
+    mainShowCube()
