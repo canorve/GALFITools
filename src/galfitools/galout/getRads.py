@@ -69,7 +69,18 @@ def mainGetBreak() -> None:
     angle = args.angle
 
 
-    getBreak(galfitfile, dis, eff, inicomp, quick, random, num_comp, angle)
+    rbreak, N, theta = getBreak(galfitfile, dis, eff, inicomp, quick, random, num_comp, angle)
+        
+    print('number of model components: ',N)
+
+    line = 'Using a theta value of: {:.2f} degrees\n'.format(theta)
+    print(line)
+
+
+    line = 'The break radius is {:.2f} pixels \n'.format(rbreak)
+    print(line)
+
+
 
 
 def getBreak(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, random: int, num_comp: int, angle: float)-> float:
@@ -124,15 +135,11 @@ def getBreak(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, r
 
 
     N = numComps(comps,'all')
-    print('number of model components: ',N)
 
     if N == 0:
         print('not enough number of components to compute Re')
         print('exiting..')
         sys.exit(1)
-
-    line = 'Using a theta value of : {:.2f} degrees\n'.format(theta)
-    print(line)
 
 
 
@@ -157,29 +164,26 @@ def getBreak(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, r
         rbreak = GetBreak().FindBreak(comps, theta, inicomp) 
 
         line = 'The break radius  is {:.2f} pixels \n'.format(rbreak)
-        print(line)
+        #print(line)
 
     else:
 
         if random:
 
             radius = np.random.random(random)*comps.Rad[maskgal][inicomp] 
-            print('The initial search radius are: ',radius)
+            #print('The initial search radius are: ',radius)
 
         else:
     
             radius = comps.Rad[maskgal]
-            print('The initial search radius are the effective radius of the components')
+            #print('The initial search radius are the effective radius of the components')
 
 
         rbreak = MulFindBreak(comps, theta, radius) 
 
-        line = 'The break radius  is {:.2f} pixels \n'.format(rbreak)
-        print(line)
 
 
-
-    return rbreak 
+    return rbreak, N, theta
 
 
 def MulFindBreak(comps, theta, radius):
@@ -190,7 +194,7 @@ def MulFindBreak(comps, theta, radius):
 
     betas = np.array([])
 
-    print('finding global minium')
+    #print('finding global minium')
 
     for r in radsbreak:
 
@@ -427,7 +431,17 @@ def mainFWHM() -> None:
    
     num_comp =  args.numcomp
 
-    getFWHM(galfitFile, dis, angle, num_comp)
+    fwhm, N, theta = getFWHM(galfitFile, dis, angle, num_comp)
+
+
+    print('number of model components: ',N)
+
+    line = 'Using a theta value of : {:.2f} degrees\n'.format(theta)
+    print(line)
+
+    line = 'The FWHM is {:.2f} pixels \n'.format(fwhm)
+    print(line)
+
 
 
 def getFWHM(galfitFile: str, dis: int, angle: float, num_comp: int):
@@ -479,15 +493,11 @@ def getFWHM(galfitFile: str, dis: int, angle: float, num_comp: int):
 
 
     N = numComps(comps,'all')
-    print('number of model components: ',N)
 
     if N == 0:
         print('not enough number of components to compute FWHM')
         print('exiting..')
         sys.exit(1)
-
-    line = 'Using a theta value of : {:.2f} degrees\n'.format(theta)
-    print(line)
 
 
 
@@ -499,11 +509,8 @@ def getFWHM(galfitFile: str, dis: int, angle: float, num_comp: int):
 
     fwhm = GetFWHM().FindFWHM(comps, theta) 
 
-    line = 'The FWHM is {:.2f} pixels \n'.format(fwhm)
-    print(line)
 
-
-    return None
+    return fwhm, N, theta 
 
 
 
@@ -665,18 +672,21 @@ def mainKappa() -> None:
     num_comp =  args.numcomp
 
 
-    getKappa(galfitFile, dis, eff, inicomp, quick, random, angle, num_comp) 
+    rkappa, N, theta = getKappa(galfitFile, dis, eff, inicomp, quick, random, angle, num_comp) 
+
+    print('number of model components: ',N)
+
+    line = 'The Kappa radius  is {:.2f} pixels \n'.format(rkappa)
+    print(line)
+
+
 
 def getKappa(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, random: int, angle: float, num_comp: int) -> float:
     '''gets the Kappa radius from a set of Sersics'''
 
 
-
-
     assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
    
-
-
 
     #head = ReadHead(galfitFile)
     #galcomps = ReadComps(galfitFile)
@@ -724,7 +734,6 @@ def getKappa(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, r
 
 
     N = numComps(comps,'all')
-    print('number of model components: ',N)
 
     if N == 0:
         print('not enough number of components to compute Re')
@@ -752,36 +761,31 @@ def getKappa(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, r
     plt.savefig("Kappa.png")
 
 
-
-
     if quick:
 
-        rbreak = GetBreak().FindKappa(comps, theta, inicomp) 
+        rkappa = GetKappa().FindKappa(comps, theta, inicomp) 
 
         line = 'The Kappa radius  is {:.2f} pixels \n'.format(rbreak)
-        print(line)
+        #print(line)
 
     else:
 
         if random:
 
             radius = np.random.random(random)*comps.Rad[maskgal][inicomp] 
-            print('The initial search radius are: ',radius)
+            #print('The initial search radius are: ',radius)
 
         else:
     
             radius = comps.Rad[maskgal]
-            print('The initial search radius are the effective radius of the components')
+            #print('The initial search radius are the effective radius of the components')
 
 
         rkappa = MulFindKappa(comps, theta, radius) 
 
-        line = 'The Kappa radius  is {:.2f} pixels \n'.format(rkappa)
-        print(line)
 
 
-
-    return rkappa 
+    return rkappa, N, theta 
 
 
 def MulFindKappa(comps, theta, radius):
@@ -793,7 +797,7 @@ def MulFindKappa(comps, theta, radius):
 
     kappas = np.array([])
 
-    print('finding global minium:')
+    #print('finding global minium:')
 
     for r in radskappa:
 
@@ -910,8 +914,6 @@ class GetKappa:
 
 
 
-
-
     def FindSlope(self, comps: GalComps, theta: float, slope: float) -> float:
         "return the Re of a set of Sersic functions. It uses Bisection"
 
@@ -1005,6 +1007,7 @@ class GetKappa:
         return Slp
 
 
+
 ############################
 ############################
 ############################
@@ -1042,8 +1045,24 @@ def mainGetReComp() -> None:
     num_comp =  args.numcomp
     angle = args.angle
 
-    getReComp(galfitFile, dis, eff, angle, num_comp)
+    Effrad, totmag, meanme, me, N, theta = getReComp(galfitFile, dis, eff, angle, num_comp)
 
+    print('number of model components: ', N)
+
+    line = 'Using a theta value of : {:.2f} degrees \n'.format(theta)
+    print(line)
+
+    line = 'Total Magnitude of the galaxy: {:.2f} \n'.format(totmag)
+    print(line)
+
+    line = 'Mean Surface Brightness at effective radius: {:.2f} mag/\" \n'.format(meanme)
+    print(line)
+
+    line = 'Surface brightness at effective radius {:.2f} mag/\" \n'.format(me)
+    print(line)
+
+    line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
+    print(line)
 
 
 def getReComp(galfitFile: str, dis: int, eff: float, angle: float, num_comp: int)-> float:
@@ -1051,7 +1070,6 @@ def getReComp(galfitFile: str, dis: int, eff: float, angle: float, num_comp: int
 
 
     assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
-
 
 
     #head = ReadHead(galfitFile)
@@ -1065,7 +1083,6 @@ def getReComp(galfitFile: str, dis: int, eff: float, angle: float, num_comp: int
 
 
 
-
     galcomps = SelectGal(galcomps, dis, num_comp)
 
     #taking the last component position angle for the whole galaxy
@@ -1076,48 +1093,27 @@ def getReComp(galfitFile: str, dis: int, eff: float, angle: float, num_comp: int
     else:
         theta = galcomps.PosAng[maskgal][-1]  
 
-    #theta = 18.2534 
-
 
     #convert all exp, gaussian and de vaucouleurs to Sersic format
     comps = conver2Sersic(galcomps) 
 
 
     N = numComps(comps,'all')
-    print('number of model components: ',N)
 
     if N == 0:
         print('not enough number of components to compute Re')
         print('exiting..')
         sys.exit(1)
 
-    line = 'Using a theta value of : {:.2f} degrees \n'.format(theta)
-    print(line)
-
 
 
     EffRad, totmag = GetReff().GetReSer(head, comps, eff, theta)
 
-    line = 'Total Magnitude of the galaxy: {:.2f} \n'.format(totmag)
-    print(line)
-
-
-    line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
-    print(line)
-
     meanme = GetMe().MeanMe(totmag, EffRad*head.scale)
     me = GetMe().Me(head, comps, EffRad*head.scale, theta)
 
-    line = 'Mean Surface Brightness at effective radius: {:.2f} mag/\" \n'.format(meanme)
-    print(line)
+    return Effrad, totmag, meanme, me, N, theta 
 
-
-    line = 'Surface brightness at effective radius {:.2f} mag/\" \n'.format(me)
-    print(line)
-
-
-
-    return None
 
 
 
@@ -1243,7 +1239,6 @@ class GetReff:
         return Fr
 
 
-
 ############################
 ############################
 ############################
@@ -1289,7 +1284,18 @@ def maingetSlope() -> None:
 
     angle = args.angle
    
-    getSlope(galfitFile, dis, eff, slope, angle, num_comp)
+    rgam, N, theta = getSlope(galfitFile, dis, eff, slope, angle, num_comp)
+
+
+    print('number of model components: ',N)
+
+    line = 'Using a theta value of : {:.2f} degrees\n'.format(theta)
+    print(line)
+
+    line = 'The radius with slope {:.2f} is {:.2f} pixels \n'.format(slope,rgam)
+    print(line)
+
+
 
 
 def getSlope(galfitFile: str, dis: int, eff: float, slope: float, angle: float, num_comp: int)-> float:
@@ -1340,15 +1346,11 @@ def getSlope(galfitFile: str, dis: int, eff: float, slope: float, angle: float, 
 
 
     N = numComps(comps,'all')
-    print('number of model components: ',N)
 
     if N == 0:
         print('not enough number of components to compute Re')
         print('exiting..')
         sys.exit(1)
-
-    line = 'Using a theta value of : {:.2f} degrees\n'.format(theta)
-    print(line)
 
 
 
@@ -1370,11 +1372,8 @@ def getSlope(galfitFile: str, dis: int, eff: float, slope: float, angle: float, 
 
     rgam = GetSlope().FindSlope(comps, theta, slope) 
 
-    line = 'The radius with slope {:.2f} is {:.2f} pixels \n'.format(slope,rgam)
-    print(line)
 
-
-    return None
+    return rgam, N, theta 
 
 
 
