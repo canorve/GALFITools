@@ -23,26 +23,32 @@ from mgefit.find_galaxy import find_galaxy
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,NullFormatter,
                                AutoMinorLocator,LogLocator,LinearLocator,AutoLocator)
 
-### Dictionary for Absolute mag of the Sun taken from Willmer 2018
-SunMag = {
-        "U":5.61,"B":5.44,"V": 4.81,"R":4.43,"I":4.1,
-        "J": 3.67,"H": 3.32,"K": 3.27,
-        "u":5.49,"g":5.23,"r": 4.53,"i":4.19,"z":4.01,
-        "L":3.26
-        } 
-
-####
 
 
+import argparse
 
-#check modify
-def main():
 
-    if (len(sys.argv[1:]) < 1):
-        print ('Missing arguments')
-        print ("Usage:\n %s [ImageFile] [opt x] [opt y] [-options] " % (sys.argv[0]))
-        Help()
-        sys.exit()
+def mainSbProf():
+
+    parser = argparse.ArgumentParser(description = "SbProf: creates a surface brightness profile from a ellipse ds9 region")
+
+
+    # required arguments
+    parser.add_argument("Image", help = "image fits file")
+    parser.add_argument("Ds9Region", help = "Ds9 ellipse region file")
+
+    parser.add_argument("-mz","--mgzpt", type=float, help="Magnitud zero point", default=25)
+    parser.add_argument("-m","--mask", type=float, help="mask fits file" )
+
+    parser.add_argument("-s","--sky", type=float, help="sky value", default=0)
+    parser.add_argument("-p","--plate", type=float, help="plate", default=1)
+
+
+
+    args = parser.parse_args()
+
+
+
 
 
     # class for user's parameters
@@ -3532,4 +3538,4 @@ def GetKAprox(n):
 
 if __name__ == '__main__':
 
-    main()
+    mainSbProf()
