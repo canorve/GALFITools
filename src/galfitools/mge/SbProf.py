@@ -73,23 +73,56 @@ def mainSbProf():
 def SbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output):
     'creates the surface brightness profile'
 
+
+    conf = Config()
+
+    conf.image = image  
+    conf.ds9reg = ds9reg
+    conf.mgzpt = mgzpt
+    conf.mask = mask
+    conf.skylevel = sky
+    conf.plate = plate
+    conf.center = center
+    conf.output = output
+
+
+
+    dataimg = readDataImg(conf)
+
+    #hdu = fits.open(image)
+    #img = hdu[0].data
+    #img=img.astype(float)
+
+
+    conf.exptime = GetExpTime(image)
+
+    (ncol, nrow) = GetAxis(image)
+ 
+
     obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
     xx, yy, Rkron, theta, eps = Ds9ell2Kronell(xpos,ypos,rx,ry,angle)
+
     if center:
         print('center of ds9 ellipse region will be used')
         xpeak, ypeak = xpos, ypos
     else:        
         (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, eps, ncol, nrow)
-        xpeak, ypeak = GetPmax(img, mask, xmin, xmax, ymin, ymax)
+        xpeak, ypeak = GetPmax(dataimg.img, dataimg.mask, xmin, xmax, ymin, ymax)
+
+
 
 
     # I have to switch x and y coordinates, don't ask me why
-    #xtemp=xpeak
-    #xpeak=ypeak
-    #ypeak=xtemp
 
     xpeak, ypeak = ypeak, xpeak
 
+
+    conf.xc = xpeak
+    conf.yc = ypeak 
+
+    conf.parg =  theta
+    conf.eps = eps
+    conf.parg = 1 - eps
 
 
 
@@ -99,42 +132,30 @@ def SbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output):
     print("Sky = ", sky)
 
 
-    #pasar todos los argumentos a la data class ellconf
-    ellconf = PassArgs(args) # from now on, ellconf is used instead of args
-
-
-
-    printEllinfo(ellconf, galhead) #print parameter info
-
-
-
-    dataimg = readDataImg(ellconf, galhead)
 
     # removing background from galaxy and model images 
-    dataimg.img = dataimg.img - ellconf.skylevel
-    dataimg.model = dataimg.model - ellconf.skylevel
+    dataimg.img = dataimg.img - conf.skylevel
+    dataimg.model = dataimg.model - conf.skylevel
 
 
 
     #   numsectors=19 default
-    numsectors = ellconf.sectors
+    numsectors = conf.sectors
 
-    minlevel = ellconf.minlevel  # minimun value for sky
+    minlevel = conf.minlevel  # minimun value for sky
 
     #call to sectors_photometry for galaxy and model
 
-    sectgalax = SectPhot(ellconf, dataimg, n_sectors = numsectors, 
-                            minlevel = minlevel, fit = 'gal')
-
-
+    sectgalax = SectPhot(conf, dataimg, n_sectors = numsectors, minlevel = minlevel)
+           
 
 
     print("creating plots..")
 
-    limx, limy = EllipSectors(ellconf, galhead, galcomps, sectgalax, 
-                                sectmodel, sectcomps, n_sectors = numsectors)
+    limx, limy = EllipSectors(conf, sectgalax, n_sectors = numsectors)
+                                
 
-    print("plot file: ", ellconf.namepng)
+    print("plot file: ", conf.output)
  
 
 
@@ -144,64 +165,42 @@ def SbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output):
 
     if ellconf.dplot:
         plt.pause(1.5)
-    plt.savefig(ellconf.namepng, dpi = ellconf.dpival)
+    plt.savefig(conf.output, dpi = conf.dpival)
 
 
+class DataImg:
 
-def readDataImg(ellconf, galhead):
+    img = np.empty([2,2])
+
+    mask = np.empty([2,2])
+
+
+def readDataImg(conf):
 
     dataimg = DataImg()
 
     #reading galaxy and model images from file
-    errmsg="file {} does not exist".format(galhead.outimage)
+    errmsg="file {} does not exist".format(conf.image)
 
     assert os.path.isfile(galhead.outimage), errmsg
 
-    if ellconf.flagmodel == False:
         # hdu 1 => image   hdu 2 => model
-        hdu = fits.open(galhead.outimage)
-        dataimg.img = (hdu[1].data.copy()).astype(float)
-        dataimg.model = (hdu[2].data.copy()).astype(float)
-        dataimg.imres = (hdu[3].data.copy()).astype(float)
-        hdu.close()
-
-    else:
-        hdu = fits.open(galhead.inputimage)
-
-        if galhead.flagidx:
-            if galhead.flagnum:
-                dataimg.img = (hdu[galhead.imgidx, galhead.num].data).astype(float)
-            else:    
-                dataimg.img = (hdu[galhead.imgidx].data).astype(float)
-        else:
-            dataimg.img = (hdu[0].data).astype(float)
-
-        hdu.close()
-
-        hdu = fits.open(ellconf.inputmodel)
-        dataimg.model = (hdu[0].data).astype(float)
-        hdu.close()
-
-        dataimg.imres = galpar.img - galpar.model
+    hdu = fits.open(conf.image)
+    dataimg.img = (hdu[0].data.copy()).astype(float)
+    hdu.close()
 
 
     ### reading mask image from file
 
-    if galhead.tempmask is not None:
+    if conf.mask is not None:
 
-        errmsg="file {} does not exist".format(galhead.tempmask)
-        assert os.path.isfile(galhead.tempmask), errmsg
+        errmsg="file {} does not exist".format(conf.mask)
+        assert os.path.isfile(conf.mask), errmsg
 
-        if ellconf.flagmodel == False:
-            hdu = fits.open(galhead.tempmask)
-            mask = hdu[0].data
-            dataimg.mask=np.array(mask,dtype=bool)
-            hdu.close()
-        else:
-            hdu = fits.open(galhead.maskimage)
-            mask = hdu[0].data
-            dataimg.mask=np.array(mask,dtype=bool)
-            hdu.close()
+        hdu = fits.open(conf.mask)
+        mask = hdu[0].data
+        dataimg.mask=np.array(mask,dtype=bool)
+        hdu.close()
 
     else:
         dataimg.mask = None
@@ -210,7 +209,7 @@ def readDataImg(ellconf, galhead):
     return dataimg
 
 
-def SectPhot(ellconf, dataimg, n_sectors = 19, minlevel = 0, fit = 'gal'):
+def SectPhot(ellconf, dataimg, n_sectors = 19, minlevel = 0):
     """ calls to function sectors_photometry for galaxy and model """
 
 
@@ -218,47 +217,47 @@ def SectPhot(ellconf, dataimg, n_sectors = 19, minlevel = 0, fit = 'gal'):
 
     eps = 1 - ellconf.qarg
 
-    if ellconf.dplot:
-        plt.clf()
-        print("")
+    #if ellconf.dplot:
+    plt.clf()
+    print("")
 
     ############
     # I have to switch x and y values because they are different axes for
     # numpy:
-    if ellconf.flagmodel == False:
-        yctemp = ellconf.xc
-        xctemp = ellconf.yc
-    else:
-        yctemp = ellconf.inxc
-        xctemp = ellconf.inyc
+    #if ellconf.flagmodel == False:
+    yctemp = conf.xc
+    xctemp = conf.yc
+    #else:
+    #    yctemp = ellconf.inxc
+    #    xctemp = ellconf.inyc
 
 
     # and angle is different as well:
-    angsec = 90 - ellconf.parg
+    angsec = 90 - conf.parg
     #    angsec=ang
 
     ###################################################
-    if fit == 'gal':
+    #if fit == 'gal':
     #  galaxy:
 
-        sectimg = sectors_photometry(dataimg.img, eps, angsec, xctemp, yctemp, minlevel = minlevel,
-                plot = ellconf.dplot, badpixels = maskb, n_sectors = n_sectors)
+    sectimg = sectors_photometry(dataimg.img, eps, angsec, xctemp, yctemp, minlevel = minlevel,
+                        plot = conf.dplot, badpixels = maskb, n_sectors = n_sectors)
 
 
-        if ellconf.dplot:
-            plt.pause(1)  # Allow plot to appear on the screen
-            plt.savefig(ellconf.namesec)
+    #if ellconf.dplot:
+    plt.pause(1)  # Allow plot to appear on the screen
+    plt.savefig(conf.namesec)
 
 
-    if fit == 'mod':
+    #if fit == 'mod':
     #  model: 
-        sectimg = sectors_photometry(dataimg.model, eps, angsec, xctemp, yctemp, minlevel=0,
-                plot = ellconf.dplot, badpixels = maskb, n_sectors = n_sectors)
+    #    sectimg = sectors_photometry(dataimg.model, eps, angsec, xctemp, yctemp, minlevel=0,
+    #            plot = ellconf.dplot, badpixels = maskb, n_sectors = n_sectors)
 
 
-        if ellconf.dplot:
-            plt.pause(1)  # Allow plot to appear on the screen
-            plt.savefig(ellconf.namemod)
+    #    if ellconf.dplot:
+    #        plt.pause(1)  # Allow plot to appear on the screen
+    #        plt.savefig(ellconf.namemod)
 
 
 
@@ -266,31 +265,17 @@ def SectPhot(ellconf, dataimg, n_sectors = 19, minlevel = 0, fit = 'gal'):
 
 
 
-def EllipSectors(ellconf, galhead, galcomps, sectgalax, sectmodel, sectcomps, n_sectors = 19, minlevel = 0):
+def EllipSectors(conf, sectgalax, n_sectors = 19, minlevel = 0):
 
 
    
     #galaxy
-    xradq, ysbq, ysberrq = sect2xy(sectgalax, ellconf, galhead, n_sectors)
+    xradq, ysbq, ysberrq = sect2xy(sectgalax, conf,  n_sectors)
 
-    #model
-    xradm, ysbm, ysberrm = sect2xy(sectmodel, ellconf, galhead, n_sectors)
 
     # Plotting
-    limx,limy, axsec = PlotSB(xradq, ysbq, ysberrq, xradm, ysbm, ysberrm, ellconf, galhead.scale)
+    limx,limy, axsec = PlotSB(xradq, ysbq, ysberrq, conf, conf.plate)
 
-    ### surface brightness output file
-
-    if ellconf.flagsbout == True: 
-
-        #print to file    
-        PrintEllFilesGax(ellconf, galhead, xradq, ysbq, ysberrq, xradm, ysbm, ysberrm)
-
-    #### Creating Subcomponents images with Galfit
-
-    if ellconf.flagcomp:
-
-        xradq, ysbq, n = SubComp(ellconf, galhead, galcomps, sectcomps, axsec, n_sectors = n_sectors)
 
 
     axsec.legend(loc=1)
@@ -298,7 +283,7 @@ def EllipSectors(ellconf, galhead, galcomps, sectgalax, sectmodel, sectcomps, n_
     return limx,limy
 
 
-def sect2xy(sect, ellconf, galhead, n_sectors):
+def sect2xy(sect, conf, n_sectors):
 
     #######################################
     #######################################
@@ -311,15 +296,15 @@ def sect2xy(sect, ellconf, galhead, n_sectors):
     mgeangle = sect.angle[stidx]
     mgeanrad = np.deg2rad(mgeangle)
 
-    ab = ellconf.qarg
+    ab = conf.qarg
 
     aellab = mgerad * np.sqrt((np.sin(mgeanrad)**2)/ab**2 + np.cos(mgeanrad)**2)
 
 
-    aellarc = aellab*galhead.scale
+    aellarc = aellab*conf.plate
 
     # formula according to cappellary mge manual
-    mgesb = galhead.mgzpt - 2.5*np.log10(mgecount/galhead.exptime) \
+    mgesb = galhead.mgzpt - 2.5*np.log10(mgecount/conf.exptime) \
             + 2.5*np.log10(galhead.scale**2) + 0.1 - ellconf.Aext
 
     stidxq = np.argsort(aellarc)
@@ -384,7 +369,7 @@ def FindSB(xarcq, ymgeq, numsectors):
     return xradq, ysbq, ysberrq
 
 
-def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,ellconf,scale):
+def PlotSB(xradq,ysbq,ysberrq, conf, scale):
     """  Produces final best-fitting plot  """
 
     # subplot for arc sec axis
@@ -398,11 +383,11 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,ellconf,scale):
     #ULISES end 
 
 
-    if ellconf.flagranx == True:
-        (xmin,xmax)=ellconf.ranx[0], ellconf.ranx[1]
+    #if ellconf.flagranx == True:
+    #    (xmin,xmax)=ellconf.ranx[0], ellconf.ranx[1]
 
-    if ellconf.flagrany == True:
-        (ymin,ymax)=ellconf.rany[0], ellconf.rany[1]
+    #if ellconf.flagrany == True:
+    #    (ymin,ymax)=ellconf.rany[0], ellconf.rany[1]
 
 
     minrad = np.min(xradq)
@@ -423,16 +408,17 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,ellconf,scale):
     axsec.errorbar(xradq, ysbq,yerr=ysberrq,fmt='o-',capsize=2,color='red',markersize=0.7,label="galaxy",linewidth=2)
 
 
-    if ellconf.flagalax == False:
-        axsec.errorbar(xradm, ysbm,yerr=ysberrm,fmt='o-',capsize=2,color='blue',markersize=0.7,label="Model",linewidth=2)
+    #if ellconf.flagalax == False:
+    #    axsec.errorbar(xradm, ysbm,yerr=ysberrm,fmt='o-',capsize=2,color='blue',markersize=0.7,label="Model",linewidth=2)
 
 
-    if ellconf.flagrany == True:
-        axsec.set_ylim(ymax,ymin) #inverted
-    else:
-        axsec.set_ylim(yran)
+    #if ellconf.flagrany == True:
+    #    axsec.set_ylim(ymax,ymin) #inverted
+    #else:
 
-    if ellconf.flaglogx == True:
+    axsec.set_ylim(yran)
+
+    if conf.flaglogx == True:
 
         axsec.set_xscale("log")
 
@@ -454,9 +440,9 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,ellconf,scale):
 
 
     #begin psf fwhm 
-    if ellconf.flagfwhm: 
-        xpos = ellconf.fwhm*scale
-        axsec.axvline(x=xpos,  linestyle='--', color='k', linewidth=2)
+    #if ellconf.flagfwhm: 
+    #    xpos = ellconf.fwhm*scale
+    #    axsec.axvline(x=xpos,  linestyle='--', color='k', linewidth=2)
     # end 
 
 
@@ -471,28 +457,28 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,ellconf,scale):
 
     # ULISES begin
     # Residual plot
-    if len(ysbq) < len(ysbm):
-        ysbm = ysbm[len(ysbm)-len(ysbq):]
+    #if len(ysbq) < len(ysbm):
+    #    ysbm = ysbm[len(ysbm)-len(ysbq):]
     
-    elif len(ysbq) > len(ysbm):
-        ysbq = ysbq[len(ysbq)-len(ysbm):]
-        ysberrq = ysberrq[len(ysberrq)-len(ysbq):]
+    #elif len(ysbq) > len(ysbm):
+    #    ysbq = ysbq[len(ysbq)-len(ysbm):]
+    #    ysberrq = ysberrq[len(ysberrq)-len(ysbq):]
 
-    if len(ysbq) < len(ysberrm):
-        ysberrm = ysberrm[len(ysberrm)-len(ysbq):]
-    elif len(ysbq) > len(ysberrm):
-        ysbq = ysbq[len(ysbq)-len(ysberrm):]        
+    #if len(ysbq) < len(ysberrm):
+    #    ysberrm = ysberrm[len(ysberrm)-len(ysbq):]
+    #elif len(ysbq) > len(ysberrm):
+    #    ysbq = ysbq[len(ysbq)-len(ysberrm):]        
 
-    residual = ((ysbq-ysbm)/ysbq)*100 # (data-model)/data in percentage
+    #residual = ((ysbq-ysbm)/ysbq)*100 # (data-model)/data in percentage
 
-    err = ((ysbm/ysbq**2)**2) * ysberrq**2 + ((1/ysbq)**2) * ysberrm**2 
-    err = np.sqrt(err)*100
-    axred = plt.subplot(gs[1])
+    #err = ((ysbm/ysbq**2)**2) * ysberrq**2 + ((1/ysbq)**2) * ysberrm**2 
+    #err = np.sqrt(err)*100
+    #axred = plt.subplot(gs[1])
 
-    if len(xradq) != len(residual):
-        axred.errorbar(xradm, residual, yerr=err,fmt='.',capsize=2,color='k')
-    else:
-        axred.errorbar(xradq, residual, yerr=err,fmt='.',capsize=2,color='k')
+    #if len(xradq) != len(residual):
+    #    axred.errorbar(xradm, residual, yerr=err,fmt='.',capsize=2,color='k')
+    #else:
+    #    axred.errorbar(xradq, residual, yerr=err,fmt='.',capsize=2,color='k')
 
     axred.axhline(y=0,ls='dashed', color='k')
     axred.set_xlabel('Radius $(arcsec)$')
@@ -501,7 +487,7 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,ellconf,scale):
     # ULISES end
 
 
-    if ellconf.flaglogx == True:
+    if conf.flaglogx == True:
 
         axred.set_xscale("log")
 
@@ -521,17 +507,17 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,ellconf,scale):
     axred.tick_params(which='major', length=7)
     axred.tick_params(which='minor', length=4, color='r')
 
-    if ellconf.flagranx == True:
-        axsec.set_xlim(xmin,xmax)
-        axred.set_xlim(xmin,xmax) #ulises plot
-    else:
-        axsec.set_xlim(xran)
-        axred.set_xlim(xran) #ulises plot
+    #if ellconf.flagranx == True:
+    #    axsec.set_xlim(xmin,xmax)
+    #    axred.set_xlim(xmin,xmax) #ulises plot
+    #else:
+    axsec.set_xlim(xran)
+    axred.set_xlim(xran) #ulises plot
  
 
 
 
-    if ellconf.flagpix == True:
+    if conf.flagpix == True:
 
         axpix = axsec.twiny()
 
@@ -543,7 +529,7 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,ellconf,scale):
         axpix.figure.canvas.draw()
 
 
-        if ellconf.flaglogx == True:
+        if conf.flaglogx == True:
             axpix.set_xscale("log")
             locmaj = LogLocator(base=10,numticks=12)
             axpix.xaxis.set_major_locator(locmaj)
@@ -581,166 +567,74 @@ def PlotSB(xradq,ysbq,ysberrq,xradm,ysbm,ysberrm,ellconf,scale):
 
 
 ## class for parameters
-class EllipSectConfig:
-
-    #flags
-    flaglogx=False
-    flagq=False
-    flagpa=False
-    flagcomp=False
-    flagpix=False
-    flagranx=False
-    flagrany=False
-    flagnoplot=False
-    flagrid=False
-    flagdpi=False
-    flagsbout=False
-    flagphot=False
-    flagminlevel=False
-    flagsectors=False
-    flagobj=False
-    flagband=False
-    flagweb=False # to check connection to ned
-    flagsnr = False
-    flagchi = False
-
-    flagcheck=False
-    flagned=False
-
-    flagmod=False
-    flagmag=False
-    flagscale=False
-    flagdim=False
-   
-    flagmodel=False
-
-    flagsky=False
-    flagkeep=False
-    flagalax=False
-
-    flagnedfile=False
-
-    flagradsky=False
-    flagrandboxsky=False
+class Config:
 
 
-    flagskyRad = False
-    flagskyRadmax = False
-    flagskybox =  False
-    flagskynum = False
-    flagskywidth = False
-    
-    flagdistmax = False
+    flaglogx = False
+    image = "none.fits" 
 
-    flagfwhm = False
+    mgzpt = 25
+    ds9reg = "none.reg"
+    mask = 'mask.fits'
+    plate = 1 
+    center = False
+    exptime = 1
 
-    #flagcent = False 
-
-    flagrmsky=True
-
-
+    namesec = "gal.png"
 
     #init
     xc = 1 
     yc = 1 
-    inxc=1    #same as above xc but used for input image
-    inyc=1    #same as above yc but used for input image
  
     qarg=1
     parg=0
-    ranx=1
-    rany=1
-    dplot=True
 
-    dpival=100
+    dpival=150
 
     minlevel=0
     sectors=19
 
 
+    image = "none.fits"
 
-    #input file
-    galfile= "galfit.01"
-
-    #sb output file
-    sboutput = "sbout.txt"
 
     #output file
-    output = "out.txt"
+    output = "out.png"
 
-    # input image model
-    inputmodel="none.fits"
-
-    # object name to search in NED
-
-    objname="none"
-    band="R"
-
-    InDistMod=0
-    InMagCor=0
-    InScale=1
-    InSbDim=0
-   
-
-    namefile = "none"
-    namepng = "none.png"
-    namesec = "none-gal.png"
-    namemod = "none-mod.png"
-    namemul = "none-mul.png"
-    namesub = "none-sub.fits"
-    namesig = "none-sig.fits"
-    namesnr = "none-snr.fits"
-    namechi = "none-chi.fits"
-    namened = "none-ned.xml"
-    namecheck = "none-check.fits"
-    namering = "none-ring.fits"
-    nameringmask = "none-ringmask.fits"
-
-    namecube = "none-cub.png"
-
-
-    nedfile = "default.xml"
+    flagpix = False
+    flagrid = False
 
 
     # sky parameters:
     skylevel = 0
 
 
-    skyRad = 50 # minimum radius
-    skybox = 20
-    skynum = 20
-    skywidth = 20
-
-    fwhm = 2
-
-    distmax = 10
-
-    brightness = 0 
-    contrast = 1 
-
-    cmap="viridis"
-
-
-    numcomp = 1
-    tot = 0 # total number of components
-
-
-    # for computed gradsky
-    gradskymean = 0
-    gradskystd = 0
-    gradskymed = 0
-
-    randskymean = 0
-    randskystd = 0
-    randskymed = 0
+    dplot=True
 
     Aext = 0  # surface brightness correction for plots
 
-    hconst = 67.8 
-    omegam  = 0.308
-    omegav = 0.692
+def GetExpTime(Image):
+    # k Check
+    "Get exposition time from the image"
+
+    try:
+        hdu = fits.open(Image)
+        exptime = hdu[0].header["EXPTIME"]
+        hdu.close()
+    except: 
+        exptime = 1
+    return float(exptime)
 
 
+def GetAxis(Image):
+    # k Check
+    "Get number of rows and columns from the image"
+
+    hdu = fits.open(Image)
+    ncol = hdu[0].header["NAXIS1"]
+    nrow = hdu[0].header["NAXIS2"]
+    hdu.close()
+    return ncol, nrow
 
 
 if __name__ == '__main__':
