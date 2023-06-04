@@ -377,11 +377,13 @@ def PlotSB(xradq,ysbq,ysberrq, conf, scale):
 
 
     #ULISES begin
-    fig, (axsec,axred) = plt.subplots(2, sharex=True, sharey=False)
-    gs = gridspec.GridSpec(2, 1,height_ratios=[3,1])
-    gs.update(hspace=0.07)
+    #fig, (axsec,axred) = plt.subplots(2, sharex=True, sharey=False)
+    #gs = gridspec.GridSpec(2, 1,height_ratios=[3,1])
+    #gs.update(hspace=0.07)
     #ULISES end 
 
+
+    fig, axsec = plt.subplots()
 
     #if ellconf.flagranx == True:
     #    (xmin,xmax)=ellconf.ranx[0], ellconf.ranx[1]
@@ -400,10 +402,12 @@ def PlotSB(xradq,ysbq,ysberrq, conf, scale):
 
    
     # ULISES begin
-    axsec = plt.subplot(gs[0])
+    #axsec = plt.subplot(gs[0])
+
+    #axsec.set_ylabel(r"Surface Brightness $(mag\; arcsec^{-2})$")
+    # ULISES end
 
     axsec.set_ylabel(r"Surface Brightness $(mag\; arcsec^{-2})$")
-    # ULISES end
 
     axsec.errorbar(xradq, ysbq,yerr=ysberrq,fmt='o-',capsize=2,color='red',markersize=0.7,label="galaxy",linewidth=2)
 
@@ -447,9 +451,11 @@ def PlotSB(xradq,ysbq,ysberrq, conf, scale):
 
 
     # ULISES begin
-    axsec.axes.xaxis.set_ticklabels([])
+    #axsec.axes.xaxis.set_ticklabels([])
     # ULISES end 
 
+
+    axsec.axes.xaxis.set_ticklabels([])
 
     axsec.yaxis.set_minor_locator(AutoMinorLocator())
     axsec.yaxis.set_major_locator(AutoLocator())
@@ -480,10 +486,10 @@ def PlotSB(xradq,ysbq,ysberrq, conf, scale):
     #else:
     #    axred.errorbar(xradq, residual, yerr=err,fmt='.',capsize=2,color='k')
 
-    axred.axhline(y=0,ls='dashed', color='k')
-    axred.set_xlabel('Radius $(arcsec)$')
-    axred.set_ylabel('Residual (%)')
-    axred.set_ylim(-2,2)
+    #axred.axhline(y=0,ls='dashed', color='k')
+    #axred.set_xlabel('Radius $(arcsec)$')
+    #axred.set_ylabel('Residual (%)')
+    #axred.set_ylim(-2,2)
     # ULISES end
 
 
