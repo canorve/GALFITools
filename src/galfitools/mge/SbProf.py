@@ -30,45 +30,6 @@ from galfitools.mge.mge2galfit import GetInfoEllip, Ds9ell2Kronell, GetSize, Get
 import argparse
 
 
-def mainSbProf():
-
-    parser = argparse.ArgumentParser(description = "SbProf: creates a surface brightness profile from a ellipse ds9 region")
-
-
-    # required arguments
-    parser.add_argument("Image", help = "image fits file")
-    parser.add_argument("Ds9Region", help = "Ds9 ellipse region file")
-
-    parser.add_argument("-mz","--mgzpt", type=float, help="Magnitud zero point", default=25)
-    parser.add_argument("-m","--mask", type=float, help="mask fits file" )
-
-    parser.add_argument("-s","--sky", type=float, help="sky value", default=0)
-    parser.add_argument("-p","--plate", type=float, help="plate scale ", default=1)
-    parser.add_argument("-o","--output", type=str, help="output file", default="sb.png")
-
-    parser.add_argument("-c","--center", action="store_true", 
-                        help="uses the center given in DS9 region file," + 
-                        "otherwise it will found the x,y peaks within DS9 ellipse")
-
-
-    args = parser.parse_args()
-
-
-    image = args.image
-    ds9reg = args.Ds9Region
-    mgzpt = args.mgzpt
-    mask =  args.mask
-    sky = args.sky
-    plate = args.plate
-    output = args.output
-    center = args.center
-
-    SbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output)
-
-    
-    print('Done')
-
-
 
 def SbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output):
     'creates the surface brightness profile'
