@@ -10,48 +10,6 @@ import os.path
 import argparse
 
 
-def mainGetStar():
-
-    parser = argparse.ArgumentParser(description="gets a image slice centered on the object peak")
-
-    parser.add_argument("image", help="the image file to obtain the slice")
-    parser.add_argument("Ds9regFile", help="the DS9 ellipse region file containing the ")
-    parser.add_argument("size", type=int, help="the size of the new image")
-    parser.add_argument("-c","--center", action="store_true", 
-                        help="uses the center given in DS9 region file," + 
-                        "otherwise it will found the x,y peaks within DS9 ellipse")
-    parser.add_argument("-s","--sky", type=float, 
-                        help="the sky background to be removed. Default = 0",default=0)
-    parser.add_argument("-o","--out", type=str, 
-                        help="the image output.",default="star.fits")
-
-    parser.add_argument("-sig","--sigma", type=str, 
-                        help="introduce the sigma image")
-
-    parser.add_argument("-so","--sigout", type=str, 
-                        help="the sigma image output.",default="sigma.fits")
-
-
-
-    args = parser.parse_args()
-
-    image = args.image
-    regfile = args.Ds9regFile 
-    imsize = args.size
-    center = args.center
-
-    sky = args.sky
-    imout = args.out
-
-    sigma = args.sigma
-    sigout = args.sigout
-
-    getStar(image, regfile, imsize, center, sky, imout, sigma, sigout)
-
-    print("Done. Object fits file: {} created ".format(imout))
-
-
-
 
 def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imout: str, sigma: str sigout: str)-> None: 
 

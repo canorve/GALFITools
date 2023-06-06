@@ -13,36 +13,6 @@ from shapely.geometry import Point, Polygon
 
 
 
-def mainMaskDs9(): 
-
-
-    parser = argparse.ArgumentParser(description="creates (or modify) a mask image for GALFIT using Ds9 regions such as Boxes, Ellipses and Polygons ")
-
-    parser.add_argument("MaskFile", help="the Mask image file to modify or create")
-    parser.add_argument("RegFile", help="the DS9 region file")
-
-    parser.add_argument("-f","--fill", type=int, help="the value in counts to fill into the Ds9 regions. Default = 0 (remove)",default=0)
-
-    parser.add_argument("-i","--image", type=str, help="image to obtain the size  ")
-
-
-
-    args = parser.parse_args()
-
-    MaskFile = args.MaskFile 
-    RegFile = args.RegFile 
-    fill = args.fill
-    image = args.image
-
-
-
-    MaskDs9(MaskFile, RegFile, fill, image) 
-
-    print('Done. Mask {} created (or modified)'.format(MaskFile))
-
-
-
-
 def MaskDs9(MaskFile: str, RegFile: str, fill: bool, image: str) -> None:
 
     if not os.path.exists(MaskFile):

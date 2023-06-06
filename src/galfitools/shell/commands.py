@@ -1,1 +1,0 @@
-#check agregar los comandos

@@ -11,39 +11,6 @@ import argparse
 
 
 
-def mainMakeMask():
-
-
-    parser = argparse.ArgumentParser(description="creates mask file from a catalog of Sextractor")
-
-    parser.add_argument("Sexfile", help="Sextractor catalog file ")
-    parser.add_argument("ImageFile", help="Image file")
-
-    parser.add_argument("-o","--maskout", type=str, help="the output mask file name  ",default='masksex.fits')
-    parser.add_argument("-sf","--satds9", type=str, help="ds9 saturation file",default='ds9sat.reg')
-        
-    parser.add_argument("-s","--scale", type=float, help="scale factor to increase the ellipses",)
- 
-
-
-    args = parser.parse_args()
-
-
-    sexfile = args.Sexfile 
-    image = args.ImageFile  
-    maskfile = args.maskout  
-    scale = args.scale 
-    satfileout = args.satds9
-
-
-
-
-
-    MakeMaskFiles(sexfile, image, maskfile, scale, satfileout)
-    
-
-    print("Done. Mask image created ")
-
 
 def MakeMaskFiles(sexfile: str, image: str, maskfile: str, scale: float, satfileout: str) -> None:
 

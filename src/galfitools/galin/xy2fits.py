@@ -13,29 +13,6 @@ import argparse
 # code to convert ASCII xy positions to FTIS mask 
 
 
-def mainxy2fits(): 
-
-
-    parser = argparse.ArgumentParser(description="code to convert ASCII x,y positions to FTIS mask")
-
-    parser.add_argument("ImageFile", help="The Image file ")
-    parser.add_argument("AsciiMask", help="The ascii file with the x,y positions ")
-    parser.add_argument("-c","--val", type=int, help="the value in counts for the masked pixels",default=1)
- 
-    args = parser.parse_args()
-
-
-
-
-    ImageFile= args.ImageFile
-    AsciiFile= args.AsciiMask
-    Value = args.val 
-
-    xy2fits().MakeFits(ImageFile, AsciiFile, Value)
-
-    print("Ascii -> Fits done ")
-
-
 
 class xy2fits:
 

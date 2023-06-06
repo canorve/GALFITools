@@ -15,37 +15,6 @@ import argparse
 
 
 
-def mainMaskSky(): 
-
-
-    parser = argparse.ArgumentParser(description="creates a mask image for GALFIT using original image and sky mean and sigma")
-
-
-    parser.add_argument("ImageFile", help="original data image ")
-    parser.add_argument("MaskFile", help="Name of the new Mask file")
-    parser.add_argument("-sm","--skymean",default=0,type=float, help="mean of the sky background")
-    parser.add_argument("-ss","--skysigma",default=0,type=float, help="sigma of the sky background")
-    parser.add_argument("-ns","--numbersig",default=1,type=float, help="number of times that the sigma of the sky will be multiplied to remove the sky background")
-
-    parser.add_argument("-b","--border", action="store_true", help="Mask the borders when their value is zero")
-
-    parser.add_argument("-bv","--borValue",default=0,type=float, help="value of the border if it is different from zero")
-    args = parser.parse_args()
-
-    image = args.ImageFile 
-    mask = args.MaskFile
-    sky_mean = args.skymean
-    sky_sig = args.skysigma
-    nsig = args.numbersig
-
-    bor_flag = args.border
-    borValue = args.borValue
-
-
-    SkyRem(image, mask, sky_mean, sky_sig, nsig, borValue, bor_flag)
-
-    print('Done. Mask file {} created'.format(mask))
-
 #################################################################
 #################################################################
 

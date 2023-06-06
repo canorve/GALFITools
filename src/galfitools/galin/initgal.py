@@ -10,57 +10,6 @@ from pathlib import Path
 # code to make init galfit files 
 
 
-def mainInitGal(): 
-
-
-
-   #parser argument section
-
-    parser = argparse.ArgumentParser(description="Creates GALFIT's input files with different initial parameters")
-
-    parser.add_argument("inFile", help="the galfit file galfit.XX ")
-    parser.add_argument("-n","--number", type=int, help="the number of files generated ",default=1)
-        
-    parser.add_argument("-p3","--param3", nargs=2, type=float, help="range of values to give to the 3) model's parameter in format [min max] ",)
-    parser.add_argument("-p4", "--param4", nargs=2, type=float, help="range of values to give to the 4) model's parameter in format [min max] ")
-    parser.add_argument("-p5", "--param5", nargs=2, type=float, help="range of values to give to the 5) model's parameter in format [min max] ")
-    parser.add_argument("-p6", "--param6", nargs=2, type=float, help="range of values to give to the 6) model's parameter in format  [min max]")
-    parser.add_argument("-p7", "--param7", nargs=2, type=float, help="range of values to give to the 7) model's parameter in format [min max]")
-    parser.add_argument("-p8", "--param8", nargs=2, type=float, help="range of values to give to the 8) model's parameter in format [min max]")
-    parser.add_argument("-p9", "--param9", nargs=2, type=float, help="range of values to give to the 9) model's parameter in format [min max]")
-    parser.add_argument("-p10", "--param10", nargs=2, type=float, help="range of values to give to the 10) model's parameter in format [min max]")
-
-
-
-    parser.add_argument("-nc","--numcomp", type=int, help="the component number which parameters will be changed")
-
-
-    args = parser.parse_args()
-
-
-    GalfitFile = args.inFile
-    number = args.number
-    param3 = args.param3
-    param4 = args.param4
-    param5 = args.param5
-    param6 = args.param6
-    param7 = args.param7
-
-    param8 = args.param8
-    param9 = args.param9
-    param10 = args.param10
-
-
-    numcomp = args.numcomp
-
-
-    InitGal(GalfitFile, number, param3, param4, param5, param6, param7, param8, param9, param10, numcomp)
-
-
-    print("rungalfit.sh has been created")
-
-
-
 
 class InitGal:
 
