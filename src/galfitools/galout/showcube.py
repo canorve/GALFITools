@@ -13,41 +13,6 @@ from astropy import units as U
 import argparse
 
 
-def mainShowCube():
-
-
-    parser = argparse.ArgumentParser(description="show the cube fits of the galfit output")
-
-    parser.add_argument("cubeimage", help="the cube GALFIT image")
-    parser.add_argument("-o","--outimage", type=str, help="the output png file",default="cube.png")
-
-
-    #### 
-    parser.add_argument("-br","--brightness", type=float, 
-                        help="brightness of the image. Only for galaxy and model. Default = 0. Preferible range goes from -1 to 1", default=0)
-    parser.add_argument("-co","--contrast", type=float, 
-                        help="contrast of the image. Only for galaxy and model. Default = 1. Preferible range goes from 0 to 1",default=1)
-
-    parser.add_argument("-cm","--cmap", type=str, help="cmap to be used for the cube image ",default="viridis")
-    parser.add_argument("-dpi","--dotsinch", type=int, help="dots per inch used for images files ",default=100)
-    parser.add_argument("-s","--scale", type=float, help="plate scale of the image. Default = 1",default=1)
-    parser.add_argument("-np","--noplot", action="store_true", help="it doesn\'t show plotting window")
-
-    args = parser.parse_args()
-
-    cubeimage = args.cubeimage
-    namecube = args.outimage 
-    dpival = args.dotsinch 
-    brightness = args.brightness
-    contrast = args.contrast 
-    cmap = args.cmap 
-    scale = args.scale  
-    noplot = args.noplot
-
-
-    displayCube(cubeimage, namecube, dpival, brightness, contrast, cmap, scale, noplot)
-
-
 
 
 def displayCube(cubeimage: str, namecube: str, dpival; int, brightness: float, contrast:float, cmap: str, scale: float, noplot: bool) -> None:

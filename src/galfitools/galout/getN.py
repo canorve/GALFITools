@@ -17,51 +17,6 @@ import matplotlib.pyplot as plt
 
 
 
-#check modify
-#console scripts
-def main() -> None: 
-
-    #reading arguments parsing
-
-    parser = argparse.ArgumentParser(description = "getN: computes the Sersic index from surface brightness at effective radius")
-
-
-    # required arguments
-    parser.add_argument("GalfitFile", help = "Galfit File containing the Sersics or gaussians components")
-
-    parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
-
-    #parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
-
-    parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
-
-    parser.add_argument("-pa","--angle", type=float, 
-                        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components. Angle measured from Y-Axis as same as GALFIT. ")
-
-
-    parser.add_argument("-rf","--radfrac", type=float, help="fraction of light radius. Default = .2 ", default=.2)
-
-    ## parsing variables
-
-    args = parser.parse_args()
-
-    galfitFile = args.GalfitFile
-    dis = args.dis
-
-
-   
-    num_comp =  args.numcomp
-
-    frac = args.radfrac
-
-
-    angle = args.angle
-
-
-    getN(galfitFile, dis, frac, angle, num_comp)
-
-
-
 def getN(galfitFile: str, dis: int, frac: float, angle: float, num_comp: int) -> float:
     '''gets the effective radius from a set of Sersics'''
 
