@@ -17,56 +17,6 @@ import matplotlib.pyplot as plt
 
 
 #check modify
-#console scripts
-def main() -> None: 
-
-    #reading argument parsing
-
-    parser = argparse.ArgumentParser(description = "getBreak: gets the break radius from a set of Sersics ")
-
-
-    # required arguments
-    parser.add_argument("GalfitFile", help = "Galfit File containing the Sersics or gaussians components")
-
-    parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
-    parser.add_argument("-er","--effrad", type=float, 
-                        help="percentage of light to compute for radius. default=.5 for effective radius ", default=.5)
-
-    #parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
-
-    parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
-
-    parser.add_argument("-a","--angle", type=float, 
-                        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components")
-
-
-    parser.add_argument("-ni","--numinitial", type=int, help="Number of component where it'll obtain the initial parameter to search break radius or to generated random initial radius. ", default=2)
-
-
-    parser.add_argument("-q","--quick", action="store_true", help='evaluate in position only (given by -ni parameter') 
-
-
-    parser.add_argument("-r","--random", type=int, help="Number of random radius as initial parameters to search for the minimum. It will generated random radius from 0 to effective radius of the component indicated by parameter -ni ")
-
-
-
-
-    args = parser.parse_args()
-
-    galfitFile = args.GalfitFile
-    dis = args.dis
-
-    eff = args.effrad
-    inicomp = args.numinitial
-
-    quick = args.quick
-    random = args.random
-
-    num_comp =  args.numcomp
-
-
-    getBreak(galfitfile, dis, eff, inicomp, quick, random, num_comp)
-
 
 
 def getBreak(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, random: int, num_comp: int)-> float:
