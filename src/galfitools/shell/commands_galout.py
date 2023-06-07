@@ -321,7 +321,41 @@ def maingetN() -> None:
     angle = args.angle
 
 
-    getN(galfitFile, dis, frac, angle, num_comp)
+    sersic, meanser, stdser, totmag, N, theta = getN(galfitFile, dis, frac, angle, num_comp)
+
+
+    print('number of model components: ', N)
+
+    line = 'Using a theta value of : {:.2f} degrees \n'.format(theta)
+    print(line)
+
+    line = 'Total Magnitude of the galaxy: {:.2f} \n'.format(totmag)
+    print(line)
+
+    #line = 'Mean Surface Brightness at effective radius: {:.2f} mag/\" \n'.format(meanme)
+    #print(line)
+
+    #line = 'Surface brightness at effective radius {:.2f} mag/\" \n'.format(me)
+    #print(line)
+
+    #line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
+    #print(line)
+
+    line = 'Sersic index with the method of Mean Surface Brightness at effective radius: {:.2f}  \n'.format(sersic)
+    print(line)
+
+
+    line = 'Sersic index with the method of fraction of light (at different radius)  \n'
+    print(line)
+
+
+
+    line = '\nSersic index mean: {:.2f}  Standard deviation: {:.2f}  '.format(meanser, stdser))
+    print(line)
+
+
+
+
 
 
 def mainShowCube():
