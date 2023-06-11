@@ -7,7 +7,7 @@ from galfitools.mge.mge2galfit import mge2gal
 from galfitools.mge.SbProf import SbProf
 
 #check modify: remove initgauss
-def main_mge():
+def mainMGE():
 
     parser = argparse.ArgumentParser(description="fits mge of Cappellari and formats to GALFIT")
 
