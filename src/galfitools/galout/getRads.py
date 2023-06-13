@@ -132,7 +132,7 @@ def MulFindBreak(comps, theta, radius):
 
     betas = np.array([])
 
-    #print('finding global minium')
+    #print('finding global minimum')
 
     for r in radsbreak:
 
@@ -636,7 +636,7 @@ def MultiFindKappa(comps, theta, radius):
 
     kappas = np.array([])
 
-    print('finding global minium:')
+    print('finding global minimum:')
 
     for r in radskappa:
 
