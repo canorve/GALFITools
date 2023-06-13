@@ -619,14 +619,15 @@ def getKappa(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, r
             #print('The initial search radius are the effective radius of the components')
 
 
-        rkappa = MulFindKappa(comps, theta, radius) 
+        rkappa = MultiFindKappa(comps, theta, radius) 
 
 
 
     return rkappa, N, theta 
 
 
-def MulFindKappa(comps, theta, radius):
+
+def MultiFindKappa(comps, theta, radius):
 
 
     maskgal = (comps.Active == True) 
@@ -635,11 +636,11 @@ def MulFindKappa(comps, theta, radius):
 
     kappas = np.array([])
 
-    #print('finding global minium:')
+    print('finding global minium:')
 
     for r in radskappa:
 
-        kappa = GetKappa().KappaSer(r, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta)
+        kappa = GetKappa().funGalKappaSer(r, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta)
 
         
         kappas = np.append(kappas, kappa)
@@ -651,6 +652,7 @@ def MulFindKappa(comps, theta, radius):
 
     
     return radskappa[idx][0]
+
 
 
 
@@ -676,7 +678,7 @@ class GetKappa:
 
         for r in R:
 
-            beta = self.KappaSer(r, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta)
+            beta = self.BetaSer(r, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta)
 
             gam = self.SlopeSer(r, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta)
 
@@ -704,17 +706,17 @@ class GetKappa:
 
         init = comps.Rad[maskgal][initial_comp] #component as initial value, hope it works 
 
-        breakrad = scipy.optimize.fmin(self.funGalKappaSer, init, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta))
+        kapparad = scipy.optimize.fmin(self.funGalKappaSer, init, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta))
 
 
-        return breakrad[0] 
+        return kapparad[0] 
   
 
     def funGalKappaSer(self, R, Ie, Re, n, q, pa, theta):
 
 
 
-        beta = self.KappaSer(R, Ie, Re, n, q, pa, theta)
+        beta = self.BetaSer(R, Ie, Re, n, q, pa, theta)
 
         gam = self.SlopeSer(R, Ie, Re, n, q, pa, theta)
            
@@ -748,6 +750,8 @@ class GetKappa:
 
         return krads 
  
+
+
 
 
 
@@ -810,7 +814,7 @@ class GetKappa:
         return Sprim2.sum()
 
 
-    def KappaSer(self, R: float, Ie: list, Re: list, n: list, q: list, pa: list, theta: float) -> float:
+    def BetaSer(self, R: float, Ie: list, Re: list, n: list, q: list, pa: list, theta: float) -> float:
         '''Kappa from sersic function to a determined R'''
             
         Rcor = GetRadAng(R, q, pa, theta) 
@@ -823,10 +827,10 @@ class GetKappa:
         Sprim = self.var_Sprim(Rcor, Ie, Re, n, X, Xprim)
         Sprim2 = self.var_Sprim2(Rcor, Ie, Re, n, X, Xprim, Xprim2)
 
-        Kappa = (Sprim/S)*(R/np.log10(np.e)) + (
+        Beta = (Sprim/S)*(R/np.log10(np.e)) + (
                     (Sprim2*S - Sprim**2)/S**2)*(R**2/np.log10(np.e)) 
 
-        return Kappa 
+        return Beta 
 
     def SlopeSer(self, R: float, Ie: list, Re: list, n: list, q: list, pa: list, theta: float) -> float:
         '''slope from sersic function to a determined R'''
@@ -843,6 +847,8 @@ class GetKappa:
 
 
         return Slp
+
+
 
 
 
