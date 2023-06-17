@@ -2,13 +2,13 @@
 
 import argparse
 
-from galfitools.galin import GetStar
-from galfitools.galin import InitGal
-from galfitools.galin import MaskDs9
+from galfitools.galin.getStar import getStar
+from galfitools.galin.initgal import InitGal
+from galfitools.galin.MaskDs9 import MaskDs9
 
-from galfitools.galin import MakeMaskFiles
-from galfitools.galin import SkyRem
-from galfitools.galin import xy2fits
+from galfitools.galin.MakeMask import MakeMaskFiles
+from galfitools.galin.MaskSky import SkyRem
+from galfitools.galin.xy2fits import xy2fits
 
 
 def mainGetStar():

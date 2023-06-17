@@ -11,7 +11,7 @@ import argparse
 
 
 
-def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imout: str, sigma: str sigout: str)-> None: 
+def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imout: str, sigma: str , sigout: str)-> None: 
 
 
     ##########################################
