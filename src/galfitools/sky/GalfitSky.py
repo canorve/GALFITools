@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import argparse
 
 # computes sky using GALFIT
-
+#change it and use skyRem instead
 
 def galfitSky(imgname, maskfile, mgzpt, scale, X, Y)-> None:
     

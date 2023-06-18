@@ -18,7 +18,7 @@ import argparse
 #################################################################
 #################################################################
 
-def SkyRem(imageFile,maskFile,mean,sig, nsig,borValue,bor_flag=False):
+def skyRem(imageFile,maskFile,mean,sig, nsig,borValue,bor_flag=False):
 
     bor_val = 100
 

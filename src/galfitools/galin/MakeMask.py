@@ -12,7 +12,7 @@ import argparse
 
 
 
-def MakeMaskFiles(sexfile: str, image: str, maskfile: str, scale: float, satfileout: str) -> None:
+def makeMask(sexfile: str, image: str, maskfile: str, scale: float, satfileout: str) -> None:
 
 
 

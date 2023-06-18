@@ -4,7 +4,7 @@ import argparse
 
 
 from galfitools.mge.mge2galfit import mge2gal
-from galfitools.mge.SbProf import SbProf
+from galfitools.mge.SbProf import sbProf
 
 #check modify: remove initgauss
 def mainMGE():

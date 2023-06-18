@@ -31,7 +31,7 @@ import argparse
 
 
 
-def SbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output):
+def sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output):
     'creates the surface brightness profile'
 
 

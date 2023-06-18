@@ -2,7 +2,7 @@
 
 import argparse
 
-from galfitools.sim.MakeSim import MakeSim
+from galfitools.sim.MakeSim import makeSim
 
 
 def mainMakeSim():
@@ -34,7 +34,7 @@ def mainMakeSim():
 
 
 
-    MakeSim(image, GAIN, skymean, skystd, newimage)
+    makeSim(image, GAIN, skymean, skystd, newimage)
 
 
 

@@ -17,7 +17,7 @@ import argparse
 #introducir sky box y sky ring
 #use maskds9 para obtener los pixeles de las regiones
 
-def Sky(imgname, maskimage, filereg) -> None:
+def sky(imgname, maskimage, filereg) -> None:
 
 
 

@@ -5,7 +5,7 @@ import argparse
 
 from galfitools.sky.GalfitSky import galfitSky
 
-from galfitools.sky.Sky import Sky
+from galfitools.sky.Sky import sky
 
 
 
@@ -86,7 +86,7 @@ def mainSky():
     filereg = args.Ds9regFile
 
 
-    mean, sig = Sky(imgname, maskimage, filereg)
+    mean, sig = sky(imgname, maskimage, filereg)
 
     print("Sky within 3 sigma:") 
 

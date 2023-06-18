@@ -8,7 +8,7 @@ from astropy.io import fits
 import argparse
 
 
-def MakeSim(image, GAIN, skymean, skystd, newimage)-> None: 
+def makeSim(image, GAIN, skymean, skystd, newimage)-> None: 
 
 
     sizex,sizey =GetAxis(image) 

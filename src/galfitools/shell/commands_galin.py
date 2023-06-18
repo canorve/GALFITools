@@ -4,10 +4,10 @@ import argparse
 
 from galfitools.galin.getStar import getStar
 from galfitools.galin.initgal import InitGal
-from galfitools.galin.MaskDs9 import MaskDs9
+from galfitools.galin.MaskDs9 import maskDs9
 
-from galfitools.galin.MakeMask import MakeMaskFiles
-from galfitools.galin.MaskSky import SkyRem
+from galfitools.galin.MakeMask import makeMask
+from galfitools.galin.MaskSky import skyRem
 from galfitools.galin.xy2fits import xy2fits
 
 
@@ -131,7 +131,7 @@ def mainMakeMask():
 
 
 
-    MakeMaskFiles(sexfile, image, maskfile, scale, satfileout)
+    makeMask(sexfile, image, maskfile, scale, satfileout)
     
 
     print("Done. Mask image created ")
@@ -160,7 +160,7 @@ def mainMaskDs9():
 
 
 
-    MaskDs9(MaskFile, RegFile, fill, image) 
+    maskDs9(MaskFile, RegFile, fill, image) 
 
     print('Done. Mask {} created (or modified)'.format(MaskFile))
 
@@ -193,7 +193,7 @@ def mainMaskSky():
     borValue = args.borValue
 
 
-    SkyRem(image, mask, sky_mean, sky_sig, nsig, borValue, bor_flag)
+    skyRem(image, mask, sky_mean, sky_sig, nsig, borValue, bor_flag)
 
     print('Done. Mask file {} created'.format(mask))
 

@@ -13,7 +13,7 @@ from shapely.geometry import Point, Polygon
 
 
 
-def MaskDs9(MaskFile: str, RegFile: str, fill: bool, image: str) -> None:
+def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str) -> None:
 
     if not os.path.exists(MaskFile):
 
