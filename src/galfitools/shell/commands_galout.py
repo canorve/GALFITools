@@ -350,7 +350,7 @@ def maingetN() -> None:
 
 
 
-    line = '\nSersic index mean: {:.2f}  Standard deviation: {:.2f}  '.format(meanser, stdser))
+    line = '\nSersic index mean: {:.2f}  Standard deviation: {:.2f}  '.format(meanser, stdser)
     print(line)
 
 

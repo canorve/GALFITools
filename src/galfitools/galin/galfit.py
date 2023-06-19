@@ -3,7 +3,6 @@
 from astropy.io import fits
 import numpy as np
 
-from astropy import fits
 
 
 import copy

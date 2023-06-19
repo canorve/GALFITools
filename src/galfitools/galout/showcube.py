@@ -15,7 +15,8 @@ import argparse
 
 
 
-def displayCube(cubeimage: str, namecube: str, dpival; int, brightness: float, contrast:float, cmap: str, scale: float, noplot: bool) -> None:
+def displayCube(cubeimage: str, namecube: str, dpival: int, brightness: float, contrast:float, 
+                    cmap: str, scale: float, noplot: bool) -> None:
 
 
     ######################

@@ -54,30 +54,6 @@ def mainSky():
     parser.add_argument("Ds9regFile", help="the DS9 ellipse region file containing the galaxy")
  
 
-    if len(sys.argv[1:]) != 2 and len(sys.argv[1:]) != 6 and len(sys.argv[1:]) != 3:
-        print ('Missing arguments')
-        print ("Usage:\n %s [ImageFile] [MaskImage] [optional Ds9RegFile] [optional: Xmin Xmax Ymin Ymax]" % sys.argv[0])
-        print ("Example:\n %s image.fits mask.fits" % sys.argv[0])
-        print ("Example:\n %s image.fits mask.fits ds9.reg" % sys.argv[0])
-        print ("Example:\n %s image.fits mask.fits 330 450 200 700" % sys.argv[0])
-
-        sys.exit()
-
-
-    flagseg=False
-    flagreg=False
-    xmin=xmax=ymin=ymax=0
-    if len(sys.argv[1:]) == 6:
-        flagseg=True
-        xmin=int(sys.argv[3])
-        xmax=int(sys.argv[4])
-        ymin=int(sys.argv[5])
-        ymax=int(sys.argv[6])
-
-    if len(sys.argv[1:]) == 3:
-        flagreg=True
-        filereg=sys.argv[3]
-
    
     args = parser.parse_args()
 

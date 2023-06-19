@@ -16,7 +16,7 @@ from scipy.optimize import bisect
 import matplotlib.pyplot as plt
 
 
-from galfitools.galin.galfit import Galfit, conver2sersic, SelectGal, numComps,GetRadAng
+from galfitools.galin.galfit import Galfit, conver2Sersic, SelectGal, numComps,GetRadAng
 
 from galfitools.galout.getRads import GetReff, GetMe
 
