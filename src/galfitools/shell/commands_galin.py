@@ -17,7 +17,7 @@ def mainGetStar():
 
     parser.add_argument("image", help="the image file to obtain the slice")
     parser.add_argument("Ds9regFile", help="the DS9 ellipse region file containing the ")
-    parser.add_argument("size", type=int, help="the size of the new image")
+    parser.add_argument("size", type=int, help="the size of the new image in pixels")
     parser.add_argument("-c","--center", action="store_true", 
                         help="uses the center given in DS9 region file," + 
                         "otherwise it will found the x,y peaks within DS9 ellipse")
