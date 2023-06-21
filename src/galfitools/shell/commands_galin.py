@@ -114,7 +114,7 @@ def mainMakeMask():
     parser.add_argument("-o","--maskout", type=str, help="the output mask file name  ",default='masksex.fits')
     parser.add_argument("-sf","--satds9", type=str, help="ds9 saturation file",default='ds9sat.reg')
         
-    parser.add_argument("-s","--scale", type=float, help="scale factor to increase the ellipses",)
+    parser.add_argument("-s","--scale", type=float, help="scale factor to increase the ellipses. Default=1",default = 1)
  
 
 

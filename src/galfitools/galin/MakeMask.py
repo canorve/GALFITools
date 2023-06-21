@@ -125,7 +125,7 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
     n = n.astype(int)
     flg = flg.astype(int)
 
-    print("Creating Masks for sky \n")
+    #print("Creating Masks for sky \n")
 
     Rkron = scale * ai * kr + offset
 
@@ -135,6 +135,10 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
 
     hdu = fits.open(maskimage)
     img = hdu[0].data
+
+
+
+    print ("Creating ellipse masks for every object \n")
 
     for idx, val in enumerate(n):
 
@@ -146,13 +150,15 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
 
         if (checkflag == False) and (regflag == False):
 
-            print ("Creating ellipse mask for object {}  \n".format(n[idx]))
+            #print ("Creating ellipse mask for object {}  \n".format(n[idx]))
             img = MakeKron(img, n[idx], xx[idx], yy[idx], Rkron[idx], theta[idx], e[
                 idx], sxsmin[idx], sxsmax[idx], sysmin[idx], sysmax[idx])
 
-        elif(checkflag == True or regflag == True):
+        #elif(checkflag == True or regflag == True):
 
-            print ("Skipping object {}, one or more pixels are saturated \n".format(n[idx]))
+            
+
+    print ("ignoring objects where one or more pixels are saturated \n")
 
     hdu[0].data = img
     hdu.writeto(maskimage, overwrite=True)
@@ -166,10 +172,10 @@ def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
 
     # Check
 
-    xmin = np.int(xmin)
-    xmax = np.int(xmax)
-    ymin = np.int(ymin)
-    ymax = np.int(ymax)
+    xmin = int(xmin)
+    xmax = int(xmax)
+    ymin = int(ymin)
+    ymax = int(ymax)
 
     q = (1 - ell)
     bim = q * R
@@ -366,8 +372,8 @@ def CatArSort(SexCat,scale,SexArSort,NCol,NRow):
     index = Area.argsort()
     for i in index:
 
-        line = "{} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}\n".format(n[i], alpha[i], delta[i], xx[i], yy[i], mg[i], kr[i], fluxrad[i], ia[i], ai[i], e[i], theta[i], bkgd[i], idx[i], flg[i], np.int(
-            np.round(sxmin[i])), np.int(np.round(sxmax[i])), np.int(np.round(symin[i])), np.int(np.round(symax[i])), np.int(np.round(sxsmin[i])), np.int(np.round(sxsmax[i])), np.int(np.round(sysmin[i])), np.int(np.round(sysmax[i])))
+        line = "{} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}\n".format(n[i], alpha[i], delta[i], xx[i], yy[i], mg[i], kr[i], fluxrad[i], ia[i], ai[i], e[i], theta[i], bkgd[i], idx[i], flg[i], int(
+            np.round(sxmin[i])), int(np.round(sxmax[i])), int(np.round(symin[i])), int(np.round(symax[i])), int(np.round(sxsmin[i])), int(np.round(sxsmax[i])), int(np.round(sysmin[i])), int(np.round(sysmax[i])))
 
         f_out.write(line)
 
