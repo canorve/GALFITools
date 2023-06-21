@@ -39,7 +39,6 @@ class InitGal:
     def MakeParams(self):   
 
 
-        flagsky3 = False # flag to avoid to write in sky c3
 
         lines = self.ReadFile(self.GalfitFile) #read  galfit input file
 
@@ -53,14 +52,17 @@ class InitGal:
 
             fileout = open(self.namefile, "w")
 
+            flagsky3 = False # flag to avoid to write in sky c3
 
             index = 0
             comp = 0
+
 
             while index < len(lines):
 
                 line = lines[index]
                 (tmp) = line.split()
+
 
                 if (tmp[0] == "0)"):
                     comp = comp + 1

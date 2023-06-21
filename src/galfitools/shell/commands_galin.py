@@ -62,7 +62,7 @@ def mainInitGal():
     parser = argparse.ArgumentParser(description="Creates GALFIT's input files with different initial parameters")
 
     parser.add_argument("inFile", help="the galfit file galfit.XX ")
-    parser.add_argument("-n","--number", type=int, help="the number of files generated ",default=1)
+    parser.add_argument("-n","--number", type=int, help="the number of files generated. Default = 1",default=1)
         
     parser.add_argument("-p3","--param3", nargs=2, type=float, help="range of values to give to the 3) model's parameter in format [min max] ",)
     parser.add_argument("-p4", "--param4", nargs=2, type=float, help="range of values to give to the 4) model's parameter in format [min max] ")
