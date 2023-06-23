@@ -150,6 +150,11 @@ def mainMaskDs9():
     parser.add_argument("-i","--image", type=str, help="image to obtain the size  ")
 
 
+    parser.add_argument("-b","--border", action="store_true", help="Mask the borders when their value is zero")
+    parser.add_argument("-bv","--borValue",default=0,type=float, help="value of the border if it is different from zero")
+
+
+
 
     args = parser.parse_args()
 
@@ -158,9 +163,12 @@ def mainMaskDs9():
     fill = args.fill
     image = args.image
 
+    bor_flag = args.border
+    borValue = args.borValue
 
 
-    maskDs9(MaskFile, RegFile, fill, image) 
+
+    maskDs9(MaskFile, RegFile, fill, image, bor_flag, borValue) 
 
     print('Done. Mask {} created (or modified)'.format(MaskFile))
 

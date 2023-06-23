@@ -13,7 +13,7 @@ from shapely.geometry import Point, Polygon
 
 
 
-def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str) -> None:
+def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool, borValue: int) -> None:
 
     if not os.path.exists(MaskFile):
 
@@ -173,6 +173,22 @@ def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str) -> None:
             Image = MakePolygon(Image, fill, tupVerts[idx], ncol, nrow)
 
 
+
+    if image:
+
+        hduim=fits.open(image)
+        dataImage = hduim[0].data
+
+        #masking the border in case:
+        bor_val = 100
+        if bor_flag:
+            #print("masking the border")
+            bor_mask = dataImage == borValue 
+
+            if bor_mask.any():
+                Image[bor_mask] = bor_val 
+ 
+        hduim.close()
 
 
     #writing mask file
