@@ -8,7 +8,6 @@ from astropy.io import fits
 import argparse
 
 from matplotlib.path import Path
-from shapely.geometry import Point, Polygon
 
 
 
@@ -211,7 +210,6 @@ def MakePolygon(Image,fill,tupVerts,ncol,nrow):
     "Make a polygon in an image"
 
 
-    poly = Polygon(tupVerts)
 
 
     x, y = np.meshgrid(np.arange(ncol), np.arange(nrow)) # make a canvas with coordinates
@@ -236,30 +234,51 @@ def MakePolygon(Image,fill,tupVerts,ncol,nrow):
 def MakeBox(Image,fill,xpos,ypos,rx,ry,angle,ncol,nrow):
     "Make a box in an image"
 
-    xlo = xpos - rx/2 + 1.
-    xhi = xpos + rx/2.
 
-    ylo = ypos - ry/2 + 1.
-    yhi = ypos + ry/2.
+    anglerad = angle*np.pi/180
+    beta = np.pi/2 - anglerad
 
-    if xlo  < 1:
-        xlo = 1
-    if ylo  < 1:
-        ylo = 1
+    lx = (rx/2)*np.cos(anglerad) - (ry/2)*np.cos(beta)
+    lx2 = (rx/2)*np.cos(anglerad) + (ry/2)*np.cos(beta)
+    ly = (rx/2)*np.sin(anglerad) + (ry/2)*np.sin(beta)
+    ly2 = (rx/2)*np.sin(anglerad) - (ry/2)*np.sin(beta)
 
-    if xhi  > ncol:
-        xhi = ncol - 1 
- 
-    if yhi  > nrow:
-        yhi = nrow - 1
- 
-    xlo=int(np.round(xlo))
-    xhi=int(np.round(xhi))
 
-    ylo=int(np.round(ylo))
-    yhi=int(np.round(yhi))
+    v1x = round(xpos - lx)  
+    v1y = round(ypos - ly) 
 
-    Image[ylo - 1: yhi + 1, xlo - 1: xhi + 1] = fill
+
+    v2x = round(xpos - lx2) 
+    v2y = round(ypos - ly2) 
+
+
+    v3x = round(xpos + lx)  
+    v3y = round(ypos + ly) 
+
+
+    v4x = round(xpos + lx2)
+    v4y = round(ypos + ly2)
+
+
+
+    Verts = [(v1x,v1y),(v2x,v2y),(v3x,v3y),(v4x,v4y)]
+
+
+
+    x, y = np.meshgrid(np.arange(ncol), np.arange(nrow)) # make a canvas with coordinates
+    x, y = x.flatten(), y.flatten()
+    points = np.vstack((x,y)).T 
+
+    p = Path(Verts) # make a polygon
+
+    grid = p.contains_points(points)
+
+    mask = grid.reshape(nrow, ncol) # now you have a mask with points inside a polygon
+
+
+    Image[mask] = fill
+
+
 
     return Image
 
