@@ -22,6 +22,12 @@ from galfitools.galout.getRads import GetReff, GetMe
 
 
 
+from galfitools.galin.galfit import GalComps, GalHead
+
+
+
+
+
 def getN(galfitFile: str, dis: int, frac: float, angle: float, num_comp: int) -> float:
     '''gets the effective radius from a set of Sersics'''
 
@@ -29,14 +35,13 @@ def getN(galfitFile: str, dis: int, frac: float, angle: float, num_comp: int) ->
 
     eff = 0.5
 
-    #head = ReadHead(galfitFile)
-    #galcomps = ReadComps(galfitFile)
-    galcomps = SelectGal(galcomps, dis, num_comp)
-
     galfit = Galfit(galfitFile)
 
     head = galfit.ReadHead()
     galcomps = galfit.ReadComps()
+
+
+
 
 
     galcomps = SelectGal(galcomps, dis, num_comp)
@@ -88,8 +93,9 @@ def getN(galfitFile: str, dis: int, frac: float, angle: float, num_comp: int) ->
 
 
 
+    comps2 =  copy.deepcopy(comps)
     meanme = GetMe().MeanMe(totmag, EffRad*head.scale)
-    me = GetMe().Me(head, comps, EffRad*head.scale, theta)
+    me = GetMe().Me(head, comps2, EffRad*head.scale, theta)
 
     line = 'Mean Surface Brightness at effective radius: {:.2f} mag/\" \n'.format(meanme)
     #print(line)
@@ -114,11 +120,10 @@ def getN(galfitFile: str, dis: int, frac: float, angle: float, num_comp: int) ->
     #computing the Sersic indexes for different radius
 
     Fa = np.arange(0.1, .5, .05)
-    Fb = np.arange(.55,.95,.05)
+    Fb = np.arange(.55,1,.05)
     F = np.concatenate((Fa,Fb))
 
     R = GetReff().GetRfracSer(head, comps, F, theta)
-
 
 
     ns = GetN().GalNs(EffRad, R, F) 

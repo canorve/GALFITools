@@ -907,7 +907,7 @@ def getReComp(galfitFile: str, dis: int, eff: float, angle: float, num_comp: int
     meanme = GetMe().MeanMe(totmag, EffRad*head.scale)
     me = GetMe().Me(head, comps, EffRad*head.scale, theta)
 
-    return Effrad, totmag, meanme, me, N, theta 
+    return EffRad, totmag, meanme, me, N, theta 
 
 
 
@@ -973,6 +973,28 @@ class GetMe:
 ### Sersic components 
 class GetReff:
     '''class to obtain the effective radius for the whole galaxy'''
+
+
+    def GetRfracSer(self, head, comps, F, theta):
+
+
+
+        rads = np.array([])
+
+        for f in F:
+
+
+            r, totmag = GetReff().GetReSer(head, comps, f, theta)
+
+            rads = np.append(rads, r)
+
+
+
+        return rads 
+
+
+
+
 
     def GetReSer(self, galhead: GalHead, comps: GalComps, eff: float, theta: float) -> float:
 

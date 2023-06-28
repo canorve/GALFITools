@@ -62,7 +62,7 @@ def mainGetBreak() -> None:
     angle = args.angle
 
 
-    rbreak, N, theta = getBreak(galfitfile, dis, eff, inicomp, quick, random, num_comp, angle)
+    rbreak, N, theta = getBreak(galfitFile, dis, eff, inicomp, quick, random, num_comp, angle)
         
     print('number of model components: ',N)
 
@@ -206,7 +206,7 @@ def mainGetReComp() -> None:
     num_comp =  args.numcomp
     angle = args.angle
 
-    Effrad, totmag, meanme, me, N, theta = getReComp(galfitFile, dis, eff, angle, num_comp)
+    EffRad, totmag, meanme, me, N, theta = getReComp(galfitFile, dis, eff, angle, num_comp)
 
     print('number of model components: ', N)
 
@@ -350,7 +350,7 @@ def maingetN() -> None:
 
 
 
-    line = '\nSersic index mean: {:.2f}  Standard deviation: {:.2f}  '.format(meanser, stdser)
+    line = 'Sersic index mean: {:.2f}  Standard deviation: {:.2f}  '.format(meanser, stdser)
     print(line)
 
 
