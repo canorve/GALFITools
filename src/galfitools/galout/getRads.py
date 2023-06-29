@@ -23,7 +23,7 @@ from galfitools.galin.galfit import GalComps, GalHead
 
 
 
-def getBreak(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, random: int, num_comp: int, angle: float)-> float:
+def getBreak(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, random: int, num_comp: int, angle: float, plot: bool, ranx: list)-> float:
     '''gets the break radius from a set of Sersics'''
 
 
@@ -88,15 +88,23 @@ def getBreak(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, r
     #########################
 
 
-    R = np.arange(0.1,100,.1)
+    if plot:
 
-    gam = GetBreak().GalBreak(R, comps, theta) 
+        if ranx:
+            (xmin,xmax)=ranx[0], ranx[1]
+        else:
+            xmin = 0.1
+            xmax = 100
+
+        R = np.arange(xmin,xmax,.1)
+
+        gam = GetBreak().GalBreak(R, comps, theta) 
 
 
-    plt.plot(R, gam)
-    plt.grid(True)
-    plt.minorticks_on()
-    plt.savefig("Break.png")
+        plt.plot(R, gam)
+        plt.grid(True)
+        plt.minorticks_on()
+        plt.savefig("Break.png")
 
 
     if quick:
@@ -521,7 +529,7 @@ class GetFWHM:
 
 
 
-def getKappa(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, random: int, angle: float, num_comp: int) -> float:
+def getKappa(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, random: int, angle: float, num_comp: int, plot: bool, ranx: list) -> float:
     '''gets the Kappa radius from a set of Sersics'''
 
 
@@ -590,15 +598,24 @@ def getKappa(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, r
     #########################
 
 
-    R = np.arange(0.1,100,.1)
+    if plot:
 
-    gam = GetKappa().GalKappa(R, comps, theta) 
+        if ranx:
+            (xmin,xmax)=ranx[0], ranx[1]
+        else:
+            xmin = 0.1
+            xmax = 100
+
+        R = np.arange(xmin,xmax,.1)
 
 
-    plt.plot(R, gam)
-    plt.grid(True)
-    plt.minorticks_on()
-    plt.savefig("Kappa.png")
+        gam = GetKappa().GalKappa(R, comps, theta) 
+
+
+        plt.plot(R, gam)
+        plt.grid(True)
+        plt.minorticks_on()
+        plt.savefig("Kappa.png")
 
 
     if quick:
@@ -1062,7 +1079,7 @@ class GetReff:
 
 
 
-def getSlope(galfitFile: str, dis: int, eff: float, slope: float, angle: float, num_comp: int)-> float:
+def getSlope(galfitFile: str, dis: int, eff: float, slope: float, angle: float, num_comp: int, plot: bool, ranx: list)-> float:
     '''gets the slope radius from a set of Sersics'''
 
 
@@ -1122,16 +1139,24 @@ def getSlope(galfitFile: str, dis: int, eff: float, slope: float, angle: float, 
     ### computing the slope
     #########################
 
+    if plot:
 
-    R = np.arange(0.1,100,.1)
+        if ranx:
+            (xmin,xmax)=ranx[0], ranx[1]
+        else:
+            xmin = 0.1
+            xmax = 100
 
-    gam = GetSlope().GalSlope(R, comps, theta) 
+        R = np.arange(xmin,xmax,.1)
 
 
-    plt.plot(R, gam)
-    plt.grid(True)
-    plt.minorticks_on()
-    plt.savefig("slope.png")
+        gam = GetSlope().GalSlope(R, comps, theta) 
+
+
+        plt.plot(R, gam)
+        plt.grid(True)
+        plt.minorticks_on()
+        plt.savefig("slope.png")
 
 
     rgam = GetSlope().FindSlope(comps, theta, slope) 

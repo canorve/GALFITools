@@ -41,7 +41,12 @@ def mainGetBreak() -> None:
     parser.add_argument("-q","--quick", action="store_true", help='evaluate in position only (given by -ni parameter') 
 
 
+
     parser.add_argument("-r","--random", type=int, help="Number of random radius as initial parameters to search for the minimum. It will generated random radius from 0 to effective radius of the component indicated by parameter -ni ")
+
+
+    parser.add_argument("-p","--plot", action="store_true", help='makes plot of double derivative vs. radius ') 
+    parser.add_argument("-rx","--ranx",nargs=2, type=float, help="provide a range for x-axis: xmin - xmax ")
 
 
 
@@ -62,7 +67,11 @@ def mainGetBreak() -> None:
     angle = args.angle
 
 
-    rbreak, N, theta = getBreak(galfitFile, dis, eff, inicomp, quick, random, num_comp, angle)
+    ranx = args.ranx
+    plot = args.plot
+
+
+    rbreak, N, theta = getBreak(galfitFile, dis, eff, inicomp, quick, random, num_comp, angle, plot, ranx)
         
     print('number of model components: ',N)
 
@@ -151,6 +160,12 @@ def mainKappa() -> None:
     parser.add_argument("-r","--random", type=int, help="Number of random radius as initial parameters to search for the minimum. It will generated random radius from 0 to effective radius of the component indicated by parameter -ni ")
 
 
+    parser.add_argument("-p","--plot", action="store_true", help='makes plot of double derivative vs. radius ') 
+    parser.add_argument("-rx","--ranx",nargs=2, type=float, help="provide a range for x-axis: xmin - xmax ")
+
+
+
+
     args = parser.parse_args()
 
     galfitFile = args.GalfitFile
@@ -163,11 +178,14 @@ def mainKappa() -> None:
     random = args.random
     angle = args.angle
 
+    ranx = args.ranx
+    plot = args.plot
+
 
     num_comp =  args.numcomp
 
 
-    rkappa, N, theta = getKappa(galfitFile, dis, eff, inicomp, quick, random, angle, num_comp) 
+    rkappa, N, theta = getKappa(galfitFile, dis, eff, inicomp, quick, random, angle, num_comp, plot, ranx) 
 
     print('number of model components: ',N)
 
@@ -254,6 +272,11 @@ def maingetSlope() -> None:
 
 
 
+    parser.add_argument("-p","--plot", action="store_true", help='makes plot of double derivative vs. radius ') 
+    parser.add_argument("-rx","--ranx",nargs=2, type=float, help="provide a range for x-axis: xmin - xmax ")
+
+
+
 
     args = parser.parse_args()
 
@@ -266,8 +289,14 @@ def maingetSlope() -> None:
     num_comp =  args.numcomp
 
     angle = args.angle
-   
-    rgam, N, theta = getSlope(galfitFile, dis, eff, slope, angle, num_comp)
+
+    ranx = args.ranx
+    plot = args.plot
+
+
+
+
+    rgam, N, theta = getSlope(galfitFile, dis, eff, slope, angle, num_comp, plot, ranx)
 
 
     print('number of model components: ',N)
@@ -304,6 +333,13 @@ def maingetN() -> None:
 
     parser.add_argument("-rf","--radfrac", type=float, help="fraction of light radius. Default = .2 ", default=.2)
 
+
+
+    parser.add_argument("-p","--plot", action="store_true", help='makes plot of double derivative vs. radius ') 
+
+
+
+
     ## parsing variables
 
     args = parser.parse_args()
@@ -317,11 +353,12 @@ def maingetN() -> None:
 
     frac = args.radfrac
 
-
     angle = args.angle
 
+    plot = args.plot
 
-    sersic, meanser, stdser, totmag, N, theta = getN(galfitFile, dis, frac, angle, num_comp)
+
+    sersic, meanser, stdser, totmag, N, theta = getN(galfitFile, dis, frac, angle, num_comp, plot)
 
 
     print('number of model components: ', N)

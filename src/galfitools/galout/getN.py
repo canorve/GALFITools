@@ -28,7 +28,7 @@ from galfitools.galin.galfit import GalComps, GalHead
 
 
 
-def getN(galfitFile: str, dis: int, frac: float, angle: float, num_comp: int) -> float:
+def getN(galfitFile: str, dis: int, frac: float, angle: float, num_comp: int, plot: bool) -> float:
     '''gets the effective radius from a set of Sersics'''
 
 
@@ -129,12 +129,14 @@ def getN(galfitFile: str, dis: int, frac: float, angle: float, num_comp: int) ->
     ns = GetN().GalNs(EffRad, R, F) 
 
 
-    plt.plot(F, ns)
-    plt.grid(True)
-    plt.minorticks_on()
-    plt.xlabel("Fraction of light")
-    plt.ylabel("Sersic index")
-    plt.savefig("Serind.png")
+    if plot:
+
+        plt.plot(F, ns)
+        plt.grid(True)
+        plt.minorticks_on()
+        plt.xlabel("Fraction of light")
+        plt.ylabel("Sersic index")
+        plt.savefig("Serind.png")
 
 
     #print("Sersic index computed at different fraction of light radius: ")
