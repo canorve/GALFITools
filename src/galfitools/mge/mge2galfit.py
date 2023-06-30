@@ -51,9 +51,10 @@ def mge2gal(args) -> None:
 
     regu = args.regu
 
-    initgauss = args.initgauss
 
     numgauss = args.numgauss 
+
+    initgauss = 12
 
 
 

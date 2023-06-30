@@ -36,7 +36,6 @@ def mainMGE():
 
     parser.add_argument("-ng","--numgauss", type=int, help="number of gaussians that will be used for galfit.Starting from the first one")
 
-    parser.add_argument("-ig","--initgauss", type=int, help="number of gaussians to be used in mge_fit_sectors",default=12)
 
 
     args = parser.parse_args()
