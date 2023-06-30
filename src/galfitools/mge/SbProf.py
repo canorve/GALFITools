@@ -42,7 +42,7 @@ def sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output):
     conf.mgzpt = mgzpt
     conf.mask = mask
     conf.skylevel = sky
-    conf.plate = plate
+    conf.scale = plate
     conf.center = center
     conf.output = output
 
@@ -60,7 +60,7 @@ def sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output):
     (ncol, nrow) = GetAxis(image)
  
 
-    obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
+    obj, xpos, ypos, rx, ry, angle = GetInfoEllip(conf.ds9reg)
     xx, yy, Rkron, theta, eps = Ds9ell2Kronell(xpos,ypos,rx,ry,angle)
 
     if center:
@@ -83,7 +83,7 @@ def sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output):
 
     conf.parg =  theta
     conf.eps = eps
-    conf.parg = 1 - eps
+    conf.qarg = 1 - eps
 
 
 
@@ -96,7 +96,7 @@ def sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output):
 
     # removing background from galaxy and model images 
     dataimg.img = dataimg.img - conf.skylevel
-    dataimg.model = dataimg.model - conf.skylevel
+    #dataimg.model = dataimg.model - conf.skylevel
 
 
 
@@ -143,7 +143,7 @@ def readDataImg(conf):
     #reading galaxy and model images from file
     errmsg="file {} does not exist".format(conf.image)
 
-    assert os.path.isfile(galhead.outimage), errmsg
+    assert os.path.isfile(conf.image), errmsg
 
         # hdu 1 => image   hdu 2 => model
     hdu = fits.open(conf.image)
@@ -170,13 +170,13 @@ def readDataImg(conf):
     return dataimg
 
 
-def SectPhot(ellconf, dataimg, n_sectors = 19, minlevel = 0):
+def SectPhot(conf, dataimg, n_sectors = 19, minlevel = 0):
     """ calls to function sectors_photometry for galaxy and model """
 
 
     maskb = dataimg.mask
 
-    eps = 1 - ellconf.qarg
+    eps = 1 - conf.qarg
 
     #if ellconf.dplot:
     plt.clf()
@@ -265,8 +265,8 @@ def sect2xy(sect, conf, n_sectors):
     aellarc = aellab*conf.plate
 
     # formula according to cappellary mge manual
-    mgesb = galhead.mgzpt - 2.5*np.log10(mgecount/conf.exptime) \
-            + 2.5*np.log10(galhead.scale**2) + 0.1 - ellconf.Aext
+    mgesb = conf.mgzpt - 2.5*np.log10(mgecount/conf.exptime) \
+            + 2.5*np.log10(conf.scale**2) + 0.1 #- ellconf.Aext
 
     stidxq = np.argsort(aellarc)
 

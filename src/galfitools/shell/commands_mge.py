@@ -53,7 +53,7 @@ def mainSbProf():
     parser.add_argument("Ds9Region", help = "Ds9 ellipse region file")
 
     parser.add_argument("-mz","--mgzpt", type=float, help="Magnitud zero point", default=25)
-    parser.add_argument("-m","--mask", type=float, help="mask fits file" )
+    parser.add_argument("-m","--mask", type=str, help="mask fits file" )
 
     parser.add_argument("-s","--sky", type=float, help="sky value", default=0)
     parser.add_argument("-p","--plate", type=float, help="plate scale ", default=1)
@@ -67,7 +67,7 @@ def mainSbProf():
     args = parser.parse_args()
 
 
-    image = args.image
+    image = args.Image
     ds9reg = args.Ds9Region
     mgzpt = args.mgzpt
     mask =  args.mask
@@ -76,7 +76,7 @@ def mainSbProf():
     output = args.output
     center = args.center
 
-    SbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output)
+    sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output)
 
     
     print('Done')
