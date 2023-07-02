@@ -63,6 +63,15 @@ def mainSbProf():
                         help="uses the center given in DS9 region file," + 
                         "otherwise it will found the x,y peaks within DS9 ellipse")
 
+    parser.add_argument("-rx","--ranx",nargs=2, type=float, help="provide a range for x-axis: xmin - xmax ")
+    parser.add_argument("-ry","--rany", nargs=2,type=float, help="provide a range for y-axis: ymin - ymax  ")
+ 
+    parser.add_argument("-lx","--logx", action="store_true", help="turn the X-axis to logarithm ")
+
+    parser.add_argument("-px","--pix", action="store_true", help="turn the top x-axis in pixels ")
+    parser.add_argument("-g","--grid", action="store_true", help="display a grid in the plot ")
+ 
+    parser.add_argument("-r","--rad", type=float, help="value for a vertical line to add into the plot")
 
     args = parser.parse_args()
 
@@ -75,8 +84,15 @@ def mainSbProf():
     plate = args.plate
     output = args.output
     center = args.center
+    ranx = args.ranx
+    rany = args.rany
+    logx = args.logx
+    pix = args.pix
+    grid = args.grid
 
-    sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output)
+    rad = args.rad
+
+    sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output, ranx, rany, logx, pix, grid, rad)
 
     
     print('Done')

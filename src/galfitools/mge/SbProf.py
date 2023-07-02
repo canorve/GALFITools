@@ -15,6 +15,8 @@ import mimetypes
 import warnings
 
 
+from scipy import stats
+from matplotlib import gridspec
 
 from astropy.io.votable import parse
 from mgefit.sectors_photometry import sectors_photometry
@@ -31,7 +33,7 @@ import argparse
 
 
 
-def sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output):
+def sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output, ranx, rany, logx, pix, grid, rad):
     'creates the surface brightness profile'
 
 
@@ -45,6 +47,12 @@ def sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output):
     conf.scale = plate
     conf.center = center
     conf.output = output
+    conf.ranx = ranx
+    conf.rany = rany
+    conf.pix = pix
+    conf.grid = grid 
+    conf.logx = logx 
+    conf.rad = rad
 
 
 
@@ -75,7 +83,7 @@ def sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output):
 
     # I have to switch x and y coordinates, don't ask me why
 
-    xpeak, ypeak = ypeak, xpeak
+    #xpeak, ypeak = ypeak, xpeak
 
 
     conf.xc = xpeak
@@ -124,7 +132,7 @@ def sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output):
     ##############################################
     ##############################################
 
-    if ellconf.dplot:
+    if conf.dplot:
         plt.pause(1.5)
     plt.savefig(conf.output, dpi = conf.dpival)
 
@@ -235,7 +243,7 @@ def EllipSectors(conf, sectgalax, n_sectors = 19, minlevel = 0):
 
 
     # Plotting
-    limx,limy, axsec = PlotSB(xradq, ysbq, ysberrq, conf, conf.plate)
+    limx,limy, axsec = PlotSB(xradq, ysbq, ysberrq, conf, conf.scale)
 
 
 
@@ -248,7 +256,6 @@ def sect2xy(sect, conf, n_sectors):
 
     #######################################
     #######################################
-
     # model
     stidx = np.argsort(sect.radius)
 
@@ -262,7 +269,7 @@ def sect2xy(sect, conf, n_sectors):
     aellab = mgerad * np.sqrt((np.sin(mgeanrad)**2)/ab**2 + np.cos(mgeanrad)**2)
 
 
-    aellarc = aellab*conf.plate
+    aellarc = aellab*conf.scale
 
     # formula according to cappellary mge manual
     mgesb = conf.mgzpt - 2.5*np.log10(mgecount/conf.exptime) \
@@ -339,6 +346,7 @@ def PlotSB(xradq,ysbq,ysberrq, conf, scale):
 
     #ULISES begin
     #fig, (axsec,axred) = plt.subplots(2, sharex=True, sharey=False)
+    #fig, axsec = plt.subplots(1)
     #gs = gridspec.GridSpec(2, 1,height_ratios=[3,1])
     #gs.update(hspace=0.07)
     #ULISES end 
@@ -346,12 +354,11 @@ def PlotSB(xradq,ysbq,ysberrq, conf, scale):
 
     fig, axsec = plt.subplots()
 
-    #if ellconf.flagranx == True:
-    #    (xmin,xmax)=ellconf.ranx[0], ellconf.ranx[1]
+    if conf.ranx:
+        (xmin, xmax) = conf.ranx[0], conf.ranx[1]
 
-    #if ellconf.flagrany == True:
-    #    (ymin,ymax)=ellconf.rany[0], ellconf.rany[1]
-
+    if conf.rany:
+        (ymin, ymax) = conf.rany[0], conf.rany[1]
 
     minrad = np.min(xradq)
     maxrad = np.max(xradq)
@@ -370,20 +377,19 @@ def PlotSB(xradq,ysbq,ysberrq, conf, scale):
 
     axsec.set_ylabel(r"Surface Brightness $(mag\; arcsec^{-2})$")
 
-    axsec.errorbar(xradq, ysbq,yerr=ysberrq,fmt='o-',capsize=2,color='red',markersize=0.7,label="galaxy",linewidth=2)
+    axsec.errorbar(xradq, ysbq,yerr=ysberrq,fmt='o-',capsize=2,color='blue',markersize=0.7,label="galaxy",linewidth=2)
 
 
     #if ellconf.flagalax == False:
     #    axsec.errorbar(xradm, ysbm,yerr=ysberrm,fmt='o-',capsize=2,color='blue',markersize=0.7,label="Model",linewidth=2)
 
 
-    #if ellconf.flagrany == True:
-    #    axsec.set_ylim(ymax,ymin) #inverted
-    #else:
+    if conf.rany == True:
+        axsec.set_ylim(ymax,ymin) #inverted
+    else:
+        axsec.set_ylim(yran)
 
-    axsec.set_ylim(yran)
-
-    if conf.flaglogx == True:
+    if conf.logx == True:
 
         axsec.set_xscale("log")
 
@@ -448,43 +454,45 @@ def PlotSB(xradq,ysbq,ysberrq, conf, scale):
     #    axred.errorbar(xradq, residual, yerr=err,fmt='.',capsize=2,color='k')
 
     #axred.axhline(y=0,ls='dashed', color='k')
-    #axred.set_xlabel('Radius $(arcsec)$')
+    axsec.set_xlabel('Radius $(arcsec)$')
     #axred.set_ylabel('Residual (%)')
     #axred.set_ylim(-2,2)
     # ULISES end
 
 
-    if conf.flaglogx == True:
+    #if conf.flaglogx == True:
 
-        axred.set_xscale("log")
+    #    axred.set_xscale("log")
 
-        locmaj = LogLocator(base=10,numticks=12)
-        axred.xaxis.set_major_locator(locmaj)
+    #    locmaj = LogLocator(base=10,numticks=12)
+    #    axred.xaxis.set_major_locator(locmaj)
 
-        locmin = LogLocator(base=10.0,subs=(0.2,0.4,0.6,0.8),numticks=12)
-        axred.xaxis.set_minor_locator(locmin)
-        axred.xaxis.set_minor_formatter(NullFormatter())
-    else:
-        axred.xaxis.set_minor_locator(AutoMinorLocator())
-        axred.xaxis.set_major_locator(AutoLocator())
-
-
-
-    axred.tick_params(which='both', width=2)
-    axred.tick_params(which='major', length=7)
-    axred.tick_params(which='minor', length=4, color='r')
-
-    #if ellconf.flagranx == True:
-    #    axsec.set_xlim(xmin,xmax)
-    #    axred.set_xlim(xmin,xmax) #ulises plot
+    #    locmin = LogLocator(base=10.0,subs=(0.2,0.4,0.6,0.8),numticks=12)
+    #    axred.xaxis.set_minor_locator(locmin)
+    #    axred.xaxis.set_minor_formatter(NullFormatter())
     #else:
-    axsec.set_xlim(xran)
-    axred.set_xlim(xran) #ulises plot
- 
+    #    axred.xaxis.set_minor_locator(AutoMinorLocator())
+    #    axred.xaxis.set_major_locator(AutoLocator())
 
 
 
-    if conf.flagpix == True:
+    #axred.tick_params(which='both', width=2)
+    #axred.tick_params(which='major', length=7)
+    #axred.tick_params(which='minor', length=4, color='r')
+
+
+
+    if conf.ranx:
+        axsec.set_xlim(xmin,xmax)
+    #  axred.set_xlim(xmin,xmax) #ulises plot
+    else:
+        axsec.set_xlim(xran)
+      # axred.set_xlim(xran) #ulises plot
+     
+
+
+
+    if conf.pix == True:
 
         axpix = axsec.twiny()
 
@@ -496,7 +504,7 @@ def PlotSB(xradq,ysbq,ysberrq, conf, scale):
         axpix.figure.canvas.draw()
 
 
-        if conf.flaglogx == True:
+        if conf.logx == True:
             axpix.set_xscale("log")
             locmaj = LogLocator(base=10,numticks=12)
             axpix.xaxis.set_major_locator(locmaj)
@@ -516,7 +524,7 @@ def PlotSB(xradq,ysbq,ysberrq, conf, scale):
     else:
         axret=axsec
 
-    if ellconf.flagrid == True:
+    if conf.grid == True:
         # Customize the major grid
         axsec.grid(which='major', linestyle='-', linewidth='0.7', color='black')
         # Customize the minor grid
@@ -526,8 +534,11 @@ def PlotSB(xradq,ysbq,ysberrq, conf, scale):
     #change the linewidth of the axis
     for axis in ['top','bottom','left','right']:
         axsec.spines[axis].set_linewidth(1.5)
-        axred.spines[axis].set_linewidth(1.5)
+        #axred.spines[axis].set_linewidth(1.5)
 
+    if conf.rad:
+
+        axsec.axvline(x=conf.rad,  linestyle='--', color='k', linewidth=2)
 
     return xran,yran,axret
 
@@ -537,13 +548,13 @@ def PlotSB(xradq,ysbq,ysberrq, conf, scale):
 class Config:
 
 
-    flaglogx = False
+    logx = False
     image = "none.fits" 
 
     mgzpt = 25
     ds9reg = "none.reg"
     mask = 'mask.fits'
-    plate = 1 
+    scale = 1 
     center = False
     exptime = 1
 
@@ -552,6 +563,9 @@ class Config:
     #init
     xc = 1 
     yc = 1 
+
+    ranx = [0,0]
+    rany = [0,0]
  
     qarg=1
     parg=0
@@ -568,8 +582,8 @@ class Config:
     #output file
     output = "out.png"
 
-    flagpix = False
-    flagrid = False
+    pix = False
+    grid = False
 
 
     # sky parameters:
@@ -579,6 +593,10 @@ class Config:
     dplot=True
 
     Aext = 0  # surface brightness correction for plots
+
+    rad = 0
+
+
 
 def GetExpTime(Image):
     # k Check
