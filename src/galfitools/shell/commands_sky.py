@@ -24,6 +24,7 @@ def mainGalfitSky():
     parser.add_argument("-x","--xpos", type=float, help="the x position. default=1",default = 1)
     parser.add_argument("-y","--ypos", type=float, help="the y position. default=1",default = 1)
 
+    parser.add_argument("-is","--initsky", type=float, help="the initial sky value default=0",default = 0)
 
 
     args = parser.parse_args()
@@ -37,10 +38,10 @@ def mainGalfitSky():
     X = args.xpos
     Y = args.ypos
 
+    initsky = args.initsky
 
 
-
-    galfitSky(imgname, maskfile, mgzpt, scale, X, Y)
+    galfitSky(imgname, maskfile, mgzpt, scale, X, Y, initsky)
 
 
 

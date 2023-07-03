@@ -17,51 +17,15 @@ import argparse
 # computes sky using GALFIT
 #change it and use skyRem instead
 
-def galfitSky(imgname, maskfile, mgzpt, scale, X, Y)-> None:
+def galfitSky(imgname, maskfile, mgzpt, scale, X, Y, sky)-> None:
     
 
     flagpos=False
 
 
-    sexfile = "sim.cat"
-    sexarsort   = "sexsort.cat"
-    satfileout  = "ds9sat.reg"
 
-    satscale = 1
-    satoffset = 0
-
-
-     # running sextractor
-    eps,theta,xpeak,ypeak,back = Sextractor(imgname)
-
-
-    #    ang=90-ang
-    ######################
-    sky=back
-    #################
-
-    # comparison between different methods
-    print(eps,theta,xpeak,ypeak,back)
-
-
-
-    print ("Creating masks....\n")
 
     (NCol, NRow) = GetAxis(imgname)
-
-    Total = CatArSort(sexfile,scale,sexarsort,NCol,NRow)
-
-    print ("Creating sat region files....\n")
-
-    ds9satbox(satfileout,sexfile,satscale,satoffset) # crea archivo  Saturacion reg
-
-
-    ##### segmentation mask
-
-    MakeImage(maskfile, NCol, NRow)
-
-    MakeMask(maskfile, sexarsort, scale, 0, satfileout)  # offset set to 0
-    MakeSatBox(maskfile, satfileout, Total + 1, NCol, NRow) #make sat region
 
 
 
@@ -71,8 +35,8 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y)-> None:
     fit=1
     Z=0
 
-    xpos=xpeak
-    ypos=ypeak
+    xpos = X
+    ypos = Y
     anglegass=35.8
 
 
@@ -100,124 +64,6 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y)-> None:
 
     #    sigmapsf = [0.494, 1.44, 4.71, 13.4]      # In PC1 pixels
     #    normpsf = [0.294, 0.559, 0.0813, 0.0657]  # total(normpsf)=1
-
-    ############################
-
-    FitBox=6
-
-    Num, RA, Dec, XPos, YPos, Mag, Kron, FluxRad, IsoArea, AIm, E, Theta, Background, Class, Flag, XMin, XMax, YMin, YMax, XSMin, XSMax, YSMin, YSMax = np.genfromtxt(
-	    sexarsort, delimiter="", unpack=True)  # sorted
-
-    ##
-    #    Obj.Angle = Obj.Theta - 90
-    #    Obj.AR = 1 - Obj.E
-    #    Obj.RKron = ParVar.KronScale * Obj.AIm * Obj.Kron
-    Sky = Background
-
-
-    XMin = XMin.astype(int)
-    XMax = XMax.astype(int)
-    YMin = YMin.astype(int)
-    YMax = YMax.astype(int)
-
-    XSMin = XSMin.astype(int)
-    XSMax = XSMax.astype(int)
-    YSMin = YSMin.astype(int)
-    YSMax = YSMax.astype(int)
-
-
-
-
-    XSize = XMax - XMin
-    YSize = YMax - YMin
-
-    #   enlarge fit area
-
-    XSize = FitBox * XSize
-    YSize = FitBox * YSize
-
-    ##  30 pixels is the minimum area to fit (arbitrary number):
-
-    masksize = XSize < 30
-
-    if masksize.any():
-        XSize[masksize] = 30
-
-    masksize = YSize < 30
-
-    if masksize.any():
-        YSize[masksize] = 30
-
-    #  Calculate the (x,y) position of the current object relative to
-    #  the tile in which it lives.
-
-    XFit = XPos
-    YFit = YPos
-
-    #  Calculate fitting box needed to plug into galfit header:
-
-    XLo = XFit - XSize / 2
-    XLo = XLo.astype(int)
-
-    maskxy = XLo <= 0
-    if maskxy.any():
-        XLo[maskxy] = 1
-
-
-    XHi = XFit + XSize / 2
-    XHi = XHi.astype(int)
-
-    maskxy = XHi > NCol  #This does not affect the code at all
-    if maskxy.any():
-        XHi[maskxy] = NCol
-
-
-    YLo = YFit - YSize / 2
-    YLo = YLo.astype(int)
-
-    maskxy = YLo <= 0
-    if maskxy.any():
-        YLo[maskxy] = 1
-
-
-    YHi = YFit + YSize / 2
-    YHi = YHi.astype(int)
-
-    maskxy = YHi > NRow  # same as above but for y axis
-    if maskxy.any():
-        YHi[maskxy] = NRow
-
-    ####### find galax
-
-    if flagpos == True:
-
-    #        index =  Mag.argsort()
-    #        i=0
-        dist=15
-
-        for idx, item in enumerate(Num):
-
-            dx= XPos[idx] - X
-            dy= YPos[idx] - Y
-            dt= np.sqrt(dx**2 + dy**2)
-
-
-            cflag=CheckFlag(4,Flag[idx])
-            if cflag==False and dt < dist:
-                dist = dt
-                sindex=idx
-
-
-        Num=Num[sindex]
-        xpos=XPos[sindex]
-        ypos=YPos[sindex]
-
-        xlo=XLo[sindex]
-        ylo=YLo[sindex]
-
-        xhi=XHi[sindex]
-        yhi=YHi[sindex]
-
 
     parfile="sky.txt"
     outname=TNAM
@@ -752,73 +598,6 @@ def CheckSatReg(x,y,filein,R,theta,ell):
 ####################################################
 ####################################################
 #####################################################
-
-
-def Sextractor(filimage):
-
-    sexfile="../config/default.sex"
-    CatSex="sim.cat"
-
-    runcmd="sextractor -c {} {} ".format(sexfile,filimage)
-    print(runcmd)
-
-    err = sp.run([runcmd],shell=True,stdout=sp.PIPE,stderr=sp.PIPE,universal_newlines=True)  # Run GALFIT
-
-    KronScale=1
-###############  Read in sextractor sorted data ################
-    if os.stat(CatSex).st_size != 0 :
-        Num, RA, Dec, XPos, YPos, Mag, Kron, FluxRad, IsoArea, AIm, E, Theta, Background, Class, Flag = np.genfromtxt(
-           CatSex, delimiter="", unpack=True)  # sorted
-## checking if they are numpy arrays:
-
-
-        if(isinstance(Num,np.ndarray)):
-
-            index =  Mag.argsort()
-            i=0
-
-            for i in index:
-
-                cflag=CheckFlag(4,Flag[i])
-                if cflag==False:  # avoid confusion with saturated stars
-                    sindex=i
-                    break
-
-            Num=Num[sindex]
-            RA=RA[sindex]
-            Dec=Dec[sindex]
-            XPos=XPos[sindex]
-            YPos=YPos[sindex]
-            Mag=Mag[sindex]
-            Kron=Kron[sindex]
-            FluxRad=FluxRad[sindex]
-            IsoArea=IsoArea[sindex]
-            AIm=AIm[sindex]
-            E=E[sindex]
-            Theta=Theta[sindex]
-            Background=Background[sindex]
-            Class=Class[sindex]
-            Flag=Flag[sindex]
-
-##
-        Angle = np.abs(Theta)
-        AR = 1 - E
-        RKron = KronScale * AIm * Kron
-        Sky = Background
-
-
-############
-
-    XPos=np.round(XPos)
-    YPos=np.round(YPos)
-
-    XPos=np.int(XPos)
-    YPos=np.int(YPos)
-
-
-    print("Sextractor done")
-    return E,Angle,XPos,YPos,Background
-
 
 
 
