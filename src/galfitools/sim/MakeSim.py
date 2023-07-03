@@ -11,29 +11,29 @@ import argparse
 def makeSim(image, GAIN, skymean, skystd, newimage)-> None: 
 
 
-    sizex,sizey =GetAxis(image) 
+    sizex, sizey = GetAxis(image) 
 
     hdu = fits.open(image)
 
-    img=hdu[0].data
+    img = hdu[0].data
 
     eimg = GAIN*img
 
-    noisyimg= np.random.poisson(eimg)
+    noisyimg = np.random.poisson(eimg)
 
-    pimg = noisyimg / GAIN
+    pimg = noisyimg/GAIN
 
     hdu[0].data = pimg  
 
-    hdu.writeto("poissonimg.fits",overwrite=True)
+    hdu.writeto("poissonimg.fits", overwrite=True)
 
-    sky = np.random.normal(skymean,skystd,(sizex,sizey))
+    sky = np.random.normal(skymean, skystd, (sizex,sizey))
    
 
     hdusky = fits.PrimaryHDU()
     hdusky.data = sky
 
-    hdusky.writeto("skynoise.fits",overwrite=True)
+    hdusky.writeto("skynoise.fits", overwrite = True)
 
 
 
@@ -44,7 +44,7 @@ def makeSim(image, GAIN, skymean, skystd, newimage)-> None:
 
     hdu[0].data = imgsim
 
-    hdu.writeto(newimage,overwrite=True)
+    hdu.writeto(newimage, overwrite = True)
 
 
     hdu.close()
