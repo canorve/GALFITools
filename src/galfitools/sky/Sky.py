@@ -34,9 +34,8 @@ def sky(imgname, maskimage, filereg) -> None:
     maskdat = hdu[0].data
     hdu.close()
 
-    if flagseg or flagreg:
-        imgdat  = imgdat[ylo - 1:yhi, xlo - 1:xhi]
-        maskdat = maskdat[ylo - 1:yhi, xlo - 1:xhi]
+    imgdat  = imgdat[ylo - 1:yhi, xlo - 1:xhi]
+    maskdat = maskdat[ylo - 1:yhi, xlo - 1:xhi]
 
 
     maskdat=np.array(maskdat,dtype=bool)
