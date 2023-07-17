@@ -8,6 +8,8 @@ from galfitools.galout.getRads import getKappa
 from galfitools.galout.getRads import getReComp
 from galfitools.galout.getRads import getSlope
 from galfitools.galout.getRads import getSlope
+from galfitools.galout.getRads import getBulgeRad
+from galfitools.galout.getMissingLight import getMissLight
 from galfitools.galout.getN import getN
 from galfitools.galout.showcube import displayCube
 
@@ -389,6 +391,117 @@ def maingetN() -> None:
 
     line = 'Sersic index mean: {:.2f}  Standard deviation: {:.2f}  '.format(meanser, stdser)
     print(line)
+
+
+
+
+def mainGetBulgeRad() -> None: 
+    '''gets the bulge radius or the radius where two models of surface brightness models are equal'''
+
+    #reading arguments parsing
+
+    parser = argparse.ArgumentParser(description = "getBulgeRad: gets the bulge radius or the radius where two models of surface brightness models are equal")
+
+
+    # required arguments
+    parser.add_argument("GalfitFile1", help = "Galfit File containing the coreless surface brightness model")
+    parser.add_argument("GalfitFile2", help = "Galfit File containing the core surface brightness model")
+
+    #parser.add_argument("gammarad", type=float, help="gamma radius")
+
+    parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
+
+    #parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
+
+    parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
+
+    parser.add_argument("-pa","--angle", type=float, 
+                        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components. Angle measured from Y-Axis as same as GALFIT. ")
+
+
+    parser.add_argument("-p","--plot", action="store_true", help='makes plot of double derivative vs. radius ') 
+    parser.add_argument("-rx","--ranx", nargs=2, type=float, help="provide a range for x-axis: xmin - xmax ")
+
+
+    ## parsing variables
+
+    args = parser.parse_args()
+
+    galfitFile1 = args.GalfitFile1
+    galfitFile2 = args.GalfitFile2
+
+    dis = args.dis
+
+    num_comp =  args.numcomp
+
+
+    ranx = args.ranx
+    plot = args.plot
+
+
+    rbulge, N1, N2, theta = getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx)
+
+
+    print('number of model components for the bulge: ',N1)
+    print('number of model components for the rest of the galaxy: ',N2)
+
+
+    line = 'Using a theta value of: {:.2f} degrees\n'.format(theta)
+    print(line)
+
+
+    line = 'The bulge radius is {:.2f} pixels \n'.format(rbulge)
+    print(line)
+
+
+
+
+def mainMissingLight() -> None: 
+    '''gets the missing light from a two models'''
+
+    #reading arguments parsing
+
+    parser = argparse.ArgumentParser(description = "getMissLight: computes the missing light from two surface brightness models")
+
+
+    # required arguments
+    parser.add_argument("GalfitFile1", help = "Galfit File containing the coreless surface brightness model")
+    parser.add_argument("GalfitFile2", help = "Galfit File containing the core surface brightness model")
+
+    parser.add_argument("rad", type=float, help="radius to integrate")
+
+    parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
+
+
+    parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
+
+
+    ## parsing variables
+
+    args = parser.parse_args()
+
+    galfitFile1 = args.GalfitFile1
+    galfitFile2 = args.GalfitFile2
+
+    dis = args.dis
+
+    num_comp =  args.numcomp
+
+    rad = args.rad
+
+
+
+    magmiss, N1, N2 = getMissLight(galfitFile1, galfitFile2, dis, num_comp, rad)
+
+
+    print('number of model components coreless model: ',N1)
+    print('number of model components core model: ',N2)
+
+
+    line = 'the missing light is {:.2f} mag \n'.format(magmiss)
+    print(line)
+
+
 
 
 

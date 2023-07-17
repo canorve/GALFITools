@@ -1268,6 +1268,187 @@ class GetSlope:
 
 
 
+############################
+############################
+############################
+
+
+
+def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
+    '''gets the bulge radius or the radius where two models of surface brightness models are equal'''
+
+
+
+    galfit1 = Galfit(galfitFile1)
+    head1 = galfit1.ReadHead()
+    galcomps1 = galfit1.ReadComps()
+
+
+    galfit2 = Galfit(galfitFile1)
+    head2 = galfit2.ReadHead()
+    galcomps2 = galfit2.ReadComps()
+
+
+
+    galcomps1 = SelectGal(galcomps1, dis, num_comp)
+
+    galcomps2 = SelectGal(galcomps2, dis, num_comp)
+
+
+
+    #taking the last component position angle for the whole galaxy
+
+    maskgal1 = (galcomps1.Active == True) 
+    maskgal2 = (galcomps2.Active == True) 
+
+    if args.angle:
+        theta = angle
+    else:
+        theta = galcomps2.PosAng[maskgal2][-1]  
+
+    #theta = 18.2534 
+
+
+    #convert all exp, gaussian and de vaucouleurs to Sersic format
+    comps1 = conver2Sersic(galcomps1) 
+    comps2 = conver2Sersic(galcomps2) 
+
+
+    N1 = numComps(comps1,'all')
+    N2 = numComps(comps2,'all')
+
+
+    if (N1 == 0) or (N2 == 0):
+        print('not enough number of components of one of the two models to proceed')
+        print('exiting..')
+        sys.exit(1)
+
+
+
+
+
+
+    if plot:
+
+        if ranx:
+            (xmin, xmax) = ranx[0], ranx[1]
+        else:
+            xmin = 0.1
+            xmax = 100
+
+
+
+        R = np.arange(xmin,xmax,.1)
+
+
+        Idiff = getDiff(head1, comps1, comps2, R, theta)
+
+        plt.plot(R, Idiff)
+        plt.grid(True)
+        plt.minorticks_on()
+        plt.savefig("BulgeRad.png")
+
+
+
+
+
+    #computing bulge radius
+
+    rbulge = optimize.newton(getDiffx, 0, args=(head1, comps1, comps2, theta)) 
+
+
+    return rbulge, N1, N2, theta 
+
+
+
+def getDiff(head1, comps1, comps2, R, theta):
+
+
+    Idiff = np.array([])
+
+    for r in R:
+
+        Ir1 = GetIr().Ir(head1, comps1, r, theta)
+        Ir2 = GetIr().Ir(head1, comps2, r, theta)
+
+        Ird = Ir1 - Ir2
+        Idiff = np.append(Idiff, Ird)
+
+
+
+    return Idiff  
+
+
+def getDiffx(r, head1, comps1, comps2, theta):
+
+
+    Ir1 = GetIr().Ir(head1, comps1, r, theta)
+    Ir2 = GetIr().Ir(head1, comps2, r, theta)
+
+    Irdx = Ir1 - Ir2
+
+
+    return Irdx
+
+
+
+
+
+class GetIr:
+
+
+    def Ir(self, head, comps, R, theta):
+
+
+        #comps.Rad = comps.Rad*head.scale
+        comps.Flux = 10**((head.mgzpt - comps.Mag)/2.5)
+
+        k = gammaincinv(2*comps.Exp, 0.5)
+
+        denom1 = (2*np.pi*comps.Rad**2)*(np.exp(k))
+        denom2 = (comps.Exp)*(k**(-2*comps.Exp))
+        #denom3 = (gamma(2*comps.Exp))*(comps.AxRat) 
+        denom3 = (gamma(2*comps.Exp))
+
+        denom = denom1*denom2*denom3 
+        
+        comps.Ie = comps.Flux/denom
+
+        maskgal = (comps.Active == True) 
+
+
+        Itotr = self.Itotser(R, comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta) 
+
+        #me = -2.5*np.log10(Itotr)
+
+        return Itotr 
+
+     
+    def Itotser(self, R: float, Ie: list, rad: list, n: list, q: list, pa: list, theta: float) -> float:
+
+        ItotR = self.Iser(R, Ie, rad, n, q, pa, theta) 
+
+        return ItotR.sum()
+
+
+
+    def Iser(self, R: float, Ie: list, Re: list, n: list, q: list, pa: list, theta: float) -> float:
+        '''sersic flux to a determined R'''
+
+
+        k = gammaincinv(2*n, 0.5)
+
+        Rcor = GetRadAng(R, q, pa, theta) 
+
+        Ir = Ie*np.exp(-k*((Rcor/Re)**(1/n) - 1))
+
+        
+        return Ir
+
+
+
+
+
 
 
 
