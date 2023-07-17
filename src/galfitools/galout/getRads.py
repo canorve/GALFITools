@@ -11,7 +11,7 @@ import copy
 
 from scipy.special import gamma, gammainc, gammaincinv
 
-from scipy.optimize import bisect, fmin
+from scipy.optimize import bisect, fmin, newton
 
 import matplotlib.pyplot as plt
 
@@ -1354,7 +1354,7 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
 
     #computing bulge radius
 
-    rbulge = optimize.newton(getDiffx, 0, args=(head1, comps1, comps2, theta)) 
+    rbulge = newton(getDiffx, 0, args=(head1, comps1, comps2, theta)) 
 
 
     return rbulge, N1, N2, theta 
