@@ -13,6 +13,42 @@ from galfitools.galout.getMissingLight import getMissLight
 from galfitools.galout.getN import getN
 from galfitools.galout.showcube import displayCube
 
+from galfitools.galout.PhotDs9 import photDs9 
+
+
+
+
+def mainPhotDs9(): 
+
+
+    parser = argparse.ArgumentParser(description="computes photometry from a Ds9 region file: Box, Ellipses and Polygons ")
+
+    parser.add_argument("ImageFile", help="the image file where the photometry will be computed")
+    parser.add_argument("RegFile", help="the DS9 region file")
+
+    parser.add_argument("-zp","--zeropoint", type=float, help="The value of the zero point. Default = 25 ",default=25)
+
+
+    parser.add_argument("-sk","--sky", default=0, type=float, help="the value of the sky background to be removed")
+
+
+
+
+    args = parser.parse_args()
+
+    ImageFile = args.ImageFile 
+    RegFile = args.RegFile 
+    zeropoint = args.zeropoint
+    sky = args.sky
+
+
+    mag = photDs9(ImageFile, RegFile, zeropoint, sky)
+
+
+    line = "the magnitude from the ds9 region is: {:.2f} \n".format(mag)
+    print(line)
+
+
 
 #console scripts
 def mainGetBreak() -> None: 
