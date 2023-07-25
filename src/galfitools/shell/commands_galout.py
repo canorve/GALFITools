@@ -272,10 +272,11 @@ def mainGetReComp() -> None:
     line = 'Total Magnitude of the galaxy: {:.2f} \n'.format(totmag)
     print(line)
 
-    line = 'Mean Surface Brightness at effective radius: {:.2f} mag/\" \n'.format(meanme)
+    line = 'Surface brightness at effective radius (\u03BCe): {:.2f} mag/\" \n'.format(me)
     print(line)
 
-    line = 'Surface brightness at effective radius {:.2f} mag/\" \n'.format(me)
+
+    line = 'Mean Surface Brightness at effective radius (<\u03BC>e): {:.2f} mag/\" \n'.format(meanme)
     print(line)
 
     line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
