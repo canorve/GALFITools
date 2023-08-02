@@ -33,7 +33,7 @@ import argparse
 
 
 
-def sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output, ranx, rany, logx, pix, grid, rad):
+def sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output, ranx, rany, logx, pix, grid, rad, rad2):
     'creates the surface brightness profile'
 
 
@@ -53,6 +53,7 @@ def sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output, ranx, rany, l
     conf.grid = grid 
     conf.logx = logx 
     conf.rad = rad
+    conf.rad2 = rad2
 
 
 
@@ -538,7 +539,14 @@ def PlotSB(xradq,ysbq,ysberrq, conf, scale):
 
     if conf.rad:
 
-        axsec.axvline(x=conf.rad,  linestyle='--', color='k', linewidth=2)
+        axsec.axvline(x=conf.rad,  linestyle='--', color='m', linewidth=2)
+
+    if conf.rad2:
+
+        axsec.axvline(x=conf.rad2,  linestyle='--', color='c', linewidth=2)
+
+
+
 
     return xran,yran,axret
 
@@ -595,6 +603,7 @@ class Config:
     Aext = 0  # surface brightness correction for plots
 
     rad = 0
+    rad2 = 0
 
 
 

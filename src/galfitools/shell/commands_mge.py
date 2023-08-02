@@ -72,6 +72,7 @@ def mainSbProf():
     parser.add_argument("-g","--grid", action="store_true", help="display a grid in the plot ")
  
     parser.add_argument("-r","--rad", type=float, help="value for a vertical line to add into the plot")
+    parser.add_argument("-r2","--rad2", type=float, help="value for a second vertical line to add into the plot")
 
     args = parser.parse_args()
 
@@ -91,8 +92,9 @@ def mainSbProf():
     grid = args.grid
 
     rad = args.rad
+    rad2 = args.rad2
 
-    sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output, ranx, rany, logx, pix, grid, rad)
+    sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output, ranx, rany, logx, pix, grid, rad, rad2)
 
     
     print('Done')
