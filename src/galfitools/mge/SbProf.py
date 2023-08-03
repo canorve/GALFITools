@@ -89,8 +89,8 @@ def sbProf(args):
     (ncol, nrow) = GetAxis(image)
  
 
-    obj, xpos, ypos, rx, ry, angle = GetInfoEllip(conf.ds9reg)
-    xx, yy, Rkron, theta, eps = Ds9ell2Kronell(xpos,ypos,rx,ry,angle)
+    obj, xpos, ypos, rx, ry, angle2 = GetInfoEllip(conf.ds9reg)
+    xx, yy, Rkron, theta, eps = Ds9ell2Kronell(xpos,ypos,rx,ry,angle2)
 
     if center:
         print('center of ds9 ellipse region will be used')
@@ -113,7 +113,7 @@ def sbProf(args):
     conf.yc = ypeak 
 
     if angle:
-        conf.parg =  theta
+        conf.parg = angle 
     else:
         conf.parg =  theta
 
@@ -192,7 +192,7 @@ def readDataImg(conf):
 
     ### reading mask image from file
 
-    if conf.mask is not None:
+    if conf.mask:
 
         errmsg="file {} does not exist".format(conf.mask)
         assert os.path.isfile(conf.mask), errmsg
@@ -203,8 +203,10 @@ def readDataImg(conf):
         hdu.close()
 
     else:
-        dataimg.mask = None
+        dataimg.mask = np.array([])
+
  
+
 
     return dataimg
 
@@ -240,8 +242,13 @@ def SectPhot(conf, dataimg, n_sectors = 19, minlevel = 0):
     #if fit == 'gal':
     #  galaxy:
 
-    sectimg = sectors_photometry(dataimg.img, eps, angsec, xctemp, yctemp, minlevel = minlevel,
+    if conf.mask:
+        sectimg = sectors_photometry(dataimg.img, eps, angsec, xctemp, yctemp, minlevel = minlevel,
                         plot = conf.dplot, badpixels = maskb, n_sectors = n_sectors)
+    else:
+        sectimg = sectors_photometry(dataimg.img, eps, angsec, xctemp, yctemp, minlevel = minlevel,
+                        plot = conf.dplot, n_sectors = n_sectors)
+ 
 
 
     #if ellconf.dplot:
