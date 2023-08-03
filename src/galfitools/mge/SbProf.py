@@ -33,9 +33,29 @@ import argparse
 
 
 
-def sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output, ranx, rany, logx, pix, grid, rad, rad2):
-    'creates the surface brightness profile'
+def sbProf(args):
+    '''creates a surface brightness profile'''
 
+    image = args.Image
+    ds9reg = args.Ds9Region
+    mgzpt = args.mgzpt
+    mask =  args.mask
+    axrat = args.axrat
+    angle = args.angle
+    sky = args.sky
+    plate = args.plate
+    output = args.output
+    center = args.center
+    ranx = args.ranx
+    rany = args.rany
+    logx = args.logx
+    pix = args.pix
+    grid = args.grid
+
+    rad = args.rad
+    rad2 = args.rad2
+
+    #configuration
 
     conf = Config()
 
@@ -87,17 +107,27 @@ def sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output, ranx, rany, l
     #xpeak, ypeak = ypeak, xpeak
 
 
+
+
     conf.xc = xpeak
     conf.yc = ypeak 
 
-    conf.parg =  theta
-    conf.eps = eps
-    conf.qarg = 1 - eps
+    if angle:
+        conf.parg =  theta
+    else:
+        conf.parg =  theta
+
+    if axrat:
+        conf.qarg = axrat
+        conf.eps = 1 - axrat
+    else:
+        conf.eps = eps
+        conf.qarg = 1 - eps
 
 
 
     print("galaxy found at ", xpeak + 1, ypeak + 1)
-    print("Ellipticity, Angle = ", eps, theta)
+    print("Axis ratio {:.2f}, Angle = {:.2f}".format(conf.qarg, conf.parg))
 
     print("Sky = ", sky)
 
@@ -423,7 +453,7 @@ def PlotSB(xradq,ysbq,ysberrq, conf, scale):
     # ULISES end 
 
 
-    axsec.axes.xaxis.set_ticklabels([])
+    #axsec.axes.xaxis.set_ticklabels([])
 
     axsec.yaxis.set_minor_locator(AutoMinorLocator())
     axsec.yaxis.set_major_locator(AutoLocator())

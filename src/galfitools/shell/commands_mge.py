@@ -52,10 +52,14 @@ def mainSbProf():
     parser.add_argument("Image", help = "image fits file")
     parser.add_argument("Ds9Region", help = "Ds9 ellipse region file")
 
+
+    parser.add_argument("-q","--axrat", type=float, help="axis ratio")
+    parser.add_argument("-pa","--angle", type=float, help="angular position (same as GALFIT)")
+
     parser.add_argument("-mz","--mgzpt", type=float, help="Magnitud zero point", default=25)
     parser.add_argument("-m","--mask", type=str, help="mask fits file" )
 
-    parser.add_argument("-s","--sky", type=float, help="sky value", default=0)
+    parser.add_argument("-s","--sky", type=float, help="sky value. Default = 0", default=0)
     parser.add_argument("-p","--plate", type=float, help="plate scale ", default=1)
     parser.add_argument("-o","--output", type=str, help="output file", default="sb.png")
 
@@ -77,24 +81,8 @@ def mainSbProf():
     args = parser.parse_args()
 
 
-    image = args.Image
-    ds9reg = args.Ds9Region
-    mgzpt = args.mgzpt
-    mask =  args.mask
-    sky = args.sky
-    plate = args.plate
-    output = args.output
-    center = args.center
-    ranx = args.ranx
-    rany = args.rany
-    logx = args.logx
-    pix = args.pix
-    grid = args.grid
+    sbProf(args)
 
-    rad = args.rad
-    rad2 = args.rad2
-
-    sbProf(image, ds9reg, mgzpt, mask, sky, plate, center, output, ranx, rany, logx, pix, grid, rad, rad2)
 
     
     print('Done')
