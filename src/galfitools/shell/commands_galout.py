@@ -3,6 +3,7 @@
 import argparse
 
 from galfitools.galout.getRads import getBreak
+from galfitools.galout.getRads import getBreak2
 from galfitools.galout.getRads import getFWHM
 from galfitools.galout.getRads import getKappa
 from galfitools.galout.getRads import getReComp
@@ -84,7 +85,7 @@ def mainGetBreak() -> None:
 
 
     parser.add_argument("-p","--plot", action="store_true", help='makes plot of double derivative vs. radius ') 
-    parser.add_argument("-rx","--ranx",nargs=2, type=float, help="provide a range for x-axis: xmin - xmax ")
+    parser.add_argument("-rx","--ranx",nargs=2, type=float, help="provide a range for the plot x-axis: xmin - xmax ")
 
 
 
@@ -119,6 +120,53 @@ def mainGetBreak() -> None:
 
     line = 'The break radius is {:.2f} pixels \n'.format(rbreak)
     print(line)
+
+
+
+def mainGetBreak2():
+    '''gets the break radius from a set of Sersics'''
+
+    #reading argument parsing
+
+    parser = argparse.ArgumentParser(description = "getBreak2: gets the break radius from a set of Sersics ")
+
+
+    # required arguments
+    parser.add_argument("GalfitFile", help = "Galfit File containing the Sersics or gaussians components")
+
+    parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
+    parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
+
+    parser.add_argument("-a","--angle", type=float, 
+                        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components")
+
+
+    parser.add_argument("-p","--plot", action="store_true", help='makes plot of double derivative vs. radius ') 
+
+    parser.add_argument("-rx","--ranx",nargs=2, type=float, help="provide a range for the plot x-axis: xmin - xmax ")
+
+
+    args = parser.parse_args()
+
+    galfitFile = args.GalfitFile
+    dis = args.dis
+    angle = args.angle
+    num_comp =  args.numcomp
+    plot = args.plot
+    ranx = args.ranx
+
+    rbreak, N, theta =  getBreak2(galfitFile, dis, angle, num_comp, plot, ranx)
+
+
+    print('number of model components: ',N)
+
+    line = 'Using a theta value of: {:.2f} degrees\n'.format(theta)
+    print(line)
+
+
+    line = 'The break radius is {:.2f} pixels \n'.format(rbreak)
+    print(line)
+
 
 
 

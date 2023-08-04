@@ -15,6 +15,7 @@ from scipy.optimize import bisect, fmin, newton
 
 import matplotlib.pyplot as plt
 
+from scipy.interpolate import UnivariateSpline
 
 from galfitools.galin.galfit import Galfit, conver2Sersic, SelectGal, numComps, GetRadAng
 
@@ -343,6 +344,110 @@ class GetBreak:
         return Slp
 
 
+
+
+def getBreak2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool, ranx: list): -> float, int, float
+    '''gets the break radius from a set of Sersics using another method'''
+
+
+    galfit = Galfit(galfitFile)
+
+    head = galfit.ReadHead()
+    galcomps = galfit.ReadComps()
+
+
+
+    #convert all exp, gaussian and de vaucouleurs to Sersic format
+    comps = conver2Sersic(galcomps) 
+
+
+
+    comps.Flux = 10**((-comps.Mag)/2.5)
+
+    k = gammaincinv(2*comps.Exp, 0.5)
+
+    denom1 = (2*np.pi*comps.Rad**2)*(np.exp(k))
+    denom2 = (comps.Exp)*(k**(-2*comps.Exp))
+    denom3 = (gamma(2*comps.Exp))*(comps.AxRat) 
+
+    denom = denom1*denom2*denom3 
+    
+    comps.Ie = comps.Flux/denom
+
+
+
+    comps = SelectGal(comps, dis, num_comp)
+
+
+    maskgal = (comps.Active == True) 
+    if angle:
+        theta = angle
+    else:
+        #taking the last component position angle for the whole galaxy
+        theta = comps.PosAng[maskgal][-1]  
+
+
+    N = numComps(comps,'all')
+
+    if N == 0:
+        print('not enough number of components to compute Re')
+        print('exiting..')
+        sys.exit(1)
+
+
+
+    #########################
+    ### computing the slope
+    #########################
+    if ranx:
+        (xmin,xmax)=ranx[0], ranx[1]
+    else:
+        xmin = 0.1
+        xmax = 100
+
+
+    R = np.arange(xmin,xmax,.1)
+
+    lrad= np.log10(R)
+    slp = GetSlope().GalSlope(R, comps, theta) 
+
+
+    if plot:
+        plt.close()
+        plt.plot(R, slp)
+        plt.grid(True)
+        plt.minorticks_on()
+        plt.savefig("Nukslope.png")
+
+
+    ###
+    yspl = UnivariateSpline(lrad,slp,s=0,k=4)
+
+    yspl2d = yspl.derivative(n=2)
+    yspl1d = yspl.derivative(n=1)
+
+    if plot:
+        plt.close()
+        plt.plot(lrad,yspl1d(lrad))
+        plt.grid(True)
+        plt.minorticks_on()
+        plt.savefig("Nuk2d.png")
+
+
+
+
+    idx = np.where(yspl1d(lrad) == max(yspl1d(lrad)))[0][0]
+
+    brad = lrad[idx]
+
+
+
+
+    rbreak = 10**brad
+
+
+
+    return rbreak, N, theta  
 ############################
 ############################
 ############################
