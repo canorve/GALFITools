@@ -346,7 +346,7 @@ class GetBreak:
 
 
 
-def getBreak2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool, ranx: list): -> float, int, float
+def getBreak2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool, ranx: list) -> float:
     '''gets the break radius from a set of Sersics using another method'''
 
 

@@ -143,7 +143,7 @@ def mainGetBreak2():
 
     parser.add_argument("-p","--plot", action="store_true", help='makes plot of double derivative vs. radius ') 
 
-    parser.add_argument("-rx","--ranx",nargs=2, type=float, help="provide a range for the plot x-axis: xmin - xmax ")
+    parser.add_argument("-rx","--ranx",nargs=2, type=float, help="x-axis range to search for the Break radius: xmin - xmax ")
 
 
     args = parser.parse_args()
