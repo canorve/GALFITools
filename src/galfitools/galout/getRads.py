@@ -1389,7 +1389,7 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
     galcomps1 = galfit1.ReadComps()
 
 
-    galfit2 = Galfit(galfitFile1)
+    galfit2 = Galfit(galfitFile2)
     head2 = galfit2.ReadHead()
     galcomps2 = galfit2.ReadComps()
 
@@ -1406,7 +1406,7 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
     maskgal1 = (galcomps1.Active == True) 
     maskgal2 = (galcomps2.Active == True) 
 
-    if args.angle:
+    if angle:
         theta = angle
     else:
         theta = galcomps2.PosAng[maskgal2][-1]  
@@ -1427,8 +1427,6 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
         print('not enough number of components of one of the two models to proceed')
         print('exiting..')
         sys.exit(1)
-
-
 
 
 

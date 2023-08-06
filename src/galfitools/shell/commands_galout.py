@@ -519,6 +519,7 @@ def mainGetBulgeRad() -> None:
 
     num_comp =  args.numcomp
 
+    angle = args.angle
 
     ranx = args.ranx
     plot = args.plot
