@@ -35,6 +35,7 @@ Contents
    Authors <authors>
    Changelog <changelog>
    Module Reference <api/modules>
+   How To <howto>
 
 
 Indices and tables
@@ -43,6 +44,7 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+* :ref:`howto`
 
 .. _toctree: https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html
 .. _reStructuredText: https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
@@ -59,3 +61,7 @@ Indices and tables
 .. _Google style: https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
 .. _NumPy style: https://numpydoc.readthedocs.io/en/latest/format.html
 .. _classical style: https://www.sphinx-doc.org/en/master/domains.html#info-field-lists
+.. _classical style: https://www.sphinx-doc.org/en/master/domains.html#info-field-lists
+`How to use <docs/howto.rst>`__
+
+

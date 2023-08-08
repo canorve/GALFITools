@@ -4,10 +4,10 @@
    :depth: 3
 ..
 
---------------
+-------------------
 
 **GALFITools: How to use**
-=========================
+============================
 
 GALFITools is a set of routines that
 aids the GALFIT's user to create masks,
@@ -22,11 +22,11 @@ This How-To is divided in five sections
 
 
 **GALFIT INPUT**
----------------
+------------------
 
 
 **GALFIT OUTPUT**
----------------
+-------------------
 
 
 **MGE**
