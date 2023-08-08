@@ -39,11 +39,12 @@ GALFITools
 
 **Documentation under construction**
 
-    A library for  `GALFIT`_ 
+A library for  `GALFIT`_ 
 
 
-`GALFIT`_  is a 2 dimensional image fitting algorithm.  See Peng et al. (2002, 
-    AJ, 124, 266) for general description. 
+`GALFIT`_  
+is a 2 dimensional image fitting algorithm.  
+See Peng et al. (2002, AJ, 124, 266) for general description. 
 
 .. _GALFIT: https://users.obs.carnegiescience.edu/peng/work/galfit/galfit.html
 
