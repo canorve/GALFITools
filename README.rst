@@ -37,7 +37,16 @@ GALFITools
 ==========
 
 
-    A library of useful scripts for GALFIT
+    A library for  `GALFIT`_ 
+
+
+`GALFIT`_  is a 2 dimensional image fitting algorithm.  See Peng et al. (2002, 
+    AJ, 124, 266) for general description. 
+
+.. _GALFIT: https://users.obs.carnegiescience.edu/peng/work/galfit/galfit.html
+
+
+
 
 GALFITools is a collection of Python
 scripts that improve the input and 
@@ -46,7 +55,72 @@ output analysis of GALFIT.
 
 This is a set of routines which help the GALFIT's  user to make 
 masks, cut stars, create multiple initial parameters, simulate 
-galaxies, fit MGE, compute sky and other photometric variables.
+galaxies, fit MGE, compute sky and compute other photometric variables.
+
+
+--------------
+
+**Installation**
+----------------
+
+The python libraries required are:
+
+-  numpy
+-  astropy
+-  scipy
+-  matplotlib
+-  mgefit
+
+
+Install GALFIT if you haven't done so.
+
+Download the latest release, and installed it via
+
+::
+
+   cd GALFITools 
+   pip install . 
+
+or
+
+::
+
+   cd GALFITools 
+   python setup.py install
+
+
+Also, you can install it via pip:
+
+::
+
+   pip install GALFITools 
+
+
+Run the automated tests:
+
+::
+
+    tox 
+
+
+A list of commands will be installed and 
+run it via shell.
+
+
+--------------
+
+**HOW TO USE**
+~~~~~~~~~~~~~~
+
+To learn how to use every command routine of GALFITools,
+check:
+
+
+`How to use <docs/howto.rst>`__
+
+Where you can find full explanations of each routine.
+
+
 
 .. _pyscaffold-notes:
 

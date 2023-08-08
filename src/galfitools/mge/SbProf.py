@@ -11,8 +11,6 @@ import scipy.special
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
-import mimetypes
-import warnings
 
 
 from scipy import stats

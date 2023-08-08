@@ -8,7 +8,6 @@ from os import path
 import mgefit
 from mgefit.mge_fit_1d import mge_fit_1d
 from scipy.special import gammaincinv
-from itertools import product
 
 
 from scipy.interpolate import UnivariateSpline
