@@ -3,3 +3,10 @@
 # under `install_requires` in `setup.cfg` is also listed here!
 sphinx>=3.2.1
 # sphinx_rtd_theme
+numpy>=1.22.4
+astropy>=5.1
+matplotlib>=3.5.2  
+scipy>=1.9.1
+mgefit>=5.0.13
+
+

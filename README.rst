@@ -10,9 +10,6 @@
     .. image:: https://img.shields.io/coveralls/github/<USER>/GALFITools/main.svg
         :alt: Coveralls
         :target: https://coveralls.io/r/<USER>/GALFITools
-    .. image:: https://img.shields.io/pypi/v/GALFITools.svg
-        :alt: PyPI-Server
-        :target: https://pypi.org/project/GALFITools/
     .. image:: https://img.shields.io/conda/vn/conda-forge/GALFITools.svg
         :alt: Conda-Forge
         :target: https://anaconda.org/conda-forge/GALFITools
@@ -23,6 +20,10 @@
         :alt: Twitter
         :target: https://twitter.com/GALFITools
 
+.. image:: https://img.shields.io/pypi/v/GALFITools.svg
+    :alt: PyPI-Server
+    :target: https://pypi.org/project/GALFITools/
+
 .. image:: https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold
     :alt: Project generated with PyScaffold
     :target: https://pyscaffold.org/
@@ -30,12 +31,13 @@
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.8216473.svg
    :target: https://doi.org/10.5281/zenodo.8216473
 
-|
+
 
 ==========
 GALFITools
 ==========
 
+**Documentation under construction**
 
     A library for  `GALFIT`_ 
 
@@ -120,12 +122,65 @@ check:
 
 Where you can find full explanations of each routine.
 
+--------------
+
+**API**
+~~~~~~~~~~~~~~
+
+Check the API to incorporate GALFITools routines to 
+your scripts:
+
+`API <docs/api.rst>`__
+
+
+
+--------------
+
+**Questions?**
+--------------
+
+Do you have any questions or suggestions? Please send an email to
+canorve [at] gmail [dot] com or open an
+`issue <https://github.com/canorve/GALFITools/issues>`__
+
+I’m open to new ideas that can benefit the library *GALFITools* and the
+*GALFIT* community
+
+--------------
+
+**License**
+--------------
+
+The code is under the license of **MIT**
+
+
+-----------
+
+**Cite as**
+-----------
+
+If you find this code useful, please cite as:
+
+Añorve, Christopher. (2023). canorve/GALFITools: 
+GALFITools v0.15.2 (v0.15.2). Zenodo. https://doi.org/10.5281/zenodo.8216473
+
+
+
+**Other Stuff**
+---------------
+
+Check EllipSect to create surface brightness profiles
+from GALFIT output and estimate other photometric parameters:
+
+`here <https://github.com/canorve/EllipSect>`__
 
 
 .. _pyscaffold-notes:
 
+====
 Note
 ====
 
 This project has been set up using PyScaffold 4.2.1. For details and usage
 information on PyScaffold see https://pyscaffold.org/.
+

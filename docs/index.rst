@@ -45,6 +45,7 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 * :ref:`howto`
+* :ref:`api`
 
 .. _toctree: https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html
 .. _reStructuredText: https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
@@ -63,5 +64,6 @@ Indices and tables
 .. _classical style: https://www.sphinx-doc.org/en/master/domains.html#info-field-lists
 .. _classical style: https://www.sphinx-doc.org/en/master/domains.html#info-field-lists
 `How to use <docs/howto.rst>`__
+`API <docs/api.rst>`__
 
 

@@ -14,30 +14,524 @@ aids the GALFIT's user to create masks,
 psf, compute sky, create initial parameters,
 analyze GALFIT output, mult-gaussian expansion.
 
+After GALFITools installation, a set of shell-routines
+will be available in your bash (or zsh). In this
+page, it is explained everyone of those routines.
+
 Explanation of the parameters of each  routine can
 be displayed with the "-h"  option. 
 
-This How-To is divided in five sections
+This How-To is divided in five sections: GALFIT input, 
+GALFIT output, MGE, Sim, Sky
 
 
 
 **GALFIT INPUT**
 ------------------
+Routines that aid the GALFIT's user to
+prepare the necessary files for GALFIT input 
+
+
+**getStar** gets a image slice centered on the object peak
+
+::
+
+  positional arguments:
+    image                 the image file to obtain the slice
+    Ds9regFile            the DS9 ellipse region file containing the
+    size                  the size of the new image in pixels
+
+  options:
+    -h, --help            show this help message and exit
+    -c, --center          uses the center given in DS9 region file,otherwise it will found the x,y
+                          peaks within DS9 ellipse
+    -s SKY, --sky SKY     the sky background to be removed. Default = 0
+    -o OUT, --out OUT     the image output.
+    -sig SIGMA, --sigma SIGMA
+                          introduce the sigma image
+    -so SIGOUT, --sigout SIGOUT
+                          the sigma image output
+
+**initGal** Creates GALFIT's input files with different initial parameters
+
+
+::
+
+  positional arguments:
+    inFile                the galfit file galfit.XX
+
+  options:
+    -h, --help            show this help message and exit
+    -n NUMBER, --number NUMBER
+                          the number of files generated. Default = 1
+    -p3 PARAM3 PARAM3, --param3 PARAM3 PARAM3
+                          range of values to give to the 3) model's parameter in format [min max]
+    -p4 PARAM4 PARAM4, --param4 PARAM4 PARAM4
+                          range of values to give to the 4) model's parameter in format [min max]
+    -p5 PARAM5 PARAM5, --param5 PARAM5 PARAM5
+                          range of values to give to the 5) model's parameter in format [min max]
+    -p6 PARAM6 PARAM6, --param6 PARAM6 PARAM6
+                          range of values to give to the 6) model's parameter in format [min max]
+    -p7 PARAM7 PARAM7, --param7 PARAM7 PARAM7
+                          range of values to give to the 7) model's parameter in format [min max]
+    -p8 PARAM8 PARAM8, --param8 PARAM8 PARAM8
+                          range of values to give to the 8) model's parameter in format [min max]
+    -p9 PARAM9 PARAM9, --param9 PARAM9 PARAM9
+                          range of values to give to the 9) model's parameter in format [min max]
+    -p10 PARAM10 PARAM10, --param10 PARAM10 PARAM10
+                          range of values to give to the 10) model's parameter in format [min max]
+    -nc NUMCOMP, --numcomp NUMCOMP
+                          the component number which parameters will be changed
+       
+
+
+**gtmakeMask**  creates mask file from a SExtractor's catalog 
+
+::
+
+    positional arguments:
+      Sexfile               Sextractor catalog file
+      ImageFile             Image file
+
+    options:
+      -h, --help            show this help message and exit
+      -o MASKOUT, --maskout MASKOUT
+                            the output mask file name
+      -sf SATDS9, --satds9 SATDS9
+                            ds9 saturation file
+      -s SCALE, --scale SCALE
+                            scale factor to increase the ellipses. Default=1
+
+
+
+**maskDs9**  creates (or modify) a mask image for GALFIT using Ds9 regions such as Boxes, Ellipses and Polygons
+
+::
+
+  positional arguments:
+    MaskFile              the Mask image file to modify or create
+    RegFile               the DS9 region file
+
+  options:
+    -h, --help            show this help message and exit
+    -f FILL, --fill FILL  the value in counts to fill into the Ds9 regions. Default = 0 (remove)
+    -i IMAGE, --image IMAGE
+                          image to obtain the size
+    -b, --border          Mask the borders when their value is zero
+    -bv BORVALUE, --borValue BORVALUE
+                          value of the border if it is different from zero
+
+
+**maskSky** creates a mask image for GALFIT using original image and sky mean and sigma
+
+::
+
+  positional arguments:
+    ImageFile             original data image
+    MaskFile              Name of the new Mask file
+
+  options:
+    -h, --help            show this help message and exit
+    -sm SKYMEAN, --skymean SKYMEAN
+                          mean of the sky background
+    -ss SKYSIGMA, --skysigma SKYSIGMA
+                          sigma of the sky background
+    -ns NUMBERSIG, --numbersig NUMBERSIG
+                          number of times that the sigma of the sky will be multiplied to remove the
+                          sky background
+    -b, --border          Mask the borders when their value is zero
+    -bv BORVALUE, --borValue BORVALUE
+                          value of the border if it is different from zero
+
+**xy2fits** code to convert ASCII x,y positions to FTIS mask
+
+::
+
+  positional arguments:
+    ImageFile          The Image file
+    AsciiMask          The ascii file with the x,y positions
+
+  options:
+    -h, --help         show this help message and exit
+    -c VAL, --val VAL  the value in counts for the masked pixels
 
 
 **GALFIT OUTPUT**
 -------------------
+Routines that computes photometric variables from 
+the surface brightness models fitted by GALFIT 
+
+
+**getBreak** gets the break radius from a set of Sersics
+
+::
+
+
+  positional arguments:
+    GalfitFile            Galfit File containing the Sersics or gaussians components
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components
+    -er EFFRAD, --effrad EFFRAD
+                          percentage of light to compute for radius. default=.5 for effective radius
+    -n NUMCOMP, --numcomp NUMCOMP
+                          Number of component where it'll obtain center of all components, default = 1
+    -a ANGLE, --angle ANGLE
+                          Angle of the major axis of the galaxy. Default= it will take the angle of the
+                          last components
+    -ni NUMINITIAL, --numinitial NUMINITIAL
+                          Number of component where it'll obtain the initial parameter to search break
+                          radius or to generated random initial radius.
+    -q, --quick           evaluate in position only (given by -ni parameter
+    -r RANDOM, --random RANDOM
+                          Number of random radius as initial parameters to search for the minimum. It
+                          will generated random radius from 0 to effective radius of the component
+                          indicated by parameter -ni
+    -p, --plot            makes plot of double derivative vs. radius
+    -rx RANX RANX, --ranx RANX RANX
+                          provide a range for the plot x-axis: xmin - xmax
+
+
+**getBreak2** gets the break radius from a set of Sersics using an 
+alternative method to getBreak
+
+::
+
+  positional arguments:
+    GalfitFile            Galfit File containing the Sersics or gaussians components
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components
+    -n NUMCOMP, --numcomp NUMCOMP
+                          Number of component where it'll obtain center of all components, default = 1
+    -a ANGLE, --angle ANGLE
+                          Angle of the major axis of the galaxy. Default= it will take the angle of the
+                          last components
+    -p, --plot            makes plot of double derivative vs. radius
+    -rx RANX RANX, --ranx RANX RANX
+                          x-axis range to search for the Break radius: xmin - xmax
+
+
+
+**getFWHM** gets the FWHM from a set of Sersics
+::
+
+
+  positional arguments:
+    GalfitFile            Galfit File containing the Sersics or gaussians components
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components
+    -n NUMCOMP, --numcomp NUMCOMP
+                          Number of component where it'll obtain center of all components, default = 1
+    -a ANGLE, --angle ANGLE
+                          Angle of the major axis of the galaxy. Default= it will take the angle of the
+                          last components
+
+
+**getKappa** gets the Kappa radius from a set of Sersics
+
+::
+
+  positional arguments:
+    GalfitFile            Galfit File containing the Sersics or gaussians components
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components
+    -er EFFRAD, --effrad EFFRAD
+                          percentage of light to compute for radius. default=.5 for effective radius
+    -n NUMCOMP, --numcomp NUMCOMP
+                          Number of component where it'll obtain center of all components, default = 1
+    -a ANGLE, --angle ANGLE
+                          Angle of the major axis of the galaxy. Default= it will take the angle of the
+                          last components
+    -ni NUMINITIAL, --numinitial NUMINITIAL
+                          Number of component where it'll obtain the initial parameter to search break
+                          radius or to generated random initial radius.
+    -q, --quick           evaluate in position only (given by -ni parameter
+    -r RANDOM, --random RANDOM
+                          Number of random radius as initial parameters to search for the minimum. It
+                          will generated random radius from 0 to effective radius of the component
+                          indicated by parameter -ni
+    -p, --plot            makes plot of double derivative vs. radius
+    -rx RANX RANX, --ranx RANX RANX
+                          provide a range for x-axis: xmin - xmax
+
+
+
+
+**getReComp** gets the effective radius from a set of Sersics
+::
+
+  positional arguments:
+    GalfitFile            Galfit File containing the Sersics or gaussians components
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components
+    -er EFFRAD, --effrad EFFRAD
+                          percentage of light to compute for radius. default=.5 for effective radius
+    -n NUMCOMP, --numcomp NUMCOMP
+                          Number of component where it'll obtain center of all components, default = 1
+    -pa ANGLE, --angle ANGLE
+                          Angle of the major axis of the galaxy. Default= it will take the angle of the
+                          last components. Angle measured from Y-Axis as same as GALFIT.
+
+
+
+**getSlope** gets the slope radius from a set of Sersics
+::
+
+
+  positional arguments:
+    GalfitFile            Galfit File containing the Sersics or gaussians components
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components
+    -er EFFRAD, --effrad EFFRAD
+                          percentage of light to compute for radius. default=.5 for effective radius
+    -n NUMCOMP, --numcomp NUMCOMP
+                          Number of component where it'll obtain center of all components, default = 1
+    -a ANGLE, --angle ANGLE
+                          Angle of the major axis of the galaxy. Default= it will take the angle of the
+                          last components
+    -s SLOPE, --slope SLOPE
+                          value of slope to find. default=.5
+    -p, --plot            makes plot of double derivative vs. radius
+    -rx RANX RANX, --ranx RANX RANX
+                          provide a range for x-axis: xmin - xmax
+
+
+
+
+**getN** computes the Sersic index from surface brightness at effective radius
+::
+
+  positional arguments:
+    GalfitFile            Galfit File containing the Sersics or gaussians components
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components
+    -n NUMCOMP, --numcomp NUMCOMP
+                          Number of component where it'll obtain center of all components, default = 1
+    -pa ANGLE, --angle ANGLE
+                          Angle of the major axis of the galaxy. Default= it will take the angle of the
+                          last components. Angle measured from Y-Axis as same as GALFIT.
+    -rf RADFRAC, --radfrac RADFRAC
+                          fraction of light radius. Default = .2
+    -p, --plot            makes plot of double derivative vs. radius
+
+
+
+**getMissLight** computes the missing light from two surface brightness models
+::
+
+  positional arguments:
+    GalfitFile1           Galfit File containing the coreless surface brightness model
+    GalfitFile2           Galfit File containing the core surface brightness model
+    rad                   radius to integrate
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components
+    -n NUMCOMP, --numcomp NUMCOMP
+                          Number of component where it'll obtain center of all components, default = 1
+
+
+
+**getBulgeRad** gets the bulge radius or the radius where two models of surface brightness models are
+equal
+::
+
+  positional arguments:
+    GalfitFile1           Galfit File containing the coreless surface brightness model
+    GalfitFile2           Galfit File containing the core surface brightness model
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components
+    -n NUMCOMP, --numcomp NUMCOMP
+                          Number of component where it'll obtain center of all components, default = 1
+    -pa ANGLE, --angle ANGLE
+                          Angle of the major axis of the galaxy. Default= it will take the angle of the
+                          last components. Angle measured from Y-Axis as same as GALFIT.
+    -p, --plot            makes plot of double derivative vs. radius
+    -rx RANX RANX, --ranx RANX RANX
+                          provide a range for x-axis: xmin - xmax
+
+
+**showCube** takes the GALFIT output and creates an image that shows galaxy, model and residual 
+::
+
+  positional arguments:
+    cubeimage             the cube GALFIT image
+
+  options:
+    -h, --help            show this help message and exit
+    -o OUTIMAGE, --outimage OUTIMAGE
+                          the output png file
+    -br BRIGHTNESS, --brightness BRIGHTNESS
+                          brightness of the image. Only for galaxy and model. Default = 0. Preferible
+                          range goes from -1 to 1
+    -co CONTRAST, --contrast CONTRAST
+                          contrast of the image. Only for galaxy and model. Default = 1. Preferible
+                          range goes from 0 to 1
+    -cm CMAP, --cmap CMAP
+                          cmap to be used for the cube image
+    -dpi DOTSINCH, --dotsinch DOTSINCH
+                          dots per inch used for images files
+    -s SCALE, --scale SCALE
+                          plate scale of the image. Default = 1
+    -np, --noplot         it doesn't show plotting window
+
+
+**photDs9** computes photometry from a Ds9 region file: Box, Ellipses and Polygons
+::
+
+
+  positional arguments:
+    ImageFile             the image file where the photometry will be computed
+    RegFile               the DS9 region file
+
+  options:
+    -h, --help            show this help message and exit
+    -zp ZEROPOINT, --zeropoint ZEROPOINT
+                          The value of the zero point. Default = 25
+    -sk SKY, --sky SKY    the value of the sky background to be removed
 
 
 **MGE**
 ---------------
 
+Routines that use the Multi-Gaussian Expansion
+
+**mge2galfit** fits multi-gaussian expansion of Cappellari (2002) and formats to GALFIT
+::
+
+  positional arguments:
+    image                 the Mask image file to modify or create
+    Ds9regFile            the DS9 ellipse region file containing the galaxy
+    magzpt                the magnitude zero point
+
+  options:
+    -h, --help            show this help message and exit
+    -t, --twist           uses twist option for mge
+    -r, --regu            regularized mode for mge_fit_sectors
+    -c, --center          uses the center given in DS9 region file,otherwise it will found the x,y
+                          peaks within DS9 ellipse
+    -p PSF, --psf PSF     the value of PSF sigma
+    -s SKY, --sky SKY     the sky background value
+    -m MASK, --mask MASK  the mask file
+    -ps PLATE, --plate PLATE
+                          plate scale of the image
+    -gas, --gauss         uses gauss function for galfit file
+    -fser, --freeser      leaves the sersic index as a free parameter to fit
+    -fsk, --freesky       leaves the sky as a free parameter to fit
+    -pf PSFILE, --psfile PSFILE
+                          name of the psf file for GALFIT. default = psf.fits
+    -sf SIGFILE, --sigfile SIGFILE
+                          name of the sigma image for GALFIT. default = sigma.fits
+    -ng NUMGAUSS, --numgauss NUMGAUSS
+                          number of gaussians that will be used for galfit.Starting from the first one
+
+**SbProf** creates a surface brightness profile from a ellipse ds9 region
+::
+
+  positional arguments:
+    Image                 image fits file
+    Ds9Region             Ds9 ellipse region file
+
+  options:
+    -h, --help            show this help message and exit
+    -q AXRAT, --axrat AXRAT
+                          axis ratio
+    -pa ANGLE, --angle ANGLE
+                          angular position (same as GALFIT)
+    -mz MGZPT, --mgzpt MGZPT
+                          Magnitud zero point
+    -m MASK, --mask MASK  mask fits file
+    -s SKY, --sky SKY     sky value. Default = 0
+    -p PLATE, --plate PLATE
+                          plate scale
+    -o OUTPUT, --output OUTPUT
+                          output file
+    -c, --center          uses the center given in DS9 region file,otherwise it will found the x,y
+                          peaks within DS9 ellipse
+    -rx RANX RANX, --ranx RANX RANX
+                          provide a range for x-axis: xmin - xmax
+    -ry RANY RANY, --rany RANY RANY
+                          provide a range for y-axis: ymin - ymax
+    -lx, --logx           turn the X-axis to logarithm
+    -px, --pix            turn the top x-axis in pixels
+    -g, --grid            display a grid in the plot
+    -r RAD, --rad RAD     value for a vertical line to add into the plot
+    -r2 RAD2, --rad2 RAD2
+                          value for a second vertical line to add into the plot
+
 **SIM**
 ---------------
+Routines that make a simulated galaxy image.
+
+**makeSim** simulates a observed galaxy from a GALFIT model
+::
+
+  positional arguments:
+    image                 the GALFIT galaxy model
+    newimage              the name of the new galaxy image
+
+  options:
+    -h, --help            show this help message and exit
+    -s SKY, --sky SKY     the sky background value. default = 0
+    -std STD, --std STD   the sky standard deviation. default = 1
+    -g GAIN, --gain GAIN  the gain value of the image. default = 1
 
 **SKY**
 -------------
 
+Routines that compute the sky background
+
+**galSky** computes the sky using GALFIT
+::
+
+  positional arguments:
+    image                 the image file
+    mask                  the GALFIT mask file
+
+  options:
+    -h, --help            show this help message and exit
+    -s SCALE, --scale SCALE
+                          the plate scale. default = 1
+    -zp MGZPT, --mgzpt MGZPT
+                          the magnitud zero point. default=25
+    -x XPOS, --xpos XPOS  the x position. default=1
+    -y YPOS, --ypos YPOS  the y position. default=1
+    -is INITSKY, --initsky INITSKY
+                          the initial sky value default=0
+
+**getSky** computes sky from a ds9 region box file
+::
+
+  positional arguments:
+    image       the Mask image file to modify or create
+    maskfile    the Mask image file to modify or create
+    Ds9regFile  the DS9 ellipse region file containing the galaxy
+
+  options:
+    -h, --help  show this help message and exit
 
 
+--------------
+
+**Questions?**
+--------------
+
+
+Something is not clear for you or do you have further questions?
+write to me at canorve [at] gmail [dot] com 
 
