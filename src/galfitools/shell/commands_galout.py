@@ -8,7 +8,6 @@ from galfitools.galout.getRads import getFWHM
 from galfitools.galout.getRads import getKappa
 from galfitools.galout.getRads import getReComp
 from galfitools.galout.getRads import getSlope
-from galfitools.galout.getRads import getSlope
 from galfitools.galout.getRads import getBulgeRad
 from galfitools.galout.getMissingLight import getMissLight
 from galfitools.galout.getN import getN

@@ -37,7 +37,6 @@
 GALFITools
 ==========
 
-**Documentation under construction**
 
 A library for  `GALFIT`_ 
 
