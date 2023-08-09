@@ -198,8 +198,6 @@ the surface brightness models fitted by GALFIT
   options:
     -h, --help            show this help message and exit
     -d DIS, --dis DIS     Maximum distance among components
-    -er EFFRAD, --effrad EFFRAD
-                          percentage of light to compute for radius. default=.5 for effective radius
     -n NUMCOMP, --numcomp NUMCOMP
                           Number of component where it'll obtain center of all components, default = 1
     -a ANGLE, --angle ANGLE
@@ -318,8 +316,6 @@ alternative method to getBreak
   options:
     -h, --help            show this help message and exit
     -d DIS, --dis DIS     Maximum distance among components
-    -er EFFRAD, --effrad EFFRAD
-                          percentage of light to compute for radius. default=.5 for effective radius
     -n NUMCOMP, --numcomp NUMCOMP
                           Number of component where it'll obtain center of all components, default = 1
     -a ANGLE, --angle ANGLE

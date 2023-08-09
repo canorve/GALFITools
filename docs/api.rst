@@ -229,67 +229,63 @@ the surface brightness models fitted by GALFIT
 ::
 
       from galfitools.galout.getRads import getBreak
-      args = parser.parse_args()
 
-      galfitFile = args.GalfitFile
-      dis = args.dis
+      #galfitFile: Galfit File containing the Sersics or gaussians components
 
-      eff = args.effrad
-      inicomp = args.numinitial
+      #optional from argparse:
+      #dis: Maximum distance among components
 
-      quick = args.quick
-      random = args.random
+      #inicomp: Number of component where it'll obtain the initial parameter to search break
+      #                  radius or to generated random initial radius.
 
-      num_comp =  args.numcomp
+      #quick: evaluate in the position given by inicomp parameter
 
-      angle = args.angle
+      #random: Number of random radius as initial parameters to search for the minimum. It
+      #        will generated random radius from 0 to effective radius of the component
+      #        indicated by parameter -ni
+      
+      #num_comp: Number of component where it'll obtain center of all components, default = 1
+      #angle:  Angle of the major axis of the galaxy. Default= it will take the angle of the
+      #ranx: list that indicates the range for the plot x-axis: xmin - xmax
+      #plot: boolean flag that indicates to  make a plot of double derivative vs. radius
 
-
-      ranx = args.ranx
-      plot = args.plot
 
 
       rbreak, N, theta = getBreak(galfitFile, dis, eff, inicomp, quick, random, num_comp, angle, plot, ranx)
-          
-      print('number of model components: ',N)
 
-      line = 'Using a theta value of: {:.2f} degrees\n'.format(theta)
-      print(line)
+      # output variables:
 
-
-      line = 'The break radius is {:.2f} pixels \n'.format(rbreak)
-      print(line)
-
+      #rbreak: the break radius in pixels  
+      #N: number of surface brightness model components of the galaxy
+      #theta: the angle used to determine the break radius. Break radius
+      #  is computed in that angle direction.
 
 
 **getBreak2** gets the break radius from a set of Sersics using an 
-alternative method to getBreak
+alternative method to getBreak.
 
 ::
 
     from galfitools.galout.getRads import getBreak2
 
-    args = parser.parse_args()
 
-    galfitFile = args.GalfitFile
-    dis = args.dis
-    angle = args.angle
-    num_comp =  args.numcomp
-    plot = args.plot
-    ranx = args.ranx
+    #galfitFile: Galfit File containing the Sersics or gaussians components
+
+    #optional from argparse:
+    #dis: Maximum distance among components
+    #angle:  Angle of the major axis of the galaxy. Default= it will take the angle of the
+    #num_comp: Number of component where it'll obtain center of all components, default = 1
+    #plot: boolean flag that indicates to  make a plot of double derivative vs. radius
+    #ranx: list that indicates the range for the plot x-axis: xmin - xmax
 
     rbreak, N, theta =  getBreak2(galfitFile, dis, angle, num_comp, plot, ranx)
 
+    # output variables:
 
-    print('number of model components: ',N)
-
-    line = 'Using a theta value of: {:.2f} degrees\n'.format(theta)
-    print(line)
-
-
-    line = 'The break radius is {:.2f} pixels \n'.format(rbreak)
-    print(line)
-
+    #rbreak: the break radius in pixels  
+    #N: number of surface brightness model components of the galaxy
+    #theta: the angle used to determine the break radius. Break radius
+    #  is computed in that angle orientation
 
 
 

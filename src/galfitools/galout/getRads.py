@@ -24,11 +24,10 @@ from galfitools.galin.galfit import GalComps, GalHead
 
 
 
-def getBreak(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, random: int, num_comp: int, angle: float, plot: bool, ranx: list)-> float:
+def getBreak(galfitFile: str, dis: int, inicomp: int, quick: bool, random: int, num_comp: int, angle: float, plot: bool, ranx: list)-> float:
     '''gets the break radius from a set of Sersics'''
 
 
-    assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
    
 
     #head = ReadHead(galfitFile)
@@ -1184,11 +1183,9 @@ class GetReff:
 
 
 
-def getSlope(galfitFile: str, dis: int, eff: float, slope: float, angle: float, num_comp: int, plot: bool, ranx: list)-> float:
+def getSlope(galfitFile: str, dis: int, slope: float, angle: float, num_comp: int, plot: bool, ranx: list)-> float:
     '''gets the slope radius from a set of Sersics'''
 
-
-    assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
 
     #head = ReadHead(galfitFile)
     #galcomps = ReadComps(galfitFile)

@@ -62,8 +62,6 @@ def mainGetBreak() -> None:
     parser.add_argument("GalfitFile", help = "Galfit File containing the Sersics or gaussians components")
 
     parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
-    parser.add_argument("-er","--effrad", type=float, 
-                        help="percentage of light to compute for radius. default=.5 for effective radius ", default=.5)
 
     #parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
 
@@ -94,7 +92,6 @@ def mainGetBreak() -> None:
     galfitFile = args.GalfitFile
     dis = args.dis
 
-    eff = args.effrad
     inicomp = args.numinitial
 
     quick = args.quick
@@ -109,7 +106,7 @@ def mainGetBreak() -> None:
     plot = args.plot
 
 
-    rbreak, N, theta = getBreak(galfitFile, dis, eff, inicomp, quick, random, num_comp, angle, plot, ranx)
+    rbreak, N, theta = getBreak(galfitFile, dis, inicomp, quick, random, num_comp, angle, plot, ranx)
         
     print('number of model components: ',N)
 
@@ -342,8 +339,6 @@ def maingetSlope() -> None:
     parser.add_argument("GalfitFile", help = "Galfit File containing the Sersics or gaussians components")
 
     parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
-    parser.add_argument("-er","--effrad", type=float, 
-                        help="percentage of light to compute for radius. default=.5 for effective radius ", default=.5)
 
     #parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
 
@@ -369,7 +364,6 @@ def maingetSlope() -> None:
     galfitFile = args.GalfitFile
     dis = args.dis
 
-    eff = args.effrad
     slope = args.slope
 
     num_comp =  args.numcomp
@@ -382,7 +376,7 @@ def maingetSlope() -> None:
 
 
 
-    rgam, N, theta = getSlope(galfitFile, dis, eff, slope, angle, num_comp, plot, ranx)
+    rgam, N, theta = getSlope(galfitFile, dis, slope, angle, num_comp, plot, ranx)
 
 
     print('number of model components: ',N)
