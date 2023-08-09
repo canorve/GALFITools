@@ -38,12 +38,12 @@ prepare the necessary files for GALFIT input
 
   positional arguments:
     image                 the image file to obtain the slice
-    Ds9regFile            the DS9 ellipse region file containing the
+    Ds9regFile            the DS9 ellipse region file containing the star 
     size                  the size of the new image in pixels
 
   options:
     -h, --help            show this help message and exit
-    -c, --center          uses the center given in DS9 region file,otherwise it will found the x,y
+    -c, --center          uses the center given in DS9 region file,otherwise it will find the x,y
                           peaks within DS9 ellipse
     -s SKY, --sky SKY     the sky background to be removed. Default = 0
     -o OUT, --out OUT     the image output.
@@ -101,6 +101,31 @@ prepare the necessary files for GALFIT input
                             ds9 saturation file
       -s SCALE, --scale SCALE
                             scale factor to increase the ellipses. Default=1
+
+
+                            *Note* The Sextractor catalog must have the following
+columns: 
+
+
+
+::
+
+    #   1 NUMBER                 Running object number
+    #   2 ALPHA_J2000            Right ascension of barycenter (J2000)                      [deg]
+    #   3 DELTA_J2000            Declination of barycenter (J2000)                          [deg]
+    #   4 X_IMAGE                Object position along x                                    [pixel]
+    #   5 Y_IMAGE                Object position along y                                    [pixel]
+    #   6 MAG_APER               Fixed aperture magnitude vector                            [mag]
+    #   7 KRON_RADIUS            Kron apertures in units of A or B
+    #   8 FLUX_RADIUS            Fraction-of-light radii                                    [pixel]
+    #   9 ISOAREA_IMAGE          Isophotal area above Analysis threshold                    [pixel**2]
+    #  10 A_IMAGE                Profile RMS along major axis                               [pixel]
+    #  11 ELLIPTICITY            1 - B_IMAGE/A_IMAGE
+    #  12 THETA_IMAGE            Position angle (CCW/x)                                     [deg]
+    #  13 BACKGROUND             Background at centroid position                            [count]
+    #  14 CLASS_STAR             S/G classifier output
+    #  15 FLAGS                  Extraction flags
+
 
 
 

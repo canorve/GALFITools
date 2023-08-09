@@ -16,11 +16,11 @@ def mainGetStar():
     parser = argparse.ArgumentParser(description="gets a image slice centered on the object peak")
 
     parser.add_argument("image", help="the image file to obtain the slice")
-    parser.add_argument("Ds9regFile", help="the DS9 ellipse region file containing the ")
+    parser.add_argument("Ds9regFile", help="the DS9 ellipse region file containing the star")
     parser.add_argument("size", type=int, help="the size of the new image in pixels")
     parser.add_argument("-c","--center", action="store_true", 
                         help="uses the center given in DS9 region file," + 
-                        "otherwise it will found the x,y peaks within DS9 ellipse")
+                        "otherwise it will find the x,y peaks within DS9 ellipse")
     parser.add_argument("-s","--sky", type=float, 
                         help="the sky background to be removed. Default = 0",default=0)
     parser.add_argument("-o","--out", type=str, 
@@ -215,7 +215,7 @@ def mainxy2fits():
 
     parser.add_argument("ImageFile", help="The Image file ")
     parser.add_argument("AsciiMask", help="The ascii file with the x,y positions ")
-    parser.add_argument("-c","--val", type=int, help="the value in counts for the masked pixels",default=1)
+    parser.add_argument("-c","--val", type=int, help="the value in counts for the masked pixels. Default = 1",default=1)
  
     args = parser.parse_args()
 

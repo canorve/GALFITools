@@ -127,24 +127,11 @@ Where you can find full explanations of each routine.
 **API**
 ~~~~~~~~~~~~~~
 
-Check the API to incorporate GALFITools routines to 
-your scripts:
+Check how to use the functions for your own scripts:
 
 `API <docs/api.rst>`__
 
 
-
---------------
-
-**Questions?**
---------------
-
-Do you have any questions or suggestions? Please send an email to
-canorve [at] gmail [dot] com or open an
-`issue <https://github.com/canorve/GALFITools/issues>`__
-
-I’m open to new ideas that can benefit the library *GALFITools* and the
-*GALFIT* community
 
 --------------
 
@@ -176,6 +163,22 @@ from GALFIT output and estimate other photometric parameters:
 
 
 .. _pyscaffold-notes:
+
+
+--------------
+
+**Questions?**
+--------------
+
+Do you have any questions or suggestions? Please send an email to
+canorve [at] gmail [dot] com or open an
+`issue <https://github.com/canorve/GALFITools/issues>`__
+
+I’m open to new ideas that can benefit the library *GALFITools* and the
+*GALFIT* community
+
+
+
 
 ====
 Note

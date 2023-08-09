@@ -21,6 +21,12 @@ Again, here it is divided in 5 sections
 as it was done in 
 `HowTo <docs/howto.rst>`__
 
+Some of the routines are optional arguments
+for argparse library and can be ignored. Those 
+optional arguments can be empty 
+variables (e.g. None or False values but check -h option when calling
+the shell command version) 
+
 **GALFIT INPUT**
 ------------------
 Routines that aid the GALFIT's user to
@@ -35,18 +41,23 @@ prepare the necessary files for GALFIT input
 
     from galfitools.galin.getStar import getStar
 
-    args = parser.parse_args()
 
-    image = args.image
-    regfile = args.Ds9regFile 
-    imsize = args.size
-    center = args.center
+    # image:             the image file to obtain the slice
+    #regfile:            the DS9 ellipse region file containing the star
+    #imsize:   the size of the new image in pixels
 
-    sky = args.sky
-    imout = args.out
+    
+    #optional for argparse
 
-    sigma = args.sigma
-    sigout = args.sigout
+    #center: boolean flag that indicates to use the center given in 
+    #        DS9 region file, otherwise it will find the x,y peaks within DS9 ellipse
+ 
+    #sky:   the value of  the sky background to be removed
+    #imout:   the image output name.
+
+    #sigma: the sigma image to obtain the slice if any 
+    #sigout: the sigma image output name.
+
 
     getStar(image, regfile, imsize, center, sky, imout, sigma, sigout)
 
@@ -61,23 +72,21 @@ prepare the necessary files for GALFIT input
 
     from galfitools.galin.initgal import InitGal
 
-    args = parser.parse_args()
 
+    #GalfitFile: the galfit file galfit.XX
 
-    GalfitFile = args.inFile
-    number = args.number
-    param3 = args.param3
-    param4 = args.param4
-    param5 = args.param5
-    param6 = args.param6
-    param7 = args.param7
+    #optional for argparse
 
-    param8 = args.param8
-    param9 = args.param9
-    param10 = args.param10
-
-
-    numcomp = args.numcomp
+    #number:  the number of files generated.
+    #param3:  range of values to give to the 3) model's parameter in format [min max]
+    #param4: range of values to give to the 4) model's parameter in format [min max]
+    #param5: range of values to give to the 5) model's parameter in format [min max]
+    #param6: range of values to give to the 6) model's parameter in format [min max]
+    #param7: range of values to give to the 7) model's parameter in format [min max]
+    #param8: range of values to give to the 8) model's parameter in format [min max]
+    #param9: range of values to give to the 9) model's parameter in format [min max]
+    #param10: range of values to give to the 10) model's parameter in format [min max] 
+    #numcomp: the component number which parameters will be changed
 
 
     InitGal(GalfitFile, number, param3, param4, param5, param6, param7, param8, param9, param10, numcomp)
@@ -94,21 +103,44 @@ prepare the necessary files for GALFIT input
     from galfitools.galin.MakeMask import makeMask
 
 
-    args = parser.parse_args()
 
+    #sexfile:    Sextractor catalog file
+    #image: Image file
 
-    sexfile = args.Sexfile 
-    image = args.ImageFile  
-    maskfile = args.maskout  
-    scale = args.scale 
-    satfileout = args.satds9
+    #optional for argparse
 
-
+    #maskfile:  the output mask file name
+    #scale: ds9 saturation file
+    #satfileout: scale factor to increase the ellipses. Default=1
 
 
 
     makeMask(sexfile, image, maskfile, scale, satfileout)
- 
+
+
+*Note* The Sextractor catalog must have the following
+columns: 
+
+::
+
+    #   1 NUMBER                 Running object number
+    #   2 ALPHA_J2000            Right ascension of barycenter (J2000)                      [deg]
+    #   3 DELTA_J2000            Declination of barycenter (J2000)                          [deg]
+    #   4 X_IMAGE                Object position along x                                    [pixel]
+    #   5 Y_IMAGE                Object position along y                                    [pixel]
+    #   6 MAG_APER               Fixed aperture magnitude vector                            [mag]
+    #   7 KRON_RADIUS            Kron apertures in units of A or B
+    #   8 FLUX_RADIUS            Fraction-of-light radii                                    [pixel]
+    #   9 ISOAREA_IMAGE          Isophotal area above Analysis threshold                    [pixel**2]
+    #  10 A_IMAGE                Profile RMS along major axis                               [pixel]
+    #  11 ELLIPTICITY            1 - B_IMAGE/A_IMAGE
+    #  12 THETA_IMAGE            Position angle (CCW/x)                                     [deg]
+    #  13 BACKGROUND             Background at centroid position                            [count]
+    #  14 CLASS_STAR             S/G classifier output
+    #  15 FLAGS                  Extraction flags
+
+
+
 
 **maskDs9**  creates (or modify) a mask image for GALFIT using Ds9 regions such as Boxes, Ellipses and Polygons
 
@@ -117,19 +149,19 @@ prepare the necessary files for GALFIT input
 
     from galfitools.galin.MaskDs9 import maskDs9
 
+    
+    #MaskFile:              the Mask image file to modify or create
+    #RegFile:               the DS9 region file
 
+    #optional arguments for argparse
+    
+    # fill: the value in counts to fill into the Ds9 regions
+    #image: image to obtain the size
 
-    args = parser.parse_args()
+    #bor_flag:    Mask the borders when their value of this regions is zero
+    #borValue:    value of the border if this region has values different from zero 
 
-    MaskFile = args.MaskFile 
-    RegFile = args.RegFile 
-    fill = args.fill
-    image = args.image
-
-    bor_flag = args.border
-    borValue = args.borValue
-
-
+               
 
     maskDs9(MaskFile, RegFile, fill, image, bor_flag, borValue) 
 
@@ -142,17 +174,21 @@ prepare the necessary files for GALFIT input
 
     from galfitools.galin.MaskSky import skyRem
 
-    args = parser.parse_args()
 
-    image = args.ImageFile 
-    mask = args.MaskFile
-    sky_mean = args.skymean
-    sky_sig = args.skysigma
-    nsig = args.numbersig
+    #image:        original data image
+    #mask:    Name of the new Mask file
 
-    bor_flag = args.border
-    borValue = args.borValue
+    #optional arguments from argparse
 
+    #sky_mean: mean of the sky background
+    #sky_sig:  background
+    #nsig:  number of times that the sigma of the sky will be multiplied to remove the
+    #        sky background
+
+
+    #bor_flag:  Mask the borders when their value is zero
+    #borValue: value of the border if it is different from zero
+                  
 
     skyRem(image, mask, sky_mean, sky_sig, nsig, borValue, bor_flag)
 
@@ -165,12 +201,16 @@ prepare the necessary files for GALFIT input
 
     from galfitools.galin.xy2fits import xy2fits
 
-    args = parser.parse_args()
 
 
-    ImageFile= args.ImageFile
-    AsciiFile= args.AsciiMask
-    Value = args.val 
+    #ImageFile: The Image file
+    #AsciiFile: The ascii file with the x,y positions
+
+ 
+
+    #optional argument from argparse
+
+    #Value: the value in counts for the masked pixels
 
     xy2fits().MakeFits(ImageFile, AsciiFile, Value)
 
