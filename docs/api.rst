@@ -589,9 +589,41 @@ Routines that use the Multi-Gaussian Expansion
 ::
 
     from galfitools.mge.mge2galfit import mge2gal
-    args = parser.parse_args()
+
+    #args is an class object from argparse
 
     mge2gal(args) 
+
+
+    #to check the args options check the -h option (shown below):
+
+    #  positional arguments:
+    #    image                 the Mask image file to modify or create
+    #    Ds9regFile            the DS9 ellipse region file containing the galaxy
+    #    magzpt                the magnitude zero point
+    #
+    #  options:
+    #    -h, --help            show this help message and exit
+    #    -t, --twist           uses twist option for mge
+    #    -r, --regu            regularized mode for mge_fit_sectors
+    #    -c, --center          uses the center given in DS9 region file,otherwise it will found the x,y
+    #                          peaks within DS9 ellipse
+    #    -p PSF, --psf PSF     the value of PSF sigma
+    #    -s SKY, --sky SKY     the sky background value
+    #    -m MASK, --mask MASK  the mask file
+    #    -ps PLATE, --plate PLATE
+    #                          plate scale of the image
+    #    -gas, --gauss         uses gauss function for galfit file
+    #    -fser, --freeser      leaves the sersic index as a free parameter to fit
+    #    -fsk, --freesky       leaves the sky as a free parameter to fit
+    #    -pf PSFILE, --psfile PSFILE
+    #                          name of the psf file for GALFIT. default = psf.fits
+    #    -sf SIGFILE, --sigfile SIGFILE
+    #                          name of the sigma image for GALFIT. default = sigma.fits
+    #    -ng NUMGAUSS, --numgauss NUMGAUSS
+    #                          number of gaussians that will be used for galfit.Starting from the first one
+    #
+
 
 
 **SbProf** creates a surface brightness profile from a ellipse ds9 region
@@ -600,11 +632,43 @@ Routines that use the Multi-Gaussian Expansion
 
     from galfitools.mge.SbProf import sbProf
 
-    args = parser.parse_args()
+    #args is an class object from argparse
 
     sbProf(args)
 
 
+    #to check the args options check the -h option (shown below):
+
+    #positional arguments:
+    #  Image                 image fits file
+    #  Ds9Region             Ds9 ellipse region file
+
+    #options:
+    #  -h, --help            show this help message and exit
+    #  -q AXRAT, --axrat AXRAT
+    #                        axis ratio
+    #  -pa ANGLE, --angle ANGLE
+    #                        angular position (same as GALFIT)
+    #  -mz MGZPT, --mgzpt MGZPT
+    #                        Magnitud zero point
+    #  -m MASK, --mask MASK  mask fits file
+    #  -s SKY, --sky SKY     sky value. Default = 0
+    #  -p PLATE, --plate PLATE
+    #                        plate scale
+    #  -o OUTPUT, --output OUTPUT
+    #                        output file
+    #  -c, --center          uses the center given in DS9 region file,otherwise it will found the x,y
+    #                        peaks within DS9 ellipse
+    #  -rx RANX RANX, --ranx RANX RANX
+    #                        provide a range for x-axis: xmin - xmax
+    #  -ry RANY RANY, --rany RANY RANY
+    #                        provide a range for y-axis: ymin - ymax
+    #  -lx, --logx           turn the X-axis to logarithm
+    #  -px, --pix            turn the top x-axis in pixels
+    #  -g, --grid            display a grid in the plot
+    #  -r RAD, --rad RAD     value for a vertical line to add into the plot
+    #  -r2 RAD2, --rad2 RAD2
+    #                        value for a second vertical line to add into the plot
 
  
 **SIM**
@@ -618,15 +682,17 @@ Routines that make a simulated galaxy image.
 
     from galfitools.sim.MakeSim import makeSim
 
-    args = parser.parse_args()
+    #args = parser.parse_args()
 
-    image = args.image 
-    GAIN = args.gain 
+    #image:  the GALFIT galaxy model
+    #newimage:  the name of the new galaxy image
 
-    skymean = args.sky
-    skystd = args.std 
+    #optional arguments from argparse
 
-    newimage = args.newimage 
+    #GAIN: the gain value of the image.
+
+    #skymean: the sky background value.
+    #skystd: the sky background value
 
 
     makeSim(image, GAIN, skymean, skystd, newimage)
@@ -642,18 +708,17 @@ Routines that compute the sky background
 
     from galfitools.sky.GalfitSky import galfitSky
 
-    args = parser.parse_args()
 
-    imgname =  args.image
-    maskfile = args.mask 
+    # imgname: the image file
+    # maskfile: the galfit mask file
 
-    mgzpt = args.mgzpt 
-    scale = args.scale
+    # mgzpt: magnitude zero point
+    # scale: the plate scale
 
-    X = args.xpos
-    Y = args.ypos
+    # X:  the X position
+    # Y: the Y position
 
-    initsky = args.initsky
+    # initsky: the initial sky value
 
 
     galfitSky(imgname, maskfile, mgzpt, scale, X, Y, initsky)
@@ -666,19 +731,17 @@ Routines that compute the sky background
 
     from galfitools.sky.Sky import sky
    
-    args = parser.parse_args()
 
-    imgname = args.image 
-    maskimage = args.maskfile 
-    filereg = args.Ds9regFile
+    # imgname: the image file
+    # maskimage: The galfit mask file
+    # filereg: Ds9 box region file containing the area to compute
 
 
-    mean, sig = sky(imgname, maskimage, filereg)
+     mean, sig = sky(imgname, maskimage, filereg)
 
-    print("Sky within 3 sigma:") 
+    # mean: the mean value of the sky background
+    # sig: the standard deviation the sky backround
 
-    print("mean sky: {:.3f} ".format(mean))
-    print("std sky: {:.3f} ".format(sig))
 
 
 

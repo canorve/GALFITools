@@ -537,9 +537,9 @@ Routines that compute the sky background
 ::
 
   positional arguments:
-    image       the Mask image file to modify or create
-    maskfile    the Mask image file to modify or create
-    Ds9regFile  the DS9 ellipse region file containing the galaxy
+    image       the image file 
+    maskfile    the Mask image file 
+    Ds9regFile  the DS9 box region file containing the galaxy
 
   options:
     -h, --help  show this help message and exit

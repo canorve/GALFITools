@@ -50,9 +50,9 @@ def mainSky():
 
     parser = argparse.ArgumentParser(description="computes sky from a ds9 region box file")
 
-    parser.add_argument("image", help="the Mask image file to modify or create")
-    parser.add_argument("maskfile", help="the Mask image file to modify or create")
-    parser.add_argument("Ds9regFile", help="the DS9 ellipse region file containing the galaxy")
+    parser.add_argument("image", help="the image file")
+    parser.add_argument("maskfile", help="the GALFIT Mask image file ")
+    parser.add_argument("Ds9regFile", help="the DS9 box region file")
  
 
    
