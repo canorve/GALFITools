@@ -222,8 +222,6 @@ def mainKappa() -> None:
     parser.add_argument("GalfitFile", help = "Galfit File containing the Sersics or gaussians components")
 
     parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
-    parser.add_argument("-er","--effrad", type=float, 
-                        help="percentage of light to compute for radius. default=.5 for effective radius ", default=.5)
 
     #parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
 
@@ -242,7 +240,7 @@ def mainKappa() -> None:
     parser.add_argument("-r","--random", type=int, help="Number of random radius as initial parameters to search for the minimum. It will generated random radius from 0 to effective radius of the component indicated by parameter -ni ")
 
 
-    parser.add_argument("-p","--plot", action="store_true", help='makes plot of double derivative vs. radius ') 
+    parser.add_argument("-p","--plot", action="store_true", help='makes plot of maximum curvature vs. radius ') 
     parser.add_argument("-rx","--ranx",nargs=2, type=float, help="provide a range for x-axis: xmin - xmax ")
 
 
@@ -253,7 +251,6 @@ def mainKappa() -> None:
     galfitFile = args.GalfitFile
     dis = args.dis
 
-    eff = args.effrad
     inicomp = args.numinitial
 
     quick = args.quick
@@ -267,7 +264,7 @@ def mainKappa() -> None:
     num_comp =  args.numcomp
 
 
-    rkappa, N, theta = getKappa(galfitFile, dis, eff, inicomp, quick, random, angle, num_comp, plot, ranx) 
+    rkappa, N, theta = getKappa(galfitFile, dis, inicomp, quick, random, angle, num_comp, plot, ranx) 
 
     print('number of model components: ',N)
 
@@ -353,7 +350,7 @@ def maingetSlope() -> None:
 
 
 
-    parser.add_argument("-p","--plot", action="store_true", help='makes plot of double derivative vs. radius ') 
+    parser.add_argument("-p","--plot", action="store_true", help='makes plot of first derivative vs. radius ') 
     parser.add_argument("-rx","--ranx",nargs=2, type=float, help="provide a range for x-axis: xmin - xmax ")
 
 
@@ -415,7 +412,7 @@ def maingetN() -> None:
 
 
 
-    parser.add_argument("-p","--plot", action="store_true", help='makes plot of double derivative vs. radius ') 
+    parser.add_argument("-p","--plot", action="store_true", help='makes plot of Sersic index vs. fraction of light ') 
 
 
 
@@ -497,7 +494,7 @@ def mainGetBulgeRad() -> None:
                         help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components. Angle measured from Y-Axis as same as GALFIT. ")
 
 
-    parser.add_argument("-p","--plot", action="store_true", help='makes plot of double derivative vs. radius ') 
+    parser.add_argument("-p","--plot", action="store_true", help='makes plot of GalfitFile1 - GalfitFile2 vs. radius ') 
     parser.add_argument("-rx","--ranx", nargs=2, type=float, help="provide a range for x-axis: xmin - xmax ")
 
 
@@ -547,7 +544,7 @@ def mainMissingLight() -> None:
     parser.add_argument("GalfitFile1", help = "Galfit File containing the coreless surface brightness model")
     parser.add_argument("GalfitFile2", help = "Galfit File containing the core surface brightness model")
 
-    parser.add_argument("rad", type=float, help="radius to integrate")
+    parser.add_argument("rad", type=float, help="upper limit of radius to integrate the missing light in pixels")
 
     parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
 

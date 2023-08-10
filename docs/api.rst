@@ -245,7 +245,7 @@ the surface brightness models fitted by GALFIT
       #        indicated by parameter -ni
       
       #num_comp: Number of component where it'll obtain center of all components, default = 1
-      #angle:  Angle of the major axis of the galaxy. Default= it will take the angle of the
+      #angle:  Angle of the major axis of the galaxy measured from the image Y-axis
       #ranx: list that indicates the range for the plot x-axis: xmin - xmax
       #plot: boolean flag that indicates to  make a plot of double derivative vs. radius
 
@@ -273,7 +273,7 @@ alternative method to getBreak.
 
     #optional from argparse:
     #dis: Maximum distance among components
-    #angle:  Angle of the major axis of the galaxy. Default= it will take the angle of the
+    #angle:  Angle of the major axis of the galaxy measured from the image Y-axis
     #num_comp: Number of component where it'll obtain center of all components, default = 1
     #plot: boolean flag that indicates to  make a plot of double derivative vs. radius
     #ranx: list that indicates the range for the plot x-axis: xmin - xmax
@@ -294,26 +294,25 @@ alternative method to getBreak.
 
     from galfitools.galout.getRads import getFWHM
 
-    args = parser.parse_args()
 
-    galfitFile = args.GalfitFile
-    dis = args.dis
-    angle = args.angle
+    #galfitFile: Galfit File containing the Sersics or gaussians components
+
+    #optional from argparse:
+
+    #dis: Maximum distance among components
+    #angle:  Angle of the major axis of the galaxy measured from the image Y-axis 
+    #num_comp: Number of component where it'll obtain center of all components, default = 1
 
 
-   
-    num_comp =  args.numcomp
 
     fwhm, N, theta = getFWHM(galfitFile, dis, angle, num_comp)
 
+    # output variables:
 
-    print('number of model components: ',N)
-
-    line = 'Using a theta value of : {:.2f} degrees\n'.format(theta)
-    print(line)
-
-    line = 'The FWHM is {:.2f} pixels \n'.format(fwhm)
-    print(line)
+    #fwhm: the fwhm 
+    #N: number of surface brightness model components of the star
+    #theta: the angle used to determine the FWHM. it 
+    #  is computed in that angle orientation
 
 
 
@@ -326,31 +325,37 @@ alternative method to getBreak.
 
     from galfitools.galout.getRads import getKappa
 
-    args = parser.parse_args()
+    #galfitFile: Galfit File containing the Sersics or gaussians components
 
-    galfitFile = args.GalfitFile
-    dis = args.dis
+    #optional from argparse:
+    #dis: Maximum distance among components
 
-    eff = args.effrad
-    inicomp = args.numinitial
+    #inicomp: Number of component where it'll obtain the initial parameter to search break
+    #                  radius or to generated random initial radius.
 
-    quick = args.quick
-    random = args.random
-    angle = args.angle
+    #quick: evaluate in the position given by inicomp parameter
 
-    ranx = args.ranx
-    plot = args.plot
+    #random: Number of random radius as initial parameters to search for the minimum. It
+    #        will generated random radius from 0 to effective radius of the component
+    #        indicated by parameter -ni
+      
+    #num_comp: Number of component where it'll obtain center of all components, default = 1
+    #angle:  Angle of the major axis of the galaxy measured from the image Y-axis 
+    #ranx: list that indicates the range for the plot x-axis: xmin - xmax
+    #plot: boolean flag that indicates to  make a plot of maximum curvature vs. radius
 
 
-    num_comp =  args.numcomp
 
 
     rkappa, N, theta = getKappa(galfitFile, dis, eff, inicomp, quick, random, angle, num_comp, plot, ranx) 
 
-    print('number of model components: ',N)
 
-    line = 'The Kappa radius  is {:.2f} pixels \n'.format(rkappa)
-    print(line)
+    # output variables:
+
+    #rkappa: the kappa radius in pixels  
+    #N: number of surface brightness model components of the galaxy
+    #theta: the angle used to determine the kappa radius. It 
+    #  is computed in that angle orientation
 
 
 
@@ -363,36 +368,24 @@ alternative method to getBreak.
     from galfitools.galout.getRads import getReComp
 
 
-    args = parser.parse_args()
-
-
-    galfitFile = args.GalfitFile
-    dis = args.dis
-    eff = args.effrad
-    num_comp =  args.numcomp
-    angle = args.angle
+    #galfitFile = Galfit File containing the Sersics or gaussians components
+    #dis: Maximum distance among components
+    #eff: percentage of light of the radius to be computed. Effective radius = 0.5  
+    #num_comp:Number of component where it'll obtain center of all components, default = 1
+    #angle:  Angle of the major axis of the galaxy measured from the image Y-axis 
 
     EffRad, totmag, meanme, me, N, theta = getReComp(galfitFile, dis, eff, angle, num_comp)
 
-    print('number of model components: ', N)
 
-    line = 'Using a theta value of : {:.2f} degrees \n'.format(theta)
-    print(line)
+    # output variables:
 
-    line = 'Total Magnitude of the galaxy: {:.2f} \n'.format(totmag)
-    print(line)
-
-    line = 'Surface brightness at effective radius (\u03BCe): {:.2f} mag/\" \n'.format(me)
-    print(line)
-
-
-    line = 'Mean Surface Brightness at effective radius (<\u03BC>e): {:.2f} mag/\" \n'.format(meanme)
-    print(line)
-
-    line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
-    print(line)
-
-
+    #EffRad: the computed fraction of light radius  in pixels  
+    #N: number of surface brightness model components of the galaxy
+    #theta: the angle used to determine the kappa radius. It 
+    #  is computed in that angle orientation
+    #totmag: total magnitude of the galaxy.
+    #me: Surface brightness at effective radius
+    #mme: Mean surface brightness at effective radius
 
 
 
@@ -402,33 +395,31 @@ alternative method to getBreak.
     from galfitools.galout.getRads import getSlope
 
 
-    args = parser.parse_args()
+    #galfitFile: Galfit File containing the Sersics or gaussians components
 
-    galfitFile = args.GalfitFile
-    dis = args.dis
+    #optional from argparse:
+    #dis: Maximum distance among components
 
-    eff = args.effrad
-    slope = args.slope
+    #slope = value of slope at which the radius is to be found. 
 
-    num_comp =  args.numcomp
+    #num_comp: Number of component where it'll obtain center of all components, default = 1
 
-    angle = args.angle
+    #angle:  Angle of the major axis of the galaxy measured from the image Y-axis 
 
-    ranx = args.ranx
-    plot = args.plot
+    #ranx: list that indicates the range for the plot x-axis: xmin - xmax
+    #plot: boolean flag that indicates to make a plot of first derivative vs. radius
 
 
 
     rgam, N, theta = getSlope(galfitFile, dis, eff, slope, angle, num_comp, plot, ranx)
 
 
-    print('number of model components: ',N)
+    # output 
 
-    line = 'Using a theta value of : {:.2f} degrees\n'.format(theta)
-    print(line)
-
-    line = 'The radius with slope {:.2f} is {:.2f} pixels \n'.format(slope,rgam)
-    print(line)
+    #rgam: the pixel radius at which the model have the specified slope value 
+    #N: number of surface brightness model components of the galaxy
+    #theta: the angle used to determine the break radius. Break radius
+    #  is computed in that angle direction.
 
 
 
@@ -440,45 +431,31 @@ alternative method to getBreak.
     from galfitools.galout.getN import getN
 
 
-    ## parsing variables
 
-    args = parser.parse_args()
+    #galfitFile: Galfit File containing the Sersics or gaussians components
 
-    galfitFile = args.GalfitFile
-    dis = args.dis
-
+    #optional from argparse:
+    #dis: Maximum distance among components
+    #num_comp: Number of component where it'll obtain center of all components, default = 1
 
    
-    num_comp =  args.numcomp
-
-    frac = args.radfrac
-
-    angle = args.angle
-
-    plot = args.plot
+    #frac: fraction of light radius 
+    #angle:  Angle of the major axis of the galaxy measured from the image Y-axis 
+    #plot: boolean flag that indicates  to make plot of Sersic index vs. fraction of light
 
 
     sersic, meanser, stdser, totmag, N, theta = getN(galfitFile, dis, frac, angle, num_comp, plot)
 
 
-    print('number of model components: ', N)
+    # output
 
-    line = 'Using a theta value of : {:.2f} degrees \n'.format(theta)
-    print(line)
-
-    line = 'Total Magnitude of the galaxy: {:.2f} \n'.format(totmag)
-    print(line)
-
-    line = 'Sersic index with the method of Mean Surface Brightness at effective radius: {:.2f}  \n'.format(sersic)
-    print(line)
-
-
-    line = 'Sersic index with the method of fraction of light (at different radius)  \n'
-    print(line)
-
-
-    line = 'Sersic index mean: {:.2f}  Standard deviation: {:.2f}  '.format(meanser, stdser)
-    print(line)
+    #sersic: sersic index obtained with the method of the surface brightness at effective radius
+    #meanser: mean of the sersic index obtained with the method of effective radius  
+    #stdser: standard deviation of the sersic index obtained with the method of effective radius  
+    #totmag: total magnitud of the galaxy
+    #N: number of surface brightness model components of the galaxy
+    #theta: the angle used to determine the break radius. Break radius
+    #  is computed in that angle direction.
 
 
 
@@ -488,30 +465,28 @@ alternative method to getBreak.
 
     from galfitools.galout.getMissingLight import getMissLight
 
-    args = parser.parse_args()
 
-    galfitFile1 = args.GalfitFile1
-    galfitFile2 = args.GalfitFile2
 
-    dis = args.dis
 
-    num_comp =  args.numcomp
+    #GalfitFile1           Galfit File containing the coreless surface brightness model
+    #GalfitFile2           Galfit File containing the core surface brightness model
+    #rad                   upper limit of radius to integrate the missing light in pixels 
 
-    rad = args.rad
 
+    #optional from argparse:
+
+    #dis: Maximum distance among components
+    #num_comp: Number of component where it'll obtain center of all components, default = 1
 
 
     magmiss, N1, N2 = getMissLight(galfitFile1, galfitFile2, dis, num_comp, rad)
 
 
-    print('number of model components coreless model: ',N1)
-    print('number of model components core model: ',N2)
+    # output
 
-
-    line = 'the missing light is {:.2f} mag \n'.format(magmiss)
-    print(line)
-
-
+    #N1: number of surface brightness model components of the coreless model
+    #N2: number of surface brightness model components of the core model
+    #magmiss: magnitude of the missing light
 
 
 
@@ -521,34 +496,29 @@ equal
 
     from galfitools.galout.getRads import getBulgeRad
 
-    args = parser.parse_args()
+    #GalfitFile1           Galfit File containing the coreless surface brightness model
+    #GalfitFile2           Galfit File containing the core surface brightness model
 
-    galfitFile1 = args.GalfitFile1
-    galfitFile2 = args.GalfitFile2
+    #optional from argparse
 
-    dis = args.dis
+    #dis: Maximum distance among components
+    #num_comp: Number of component where it'll obtain center of all components, default = 1
 
-    num_comp =  args.numcomp
+    #angle:  Angle of the major axis of the galaxy. Default= it will take the angle of the
+    #plot: boolean flag that indicates  to make  a plot of GalfitFile1 - GalfitFile2 vs. radius 
+    #plot: boolean flag that indicates to make a plot of first derivative vs. radius
+    #ranx: list that indicates the range for the plot x-axis: xmin - xmax
 
-    angle = args.angle
-
-    ranx = args.ranx
-    plot = args.plot
 
 
     rbulge, N1, N2, theta = getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx)
 
 
-    print('number of model components for the bulge: ',N1)
-    print('number of model components for the rest of the galaxy: ',N2)
+    # output
 
-
-    line = 'Using a theta value of: {:.2f} degrees\n'.format(theta)
-    print(line)
-
-
-    line = 'The bulge radius is {:.2f} pixels \n'.format(rbulge)
-    print(line)
+    #N1: number of surface brightness model components of the coreless model
+    #N2: number of surface brightness model components of the core model
+    #rbulge: bulge radius  
 
 
 
@@ -559,16 +529,19 @@ equal
     from galfitools.galout.showcube import displayCube
 
 
-    args = parser.parse_args()
+    #cubeimage: the cube GALFIT image 
 
-    cubeimage = args.cubeimage
-    namecube = args.outimage 
-    dpival = args.dotsinch 
-    brightness = args.brightness
-    contrast = args.contrast 
-    cmap = args.cmap 
-    scale = args.scale  
-    noplot = args.noplot
+    #optional arguments from argparse
+
+    #namecube: name of the output image 
+    #dpival: value of dpi (dots per inch)
+    #brightness: brightness of the image. Only for galaxy and model. Default = 0. Preferible
+    #                    range goes from -1 to 1
+    #contrast: contrast of the image. Only for galaxy and model. Default = 1. Preferible
+    #           range goes from 0 to 1
+    #cmap: colormap to be used for the cube image (based on the matplotlib)
+    #scale: plate scale of the image
+    #noplot:  avoids to show the plotting window
 
 
     displayCube(cubeimage, namecube, dpival, brightness, contrast, cmap, scale, noplot)
@@ -585,18 +558,23 @@ equal
 
     args = parser.parse_args()
 
-    ImageFile = args.ImageFile 
-    RegFile = args.RegFile 
-    zeropoint = args.zeropoint
-    sky = args.sky
+    ImageFile =  the image file where the photometry will be computed
+
+    RegFile = the DS9 region file
+
+
+
+    #optional for argparse
+
+    zeropoint: magnitude zeropoint 
+    sky: sky background value to be removed from computation 
 
 
     mag = photDs9(ImageFile, RegFile, zeropoint, sky)
 
+    #output
 
-    line = "the magnitude from the ds9 region is: {:.2f} \n".format(mag)
-    print(line)
-
+    mag: magnitud of the Ds9 regions 
 
 
 

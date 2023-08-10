@@ -633,11 +633,10 @@ class GetFWHM:
 
 
 
-def getKappa(galfitFile: str, dis: int, eff: float, inicomp: int, quick: bool, random: int, angle: float, num_comp: int, plot: bool, ranx: list) -> float:
+def getKappa(galfitFile: str, dis: int, inicomp: int, quick: bool, random: int, angle: float, num_comp: int, plot: bool, ranx: list) -> float:
     '''gets the Kappa radius from a set of Sersics'''
 
 
-    assert (eff > 0) and (eff <= 1), 'effrad must be a value between 0 and 1'
    
 
     #head = ReadHead(galfitFile)

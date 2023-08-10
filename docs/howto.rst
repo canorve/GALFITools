@@ -265,8 +265,6 @@ alternative method to getBreak
   options:
     -h, --help            show this help message and exit
     -d DIS, --dis DIS     Maximum distance among components
-    -er EFFRAD, --effrad EFFRAD
-                          percentage of light to compute for radius. default=.5 for effective radius
     -n NUMCOMP, --numcomp NUMCOMP
                           Number of component where it'll obtain center of all components, default = 1
     -a ANGLE, --angle ANGLE
@@ -356,7 +354,7 @@ alternative method to getBreak
   positional arguments:
     GalfitFile1           Galfit File containing the coreless surface brightness model
     GalfitFile2           Galfit File containing the core surface brightness model
-    rad                   radius to integrate
+    rad                   upper limit of radius to integrate the missing light in pixels 
 
   options:
     -h, --help            show this help message and exit
