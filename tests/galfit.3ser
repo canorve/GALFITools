@@ -1,0 +1,86 @@
+
+#  Input menu file: galfit.05
+
+#  Chi^2/nu = 0.445,  Chi^2 = 789870.500,  Ndof = 1775458
+
+================================================================================
+# IMAGE and GALFIT CONTROL PARAMETERS
+A) ABELL2877_C.fits      # Input data image (FITS file)
+B) ABELL2877_CG.fits      # Output data image block
+C) none                # Sigma image name (made from data if blank or "none") 
+D) psf01.fits          # Input PSF image and (optional) diffusion kernel
+E) 1                   # PSF fine sampling factor relative to data 
+F) Mask.fits           # Bad pixel mask (FITS image or ASCII coord list)
+G) constraints.txt      # File with parameter constraints (ASCII file) 
+H) 1    2097 1    2100 # Image region to fit (xmin xmax ymin ymax)
+I) 200    200          # Size of the convolution box (x y)
+J) 25.0329             # Magnitude photometric zeropoint 
+K) 0.1000  0.1000      # Plate scale (dx dy)   [arcsec per pixel]
+O) regular             # Display type (regular, curses, both)
+P) 0                   # Choose: 0=optimize, 1=model, 2=imgblock, 3=subcomps
+
+# INITIAL FITTING PARAMETERS
+#
+#   For component type, the allowed functions are: 
+#       sersic, expdisk, edgedisk, devauc, king, nuker, psf, 
+#       gaussian, moffat, ferrer, and sky. 
+#  
+#   Hidden parameters will only appear when they're specified:
+#       Bn (n=integer, Bending Modes).
+#       C0 (diskyness/boxyness), 
+#       Fn (n=integer, Azimuthal Fourier Modes).
+#       R0-R10 (coordinate rotation, for creating spiral structures).
+#       To, Ti, T0-T10 (truncation function).
+# 
+# ------------------------------------------------------------------------------
+#   par)    par value(s)    fit toggle(s)    # parameter description 
+# ------------------------------------------------------------------------------
+
+# Component number: 1
+ 0) sersic                 #  Component type
+ 1) 1080.2406 608.9464 1 1  #  Position x, y
+ 3) 14.2657     1          #  Integrated magnitude 
+ 4) 37.6392     1          #  R_e (effective radius)   [pix]
+ 5) 0.9337      1          #  Sersic index n (de Vaucouleurs n=4) 
+ 6) 0.0000      0          #     ----- 
+ 7) 0.0000      0          #     ----- 
+ 8) 0.0000      0          #     ----- 
+ 9) 0.7947      1          #  Axis ratio (b/a)  
+10) -74.7247    1          #  Position angle (PA) [deg: Up=0, Left=90]
+ Z) 0                      #  Skip this model in output image?  (yes=1, no=0)
+
+# Component number: 2
+ 0) sersic                 #  Component type
+ 1) 1080.2406 608.9464 2 2  #  Position x, y
+ 3) 11.3604     1          #  Integrated magnitude 
+ 4) 506.8360    1          #  R_e (effective radius)   [pix]
+ 5) 3.2745      1          #  Sersic index n (de Vaucouleurs n=4) 
+ 6) 0.0000      0          #     ----- 
+ 7) 0.0000      0          #     ----- 
+ 8) 0.0000      0          #     ----- 
+ 9) 0.8560      1          #  Axis ratio (b/a)  
+10) -81.1878    1          #  Position angle (PA) [deg: Up=0, Left=90]
+ Z) 0                      #  Skip this model in output image?  (yes=1, no=0)
+
+# Component number: 3
+ 0) sersic                 #  Component type
+ 1) 1080.2406 608.9464 2 2  #  Position x, y
+ 3) 15.4171     1          #  Integrated magnitude 
+ 4) 11.0053     1          #  R_e (effective radius)   [pix]
+ 5) 0.7552      1          #  Sersic index n (de Vaucouleurs n=4) 
+ 6) 0.0000      0          #     ----- 
+ 7) 0.0000      0          #     ----- 
+ 8) 0.0000      0          #     ----- 
+ 9) 0.9285      1          #  Axis ratio (b/a)  
+10) -35.7325    1          #  Position angle (PA) [deg: Up=0, Left=90]
+ Z) 0                      #  Skip this model in output image?  (yes=1, no=0)
+
+# Component number: 4
+ 0) sky                    #  Component type
+ 1) -17.0700    1          #  Sky background at center of fitting region [ADUs]
+ 2) 0.000e+00      0       #  dsky/dx (sky gradient in x)     [ADUs/pix]
+ 3) 0.000e+00      0       #  dsky/dy (sky gradient in y)     [ADUs/pix]
+ Z) 0                      #  Skip this model in output image?  (yes=1, no=0)
+
+================================================================================
+

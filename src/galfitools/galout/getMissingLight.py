@@ -32,7 +32,7 @@ def getMissLight(galfitFile1, galfitFile2, dis, num_comp, rad):
     galcomps1 = galfit1.ReadComps()
 
 
-    galfit2 = Galfit(galfitFile1)
+    galfit2 = Galfit(galfitFile2)
     head2 = galfit2.ReadHead()
     galcomps2 = galfit2.ReadComps()
 
@@ -47,11 +47,6 @@ def getMissLight(galfitFile1, galfitFile2, dis, num_comp, rad):
 
     maskgal1 = (galcomps1.Active == True) 
     maskgal2 = (galcomps2.Active == True) 
-
-    if args.angle:
-        theta = args.angle
-    else:
-        theta = galcomps2.PosAng[maskgal2][-1]  
 
 
     #convert all exp, gaussian and de vaucouleurs to Sersic format
@@ -71,6 +66,16 @@ def getMissLight(galfitFile1, galfitFile2, dis, num_comp, rad):
     Flux1, mag1 = GetMag().GetFlux(head1, comps1, rad)
     Flux2, mag2 = GetMag().GetFlux(head2, comps2, rad)
 
+
+    #if Flux1 > Flux2:
+
+    #    Fluxmiss = Flux1 - Flux2
+    #else:
+    #    print("Warning: Flux1 is less than Flux2 for the selected radius. Inverting")
+
+    #    Fluxmiss = Flux2 - Flux1
+
+    #magmiss = -2.5*np.log10(Fluxmiss) + head1.mgzpt
 
 
     magmiss = getMiss(head1, mag1, mag2)
@@ -161,7 +166,7 @@ def getMiss(head, mag1, mag2):
 
 
 
-    magMiss = -2.5*np.log10(FluxMiss) + head.mgzpt
+    magMiss = -2.5*np.log10(Fluxmiss) + head.mgzpt
 
     return magMiss
 
