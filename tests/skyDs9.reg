@@ -1,0 +1,8 @@
+# Region file format: DS9 version 4.1
+global color=green dashlist=8 3 width=1 font="helvetica 10 normal roman" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1
+physical
+ellipse(1386,1111,16,26,0)
+box(60,1480,28,38,0)
+box(309.5,613.5,35,35,0)
+ellipse(1403,485,10,49,0)
+polygon(821.06237,1087.9376,838,1091,874,1033,924,1034,923,1058,946,1023,917,1025,905,999,861,1005,821.06237,960.06237,843,1040)
