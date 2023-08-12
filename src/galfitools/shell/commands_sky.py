@@ -6,7 +6,7 @@ import argparse
 from galfitools.sky.GalfitSky import galfitSky
 
 from galfitools.sky.Sky import sky
-from galfitools.sky.Sky import SkyDs9
+from galfitools.sky.SkyDs9 import SkyDs9
 
 
 

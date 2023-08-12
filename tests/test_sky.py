@@ -12,7 +12,7 @@ from galfitools.sky.GalfitSky import galfitSky
 
 from galfitools.sky.Sky import sky
 
-
+from galfitools.sky.SkyDs9 import SkyDs9
 
 def test_galfitSky():
 
@@ -54,11 +54,6 @@ def test_sky():
 
     mean, sig = sky(imgname, maskimage, filereg)
 
-    print("Sky within 3 sigma:") 
-
-    print("mean sky: {:.3f} ".format(mean))
-    print("std sky: {:.3f} ".format(sig))
-
     tol = 1e-3
 
     result1 =  369.717 
@@ -78,5 +73,35 @@ def test_sky():
 
     return None
 
+
+
+def test_SkyDs9():
+
+    ImageFile = "A671.gtMakeMask.maskds9.masksky.fits" 
+    RegFile = "skyDs9.reg" 
+
+
+
+    mean, sig = SkyDs9(ImageFile, RegFile) 
+
+
+    tol = 1e-3
+
+    result1 = 1146.627
+    result2 = 6.919
+
+
+
+    diffsky1 = abs(mean -result1)
+
+    assert diffsky1 < tol
+
+    diffsky2 = abs(sig -result2)
+
+    assert diffsky2 < tol
+
+
+
+    return None
 
 
