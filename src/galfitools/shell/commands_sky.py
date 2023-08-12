@@ -6,6 +6,7 @@ import argparse
 from galfitools.sky.GalfitSky import galfitSky
 
 from galfitools.sky.Sky import sky
+from galfitools.sky.Sky import SkyDs9
 
 
 
@@ -69,5 +70,38 @@ def mainSky():
 
     print("mean sky: {:.3f} ".format(mean))
     print("std sky: {:.3f} ".format(sig))
+
+
+def mainSkyDs9():
+
+
+
+    parser = argparse.ArgumentParser(description="computes sky background from a Ds9 region file: Box, Ellipses and Polygons ")
+
+    parser.add_argument("ImageFile", help="the image file where the photometry will be computed")
+    parser.add_argument("RegFile", help="the DS9 region file")
+
+
+
+
+
+
+    args = parser.parse_args()
+
+    ImageFile = args.ImageFile 
+    RegFile = args.RegFile 
+
+
+
+    mean, sig = SkyDs9(ImageFile, RegFile) 
+
+
+    print("Sky with the top 80% and botton 20% removed.") 
+
+    print("mean sky: {:.3f} ".format(mean))
+    print("std sky: {:.3f} ".format(sig))
+
+
+
 
 
