@@ -4,9 +4,11 @@ import argparse
 
 from galfitools.sim.MakeSim import makeSim
 
+from galfitools.shell.prt import printWelcome
 
 def mainMakeSim():
 
+    printWelcome()
 
     parser = argparse.ArgumentParser(description="simulates a observed galaxy from a GALFIT model")
 

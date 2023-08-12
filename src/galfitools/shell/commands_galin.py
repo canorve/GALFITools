@@ -10,8 +10,11 @@ from galfitools.galin.MakeMask import makeMask
 from galfitools.galin.MaskSky import skyRem
 from galfitools.galin.xy2fits import xy2fits
 
+from galfitools.shell.prt import printWelcome
 
 def mainGetStar():
+
+    printWelcome()
 
     parser = argparse.ArgumentParser(description="gets a image slice centered on the object peak")
 
@@ -56,6 +59,7 @@ def mainGetStar():
 def mainInitGal(): 
 
 
+    printWelcome()
 
    #parser argument section
 
@@ -106,6 +110,8 @@ def mainInitGal():
 def mainMakeMask():
 
 
+    printWelcome()
+
     parser = argparse.ArgumentParser(description="creates mask file from a catalog of Sextractor")
 
     parser.add_argument("Sexfile", help="Sextractor catalog file ")
@@ -139,6 +145,7 @@ def mainMakeMask():
 
 def mainMaskDs9(): 
 
+    printWelcome()
 
     parser = argparse.ArgumentParser(description="creates (or modify) a mask image for GALFIT using Ds9 regions such as Boxes, Ellipses and Polygons ")
 
@@ -177,6 +184,8 @@ def mainMaskDs9():
 def mainMaskSky(): 
 
 
+    printWelcome()
+
     parser = argparse.ArgumentParser(description="creates a mask image for GALFIT using original image and sky mean and sigma")
 
 
@@ -210,6 +219,7 @@ def mainMaskSky():
 
 def mainxy2fits(): 
 
+    printWelcome()
 
     parser = argparse.ArgumentParser(description="code to convert ASCII x,y positions to FTIS mask")
 

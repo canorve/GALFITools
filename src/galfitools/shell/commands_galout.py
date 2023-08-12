@@ -16,10 +16,12 @@ from galfitools.galout.showcube import displayCube
 from galfitools.galout.PhotDs9 import photDs9 
 
 
+from galfitools.shell.prt import printWelcome
 
 
 def mainPhotDs9(): 
 
+    printWelcome()
 
     parser = argparse.ArgumentParser(description="computes photometry from a Ds9 region file: Box, Ellipses and Polygons ")
 
@@ -53,6 +55,7 @@ def mainPhotDs9():
 #console scripts
 def mainGetBreak() -> None: 
 
+    printWelcome()
     #reading argument parsing
 
     parser = argparse.ArgumentParser(description = "getBreak: gets the break radius from a set of Sersics ")
@@ -122,7 +125,8 @@ def mainGetBreak() -> None:
 def mainGetBreak2():
     '''gets the break radius from a set of Sersics'''
 
-    #reading argument parsing
+
+    printWelcome()
 
     parser = argparse.ArgumentParser(description = "getBreak2: gets the break radius from a set of Sersics ")
 
@@ -168,7 +172,8 @@ def mainGetBreak2():
 
 def mainFWHM() -> None: 
 
-    #reading argument parsing
+
+    printWelcome()
 
     parser = argparse.ArgumentParser(description = "getFWHM: gets the FWHM from a set of Sersics ")
 
@@ -213,6 +218,7 @@ def mainFWHM() -> None:
 #console scripts
 def mainKappa() -> None: 
 
+    printWelcome()
     #reading argument parsing
 
     parser = argparse.ArgumentParser(description = "getKappa: gets the Kappa radius from a set of Sersics ")
@@ -274,6 +280,7 @@ def mainKappa() -> None:
 
 def mainGetReComp() -> None: 
 
+    printWelcome()
     #reading arguments parsing
     parser = argparse.ArgumentParser(description = "getReComp: gets the effective radius from a set of Sersics ")
 
@@ -327,6 +334,7 @@ def mainGetReComp() -> None:
 
 def maingetSlope() -> None: 
 
+    printWelcome()
     #reading argument parsing
 
     parser = argparse.ArgumentParser(description = "getSlope: gets the slope radius from a set of Sersics ")
@@ -390,6 +398,7 @@ def maingetSlope() -> None:
 #console scripts
 def maingetN() -> None: 
 
+    printWelcome()
     #reading arguments parsing
 
     parser = argparse.ArgumentParser(description = "getN: computes the Sersic index from surface brightness at effective radius")
@@ -473,6 +482,7 @@ def maingetN() -> None:
 def mainGetBulgeRad() -> None: 
     '''gets the bulge radius or the radius where two models of surface brightness models are equal'''
 
+    printWelcome()
     #reading arguments parsing
 
     parser = argparse.ArgumentParser(description = "getBulgeRad: gets the bulge radius or the radius where two models of surface brightness models are equal")
@@ -535,6 +545,7 @@ def mainGetBulgeRad() -> None:
 def mainMissingLight() -> None: 
     '''gets the missing light from a two models'''
 
+    printWelcome()
     #reading arguments parsing
 
     parser = argparse.ArgumentParser(description = "getMissLight: computes the missing light from two surface brightness models")
@@ -587,6 +598,7 @@ def mainMissingLight() -> None:
 def mainShowCube():
 
 
+    printWelcome()
     parser = argparse.ArgumentParser(description="show the cube fits of the galfit output")
 
     parser.add_argument("cubeimage", help="the cube GALFIT image")

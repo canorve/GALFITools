@@ -7,11 +7,14 @@ from galfitools.sky.GalfitSky import galfitSky
 
 from galfitools.sky.Sky import sky
 from galfitools.sky.SkyDs9 import SkyDs9
+from galfitools.sky.SkyRing import SkyRing
 
 
+from galfitools.shell.prt import printWelcome
 
 def mainGalfitSky():
 
+    printWelcome()
     parser = argparse.ArgumentParser(description="computes the sky using GALFIT")
 
     parser.add_argument("image", help="the image file")
@@ -48,6 +51,7 @@ def mainGalfitSky():
 
 def mainSky():
 
+    printWelcome()
 
     parser = argparse.ArgumentParser(description="computes sky from a ds9 region box file")
 
@@ -75,13 +79,12 @@ def mainSky():
 def mainSkyDs9():
 
 
+    printWelcome()
 
-    parser = argparse.ArgumentParser(description="computes sky background from a Ds9 region file: Box, Ellipses and Polygons ")
+    parser = argparse.ArgumentParser(description="SkyDs9: computes sky background from a Ds9 region file: Box, Ellipses and Polygons ")
 
     parser.add_argument("ImageFile", help="the image file where the photometry will be computed")
     parser.add_argument("RegFile", help="the DS9 region file")
-
-
 
 
 
@@ -102,6 +105,51 @@ def mainSkyDs9():
     print("std sky: {:.3f} ".format(sig))
 
 
+def mainSkyRing():
+    """Computes the sky using rings """
 
+
+    printWelcome()
+
+    parser = argparse.ArgumentParser(description="SkyRing: computes the sky using gradient over rings")
+
+    # required arguments
+    parser.add_argument("Image",help="Fits image of the objects")
+
+    parser.add_argument("MaskFile",help="Fits Mask image")
+
+    parser.add_argument("Ds9regFile", help="the DS9 ellipse region file")
+
+    parser.add_argument("-c","--center", action="store_true", help="use the center of the ellipse. Otherwise it will use the (x,y) position with the highest value of the ellipse")
+
+
+  
+    # arguments with inputs
+
+   
+    parser.add_argument("-w","--width", type=int, help="width of the ring for the grad method. ",default=20)
+
+
+
+
+
+    args = parser.parse_args()
+
+    image = args.Image
+    mask = args.MaskFile
+    ds9regfile = args.Ds9regFile
+    width = args.width
+    center = args.center
+
+
+
+    ##end input
+    mean, std, median, rad = SkyRing(image, mask, ds9regfile, width, center)
+
+
+
+
+    line="Total sky:  mean = {:.2f}; std={:.2f}; median = {:.2f} at radius {:.2f} ".format(mean,std,median, rad)
+    print(line)
 
 

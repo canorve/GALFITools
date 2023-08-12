@@ -6,9 +6,11 @@ import argparse
 from galfitools.mge.mge2galfit import mge2gal
 from galfitools.mge.SbProf import sbProf
 
+from galfitools.shell.prt import printWelcome
 #check modify: remove initgauss
 def mainMGE():
 
+    printWelcome()
     parser = argparse.ArgumentParser(description="fits mge of Cappellari and formats to GALFIT")
 
     parser.add_argument("image", help="the Mask image file to modify or create")
@@ -45,6 +47,7 @@ def mainMGE():
 
 def mainSbProf():
 
+    printWelcome()
     parser = argparse.ArgumentParser(description = "SbProf: creates a surface brightness profile from a ellipse ds9 region")
 
 
