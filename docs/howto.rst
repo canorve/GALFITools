@@ -25,6 +25,10 @@ This How-To is divided in five sections: GALFIT input,
 GALFIT output, MGE, Sim, Sky
 
 
+**NOTE**: For all the routines involving a Ds9 region input, it 
+must be saved as image (or physical) coordinates. DO NOT save it
+as wcs coordinates.
+
 
 **GALFIT INPUT**
 ------------------
@@ -543,6 +547,34 @@ Routines that compute the sky background
 
   options:
     -h, --help  show this help message and exit
+
+
+**skyDs9** computes sky using ds9 region file
+::
+
+  positional arguments:
+    image       the image file 
+    Ds9regFile  the DS9 box region file containing the galaxy
+
+  options:
+    -h, --help  show this help message and exit
+
+
+
+**skyRing** computes sky computing the gradient over concentric rings
+around the galaxy.
+
+::
+
+  positional arguments:
+    image       the image file 
+    maskfile    the Mask image file 
+    Ds9regFile  the DS9 box region file containing the galaxy
+
+
+  options:
+    -h, --help  show this help message and exit
+    -c, --center  use the center of the ellipse. Otherwise it will use the (x,y) position with the highest value of the ellipse
 
 
 --------------

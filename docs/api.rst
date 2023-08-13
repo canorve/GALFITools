@@ -745,6 +745,46 @@ Routines that compute the sky background
 
 
 
+**skyDs9** computes sky using ds9 region file
+::
+
+
+
+    from galfitools.sky.SkyDs9 import SkyDs9 
+
+    # imgname: the image file
+    # filereg: Ds9 box region file containing the area to compute
+
+
+
+    mean, sig = SkyDs9(imgname, filereg) 
+
+
+
+
+
+**skyRing** computes sky computing the gradient over concentric rings around the galaxy.
+
+::
+
+
+    from galfitools.sky.SkyRing import SkyRing
+
+    # image: the image file
+    # mask: The galfit mask file
+    # ds9regfile: Ds9 box region file containing the area to compute
+
+
+    #width: width of the rings
+    #center: if True, it uses  the center indicated by the ellipse in 'ds9regfile' 
+
+
+
+    mean, std, median, rad = SkyRing(image, mask, ds9regfile, width, center)
+
+
+
+
 --------------
 
 **Questions?**

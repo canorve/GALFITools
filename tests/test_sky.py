@@ -13,6 +13,7 @@ from galfitools.sky.GalfitSky import galfitSky
 from galfitools.sky.Sky import sky
 
 from galfitools.sky.SkyDs9 import SkyDs9
+from galfitools.sky.SkyRing import SkyRing
 
 def test_galfitSky():
 
@@ -103,5 +104,63 @@ def test_SkyDs9():
 
 
     return None
+
+
+
+
+def test_skyring():
+
+    image = "A1656-1-3.sbProf.fits" 
+    ds9regfile = "skyring.reg" 
+    mask = "mask.sbProf.fits" 
+
+
+
+    width = 20 
+    center = False
+
+
+
+    ##end input
+    mean, std, median, rad = SkyRing(image, mask, ds9regfile, width, center)
+
+    tol = 1e-3
+
+
+    #update numbers
+    result1 = 1146.627
+    result2 = 6.919
+
+
+
+    diffsky1 = abs(mean -result1)
+
+    assert diffsky1 < tol
+
+    diffsky2 = abs(sig -result2)
+
+    assert diffsky2 < tol
+
+
+    assert os.path.isfile("ring.fits")
+
+    if os.path.isfile("ring.fits"):
+        os.remove("ring.fits")
+
+    assert os.path.isfile("ringmask.fits")
+
+    if os.path.isfile("ringmask.fits"):
+        os.remove("ringmask.fits")
+
+
+
+
+    return None
+
+
+
+
+
+
 
 
