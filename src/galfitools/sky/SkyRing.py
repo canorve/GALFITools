@@ -6,6 +6,7 @@ from  galfitools.mge.mge2galfit import Ds9ell2Kronell
 from  galfitools.mge.mge2galfit import GetInfoEllip
 from  galfitools.mge.mge2galfit import GetSize
 from  galfitools.mge.mge2galfit import GetPmax
+from  galfitools.mge.mge2galfit import GetAxis
 
 from astropy.io import fits
 
@@ -29,16 +30,19 @@ def SkyRing(image, mask, ds9regfile, width, center):
     hdumask.close()
 
 
+
+    (ncol, nrow) = GetAxis(image)
+
     if center:
         print('center of ds9 ellipse region will be used')
         xpeak, ypeak = xpos, ypos
     else:        
         (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, eps, ncol, nrow)
-        xpeak, ypeak = GetPmax(img, mask, xmin, xmax, ymin, ymax)
+        xpeak, ypeak = GetPmax(datimg, maskimg, xmin, xmax, ymin, ymax)
  
 
 
-    mean,std, median,rad = SkyCal().GetEllipSky(datimg,maskimg,xpeak,ypeak,
+    mean, std, median, rad = SkyCal().GetEllipSky(datimg,maskimg,xpeak,ypeak,
                                                         theta,q,Rkron,width,
                                                         "ring.fits","ringmask.fits")
 

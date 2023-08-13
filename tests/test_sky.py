@@ -128,8 +128,8 @@ def test_skyring():
 
 
     #update numbers
-    result1 = 1146.627
-    result2 = 6.919
+    result1 = 370.41 
+    result2 = 4.43
 
 
 
