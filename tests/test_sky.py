@@ -19,7 +19,9 @@ def test_galfitSky():
 
     imgname =   "A1656-1-3.sbProf.fits"
     maskfile = "mask.sbProf.fits" 
-
+    path="tests/"
+    imgname = path+imgname
+    maskfile = path+maskfile
     mgzpt =  21.817
     scale = 0.68 
 
@@ -33,10 +35,10 @@ def test_galfitSky():
 
 
 
-    assert os.path.isfile("sky.txt")
+    assert os.path.isfile("tests/sky.txt")
 
-    if os.path.isfile("sky.txt"):
-        os.remove("sky.txt")
+    if os.path.isfile("tests/sky.txt"):
+        os.remove("tests/sky.txt")
 
 
 
@@ -52,7 +54,11 @@ def test_sky():
     imgname =   "A1656-1-3.sbProf.fits"
     maskfile = "mask.sbProf.fits" 
     filereg = "ds9.sky.reg"
-
+    path="tests/"
+    imgname = path+imgname
+    maskfile = path+maskfile
+    filereg = path+filereg
+ 
     mean, sig = sky(imgname, maskimage, filereg)
 
     tol = 1e-3
@@ -81,7 +87,10 @@ def test_SkyDs9():
     ImageFile = "A671.gtMakeMask.maskds9.masksky.fits" 
     RegFile = "skyDs9.reg" 
 
-
+    path="tests/"
+    ImageFile = path+ImageFile
+    RegFile = path+RegFile
+ 
 
     mean, sig = SkyDs9(ImageFile, RegFile) 
 
@@ -114,7 +123,10 @@ def test_skyring():
     ds9regfile = "skyring.reg" 
     mask = "mask.sbProf.fits" 
 
-
+    path="tests/"
+    image = path+image 
+    ds9regfile= path+ds9regfile
+    mask=path+mask
 
     width = 20 
     center = False

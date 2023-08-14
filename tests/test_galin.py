@@ -23,11 +23,19 @@ def test_getStar():
 
     image = "A671.gtMakeMask.maskds9.masksky.fits"
     regfile = "ds9.getStar.reg"
+
+    path="tests/"
+
+    image = path+image
+    regfile = path+regfile
+
     imsize = 70 
     center = False 
 
     sky = 1153 
     imout = "testgetStar.fits" 
+
+    imout = path+imout
 
     sigma = None 
     sigout = None 
@@ -49,6 +57,10 @@ def test_InitGal():
 
     GalfitFile = "galfit.initgal"
 
+
+    path="tests/"
+    GalfitFile=path+GalfitFile
+
     number = 1 
     param3 = [1,50] 
     param4 = None 
@@ -68,6 +80,7 @@ def test_InitGal():
 
     fileout="galfit-1.gal"
 
+    fileout = path+fileout
 
     assert os.path.isfile(fileout)
 
@@ -87,16 +100,22 @@ def test_maskDs9():
     fill = 100 
     image = "A671.gtMakeMask.maskds9.masksky.fits"
 
+    
+    path="tests/"
+    MaskFile = path+MaskFile
+    RegFile = path + RegFile
+    image = path + image 
+
     bor_flag = False 
     borValue = 100 
 
 
     maskDs9(MaskFile, RegFile, fill, image, bor_flag, borValue) 
 
-    assert os.path.isfile(tempmask)
+    assert os.path.isfile(MaskFile)
 
-    if os.path.isfile(tempmask):
-        os.remove(tempmask)
+    if os.path.isfile(MaskFile):
+        os.remove(MaskFile)
 
 
     return None
@@ -109,6 +128,11 @@ def test_makeMask():
     maskfile = "tempmakemask.fits" 
     scale = 1 
     satfileout = None 
+
+    path="tests/"
+    sexfile = path+sexfile
+    image=path+image
+    maskfile = path+maskfile
 
 
     makeMask(sexfile, image, maskfile, scale, satfileout)
@@ -128,6 +152,11 @@ def test_skyRem():
 
     image =  "A671.gtMakeMask.maskds9.masksky.fits"
     mask = "tempmasksky.fits" 
+
+    path="tests/"
+    image  = path+image 
+    mask = path + mask
+
     sky_mean = 1150
     sky_sig = 14
     nsig = 1 
@@ -153,11 +182,17 @@ def test_xy2fits():
     ImageFile=  "A671.gtMakeMask.maskds9.masksky.fits"
 
     AsciiFile= "maskscii.txt" 
+
+    path="tests/"
+    ImageFile=path+ImageFile
+    AsciiFile=path+AsciiFile
+
     Value = 100 
 
     xy2fits().MakeFits(ImageFile, AsciiFile, Value)
 
     maskfile = "maskscii.fits"
+    maskfile=path+maskfile
 
     assert os.path.isfile(maskfile)
 

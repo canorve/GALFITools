@@ -11,15 +11,18 @@ import subprocess as sp
 from galfitools.sim.MakeSim import makeSim
 
 
-def test_makeSim()
+def test_makeSim():
 
     image = "Blue.fits" 
+    path="tests/"
+    image = path+image
     GAIN = 7 
 
     skymean = 0 
     skystd = 1  
 
     newimage = "BlueSim.fits" 
+    newimage= path+newimage
 
 
 
