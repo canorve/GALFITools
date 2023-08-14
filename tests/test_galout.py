@@ -25,7 +25,6 @@ from galfitools.galout.PhotDs9 import photDs9
 def test_getBreak():
 
 
-    args = parser.parse_args()
 
     galfitFile = "galfit.galout" 
 
@@ -237,7 +236,7 @@ def test_getSlope():
 def test_getBulgeRad():
 
     galfitFile1 = "galfit.1ser"
-    galfitFile2 = "galfit.2ser"
+    galfitFile2 = "galfit.3ser"
     path="tests/"
     galfitFile1=path+galfitFile1
     galfitFile2=path+galfitFile2
@@ -272,7 +271,7 @@ def test_getBulgeRad():
 def test_getMissLight():
 
     galfitFile1 = "galfit.1ser"
-    galfitFile2 = "galfit.2ser"
+    galfitFile2 = "galfit.3ser"
     path="tests/"
     galfitFile1=path+galfitFile1
     galfitFile2=path+galfitFile2

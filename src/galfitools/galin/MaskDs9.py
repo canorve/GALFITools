@@ -16,7 +16,7 @@ def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool,
 
     if not os.path.exists(MaskFile):
 
-        print ('%s: image filename does not exist!' %(sys.argv[1]))
+        print ('%s: image filename does not exist!' %(MaskFile))
         print ('Creating a new image file ')
 
         hdu=fits.PrimaryHDU()

@@ -33,7 +33,7 @@ def test_mge2gal():
     mgeargs.twist = False 
     mgeargs.regu = False 
     mgeargs.center = False 
-    mgeargs.maskfile = None 
+    mgeargs.mask = None 
 
     mgeargs.psf = 0
     mgeargs.sky = 0 
@@ -50,23 +50,35 @@ def test_mge2gal():
     mgeargs.numgauss = None
 
 
-    mge2gal(mageargs) 
+    mge2gal(mgeargs) 
 
 
 
     parfile="mseGALFIT.txt"
     file2  = "mgegas.txt"
+    namefile="sectors.png"
+    nameout="tests/ngc3344J.mge2galfit.png"
+    namecons="constraints.txt"
 
     assert os.path.isfile(parfile)
-
     if os.path.isfile(parfile):
         os.remove(parfile)
 
-
     assert os.path.isfile(file2)
-
     if os.path.isfile(file2):
         os.remove(file2)
+
+    assert os.path.isfile(namefile)
+    if os.path.isfile(namefile):
+        os.remove(namefile)
+
+    assert os.path.isfile(nameout)
+    if os.path.isfile(nameout):
+        os.remove(nameout)
+
+    assert os.path.isfile(namecons)
+    if os.path.isfile(namecons):
+        os.remove(namecons)
 
 
 
@@ -125,7 +137,7 @@ def test_sbProf():
 
 
     namefile = "gal.png"
-    namefile = path+namefile
+    #namefile = path+namefile
 
     assert os.path.isfile(namefile)
 

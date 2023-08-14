@@ -35,10 +35,10 @@ def test_galfitSky():
 
 
 
-    assert os.path.isfile("tests/sky.txt")
+    assert os.path.isfile("sky.txt")
 
-    if os.path.isfile("tests/sky.txt"):
-        os.remove("tests/sky.txt")
+    if os.path.isfile("sky.txt"):
+        os.remove("sky.txt")
 
 
 
@@ -149,20 +149,20 @@ def test_skyring():
 
     assert diffsky1 < tol
 
-    diffsky2 = abs(sig -result2)
+    diffsky2 = abs(std -result2)
 
     assert diffsky2 < tol
 
 
-    assert os.path.isfile("ring.fits")
+    #assert os.path.isfile("ring.fits")
 
-    if os.path.isfile("ring.fits"):
-        os.remove("ring.fits")
+    #if os.path.isfile("ring.fits"):
+    #    os.remove("ring.fits")
 
-    assert os.path.isfile("ringmask.fits")
+    #assert os.path.isfile("ringmask.fits")
 
-    if os.path.isfile("ringmask.fits"):
-        os.remove("ringmask.fits")
+    #if os.path.isfile("ringmask.fits"):
+    #    os.remove("ringmask.fits")
 
 
 

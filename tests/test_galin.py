@@ -89,9 +89,12 @@ def test_InitGal():
 
 
     namefile = "rungalfit.sh"
-    namefile = path+namefile
+    #namefile = path+namefile
 
     assert os.path.isfile(namefile)
+    if os.path.isfile(namefile):
+        os.remove(namefile)
+
 
 
 
@@ -136,7 +139,7 @@ def test_makeMask():
     image =  "A671.gtMakeMask.maskds9.masksky.fits"
     maskfile = "tempmakemask.fits" 
     scale = 1 
-    satfileout = None 
+    satfileout = "ds9sat.reg" 
 
     path="tests/"
     sexfile = path+sexfile
@@ -152,10 +155,17 @@ def test_makeMask():
         os.remove(maskfile)
 
     namefile = "sexsort.cat"
-    namefile = path+namefile
+    #namefile = path+namefile
 
     assert os.path.isfile(namefile)
+    if os.path.isfile(namefile):
+        os.remove(namefile)
 
+
+
+    assert os.path.isfile(satfileout)
+    if os.path.isfile(satfileout):
+        os.remove(satfileout)
 
 
 
