@@ -51,13 +51,13 @@ See Peng et al. (2002, AJ, 124, 266) for general description.
 
 
 GALFITools is a collection of Python
-scripts that improve the input and 
+routines that improve the input and 
 output analysis of GALFIT.
 
 
-This is a set of routines which help the GALFIT's  user to make 
+GALFITools allows the GALFIT's users to make 
 masks, cut stars, create multiple initial parameters, simulate 
-galaxies, fit MGE, compute sky and compute other photometric variables.
+galaxies, fit MGE, compute sky and other photometric variables.
 
 
 --------------
@@ -75,6 +75,8 @@ The python libraries required are:
 
 
 Install GALFIT if you haven't done so.
+
+*Optional*: Create a conda environment.
 
 Download the latest release, and installed it via
 
@@ -114,13 +116,11 @@ run it via shell.
 **HOW TO USE**
 ~~~~~~~~~~~~~~
 
-To learn how to use every command routine of GALFITools,
-check:
-
+The list of routines and how to use them please check:
 
 `How to use <docs/howto.rst>`__
 
-Where you can find full explanations of each routine.
+Where you can find full explanations of every routine.
 
 --------------
 
