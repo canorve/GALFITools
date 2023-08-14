@@ -88,6 +88,15 @@ def test_InitGal():
         os.remove(fileout)
 
 
+    namefile = "rungalfit.sh"
+    namefile = path+namefile
+
+    assert os.path.isfile(namefile)
+
+
+
+
+
     return None
 
 
@@ -141,6 +150,13 @@ def test_makeMask():
 
     if os.path.isfile(maskfile):
         os.remove(maskfile)
+
+    namefile = "sexsort.cat"
+    namefile = path+namefile
+
+    assert os.path.isfile(namefile)
+
+
 
 
     return None

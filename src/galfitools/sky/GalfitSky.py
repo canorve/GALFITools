@@ -47,11 +47,9 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y, sky)-> None:
     ###################################################
 
     #    imgname = "ngc4342.fits"
-
-    if imgname.find(".") != -1:
-        (TNAM, trash) = imgname.split(".")
-    else:
-        TNAM=imgname
+    root_ext = os.path.splitext(imgname)
+    TNAM = root_ext[0]
+ 
 
     exptime = GetExpTime(imgname)
 

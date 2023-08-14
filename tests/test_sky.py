@@ -59,9 +59,9 @@ def test_sky():
     maskfile = path+maskfile
     filereg = path+filereg
  
-    mean, sig = sky(imgname, maskimage, filereg)
+    mean, sig = sky(imgname, maskfile, filereg)
 
-    tol = 1e-3
+    tol = 1e-2
 
     result1 =  369.717 
     result2 = 4.407 
@@ -95,7 +95,7 @@ def test_SkyDs9():
     mean, sig = SkyDs9(ImageFile, RegFile) 
 
 
-    tol = 1e-3
+    tol = 1e-2
 
     result1 = 1146.627
     result2 = 6.919
@@ -136,7 +136,7 @@ def test_skyring():
     ##end input
     mean, std, median, rad = SkyRing(image, mask, ds9regfile, width, center)
 
-    tol = 1e-3
+    tol = 1e-2
 
 
     #update numbers

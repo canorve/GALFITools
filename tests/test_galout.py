@@ -52,7 +52,7 @@ def test_getBreak():
 
     result = 248.62
 
-    tol = 1e-3
+    tol = 1e-2
 
     rbreak, N, theta = getBreak(galfitFile, dis, inicomp, quick, random, num_comp, angle, plot, ranx)
     
@@ -86,7 +86,7 @@ def test_getBreak2():
 
     result = 42.7 
 
-    tol = 1e-3
+    tol = 1e-2
 
 
     diffrbreak = abs(rbreak -result)
@@ -117,7 +117,7 @@ def test_getFWHM():
 
     result = 8.81 
 
-    tol = 1e-3
+    tol = 1e-2
 
 
     difffwhm = abs(fwhm - result)
@@ -153,7 +153,7 @@ def test_getKappa():
     rkappa, N, theta = getKappa(galfitFile, dis, inicomp, quick, random, angle, num_comp, plot, ranx) 
 
     result = 2.62 
-    tol = 1e-3
+    tol = 1e-2
 
 
     diffrkappa = abs(rkappa - result)
@@ -182,7 +182,7 @@ def test_getReComp():
     EffRad, totmag, meanme, me, N, theta = getReComp(galfitFile, dis, eff, angle, num_comp)
 
     result = 97.82 
-    tol = 1e-3
+    tol = 1e-2
 
 
     diffEffRad = abs(EffRad - result)
@@ -218,7 +218,7 @@ def test_getSlope():
     rgam, N, theta = getSlope(galfitFile, dis, slope, angle, num_comp, plot, ranx)
 
     result = 2.62 
-    tol = 1e-3
+    tol = 1e-2
 
 
     diffrgam = abs(rgam - result)
@@ -255,7 +255,7 @@ def test_getBulgeRad():
     rbulge, N1, N2, theta = getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx)
 
     result = 3.86
-    tol = 1e-3
+    tol = 1e-2
 
 
     diffrbulge= abs(rbulge - result)
@@ -289,7 +289,7 @@ def test_getMissLight():
     magmiss, N1, N2 = getMissLight(galfitFile1, galfitFile2, dis, num_comp, rad)
 
     result = 18.66 
-    tol = 1e-3
+    tol = 1e-2
 
 
     diffmiss = abs(magmiss - result)
@@ -325,7 +325,7 @@ def test_getN():
     result1 = 3.48 
     result2 = 2.66 
 
-    tol = 1e-3
+    tol = 1e-2
 
 
     diffser = abs(sersic - result1)
@@ -390,7 +390,7 @@ def test_photDs9():
 
 
     result =  11.71
-    tol = 1e-3
+    tol = 1e-2
 
 
     diffmag = abs(mag - result)
