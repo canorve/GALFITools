@@ -6,28 +6,47 @@
 
 -------------------
 
-**GALFITools: How to use**
+**GALFITools: Usage Guide**
 ============================
 
-GALFITools is a set of routines that
-aids the GALFIT's user to create masks,
-psf, compute sky, create initial parameters,
-analyze GALFIT output, mult-gaussian expansion.
 
-After GALFITools installation, a set of shell-routines
-will be available in your bash (or zsh). In this
-page, it is explained everyone of those routines.
+GALFITools constitutes a collection of specialized 
+routines aimed at facilitating the utilization of 
+GALFIT. The toolkit encompasses a spectrum of routines, 
+spanning from mask creation, Point Spread Function (PSF) 
+creation, Multi-gaussian expansion, sky computation, 
+initial parameter estimation, 
+to the comprehensive analysis of GALFIT's output.
 
-Explanation of the parameters of each  routine can
-be displayed with the "-h"  option. 
+Upon successful installation of GALFITools, an 
+ensemble of shell routines becomes seamlessly 
+accessible through your bash (or zsh) environment. 
+The subsequent discourse elucidates the function and 
+operation of each of these routines.
 
-This How-To is divided in five sections: GALFIT input, 
-GALFIT output, MGE, Sim, Sky
+For an enhanced comprehension of the intricacies 
+of each routine, a explanation of their 
+respective parameters can be summoned through 
+the deployment of the "-h" option.
 
 
-**NOTE**: For all the routines involving a Ds9 region input, it 
-must be saved as image (or physical) coordinates. DO NOT save it
-as wcs coordinates.
+The instructional material presented herein is 
+structured into five distinct sections, each 
+devoted to a specific facet of GALFIT's application. 
+These sections are delineated as follows: GALFIT Input, 
+GALFIT Output, Multi-Gaussian Expansion (MGE), 
+Simulation (Sim), and Sky Computation.
+
+**Note**: It is paramount to underscore that 
+routines necessitating the utilization of a Ds9 
+region input mandate its conservation in image 
+(or physical) coordinates. It is imperative to 
+refrain from saving this input in the World
+Coordinate System (WCS) coordinates, in order to ensure 
+functionality.
+
+
+
 
 
 **GALFIT INPUT**
@@ -107,8 +126,7 @@ prepare the necessary files for GALFIT input
                             scale factor to increase the ellipses. Default=1
 
 
-                            *Note* The Sextractor catalog must have the following
-columns: 
+                            *Note* The Sextractor catalog must have the following columns: 
 
 
 
@@ -432,7 +450,7 @@ equal
 **MGE**
 ---------------
 
-Routines that use the Multi-Gaussian Expansion
+Routines that use the Multi-Gaussian Expansion.
 
 **mge2galfit** fits multi-gaussian expansion of Cappellari (2002) and formats to GALFIT
 ::
@@ -499,9 +517,10 @@ Routines that use the Multi-Gaussian Expansion
 
 **SIM**
 ---------------
-Routines that make a simulated galaxy image.
+Routines that make a simulated galaxy image using GALFIT.
 
-**makeSim** simulates a observed galaxy from a GALFIT model
+**makeSim** simulates a observed galaxy from a GALFIT model. It 
+adds Poisson and sky noise to the image.
 ::
 
   positional arguments:
@@ -517,7 +536,7 @@ Routines that make a simulated galaxy image.
 **SKY**
 -------------
 
-Routines that compute the sky background
+Routines that compute the sky background.
 
 **galSky** computes the sky using GALFIT
 ::

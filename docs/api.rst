@@ -6,26 +6,45 @@
 
 -------------------
 
-**API**
-============================
-
-To see how to call the routines
-for your scripts, check
-the python scrips in src/galfitools/shell/commands_*.py
+**API Integration Guidelines**
+================================
 
 
-Here we explain everyone how to call
-those routines.
+The seamless integration of GALFITools routines 
+within your custom scripts is facilitated through 
+the utilization of Application Programming Interfaces (APIs). 
+These APIs offer a systematic and efficient means of 
+invoking the routines for specific tasks. 
 
-Again, here it is divided in 5 sections
-as it was done in 
-`HowTo <docs/howto.rst>`__
+To comprehensively comprehend the invocational 
+mechanics, it is advisable to reference the Python 
+scripts located in the directory "src/galfitools/shell/commands_*.py". 
+These scripts serve as exemplars, illustrating 
+the precise syntax and methodologies for calling 
+the respective routines. Analyzing these scripts 
+aids in the assimilation of the necessary syntax 
+and parameters for API invocation.
+
+
+The API integration process is expounded across 
+five distinct sections, mirroring the structural 
+delineation observed in the  `"HowTo" <docs/howto.rst>`__ section. 
 
 Some of the routines are optional arguments
 for argparse library and can be ignored. Those 
 optional arguments can be empty 
 variables (e.g. None or False values but check -h option when calling
 the shell command version) 
+
+
+Certain routines encompass optional arguments managed by the 
+argparse library). While these optional arguments 
+can be omitted, it is recommended 
+to consult the help documentation ("-h" option) 
+associated with the respective shell command version. 
+
+
+
 
 **GALFIT INPUT**
 ------------------
