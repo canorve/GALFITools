@@ -28,10 +28,8 @@
     :alt: Project generated with PyScaffold
     :target: https://pyscaffold.org/
 
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.8216473.svg
-   :target: https://doi.org/10.5281/zenodo.8216473
-
-
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.8248042.svg
+   :target: https://doi.org/10.5281/zenodo.8248042
 
 ==========
 GALFITools

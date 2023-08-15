@@ -4,6 +4,19 @@
    :depth: 3
 ..
 
+.. image:: https://img.shields.io/pypi/v/GALFITools.svg
+    :alt: PyPI-Server
+    :target: https://pypi.org/project/GALFITools/
+
+.. image:: https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold
+    :alt: Project generated with PyScaffold
+    :target: https://pyscaffold.org/
+
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.8248042.svg
+   :target: https://doi.org/10.5281/zenodo.8248042
+
+
+
 -------------------
 
 **GALFITools: Usage Guide**
