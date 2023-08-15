@@ -21,7 +21,7 @@ to the comprehensive analysis of GALFIT's output.
 Upon successful installation of GALFITools, an 
 ensemble of shell routines becomes seamlessly 
 accessible through your bash (or zsh) environment. 
-The subsequent discourse elucidates the function and 
+The text below elucidates the function and 
 operation of each of these routines.
 
 For an enhanced comprehension of the intricacies 
@@ -35,16 +35,12 @@ structured into five distinct sections, each
 devoted to a specific facet of GALFIT's application. 
 These sections are delineated as follows: GALFIT Input, 
 GALFIT Output, Multi-Gaussian Expansion (MGE), 
-Simulation (Sim), and Sky Computation.
+Simulation of galaxy images, and Sky Computation.
 
-**Note**: It is paramount to underscore that 
-routines necessitating the utilization of a Ds9 
-region input mandate its conservation in image 
-(or physical) coordinates. It is imperative to 
-refrain from saving this input in the World
-Coordinate System (WCS) coordinates, in order to ensure 
-functionality.
-
+**Note**: Routines necessitating the utilization of a Ds9 
+region input, need that the Ds9 region to be saved in image 
+(or physical) coordinates. Ds9 regions saved in the World
+Coordinate System (WCS) coordinates will not work.
 
 
 

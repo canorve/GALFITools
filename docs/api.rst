@@ -10,7 +10,7 @@
 ================================
 
 
-The seamless integration of GALFITools routines 
+The integration of GALFITools routines 
 within your custom scripts is facilitated through 
 the utilization of Application Programming Interfaces (APIs). 
 These APIs offer a systematic and efficient means of 
