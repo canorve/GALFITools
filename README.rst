@@ -137,7 +137,10 @@ run the tests:
 For comprehensive insights into GALFITools' repertoire 
 of routines and their optimal deployment, it is 
 recommended to consult the provided documentation on 
-usage, accessible via the following link: `How to use <docs/howto.rst>`__.
+usage, accessible via the following link: 
+
+`How to use <docs/howto.rst>`__
+
 This comprehensive resource elaborates on the 
 practical implementation of each individual routine.
 
