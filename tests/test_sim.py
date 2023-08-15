@@ -13,15 +13,15 @@ from galfitools.sim.MakeSim import makeSim
 
 def test_makeSim():
 
-    image = "Blue.fits" 
+    image = "M81-BD.fits" 
     path="tests/"
     image = path+image
-    GAIN = 7 
+    GAIN = 6.5 
 
     skymean = 0 
     skystd = 1  
 
-    newimage = "BlueSim.fits" 
+    newimage = "M81Sim.fits" 
     newimage= path+newimage
 
 
