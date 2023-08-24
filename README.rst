@@ -76,7 +76,8 @@ The python libraries required are:
 
 
 
-Install `GALFIT`_ if you haven't done so.
+Install `GALFIT`_ if you haven't done so. Make sure
+that GALFIT can run in any path in your terminal.
 
 
 *Optionally*, the establishment of a virtual environment can be considered.
