@@ -1442,11 +1442,23 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
 
         Idiff = getDiff(head1, comps1, comps2, R, theta)
 
+        plt.clf()
         plt.plot(R, Idiff)
         plt.grid(True)
         plt.minorticks_on()
-        plt.savefig("BulgeRad.png")
+        plt.savefig("Idiff.png")
 
+
+        I1, I2  = getIs(head1, comps1, comps2, R, theta)
+
+
+        plt.clf()
+        plt.plot(R, I1)
+        plt.plot(R, I2)
+        plt.xscale("log")
+        plt.grid(True)
+        plt.minorticks_on()
+        plt.savefig("BulgeRad.png")
 
 
 
@@ -1476,6 +1488,28 @@ def getDiff(head1, comps1, comps2, R, theta):
 
 
     return Idiff  
+
+
+
+def getIs(head1, comps1, comps2, R, theta):
+
+
+    I1 = np.array([])
+    I2 = np.array([])
+
+    for r in R:
+
+        Ir1 = GetIr().Ir(head1, comps1, r, theta)
+        Ir2 = GetIr().Ir(head1, comps2, r, theta)
+
+        I1 = np.append(I1, Ir1)
+        I2 = np.append(I2, Ir2)
+
+
+
+    return I1, I2
+
+
 
 
 def getDiffx(r, head1, comps1, comps2, theta):

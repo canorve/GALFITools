@@ -23,7 +23,7 @@ from galfitools.galin.galfit import GalComps, GalHead
 
 
 def getMissLight(galfitFile1, galfitFile2, dis, num_comp, rad):
-    '''gets the missing light from a two models'''
+    '''gets the missing light from the difference between two GALFIT models'''
 
     #reading arguments parsing
 
@@ -67,17 +67,6 @@ def getMissLight(galfitFile1, galfitFile2, dis, num_comp, rad):
     Flux2, mag2 = GetMag().GetFlux(head2, comps2, rad)
 
 
-    #if Flux1 > Flux2:
-
-    #    Fluxmiss = Flux1 - Flux2
-    #else:
-    #    print("Warning: Flux1 is less than Flux2 for the selected radius. Inverting")
-
-    #    Fluxmiss = Flux2 - Flux1
-
-    #magmiss = -2.5*np.log10(Fluxmiss) + head1.mgzpt
-
-
     magmiss = getMiss(head1, mag1, mag2)
 
 
@@ -103,7 +92,8 @@ class GetMag:
 
         denom1 = (2*np.pi*comps.Rad**2)*(np.exp(k))
         denom2 = (comps.Exp)*(k**(-2*comps.Exp))
-        denom3 = (gamma(2*comps.Exp))*(comps.AxRat) #consider this
+        #axis ratio must be considered if mag total will be used:
+        denom3 = (gamma(2*comps.Exp))*(comps.AxRat) 
         #denom3 = (gamma(2*comps.Exp))
 
         denom = denom1*denom2*denom3 
