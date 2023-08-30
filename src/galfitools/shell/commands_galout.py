@@ -31,6 +31,8 @@ def mainPhotDs9():
     parser.add_argument("-zp","--zeropoint", type=float, help="The value of the zero point. Default = 25 ",default=25)
 
 
+    parser.add_argument("-m","--mask", type=str, help="the mask file")
+
     parser.add_argument("-sk","--sky", default=0, type=float, help="the value of the sky background to be removed")
 
 
@@ -40,11 +42,12 @@ def mainPhotDs9():
 
     ImageFile = args.ImageFile 
     RegFile = args.RegFile 
+    maskfile = args.mask
     zeropoint = args.zeropoint
     sky = args.sky
 
 
-    mag = photDs9(ImageFile, RegFile, zeropoint, sky)
+    mag = photDs9(ImageFile, RegFile, maskfile ,zeropoint, sky)
 
 
     line = "the magnitude from the ds9 region is: {:.2f} \n".format(mag)

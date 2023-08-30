@@ -11,7 +11,7 @@ from matplotlib.path import Path
 
 
 
-def photDs9(ImageFile, RegFile, zeropoint, sky): 
+def photDs9(ImageFile, RegFile, maskfile, zeropoint, sky): 
 
 
 
@@ -35,6 +35,9 @@ def photDs9(ImageFile, RegFile, zeropoint, sky):
     Image = hdu[0].data
 
     hdu.close()
+
+
+ 
 
 
     #removing sky background from image
@@ -142,6 +145,23 @@ def photDs9(ImageFile, RegFile, zeropoint, sky):
 
     totFlux = 0
 
+    # mask file
+    if maskfile:
+        errmsg="file {} does not exist".format(maskfile)
+        assert os.path.isfile(maskfile), errmsg
+
+        hdu2 = fits.open(maskfile)
+        maskimage = hdu2[0].data
+        maskb=np.array(maskimage,dtype=bool)
+        invmask = np.logical_not(maskb)
+        invmask = invmask*1
+        Image = Image*invmask
+        hdu2.close()
+
+
+    
+
+
     for idx, item in enumerate(obj):
 
         #get Flux
@@ -182,7 +202,7 @@ def photDs9(ImageFile, RegFile, zeropoint, sky):
     return mag
 
 
-def FluxEllip(Image, xpos,ypos,rx,ry,angle,ncol,nrow):
+def FluxEllip(Image, xpos, ypos, rx, ry, angle, ncol, nrow):
     "obtain flux from  an ellipse region in an image"
 
     xx, yy, Rkron, theta, e = Ds9ell2Kronell(xpos,ypos,rx,ry,angle)
@@ -191,7 +211,7 @@ def FluxEllip(Image, xpos,ypos,rx,ry,angle,ncol,nrow):
 
     return flux 
 
-def FluxPolygon(Image, tupVerts,ncol,nrow):
+def FluxPolygon(Image, tupVerts, ncol, nrow):
     "obtainn flux from a polygon region in an image"
 
 

@@ -87,16 +87,17 @@ def mainSkyDs9():
     parser.add_argument("RegFile", help="the DS9 region file")
 
 
+    parser.add_argument("-m","--mask", type=str, help="the mask file")
 
 
     args = parser.parse_args()
 
     ImageFile = args.ImageFile 
     RegFile = args.RegFile 
+    maskfile = args.mask
 
 
-
-    mean, sig = SkyDs9(ImageFile, RegFile) 
+    mean, sig = SkyDs9(ImageFile, RegFile, maskfile) 
 
 
     print("Sky with the top 80% and botton 20% removed.") 

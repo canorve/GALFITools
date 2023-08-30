@@ -18,7 +18,7 @@ import argparse
 #################################################################
 #################################################################
 
-def skyRem(imageFile,maskFile,mean,sig, nsig,borValue,bor_flag=False):
+def skyRem(imageFile, maskFile, mean, sig, nsig, borValue, bor_flag=False):
 
     bor_val = 100
 
@@ -42,12 +42,12 @@ def skyRem(imageFile,maskFile,mean,sig, nsig,borValue,bor_flag=False):
 
 
       # original file
-    hdu=fits.open(imageFile)
+    hdu = fits.open(imageFile)
     dataImage = hdu[0].data
 
 
     # output file
-    hdu2=fits.open(maskFile)
+    hdu2 = fits.open(maskFile)
     maskImage = hdu2[0].data
 
 
@@ -75,9 +75,9 @@ def skyRem(imageFile,maskFile,mean,sig, nsig,borValue,bor_flag=False):
 
     #writing mask file:
 
-    hdu2[0].data=maskImage
+    hdu2[0].data = maskImage
 
-    hdu2.writeto(maskFile,overwrite=True)
+    hdu2.writeto(maskFile, overwrite=True)
 
 
     hdu.close()

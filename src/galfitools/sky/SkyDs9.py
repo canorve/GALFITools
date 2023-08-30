@@ -11,7 +11,7 @@ from matplotlib.path import Path
 
 
 
-def SkyDs9(ImageFile, RegFile): 
+def SkyDs9(ImageFile, RegFile, maskfile): 
 
 
 
@@ -140,6 +140,20 @@ def SkyDs9(ImageFile, RegFile):
     totFlux = 0
 
     Flats = np.array([])
+
+    # mask file
+    if maskfile:
+        errmsg="file {} does not exist".format(maskfile)
+        assert os.path.isfile(maskfile), errmsg
+
+        hdu2 = fits.open(maskfile)
+        maskimage = hdu2[0].data
+        maskb=np.array(maskimage,dtype=bool)
+        invmask = np.logical_not(maskb)
+        invmask = invmask*1
+        Image = Image*invmask
+        hdu2.close()
+
 
     for idx, item in enumerate(obj):
 
