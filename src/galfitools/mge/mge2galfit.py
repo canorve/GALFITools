@@ -26,36 +26,35 @@ from mgefit.mge_fit_sectors_regularized import mge_fit_sectors_regularized
 import argparse
 
 
+#from galfitools.galin.galfit import Galfit, conver2Sersic, SelectGal, numComps, GetRadAng
+from galfitools.galin.galfit import Galfit
 
-def mge2gal(args) -> None:
+#def mge2gal(args) -> None:
 
-
-    image = args.image
-    regfile = args.Ds9regFile 
-    magzpt = args.magzpt
-    twist = args.twist
-    regu = args.regu
-    center = args.center
-    maskfile = args.mask
-
-    psf = args.psf
-    sky = args.sky
-    scale = args.plate
-    gauss = args.gauss
-
-    psfile = args.psfile
-    sigfile = args.sigfile
-
-    freeser = args.freeser
-    freesky = args.freesky
-
-    regu = args.regu
+def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, numgauss) -> None:
 
 
-    numgauss = args.numgauss 
+
+    # reading options from galfit header
+    galfit = Galfit(galfitFile)
+    head = galfit.ReadHead()
+    galsky = galfit.ReadSky()
+
+    image = head.inputimage
+    magzpt = head.mgzpt
+    maskfile = head.maskimage
+
+    sky = galsky.sky
+
+    scale = head.scale
+    psfile = head.psfimage
+
+    sigfile = head.sigimage
+
+    #################
 
     initgauss = 12
-
+    regu = None #regu option now available
 
 
     mgeoutfile="mgegas.txt"
