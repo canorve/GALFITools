@@ -152,7 +152,7 @@ def photDs9(ImageFile, RegFile, maskfile, zeropoint, sky):
 
         hdu2 = fits.open(maskfile)
         maskimage = hdu2[0].data
-        maskb=np.array(maskimage,dtype=bool)
+        maskb = np.array(maskimage,dtype=bool)
         invmask = np.logical_not(maskb)
         invmask = invmask*1
         Image = Image*invmask
@@ -193,7 +193,6 @@ def photDs9(ImageFile, RegFile, maskfile, zeropoint, sky):
 
 
             totFlux = totFlux + polFlux
-
 
     mag = -2.5*np.log10(totFlux/exptime) + zeropoint
 
