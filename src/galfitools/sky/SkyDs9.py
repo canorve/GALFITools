@@ -141,6 +141,13 @@ def SkyDs9(ImageFile, RegFile, maskfile):
 
     Flats = np.array([])
 
+
+    if (maskfile == "None") or (maskfile == "none"):
+        maskfile = None
+
+
+
+
     # mask file
     if maskfile:
         errmsg="file {} does not exist".format(maskfile)

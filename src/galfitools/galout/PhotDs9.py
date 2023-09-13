@@ -145,6 +145,9 @@ def photDs9(ImageFile, RegFile, maskfile, zeropoint, sky):
 
     totFlux = 0
 
+    if (maskfile == "none") or (maskfile == "None"): 
+        maskfile = None
+
     # mask file
     if maskfile:
         errmsg="file {} does not exist".format(maskfile)

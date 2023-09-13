@@ -90,9 +90,10 @@ def test_SkyDs9():
     path="tests/"
     ImageFile = path+ImageFile
     RegFile = path+RegFile
+    maskfile = "none"
  
 
-    mean, sig = SkyDs9(ImageFile, RegFile) 
+    mean, sig = SkyDs9(ImageFile, RegFile, maskfile) 
 
 
     tol = 1e-2
