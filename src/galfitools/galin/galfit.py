@@ -22,8 +22,8 @@ class GalHead():
     xmax = 1
     ymin = 0
     ymax = 1
-    convx = 0
-    convy = 0
+    convx = 1
+    convy = 1
     mgzpt = 25
     scale = 1
     scaley = 1

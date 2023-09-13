@@ -51,6 +51,10 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
 
     sigfile = head.sigimage
 
+    convbox =  head.convx
+    convboxy = head.convy
+
+    consfile = head.constraints
     #################
 
     initgauss = 12
@@ -59,10 +63,19 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
 
     mgeoutfile="mgegas.txt"
 
-    #default convolution box sizes:
-    convbox=100
-    convboxy=100
-    
+
+
+    ######Updating variables for empty files ###########
+
+    if maskfile == "None":
+        maskfile = None
+
+    if sigfile == "None":
+        sigfile = None
+
+    if psfile == "None":
+        psfile = None
+
 
     if regu:
         try:
@@ -117,8 +130,6 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
     ######################
     #    Mask file
     #################
-
-
     if maskfile:
 
         errmsg="file {} does not exist".format(maskfile)
@@ -302,7 +313,6 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
     ypeak=xtemp
 
 
-    consfile="constraints.txt"
 
     T1 = "{}".format(image)
     T2 = outname + "-mge.fits"
