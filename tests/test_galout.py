@@ -374,17 +374,17 @@ def test_photDs9():
 
     ImageFile =   "A671.gtMakeMask.maskds9.masksky.fits"
     RegFile = "maskds9.reg" 
-    path="tests/"
-    ImageFile=path+ImageFile
-    RegFile=path+RegFile
+    path = "tests/"
+    ImageFile = path+ImageFile
+    RegFile = path+RegFile
  
-
+    maskfile = "none" 
 
     zeropoint = 25 
     sky = 0 
 
 
-    mag = photDs9(ImageFile, RegFile, zeropoint, sky)
+    mag = photDs9(ImageFile, RegFile, maskfile, zeropoint, sky)
 
 
 
