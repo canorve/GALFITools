@@ -15,43 +15,27 @@ from galfitools.mge.SbProf import sbProf
 
 def test_mge2gal():
 
-    class mge_options:
-        pass
 
-    mgeargs = mge_options()
-
-
- 
-
-    mgeargs.image = "ngc3344J.mge2galfit.fits"
-    mgeargs.Ds9regFile ="ds9.mge2galfit.reg"
+    ##################################
     path="tests/"
-    mgeargs.image=path+mgeargs.image
-    mgeargs.Ds9regFile=path+mgeargs.Ds9regFile
+    galfitFile = "msehead.txt" 
+
+    galfitFile = path  + galfitFile
+    #mgeargs.image=path+mgeargs.image
+    #mgeargs.Ds9regFile=path+mgeargs.Ds9regFile
  
-    mgeargs.magzpt = 20.0820
-    mgeargs.twist = False 
-    mgeargs.regu = False 
-    mgeargs.center = False 
-    mgeargs.mask = None 
-
-    mgeargs.psf = 0
-    mgeargs.sky = 0 
-    mgeargs.plate = 1 
-    mgeargs.gauss = False 
-
-    mgeargs.psfile = None 
-    mgeargs.sigfile = None 
-
-    mgeargs.freeser = False
-    mgeargs.freesky = False 
-
-    mgeargs.regu = False 
-    mgeargs.numgauss = None
+    regfile  = "ds9.mge2galfit.reg"
+    regfile = path + regfile
+    center = None
+    psf = 0
+    twist = None
+    gauss = False 
+    freeser = False 
+    freesky = False 
+    numgauss = None
 
 
-    mge2gal(mgeargs) 
-
+    mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, numgauss) 
 
 
     parfile="mseGALFIT.txt"

@@ -1,0 +1,54 @@
+==================================================================================================
+# IMAGE PARAMETERS 
+A) tests/ngc3344J.mge2galfit.fits                            # Input Data image (FITS file)                           
+B) tests/ngc3344J-mge.fits                                   # Output data image block                                
+C) sigma.fits                                   # Sigma image name (made from data if blank or "none")  
+D) None                                  # Input PSF image and (optional) diffusion kernel         
+E) 1                                   # PSF fine sampling factor relative to data               
+F) tests/mask.mge.fits # Bad pixel mask (FITS image or ASCII coord list)         
+G) constraints.txt                                   # File with parameter constraints (ASCII file)            
+H) 1 493 1 493                          # Image region to fit (xmin xmax ymin ymax)               
+I) 100 100                                # Size of the convolution box (x y)                       
+J) 20.98                                   # Magnitude photometric zeropoint                         
+K) 1.0 1.0                                # Plate scale (dx dy). \[arcsec per pixel\]               
+O) regular                                   # Display type (regular, curses, both)                    
+P) 0                                   # Choose 0=optimize, 1=model, 2=imgblock, 3=subcomps      
+S) 0                                   # Modify/create objects interactively?                    
+ 
+# INITIAL FITTING PARAMETERS                                                     
+# 
+#   For object type, allowed functions are:                                      
+#       nuker, sersic, expdisk, devauc, king, psf, gaussian, moffat,             
+#       ferrer, powsersic, sky, and isophote.                                    
+# 
+#  Hidden parameters will only appear when they're specified:                    
+#      C0 (diskyness/boxyness),                                                  
+#      Fn (n=integer, Azimuthal Fourier Modes),                                  
+#      R0-R10 (PA rotation, for creating spiral structures).                     
+# 
+# column 1:  Parameter number                                                               
+# column 2:                                                                                 
+#          -- Parameter 0:    the allowed functions are: sersic, nuker, expdisk             
+#                             edgedisk, devauc, king, moffat, gaussian, ferrer, psf, sky    
+#          -- Parameter 1-10: value of the initial parameters                               
+#          -- Parameter C0:   For diskiness/boxiness                                        
+#                             <0 = disky                                                    
+#                             >0 = boxy                                                     
+#          -- Parameter Z:    Outputting image options, the options are:                    
+#                             0 = normal, i.e. subtract final model from the data to create 
+#                             the residual image                                            
+#                             1 = Leave in the model -- do not subtract from the data       
+#                                                                                           
+# column 3: allow parameter to vary (yes = 1, no = 0)                                       
+# column 4: comment                                                                         
+ 
+==================================================================================================
+
+# Object number: 5                                                             
+ 0)      sky            #    Object type                                        
+ 1) 0.0         0       # sky background        [ADU counts]                    
+ 2) 0.000      0        # dsky/dx (sky gradient in x)                           
+ 3) 0.000      0        # dsky/dy (sky gradient in y)                           
+ Z) 0                  # Skip this model in output image?  (yes=1, no=0)       
+
+================================================================================

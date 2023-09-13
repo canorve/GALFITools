@@ -223,7 +223,8 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
         plt.savefig(namepng)
 
 
-    elif twist == False:
+    else:
+    #elif twist == False:
 
         if maskfile:
             s = sectors_photometry(img, eps, theta, xpeak, ypeak, minlevel=minlevel, badpixels=maskb ,plot=1)
@@ -275,6 +276,10 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
         plt.savefig(namepng)
 
 
+
+
+
+
     if twist:
 
         (counts, sigma, axisrat, pa) = m.sol
@@ -283,7 +288,8 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
         alpha1 = pa - theta2
         alphaf = alpha1 - 90
 
-    elif twist == False:
+    else:
+        #elif twist == False:
         (counts, sigma, axisrat) = m.sol
         #anglegass = 90 - theta
         anglegass =  theta
