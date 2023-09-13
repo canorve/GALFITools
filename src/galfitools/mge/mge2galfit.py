@@ -67,13 +67,13 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
 
     ######Updating variables for empty files ###########
 
-    if maskfile == "None":
+    if (maskfile == "None") or (maskfile == "none"):
         maskfile = None
 
-    if sigfile == "None":
+    if (sigfile == "None") or  (sigfile == "none"):
         sigfile = None
 
-    if psfile == "None":
+    if (psfile == "None") or (psfile == "none"):
         psfile = None
 
 
@@ -304,7 +304,7 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
     if psfile:
         psfname = psfile
     else:
-        psfname = "psf.fits"
+        psfname = "None"
 
 
     # switch back
