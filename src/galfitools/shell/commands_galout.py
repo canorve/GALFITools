@@ -292,8 +292,8 @@ def mainGetReComp() -> None:
     parser.add_argument("GalfitFile", help = "Galfit File containing the Sersics or gaussians components")
 
     parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
-    parser.add_argument("-er","--effrad", type=float, 
-                        help="percentage of light to compute for radius. default=.5 for effective radius ", default=.5)
+    parser.add_argument("-fr","--fracrad", type=float, 
+                        help="fraction of light radius. default=.5 for effective radius ", default=.5)
 
     #parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
 
@@ -309,7 +309,7 @@ def mainGetReComp() -> None:
 
     galfitFile = args.GalfitFile
     dis = args.dis
-    eff = args.effrad
+    eff = args.fracrad
     num_comp =  args.numcomp
     angle = args.angle
 
