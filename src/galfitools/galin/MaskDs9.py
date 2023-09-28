@@ -46,7 +46,7 @@ def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool,
 
     if not os.path.exists(RegFile):
         print ('%s: reg filename does not exist!' %(sys.argv[2]))
-        sys.exit()
+        sys.exit(1)
 
     v0 = []
     v1 = []
@@ -142,6 +142,19 @@ def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool,
     rx = np.array(v3)
     ry = np.array(v4)
     angle = np.array(v5)
+
+
+    #avoids ds9 regions with Area = 0
+    maskrx = rx < 1
+    if maskrx.any():
+        rx[maskrx] = 1
+
+    maskry = ry < 1
+    if maskry.any():
+        rx[maskry] = 1
+    #
+
+
 
     Pol = np.array(Pol)
 
