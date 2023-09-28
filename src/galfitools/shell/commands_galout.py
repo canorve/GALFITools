@@ -33,7 +33,7 @@ def mainPhotDs9():
 
     parser.add_argument("-m","--mask", type=str, help="the mask file")
 
-    parser.add_argument("-sk","--sky", default=0, type=float, help="the value of the sky background to be removed")
+    parser.add_argument("-sk","--sky", default=0, type=float, help="Sky background value to be removed from image before photometry. Default = 0")
 
 
 
