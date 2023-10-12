@@ -465,30 +465,23 @@ Routines that use the Multi-Gaussian Expansion.
 ::
 
   positional arguments:
-    image                 the Mask image file to modify or create
+    GalfitFile            GALFIT file to obtain the header options
     Ds9regFile            the DS9 ellipse region file containing the galaxy
-    magzpt                the magnitude zero point
 
   options:
     -h, --help            show this help message and exit
     -t, --twist           uses twist option for mge
-    -r, --regu            regularized mode for mge_fit_sectors
-    -c, --center          uses the center given in DS9 region file,otherwise it will found the x,y
-                          peaks within DS9 ellipse
+    -c, --center          uses the center given in DS9 region file,otherwise it will found the x,y peaks within DS9
+                          ellipse
     -p PSF, --psf PSF     the value of PSF sigma
-    -s SKY, --sky SKY     the sky background value
-    -m MASK, --mask MASK  the mask file
-    -ps PLATE, --plate PLATE
-                          plate scale of the image
     -gas, --gauss         uses gauss function for galfit file
     -fser, --freeser      leaves the sersic index as a free parameter to fit
     -fsk, --freesky       leaves the sky as a free parameter to fit
-    -pf PSFILE, --psfile PSFILE
-                          name of the psf file for GALFIT. default = psf.fits
-    -sf SIGFILE, --sigfile SIGFILE
-                          name of the sigma image for GALFIT. default = sigma.fits
     -ng NUMGAUSS, --numgauss NUMGAUSS
-                          number of gaussians that will be used for galfit.Starting from the first one
+                         
+
+
+
 
 **SbProf** creates a surface brightness profile from a ellipse ds9 region
 ::
