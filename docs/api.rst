@@ -249,6 +249,51 @@ columns:
 
 
 
+**Galfit**, **galfit.ReadHead**, **galfit.ReadComps** and  **galfit.ReadSky**. Class 
+functions to read the galfit output file galfit.XX. The class functions return a data
+class with the parameters read from sky. 
+
+
+::
+
+    from galfitools.galin.galfit import Galfit
+
+
+
+    galfit = Galfit(galfitFile)
+
+    head = galfit.ReadHead()
+    galcomps = galfit.ReadComps()
+    galsky = galfit.ReadSky()
+ 
+
+
+
+
+**conver2Sersic**
+::
+
+    from galfitools.galin.galfit import conver2Sersic
+
+
+**SelectGal**
+::
+
+    from galfitools.galin.galfit import  SelectGal
+
+
+
+**numComps**
+::
+
+    from galfitools.galin.galfit import numComps
+
+
+**GetRadAnd**
+::
+
+    from galfitools.galin.galfit import GetRadAng
+
 
 
 **GALFIT OUTPUT**
