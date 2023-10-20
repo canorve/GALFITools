@@ -262,11 +262,47 @@ class with the parameters read from sky.
 
     galfit = Galfit(galfitFile)
 
-    head = galfit.ReadHead()
+    galhead = galfit.ReadHead()
     galcomps = galfit.ReadComps()
     galsky = galfit.ReadSky()
  
 
+
+**galhead** is a data class that stores the variables of the header of the galfit file:
+
+::
+
+
+    class GalHead():
+        '''store the header of galfit file'''
+
+        inputimage = "none.fits"     # Input data image (FITS file)
+        outimage = "none-out.fits"   # Output data image block
+        sigimage = "none"            # Sigma image name (made from data if blank or "none") 
+        psfimage = "none"            # Input PSF image and (optional) diffusion kernel
+        psfsamp = 1                  # PSF fine sampling factor relative to data 
+        maskimage = "none"           # Bad pixel mask (FITS image or ASCII coord list)
+        constraints = "none"         # File with parameter constraints (ASCII file) 
+        xmin = 0                     # Image region to fit (xmin)
+        xmax = 1                     # Image region to fit (xmax)
+        ymin = 0                     # Image region to fit (ymin)
+        ymax = 1                     # Image region to fit (ymax)
+        convx = 1                    # Size of the convolution box (x)
+        convy = 1                    # Size of the convolution box (y)
+        mgzpt = 25                   # Magnitude photometric zeropoint
+        scale = 1                    # Plate scale (dx)   [arcsec per pixel]
+        scaley = 1                   # Plate scale (dy)   [arcsec per pixel]
+        display = "regular"          # Display type (regular, curses, both)
+        P = 0                        # Choose: 0=optimize, 1=model, 2=imgblock, 3=subcomps
+
+        # internal variables of the data class
+
+        imgidx = "sci"
+        flagidx = False
+        num = 1
+        flagnum = False
+        exptime = 1
+        tempmask = "tempmask.fits"
 
 
 
