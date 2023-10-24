@@ -273,6 +273,9 @@ class with the parameters read from sky.
 ::
 
 
+    from galfitools.galin.galfit import GalHead
+
+
     class GalHead():
         '''store the header of galfit file'''
 
@@ -303,6 +306,93 @@ class with the parameters read from sky.
         flagnum = False
         exptime = 1
         tempmask = "tempmask.fits"
+
+
+**galcomps** is a data class that stores the variables of every component of the galfit file:
+
+::
+
+
+    from galfitools.galin.galfit import GalComps
+
+    #lastmod
+    class GalComps:
+        '''stores the components of galfit file'''
+
+        N = np.array([])
+        NameComp = np.array([])        #0)
+        PosX = np.array([])            #1)   
+        PosY = np.array([])            #2)   
+        Mag = np.array([])             #3)
+        Rad = np.array([])             #4)
+        Exp = np.array([])             #5)
+        Exp2 = np.array([])            #6)  for moffat
+        Exp3 = np.array([])            #7)  for moffat
+                                       #8)  There is No 8 in any galfit model
+        AxRat = np.array([])           #9)  AxisRatio
+        PosAng = np.array([])          #10) position angle
+        skip = np.array([])            #z)  skip model
+
+        Active = np.array([])            #activate component  for galaxy
+
+        # store the flags related to parameters
+        PosXFree = np.array([])            #1)   
+        PosYFree = np.array([])            #2)   
+        MagFree = np.array([])             #3)
+        RadFree = np.array([])             #4)
+        ExpFree = np.array([])             #5)
+        Exp2Free = np.array([])            #6)  for moffat
+        Exp3Free = np.array([])            #7)  for moffat
+                                       #8)  There is No 8 in any galfit model
+        AxRatFree = np.array([])           #9)  AxisRatio
+        PosAngFree = np.array([])          #10) position angle
+
+        # computed parameters:
+        Rad50 = np.array([])
+        SerInd = np.array([])
+        Rad50kpc = np.array([])
+        Rad50sec = np.array([])
+        Rad90 = np.array([])
+        AbsMag = np.array([])
+        Lum = np.array([])
+        Flux = np.array([])
+        PerLight = np.array([])
+        me = np.array([])
+        mme = np.array([])
+        kser = np.array([])
+
+
+        KronRad = np.array([])
+        PetRad = np.array([])
+
+
+
+
+
+
+
+**galsky** is a data class that stores the variables of the sky component of the galfit file:
+
+::
+
+
+    from galfitools.galin.galfit import GalSky
+
+    class GalSky:
+        '''stores the value of the GALFIT file'''
+
+        sky = 0  #sky background
+        dskyx = 0 # sky gradient in x
+        dskyy = 0 #sky gradient in y
+        skip = 0 #skip component from model output 
+
+        skyfree = 1  #keep varying this parameter for sky background
+        dskyxfree = 0  #keep varying this parameter for sky gradient in x
+        dskyyfree = 0 #keep varying this parameter for sky  gradient in y
+
+     
+
+
 
 
 
