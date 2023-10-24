@@ -319,23 +319,28 @@ class with the parameters read from sky.
     class GalComps:
         '''stores the components of galfit file'''
 
-        N = np.array([])
-        NameComp = np.array([])        #0)
-        PosX = np.array([])            #1)   
-        PosY = np.array([])            #2)   
-        Mag = np.array([])             #3)
-        Rad = np.array([])             #4)
-        Exp = np.array([])             #5)
-        Exp2 = np.array([])            #6)  for moffat
-        Exp3 = np.array([])            #7)  for moffat
-                                       #8)  There is No 8 in any galfit model
-        AxRat = np.array([])           #9)  AxisRatio
-        PosAng = np.array([])          #10) position angle
-        skip = np.array([])            #z)  skip model
+        #all the variables are stored as an array.
 
-        Active = np.array([])            #activate component  for galaxy
+        N = np.array([])               #   number of the component
+        NameComp = np.array([])        #0) Name of the component
+        PosX = np.array([])            #1) X - position in pixels   
+        PosY = np.array([])            #2) Y - position in pixels 
+        Mag = np.array([])             #3) magnitud of the component
+        Rad = np.array([])             #4) Radius. If Sersic this is Re, and so on for every model
+        Exp = np.array([])             #5) Exponent. If Sersic this is for 
+        Exp2 = np.array([])            #6) exponent for moffat
+        Exp3 = np.array([])            #7) exponnent for moffat
+                                       #8) There is No 8 in any galfit model
+        AxRat = np.array([])           #9) Axis ratio of the component
+        PosAng = np.array([])          #10) angular position of the component
+        skip = np.array([])            #z) skip model from output
 
-        # store the flags related to parameters
+        Active = np.array([])          # For simultaneous fitting, this paramters tells 
+                                       # which components belong to the galaxy of interest
+                                       # Activate = True/False 
+
+        # The params below correspond to the variables above and
+        # tells to GALFIT  whether this parameter must keep fixed during the fitting 
         PosXFree = np.array([])            #1)   
         PosYFree = np.array([])            #2)   
         MagFree = np.array([])             #3)
@@ -343,30 +348,27 @@ class with the parameters read from sky.
         ExpFree = np.array([])             #5)
         Exp2Free = np.array([])            #6)  for moffat
         Exp3Free = np.array([])            #7)  for moffat
-                                       #8)  There is No 8 in any galfit model
+                                           #8)  There is No 8 in any galfit model
         AxRatFree = np.array([])           #9)  AxisRatio
         PosAngFree = np.array([])          #10) position angle
 
-        # computed parameters:
-        Rad50 = np.array([])
-        SerInd = np.array([])
-        Rad50kpc = np.array([])
-        Rad50sec = np.array([])
-        Rad90 = np.array([])
-        AbsMag = np.array([])
-        Lum = np.array([])
-        Flux = np.array([])
-        PerLight = np.array([])
-        me = np.array([])
-        mme = np.array([])
-        kser = np.array([])
+        # the parameters below are not from galfit file, but computed with
+        # the routines of this library
+        Rad50 = np.array([])            # Radius that keeps the 50% of light
+        SerInd = np.array([])           # Computed Sersic index 
+        Rad50kpc = np.array([])         # Radius that keeps the 50% of light in kpc
+        Rad50sec = np.array([])         # Radius that keeps the 50% of light in arc sec
+        Rad90 = np.array([])            # Radius that keeps the 90% of light
+        AbsMag = np.array([])           # absolute magnitude
+        Lum = np.array([])              # Luminosity
+        Flux = np.array([])             # Flux
+        PerLight = np.array([])         # Percentage of light that have this component with respect to galaxy
+        me = np.array([])               # surface brightness at Re
+        mme = np.array([])              # mean surface brightness at Re
+        kser = np.array([])             # K parameter related to n to keep Ie at Re
 
-
-        KronRad = np.array([])
-        PetRad = np.array([])
-
-
-
+        KronRad = np.array([])          # kron radius
+        PetRad = np.array([])           # petrosian radius
 
 
 
