@@ -648,9 +648,10 @@ alternative method to getBreak.
     #frac: fraction of light radius 
     #angle:  Angle of the major axis of the galaxy measured from the image Y-axis 
     #plot: boolean flag that indicates  to make plot of Sersic index vs. fraction of light
+    #const: constant to be substracted from plot
 
 
-    sersic, meanser, stdser, totmag, N, theta = getN(galfitFile, dis, frac, angle, num_comp, plot)
+    sersic, meanser, stdser, totmag, N, theta = getN(galfitFile, dis, frac, angle, num_comp, plot, const = 0)
 
 
     # output

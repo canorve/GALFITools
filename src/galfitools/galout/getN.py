@@ -28,7 +28,8 @@ from galfitools.galin.galfit import GalComps, GalHead
 
 
 
-def getN(galfitFile: str, dis: int, frac: float, angle: float, num_comp: int, plot: bool) -> float:
+def getN(galfitFile: str, dis: int, frac: float, angle: float, 
+            num_comp: int, plot: bool, const = 0) -> float:
     '''gets the effective radius from a set of Sersics'''
 
 
@@ -131,7 +132,7 @@ def getN(galfitFile: str, dis: int, frac: float, angle: float, num_comp: int, pl
 
     if plot:
 
-        plt.plot(F, ns)
+        plt.plot(F, ns - const)
         plt.grid(True)
         plt.minorticks_on()
         plt.xlabel("Fraction of light")

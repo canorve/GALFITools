@@ -427,6 +427,9 @@ def maingetN() -> None:
     parser.add_argument("-p","--plot", action="store_true", help='makes plot of Sersic index vs. fraction of light ') 
 
 
+    parser.add_argument("-c","--const", type=float, 
+                        help="Substract constant from plot. Default = 0", default=0)
+
 
 
     ## parsing variables
@@ -445,9 +448,10 @@ def maingetN() -> None:
     angle = args.angle
 
     plot = args.plot
+    const = args.const
 
 
-    sersic, meanser, stdser, totmag, N, theta = getN(galfitFile, dis, frac, angle, num_comp, plot)
+    sersic, meanser, stdser, totmag, N, theta = getN(galfitFile, dis, frac, angle, num_comp, plot, const)
 
 
     print('number of model components: ', N)
@@ -457,15 +461,6 @@ def maingetN() -> None:
 
     line = 'Total Magnitude of the galaxy: {:.2f} \n'.format(totmag)
     print(line)
-
-    #line = 'Mean Surface Brightness at effective radius: {:.2f} mag/\" \n'.format(meanme)
-    #print(line)
-
-    #line = 'Surface brightness at effective radius {:.2f} mag/\" \n'.format(me)
-    #print(line)
-
-    #line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
-    #print(line)
 
     line = 'Sersic index with the method of Mean Surface Brightness at effective radius: {:.2f}  \n'.format(sersic)
     print(line)
