@@ -96,7 +96,7 @@ def getN(galfitFile: str, dis: int, frac: float, angle: float,
 
     comps2 =  copy.deepcopy(comps)
     meanme = GetMe().MeanMe(totmag, EffRad*head.scale)
-    me = GetMe().Me(head, comps2, EffRad*head.scale, theta)
+    m0 = GetMe().Me(head, comps2, 0, theta) #substituing effective radius per 0 gives m0
 
     line = 'Mean Surface Brightness at effective radius: {:.2f} mag/\" \n'.format(meanme)
     #print(line)
@@ -115,6 +115,13 @@ def getN(galfitFile: str, dis: int, frac: float, angle: float,
 
     line = 'Sersic index with the method of fraction of light at {:.2f}: {:.2f}  \n'.format(frac,sersic2)
     #print(line)
+
+
+    #sersic3 = GetN().MeM0(me, m0)
+
+    #line = 'Sersic index with the method of me - mo is {:.2f}  \n'.format(sersic3)
+    #print(line)
+
 
 
 
@@ -234,7 +241,6 @@ class GetN:
         a = 0.1
         b = 12
 
-
         Sersic = self.solveSerRe(a, b, Re, Rfrac, frac)
 
 
@@ -267,8 +273,55 @@ class GetN:
      
 
 
+    def MeM0(self, me: float, m0: float) -> float:
+        '''Uses me and m0 to compute n. It is not very realiable 
+        and takes longer than the other two methods'''
+        a = 0
+        b = 45
 
 
+        K = self.solveKm0(a, b, me, m0)
+
+
+        a = 0.2
+        b = 40
+
+
+
+        Sersic = self.solveSerK(a, b, K)
+
+
+        return Sersic
+
+    def solveKm0(self, a: float, b: float, me: float, m0: float) -> float:
+        "return the sersic index. It uses Bisection"
+
+        K = bisect(self.funMeM0, a, b, args=(me, m0))
+
+        return K 
+
+
+    def funMeM0(self, K: float, me: float, m0: float) -> float:
+
+        result = me - m0 - 2.5*K/np.log(10)
+
+        return result 
+
+    def solveSerK(self, a: float, b: float, k: float) -> float: 
+
+
+        sersic = bisect(self.funK, a, b, args=(k))
+
+        return sersic
+
+    def funK(self, n: float, k: float) -> float:
+       
+
+        result = gammaincinv(2*n, 0.5) - k
+
+
+
+        return result 
 
 
 
