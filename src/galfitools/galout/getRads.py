@@ -416,7 +416,7 @@ def getBreak2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool
         plt.plot(R, slp)
         plt.grid(True)
         plt.minorticks_on()
-        plt.savefig("Nukslope.png")
+        plt.savefig("FirstDerivative.png")
 
 
     ###
@@ -430,7 +430,7 @@ def getBreak2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool
         plt.plot(lrad,yspl1d(lrad))
         plt.grid(True)
         plt.minorticks_on()
-        plt.savefig("Nuk2d.png")
+        plt.savefig("SecondDerivative.png")
 
 
 
