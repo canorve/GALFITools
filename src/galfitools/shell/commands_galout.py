@@ -2,6 +2,9 @@
 
 import argparse
 
+
+from galfitools.shell.prt import printWelcome
+
 from galfitools.galout.getRads import getBreak
 from galfitools.galout.getRads import getBreak2
 from galfitools.galout.getRads import getFWHM
@@ -9,14 +12,18 @@ from galfitools.galout.getRads import getKappa
 from galfitools.galout.getRads import getReComp
 from galfitools.galout.getRads import getSlope
 from galfitools.galout.getRads import getBulgeRad
+
 from galfitools.galout.getMissingLight import getMissLight
+
 from galfitools.galout.getN import getN
+
 from galfitools.galout.showcube import displayCube
 
 from galfitools.galout.PhotDs9 import photDs9 
 
 
-from galfitools.shell.prt import printWelcome
+from galfitools.galout.getCOW import getCOW
+
 
 
 def mainPhotDs9(): 
@@ -627,6 +634,66 @@ def mainShowCube():
 
 
     displayCube(cubeimage, namecube, dpival, brightness, contrast, cmap, scale, noplot)
+
+
+
+
+
+def maingetCOW() -> None: 
+
+    printWelcome()
+    #reading arguments parsing
+
+    parser = argparse.ArgumentParser(description = "getCOW: plots the curve-of-growth from the galfit.XX file. Only for Sersic functions")
+
+
+    # required arguments
+    parser.add_argument("GalfitFile", help = "Galfit File containing the Sersics")
+
+    parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
+
+    parser.add_argument("-pf","--plotfile", type=str, help="name of the plot file", default='cow.png')
+
+
+    parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
+
+    parser.add_argument("-pa","--angle", type=float, 
+                        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components. Angle measured from Y-Axis as same as GALFIT. ")
+
+
+
+
+    ## parsing variables
+
+    args = parser.parse_args()
+
+    galfitFile = args.GalfitFile
+    dis = args.dis
+    plotfile = args.plotfile
+
+
+   
+    num_comp =  args.numcomp
+
+
+    angle = args.angle
+
+    totmag, N, theta = getCOW(galfitFile, dis, angle, num_comp, plotname)
+
+
+    print('number of model components: ', N)
+
+    line = 'Using a theta value of : {:.2f} degrees \n'.format(theta)
+    print(line)
+
+    line = 'Total Magnitude of the galaxy: {:.2f} \n'.format(totmag)
+    print(line)
+
+
+    print("plot file: ", plotname)
+
+
+
 
 
 
