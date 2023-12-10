@@ -29,7 +29,7 @@ from galfitools.galin.galfit import GalComps, GalHead
 
 
 def getCOW(galfitFile: str, dis: int, angle: float, 
-            num_comp: int, plotname: str) -> float, int, float:
+            num_comp: int, plotname: str) -> float:
     '''plots the curve-of-growth from the galfit.XX file. Only for Sersic functions'''
 
 
@@ -73,7 +73,7 @@ def getCOW(galfitFile: str, dis: int, angle: float,
     #lastmod
 
 
-    frac = 0.95
+    frac = 0.99
 
     EffRadfrac, totmag = GetReff().GetReSer(head, comps, frac, theta) #obtains the radius at 95% of total flux
 
@@ -81,8 +81,7 @@ def getCOW(galfitFile: str, dis: int, angle: float,
 
     #computing the Sersic indexes for different radius
 
-    R = np.arange(0.1, EffRadfrac*10,.1) 
-
+    R = np.arange(0.1, EffRadfrac,.1) 
 
     cows, totmag = GetCOW().GetCOWrad(head, comps, theta, R)
 
@@ -90,14 +89,14 @@ def getCOW(galfitFile: str, dis: int, angle: float,
     #ns = GetN().GalNs(EffRad, R, F) 
 
 
-    if plot:
 
-        plt.plot(R, cows)
-        plt.grid(True)
-        plt.minorticks_on()
-        plt.xlabel("Radius in pixels")
-        plt.ylabel("Curve of Growth")
-        plt.savefig(plotname)
+    plt.plot(R, cows)
+    plt.grid(True)
+    plt.minorticks_on()
+    plt.gca().invert_yaxis()
+    plt.xlabel("Radius in pixels")
+    plt.ylabel("Curve of Growth")
+    plt.savefig(plotname)
 
 
     
@@ -114,12 +113,11 @@ class GetCOW:
     def GetCOWrad(self, head, comps, theta, R):
 
 
-
         cowfluxs = np.array([])
 
         for r in R: #check if functions works without the for 
 
-            cowflux = GetCOW().GetCOWFluxR(head, comps, theta, r)
+            cowflux = self.GetCOWFluxR(head, comps, theta, r)
 
             cowfluxs = np.append(cowfluxs, cowflux)
 
@@ -127,14 +125,14 @@ class GetCOW:
 
         maskgal = (comps.Active == True) 
 
-        comps.Flux = 10**((galhead.mgzpt - comps.Mag)/2.5)
+        comps.Flux = 10**((head.mgzpt - comps.Mag)/2.5)
 
         totFlux = comps.Flux[maskgal].sum()
 
-        totmag = -2.5*np.log10(totFlux) + galhead.mgzpt
+        totmag = -2.5*np.log10(totFlux) + head.mgzpt
 
 
-        cows = -2.5*np.log10(cowsflux) #+ galhead.mgzpt
+        cows = -2.5*np.log10(cowfluxs) + head.mgzpt
 
 
         return cows, totmag 
@@ -153,15 +151,16 @@ class GetCOW:
 
         totmag = -2.5*np.log10(totFlux) + galhead.mgzpt
 
-
         #rad refers to the radius where flux will be computed
         #comps.Rad refers to the effective radius of every component
+
 
         cowR = self.funCOWSer(rad, comps.Flux[maskgal], comps.Rad[maskgal], 
                 comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal],  theta)
 
 
-        return cowR, totmag
+
+        return cowR
 
 
     def funCOWSer(self, R: float, flux: list, rad: list, n: list, q: list, pa: list, theta: float) -> float:

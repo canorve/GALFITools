@@ -678,7 +678,7 @@ def maingetCOW() -> None:
 
     angle = args.angle
 
-    totmag, N, theta = getCOW(galfitFile, dis, angle, num_comp, plotname)
+    totmag, N, theta = getCOW(galfitFile, dis, angle, num_comp, plotfile)
 
 
     print('number of model components: ', N)
@@ -690,7 +690,7 @@ def maingetCOW() -> None:
     print(line)
 
 
-    print("plot file: ", plotname)
+    print("plot file: ", plotfile)
 
 
 
