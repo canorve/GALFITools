@@ -655,6 +655,10 @@ def maingetCOW() -> None:
     parser.add_argument("-pf","--plotfile", type=str, help="name of the plot file", default='cow.png')
 
 
+    parser.add_argument("-fr","--fracrad", type=float, 
+                        help="fraction of light radius. This is the upper limit of X-Axis. default=.95 ", default=.95)
+
+
     parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
 
     parser.add_argument("-pa","--angle", type=float, 
@@ -671,14 +675,14 @@ def maingetCOW() -> None:
     dis = args.dis
     plotfile = args.plotfile
 
-
+    frac = args.fracrad
    
     num_comp =  args.numcomp
 
 
     angle = args.angle
 
-    totmag, N, theta = getCOW(galfitFile, dis, angle, num_comp, plotfile)
+    totmag, N, theta = getCOW(galfitFile, dis, angle, frac, num_comp, plotfile)
 
 
     print('number of model components: ', N)

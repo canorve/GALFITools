@@ -28,7 +28,7 @@ from galfitools.galin.galfit import GalComps, GalHead
 
 
 
-def getCOW(galfitFile: str, dis: int, angle: float, 
+def getCOW(galfitFile: str, dis: int, angle: float, frac: float,
             num_comp: int, plotname: str) -> float:
     '''plots the curve-of-growth from the galfit.XX file. Only for Sersic functions'''
 
@@ -70,10 +70,8 @@ def getCOW(galfitFile: str, dis: int, angle: float,
     #print(line)
 
 
-    #lastmod
 
 
-    frac = 0.99
 
     EffRadfrac, totmag = GetReff().GetReSer(head, comps, frac, theta) #obtains the radius at 95% of total flux
 
@@ -86,20 +84,38 @@ def getCOW(galfitFile: str, dis: int, angle: float,
     cows, totmag = GetCOW().GetCOWrad(head, comps, theta, R)
 
 
-    #ns = GetN().GalNs(EffRad, R, F) 
-
-
 
     plt.plot(R, cows)
     plt.grid(True)
     plt.minorticks_on()
-    plt.gca().invert_yaxis()
-    plt.xlabel("Radius in pixels")
-    plt.ylabel("Curve of Growth")
-    plt.savefig(plotname)
 
+    xmin = 0.1 
+    xmax = np.max(R) 
+   
+
+    ymin = np.min(cows) #- .1*len(cows)
+    ymax = np.max(cows) #+ .1*len(cows)
+
+
+
+    #xran = xmin * (xmax/xmin)**np.array([-0.02, +1.02])
+    #yran = ymin * (ymax/xmin)**np.array([-0.05, +1.05])
+
+
+    plt.hlines(totmag, xmin, xmax, color='red',label='total magnitude')
+    plt.gca().invert_yaxis()
+    
+    plt.xlabel("Radius (pixels)")
+    plt.title("Curve of Growth ")
+    plt.ylabel("magnitude (< R) ")
+
+    plt.legend(loc='lower right')
+
+    #plt.xlim(xran)
+    #plt.ylim(yran)
 
     
+    plt.savefig(plotname)
 
     return totmag, N, theta 
 
