@@ -29,10 +29,8 @@ from galfitools.galin.galfit import GalComps, GalHead
 
 
 def getCOW(galfitFile: str, dis: int, angle: float, frac: float,
-            num_comp: int, plotname: str) -> float:
+        num_comp: int, plotname: str, galfitF2: str, maxdiff: bool) -> float:
     '''plots the curve-of-growth from the galfit.XX file. Only for Sersic functions'''
-
-
 
 
     galfit = Galfit(galfitFile)
@@ -71,10 +69,7 @@ def getCOW(galfitFile: str, dis: int, angle: float, frac: float,
 
 
 
-
-
     EffRadfrac, totmag = GetReff().GetReSer(head, comps, frac, theta) #obtains the radius at 95% of total flux
-
 
 
     #computing the Sersic indexes for different radius
@@ -83,9 +78,29 @@ def getCOW(galfitFile: str, dis: int, angle: float, frac: float,
 
     cows, totmag = GetCOW().GetCOWrad(head, comps, theta, R)
 
+    if galfitF2:
+
+        #it uses the same num_comp as the first file
+        head2, comps2, theta2 = readGalfitF2(galfitF2, dis, angle, num_comp) 
 
 
-    plt.plot(R, cows)
+        cows2, totmag2 = GetCOW().GetCOWrad(head2, comps2, theta2, R)
+
+
+        diff =  np.abs(cows - cows2)
+
+        idx = np.where(np.max(diff))
+
+        xline = R[idx][0]
+
+
+        ymin = cows[idx] 
+        ymax = cows2[idx]
+
+
+
+
+    plt.plot(R, cows, color='blue', label='model 1')
     plt.grid(True)
     plt.minorticks_on()
 
@@ -93,32 +108,67 @@ def getCOW(galfitFile: str, dis: int, angle: float, frac: float,
     xmax = np.max(R) 
    
 
-    ymin = np.min(cows) #- .1*len(cows)
-    ymax = np.max(cows) #+ .1*len(cows)
 
-
-
-    #xran = xmin * (xmax/xmin)**np.array([-0.02, +1.02])
-    #yran = ymin * (ymax/xmin)**np.array([-0.05, +1.05])
-
-
-    plt.hlines(totmag, xmin, xmax, color='red',label='total magnitude')
     plt.gca().invert_yaxis()
     
     plt.xlabel("Radius (pixels)")
     plt.title("Curve of Growth ")
     plt.ylabel("magnitude (< R) ")
 
-    plt.legend(loc='lower right')
-
-    #plt.xlim(xran)
-    #plt.ylim(yran)
 
     
+    if galfitF2:
+
+        plt.plot(R, cows2, color='green',label='model 2')
+
+        if maxdiff:
+            plt.vlines(xline, ymin, ymax, color='red',label='max diff')
+
+
+    plt.hlines(totmag, xmin, xmax, color='black',label='total magnitude')
+    
+    plt.legend(loc='lower right')
     plt.savefig(plotname)
 
     return totmag, N, theta 
 
+
+
+def readGalfitF2(galfitF2, dis, angle, num_comp):
+
+    galfit = Galfit(galfitF2)
+
+    head2 = galfit.ReadHead()
+    galcomps2 = galfit.ReadComps()
+
+
+    galcomps2 = SelectGal(galcomps2, dis, num_comp)
+
+
+    #taking the last component position angle for the whole galaxy
+    maskgal = (galcomps2.Active == True) 
+    if angle:
+        theta2 = angle
+    else:
+        theta2 = galcomps2.PosAng[maskgal][-1]  
+
+    #convert all exp, gaussian and de vaucouleurs to Sersic format
+    comps2 = conver2Sersic(galcomps2) 
+
+
+    N = numComps(comps2,'all')
+    #print('number of model components: ',N)
+
+    if N == 0:
+        print('not enough number of components to plot COW')
+        print('exiting..')
+        sys.exit(1)
+
+    line = 'Using a theta value of : {:.2f} degrees \n'.format(theta2)
+    #print(line)
+
+
+    return head2, comps2, theta2 
 
 
 ### GetCOW

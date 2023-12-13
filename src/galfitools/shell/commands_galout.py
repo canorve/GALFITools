@@ -648,16 +648,19 @@ def maingetCOW() -> None:
 
 
     # required arguments
-    parser.add_argument("GalfitFile", help = "Galfit File containing the Sersics")
+    parser.add_argument("GalfitFile", help = "GALFIT File containing the Sersics")
 
     parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
 
     parser.add_argument("-pf","--plotfile", type=str, help="name of the plot file", default='cow.png')
 
+    parser.add_argument("-g","--galfitF2", type=str, help="Second GALFIT file to add to the plot (optional) ")
+
+    parser.add_argument("-md","--maxdiff", action="store_true", help="plot the maximum difference between model 1 and 2 (a vertical line) ")
+
 
     parser.add_argument("-fr","--fracrad", type=float, 
                         help="fraction of light radius. This is the upper limit of X-Axis. default=.95 ", default=.95)
-
 
     parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
 
@@ -676,13 +679,18 @@ def maingetCOW() -> None:
     plotfile = args.plotfile
 
     frac = args.fracrad
+
+    maxdiff = args.maxdiff
+
    
     num_comp =  args.numcomp
 
 
     angle = args.angle
 
-    totmag, N, theta = getCOW(galfitFile, dis, angle, frac, num_comp, plotfile)
+    galfitF2 = args.galfitF2
+
+    totmag, N, theta = getCOW(galfitFile, dis, angle, frac, num_comp, plotfile, galfitF2, maxdiff)
 
 
     print('number of model components: ', N)
