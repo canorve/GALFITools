@@ -89,7 +89,8 @@ def getCOW(galfitFile: str, dis: int, angle: float, frac: float,
 
         diff =  np.abs(cows - cows2)
 
-        idx = np.where(np.max(diff))
+        idx = np.where(diff == np.max(diff))
+
 
         xline = R[idx][0]
 
