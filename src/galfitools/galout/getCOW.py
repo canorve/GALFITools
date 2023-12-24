@@ -84,7 +84,7 @@ def getCOW(galfitFile: str, dis: int, angle: float, frac: float,
         head2, comps2, theta2 = readGalfitF2(galfitF2, dis, angle, num_comp) 
 
 
-        cows2, totmag2 = GetCOW().GetCOWrad(head2, comps2, theta2, R)
+        cows2, totmag2 = GetCOW().GetCOWrad(head2, comps2, theta, R) #same theta as galfitF1
 
 
         diff =  np.abs(cows - cows2)
