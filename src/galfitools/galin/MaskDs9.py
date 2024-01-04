@@ -70,6 +70,8 @@ def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool,
     #reading reg file
     for line in lines:
 
+        line = line.split("#")
+        line = line[0]
 
         b1 = line.split("(")
         p = line.split(",")
