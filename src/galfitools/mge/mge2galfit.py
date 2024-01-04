@@ -41,6 +41,7 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
     galsky = galfit.ReadSky()
 
     image = head.inputimage
+    imageout = head.outimage
     magzpt = head.mgzpt
     maskfile = head.maskimage
 
@@ -55,6 +56,13 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
     convboxy = head.convy
 
     consfile = head.constraints
+    xlo = head.xmin
+    ylo = head.ymin
+    xhi = head.xmax
+    yhi = head.ymax
+ 
+
+
     #################
 
     initgauss = 12
@@ -117,7 +125,7 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
 
     #    image = "ngc4342.fits"
 
-    root_ext = os.path.splitext(image)
+    root_ext = os.path.splitext(imageout)
     TNAM= root_ext[0]
 
 
@@ -324,10 +332,13 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
     T2 = outname + "-mge.fits"
     T3 = "{}".format(rmsname)
 
-    xlo=1
-    ylo=1
 
-    (xhi, yhi) = (ncol, nrow)
+    # now this is read from galfit file
+
+    #xlo=1
+    #ylo=1
+    #(xhi, yhi) = (ncol, nrow)
+
 
 
     fout1 = open(parfile, "w")
@@ -929,6 +940,9 @@ def GetInfoEllip(regfile):
     #reading reg file
     for line in lines:
 
+
+        line = line.split("#")
+        line = line[0]
 
         b1 = line.split("(")
         p = line.split(",")
