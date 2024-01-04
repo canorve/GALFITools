@@ -128,7 +128,7 @@ def mainSkyRing():
     # arguments with inputs
 
    
-    parser.add_argument("-w","--width", type=int, help="width of the ring for the grad method. ",default=20)
+    parser.add_argument("-w","--width", type=int, help="width of the ring for the gradient method. Default = 20. ",default=20)
 
 
 
