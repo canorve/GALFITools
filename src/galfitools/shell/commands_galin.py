@@ -242,3 +242,40 @@ def mainxy2fits():
 
 
 
+#console scripts
+def mainPrintInfo() -> None: 
+
+    printWelcome()
+    #reading arguments parsing
+
+    parser = argparse.ArgumentParser(description = "printInfo: prints information of the GALFIT input file, checks existence of files and counts how many galaxies are going to be fiited simulteaneosly. ")
+
+
+    # required arguments
+    parser.add_argument("GalfitFile", help = "GALFIT input File ")
+
+    parser.add_argument("-d","--dis", type=int, help="Maximum distance in pixels among components. Default = 10", default=10)
+
+
+    ## parsing variables
+
+    args = parser.parse_args()
+
+    galfitFile = args.GalfitFile
+    dis = args.dis
+
+   
+    headinfo, component, mags, galax = printInfo(galfitFile, dis)
+
+
+
+
+
+    print('Total number of model components: ', len(N))
+    print('Total number of galaxies: ', len(galax))
+    #total magnitud and per galaxy
+
+
+
+
+
