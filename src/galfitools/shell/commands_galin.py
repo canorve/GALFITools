@@ -265,15 +265,69 @@ def mainPrintInfo() -> None:
     dis = args.dis
 
    
-    headinfo, component, mags, galax = printInfo(galfitFile, dis)
+    headinfo, galax = printInfo(galfitFile, dis)
+
+    testflag = False
+
+    if not(headinfo.inputimageflag):
+        line="File {} not found ".format(headinfo.inputimage)
+        print(line)
+        testflag = True
+
+    if not(headinfo.outimageflag):
+        line="File {} not found ".format(headinfo.outimage)
+        print(line)
+        testflag = True
+
+    if not(headinfo.sigimageflag):
+        line="File {} not found ".format(headinfo.sigimage)
+        print(line)
+        testflag = True
+
+    if not(headinfo.psfimageflag):
+        line="File {} not found ".format(headinfo.psfimage)
+        print(line)
+        testflag = True
+
+    if not(headinfo.maskimageflag):
+        line="File {} not found ".format(headinfo.maskimage)
+        print(line)
+        testflag = True
+
+    if not(headinfo.constraintsflag):
+        line="File {} not found ".format(headinfo.constraints)
+        print(line)
+        testflag = True
+
+    if not(headinfo.xsizeflag):
+        line="format of size in x-axis not valid. xmax < xmin"
+        print(line)
+        testflag = True
+
+    if not(headinfo.ysizeflag):
+        line="Format of size in y-axis not valid. ymax < ymin"
+        print(line)
+        testflag = True
 
 
+    if not(headinfo.convxflag):
+        line="Warning: x-size of convolution is smaller than psf image x-axis"
+        print(line)
+        testflag = True
+
+    if not(headinfo.convyflag):
+        line="Warning: y-size of convolution is smaller than psf image y-axis"
+        print(line)
+        testflag = True
 
 
+    if not(testflag):
+        print("No issues with the header information")
+    else:
+        print("There are some issues with the header information. Check messages above.")
 
-    print('Total number of model components: ', len(N))
-    print('Total number of galaxies: ', len(galax))
-    #total magnitud and per galaxy
+    print('Total number of model components: ', len(galax))
+    print('Total number of galaxies: ', len(np.unique(galax)))
 
 
 
