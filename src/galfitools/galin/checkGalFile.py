@@ -16,7 +16,7 @@ from scipy.special import gamma, gammainc, gammaincinv
 #import matplotlib.pyplot as plt
 
 
-from galfitools.galin.galfit import Galfit, conver2Sersic, SelectGal, numComps,GetRadAng
+from galfitools.galin.galfit import Galfit, conver2Sersic, SelectGal, numComps, GetRadAng
 
 #from galfitools.galout.getRads import GetReff, GetMe
 
@@ -66,7 +66,7 @@ class HeadInfo():
 
 
 
-def printInfo(galfitFile: str, dis: int) -> float:
+def checkFile(galfitFile: str, dis: int) -> float:
     '''prints information of the galfit File '''
 
 
@@ -118,6 +118,7 @@ def printInfo(galfitFile: str, dis: int) -> float:
     if os.path.exists(headinfo.psfimage):
         headinfo.psfimageflag = True
 
+
     if os.path.exists(headinfo.maskimage):
         headinfo.maskimageflag = True
 
@@ -131,8 +132,10 @@ def printInfo(galfitFile: str, dis: int) -> float:
         headinfo.ysizeflag = True
 
 
-    if headinfo.psfimage:
+    if headinfo.psfimageflag:
+
         (nx, ny) = GetAxis(headinfo.psfimage)
+        
 
         if headinfo.convx > nx:
             headinfo.convxflag = True
@@ -143,12 +146,18 @@ def printInfo(galfitFile: str, dis: int) -> float:
 
     
 
-    galax=np.zeros(len(galcomps.N))
+    galax = np.zeros(len(galcomps.N))
+    mag = np.zeros(len(galcomps.N))
 
+    mag.fill(99)
+
+
+    mag =np.copy(galcomps.Mag) 
     cont=1
 
     dmax = dis
 
+    #counting components per galaxy
     for idx,item in enumerate(galcomps.N):
          dx = (galcomps.PosX[idx] - galcomps.PosX)
          dy = (galcomps.PosY[idx] - galcomps.PosY)
@@ -162,7 +171,7 @@ def printInfo(galfitFile: str, dis: int) -> float:
 
 
     #taking the last component position angle for the whole galaxy
-'''
+    '''
     maskgal = (galcomps.Active == True) 
     if angle:
         theta = angle
@@ -237,12 +246,12 @@ def printInfo(galfitFile: str, dis: int) -> float:
 
 
 
-'''
+    '''
     
     #separate in two functions:
 
     #return Effrad, totmag, meanme, me, N, theta 
-    return headinfo, galax  
+    return headinfo, galax, mag
 
 
 def copy2info(head, head2):

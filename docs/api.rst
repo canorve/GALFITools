@@ -247,7 +247,30 @@ columns:
 
     xy2fits().MakeFits(ImageFile, AsciiFile, Value)
 
+**checkFile** check that the parameters and file names inside the GALFIT input file are correct 
 
+::
+
+
+
+    from galfitools.galin.checkGalFile import checkFile 
+
+    #galfitFile is the galfit input parameter file
+    #dis is the maximum distance among components of the same galaxy
+
+    headinfo, galax, mag = checkFile(galfitFile, dis)
+
+    #output:
+
+    # galax: is an array with a size of the number of components. It indicates the
+    # galaxy number which belongs to the galaxy. This has the same order as 
+    #the galfit input file
+
+    #mag: is the magnitud of every component
+
+    #headinfo is a class that contains the name of the files 
+    #which comes in the galfit header file. It contains a flag that indicates
+    # if the file exists (True) or not (False). Check galhead class below
 
 **Galfit**, **galfit.ReadHead**, **galfit.ReadComps** and  **galfit.ReadSky**. Class 
 functions to read the galfit output file galfit.XX. The class functions return a data

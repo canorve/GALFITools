@@ -164,6 +164,9 @@ prepare the necessary files for GALFIT input
 
 ::
 
+  usage: maskDs9 [-h] [-f FILL] [-i IMAGE] [-b] [-bv BORVALUE] MaskFile RegFile
+
+
   positional arguments:
     MaskFile              the Mask image file to modify or create
     RegFile               the DS9 region file
@@ -181,6 +184,10 @@ prepare the necessary files for GALFIT input
 **maskSky** creates a mask image for GALFIT using original image and sky mean and sigma
 
 ::
+
+  usage: maskSky [-h] [-sm SKYMEAN] [-ss SKYSIGMA] [-ns NUMBERSIG] [-b] [-bv BORVALUE]
+               ImageFile MaskFile
+
 
   positional arguments:
     ImageFile             original data image
@@ -203,6 +210,8 @@ prepare the necessary files for GALFIT input
 
 ::
 
+  usage: xy2fits [-h] [-c VAL] ImageFile AsciiMask
+
   positional arguments:
     ImageFile          The Image file
     AsciiMask          The ascii file with the x,y positions
@@ -210,6 +219,24 @@ prepare the necessary files for GALFIT input
   options:
     -h, --help         show this help message and exit
     -c VAL, --val VAL  the value in counts for the masked pixels
+
+
+
+
+**checkFile** check that the parameters and file names inside the GALFIT input file are correct 
+
+::
+
+  usage: checkFile [-h] [-d DIS] GalfitFile
+
+  positional arguments:
+    GalfitFile         GALFIT input File
+
+  options:
+    -h, --help         show this help message and exit
+    -d DIS, --dis DIS  Maximum distance in pixels among components. Default = 10
+
+
 
 
 **GALFIT OUTPUT**

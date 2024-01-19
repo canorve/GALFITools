@@ -2,6 +2,10 @@
 
 import argparse
 
+import numpy as np
+
+from collections import Counter
+
 from galfitools.galin.getStar import getStar
 from galfitools.galin.initgal import InitGal
 from galfitools.galin.MaskDs9 import maskDs9
@@ -9,6 +13,10 @@ from galfitools.galin.MaskDs9 import maskDs9
 from galfitools.galin.MakeMask import makeMask
 from galfitools.galin.MaskSky import skyRem
 from galfitools.galin.xy2fits import xy2fits
+
+
+from galfitools.galin.checkGalFile import checkFile 
+
 
 from galfitools.shell.prt import printWelcome
 
@@ -243,12 +251,12 @@ def mainxy2fits():
 
 
 #console scripts
-def mainPrintInfo() -> None: 
+def maincheckFile() -> None: 
 
     printWelcome()
     #reading arguments parsing
 
-    parser = argparse.ArgumentParser(description = "printInfo: prints information of the GALFIT input file, checks existence of files and counts how many galaxies are going to be fiited simulteaneosly. ")
+    parser = argparse.ArgumentParser(description = "checkFile: check that the parameters and file names inside the GALFIT input file are correct")
 
 
     # required arguments
@@ -265,7 +273,7 @@ def mainPrintInfo() -> None:
     dis = args.dis
 
    
-    headinfo, galax = printInfo(galfitFile, dis)
+    headinfo, galax, mag = checkFile(galfitFile, dis)
 
     testflag = False
 
@@ -282,12 +290,28 @@ def mainPrintInfo() -> None:
     if not(headinfo.sigimageflag):
         line="File {} not found ".format(headinfo.sigimage)
         print(line)
-        testflag = True
-
+        #testflag = True
+        line="GALFIT will create a sigma file "
+        print(line)
+ 
     if not(headinfo.psfimageflag):
         line="File {} not found ".format(headinfo.psfimage)
         print(line)
         testflag = True
+
+    if (headinfo.psfimageflag):
+        if not(headinfo.convxflag):
+            line="Warning: x-size of convolution is smaller than psf image x-axis"
+            print(line)
+            testflag = True
+
+        if not(headinfo.convyflag):
+            line="Warning: y-size of convolution is smaller than psf image y-axis"
+            print(line)
+            testflag = True
+
+
+
 
     if not(headinfo.maskimageflag):
         line="File {} not found ".format(headinfo.maskimage)
@@ -310,16 +334,6 @@ def mainPrintInfo() -> None:
         testflag = True
 
 
-    if not(headinfo.convxflag):
-        line="Warning: x-size of convolution is smaller than psf image x-axis"
-        print(line)
-        testflag = True
-
-    if not(headinfo.convyflag):
-        line="Warning: y-size of convolution is smaller than psf image y-axis"
-        print(line)
-        testflag = True
-
 
     if not(testflag):
         print("No issues with the header information")
@@ -329,6 +343,26 @@ def mainPrintInfo() -> None:
     print('Total number of model components: ', len(galax))
     print('Total number of galaxies: ', len(np.unique(galax)))
 
+
+    print('Components per galaxy: ')
+
+    cnt = Counter(galax)
+
+
+    Flux = 10**((25 - mag)/2.5) #25 is just a constant to avoid small numbers. I substract it later
+
+    for idx,item in enumerate(np.unique(galax)): 
+        totcomp = cnt[item]  
+        maskgal  = galax == item 
+         
+
+        totFlux = Flux[maskgal].sum()
+
+        totmag = -2.5*np.log10(totFlux) + 25 
+
+        line="galaxy {} has {} components and a total mag of: {:.2f} ".format(int(item), totcomp, totmag)
+        print(line)
+ 
 
 
 
