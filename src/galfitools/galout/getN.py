@@ -207,8 +207,12 @@ class GetN:
     def solveSer(self, a: float, b: float, me: float, meanme: float) -> float:
         "return the sersic index. It uses Bisection"
 
+        try:
 
-        N = bisect(self.funMeMeanMe, a, b, args=(me, meanme))
+            N = bisect(self.funMeMeanMe, a, b, args=(me, meanme))
+        except:
+            print("unable to solve equation in the given range. Setting n to 99")
+            N = 99
 
         return N 
 
@@ -251,8 +255,13 @@ class GetN:
     def solveSerRe(self, a: float, b: float, Re: float, Rfrac: float, frac: float) -> float:
         "return the sersic index. It uses Bisection"
 
+        try:
+            N = bisect(self.funReRfrac, a, b, args=(Re, Rfrac, frac))
+        except:
+            print("unable to solve equation in the given range. Setting n to 99")
+            N = 99
 
-        N = bisect(self.funReRfrac, a, b, args=(Re, Rfrac, frac))
+
 
         return N 
 
@@ -309,8 +318,11 @@ class GetN:
 
     def solveSerK(self, a: float, b: float, k: float) -> float: 
 
-
-        sersic = bisect(self.funK, a, b, args=(k))
+        try:
+            sersic = bisect(self.funK, a, b, args=(k))
+        except:
+            print("unable to solve equation in the given range. Setting n to 99")
+            N = 99
 
         return sersic
 
