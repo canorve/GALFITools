@@ -37,10 +37,11 @@ def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool,
 
     (ncol, nrow) = GetAxis(MaskFile)
 
+    i = 0 #index of data 
 
     hdu = fits.open(MaskFile)
 
-    Image = hdu[0].data
+    Image = hdu[i].data
 
 
 
@@ -302,9 +303,10 @@ def MakeBox(Image,fill,xpos,ypos,rx,ry,angle,ncol,nrow):
 def GetAxis(Image):
     "Get number of rows and columns from the image"
 
+    i = 0 #index of data 
     hdu = fits.open(Image)
-    ncol = hdu[0].header["NAXIS1"]  # for hubble images
-    nrow = hdu[0].header["NAXIS2"]
+    ncol = hdu[i].header["NAXIS1"]  # for hubble images
+    nrow = hdu[i].header["NAXIS2"]
     hdu.close()
     return ncol, nrow
 

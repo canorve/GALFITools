@@ -47,10 +47,10 @@ class xy2fits:
 
     def GetAxis(self,Image):
         "Get number of rows and columns from the image"
-
+        i = 0 #index of data
         hdu = fits.open(Image)
-        ncol = hdu[0].header["NAXIS1"]  # for hubble images
-        nrow = hdu[0].header["NAXIS2"]
+        ncol = hdu[i].header["NAXIS1"]  # for hubble images
+        nrow = hdu[i].header["NAXIS2"]
         hdu.close()
 
         return ncol, nrow
@@ -77,14 +77,15 @@ class xy2fits:
     def PutPix(self,X,Y,Value,ImageFits):
 
         # original file
+        i = 0 # index of data
         hdu=fits.open(ImageFits)
-        Image = hdu[0].data
+        Image = hdu[i].data
 
         ## for some strange reason I have to interchange X and Y
         Image[[Y],[X]]=Value
 
-        hdu[0].data=Image
-        hdu.writeto(ImageFits,overwrite=True)
+        hdu[i].data=Image
+        hdu.writeto(ImageFits, overwrite=True)
         hdu.close()
 
 

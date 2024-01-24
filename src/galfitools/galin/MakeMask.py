@@ -133,8 +133,11 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
     if mask.any():
         Rkron[mask] = 1
 
+    
+    i = 0 #index indicated where the data is located
+
     hdu = fits.open(maskimage)
-    img = hdu[0].data
+    img = hdu[i].data
 
 
 
@@ -160,7 +163,7 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
 
     print ("ignoring objects where one or more pixels are saturated \n")
 
-    hdu[0].data = img
+    hdu[i].data = img
     hdu.writeto(maskimage, overwrite=True)
     hdu.close()
 
@@ -218,9 +221,9 @@ def MakeSatBox(maskimage, region, val, ncol, nrow):
     # k Check
 
     #	fileflag=1
-
+    i = 0 # index where data is located 
     hdu = fits.open(maskimage)
-    img = hdu[0].data
+    img = hdu[i].data
 
     with open(region) as f_in:
 
@@ -279,7 +282,7 @@ def MakeSatBox(maskimage, region, val, ncol, nrow):
 
                     img[ylo - 1:yhi, xlo - 1:xhi] = val
 
-    hdu[0].data = img
+    hdu[i].data = img
     hdu.writeto(maskimage, overwrite=True)
     hdu.close()
 
@@ -304,9 +307,11 @@ def GetAxis(Image):
     # k Check
     "Get number of rows and columns from the image"
 
+    i = 0 #index where data is located
+
     hdu = fits.open(Image)
-    ncol = hdu[0].header["NAXIS1"]
-    nrow = hdu[0].header["NAXIS2"]
+    ncol = hdu[i].header["NAXIS1"]
+    nrow = hdu[i].header["NAXIS2"]
     hdu.close()
     return ncol, nrow
 

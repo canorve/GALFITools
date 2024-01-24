@@ -138,18 +138,19 @@ def readDataImg(ellconf, galhead):
     else:
         hdu = fits.open(galhead.inputimage)
 
+        i = 0 #index of data 
         if galhead.flagidx:
             if galhead.flagnum:
                 dataimg.img = (hdu[galhead.imgidx, galhead.num].data).astype(float)
             else:    
                 dataimg.img = (hdu[galhead.imgidx].data).astype(float)
         else:
-            dataimg.img = (hdu[0].data).astype(float)
+            dataimg.img = (hdu[i].data).astype(float)
 
         hdu.close()
 
         hdu = fits.open(ellconf.inputmodel)
-        dataimg.model = (hdu[0].data).astype(float)
+        dataimg.model = (hdu[i].data).astype(float)
         hdu.close()
 
         dataimg.imres = galpar.img - galpar.model
@@ -162,14 +163,15 @@ def readDataImg(ellconf, galhead):
         errmsg="file {} does not exist".format(galhead.tempmask)
         assert os.path.isfile(galhead.tempmask), errmsg
 
+        i = 0 #index of data 
         if ellconf.flagmodel == False:
             hdu = fits.open(galhead.tempmask)
-            mask = hdu[0].data
+            mask = hdu[i].data
             dataimg.mask=np.array(mask,dtype=bool)
             hdu.close()
         else:
             hdu = fits.open(galhead.maskimage)
-            mask = hdu[0].data
+            mask = hdu[i].data
             dataimg.mask=np.array(mask,dtype=bool)
             hdu.close()
 

@@ -41,9 +41,10 @@ def skyRem(imageFile, maskFile, mean, sig, nsig, borValue, bor_flag=False):
 
 
 
-      # original file
+    i = 0 #index of data 
+    # original file
     hdu = fits.open(imageFile)
-    dataImage = hdu[0].data
+    dataImage = hdu[i].data
 
 
     # output file
@@ -88,10 +89,10 @@ def skyRem(imageFile, maskFile, mean, sig, nsig, borValue, bor_flag=False):
 
 def GetAxis(Image):
     "Get number of rows and columns from the image"
-
+    i = 0 #index of data 
     hdu = fits.open(Image)
-    ncol = hdu[0].header["NAXIS1"]  # for hubble images
-    nrow = hdu[0].header["NAXIS2"]
+    ncol = hdu[i].header["NAXIS1"]  # for hubble images
+    nrow = hdu[i].header["NAXIS2"]
     hdu.close()
     return ncol, nrow
 

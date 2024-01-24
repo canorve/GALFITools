@@ -26,8 +26,9 @@ def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imo
 
     mask = np.array([]) #empty for the moment
 
+    i = 0 #index where data is located at hdu
     hdu = fits.open(image)
-    img = hdu[0].data
+    img = hdu[i].data
 
     img = img.astype(float)
 
@@ -101,10 +102,10 @@ def GetFits(Image, Imageout, sky, xlo, xhi, ylo, yhi):
         errrm = sp.run([runcmd], shell=True, stdout=sp.PIPE,
                         stderr=sp.PIPE, universal_newlines=True)
 
-
+    i = 0 #index indicated where the data is located
     hdu = fits.open(Image)
-    dat = hdu[0].data[ylo - 1:yhi, xlo - 1:xhi]
-    hdu[0].data = dat - sky
+    dat = hdu[i].data[ylo - 1:yhi, xlo - 1:xhi]
+    hdu[i].data = dat - sky
     hdu.writeto(Imageout, overwrite=True)
     hdu.close()
 
@@ -112,9 +113,10 @@ def GetAxis(Image):
     # k Check
     "Get number of rows and columns from the image"
 
+    i = 0 #index indicated where the data is located
     hdu = fits.open(Image)
-    ncol = hdu[0].header["NAXIS1"]
-    nrow = hdu[0].header["NAXIS2"]
+    ncol = hdu[i].header["NAXIS1"]
+    nrow = hdu[i].header["NAXIS2"]
     hdu.close()
     return ncol, nrow
 
