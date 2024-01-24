@@ -27,19 +27,14 @@ def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imo
     mask = np.array([]) #empty for the moment
 
     hdu = fits.open(image)
-    if hdu[0].data:
-        img = hdu[0].data
-    else:
-        img = hdu[1].data
+    img = hdu[0].data
 
     img = img.astype(float)
 
     hdu.close()
-
-    try:
-        (ncol, nrow) = GetAxis(image)
-    except:
-        (nrow, ncol) = np.shape(img)
+    
+    (ncol, nrow) = GetAxis(image)
+    
     obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
     xx, yy, Rkron, theta, eps = Ds9ell2Kronell(xpos,ypos,rx,ry,angle)
 
@@ -108,14 +103,8 @@ def GetFits(Image, Imageout, sky, xlo, xhi, ylo, yhi):
 
 
     hdu = fits.open(Image)
-
-    if hdu[0].data:
-        dat = hdu[0].data[ylo - 1:yhi, xlo - 1:xhi]
-        hdu[0].data = dat - sky
-    else:
-        dat = hdu[1].data[ylo - 1:yhi, xlo - 1:xhi]
-        hdu[1].data = dat - sky
-        
+    dat = hdu[0].data[ylo - 1:yhi, xlo - 1:xhi]
+    hdu[0].data = dat - sky
     hdu.writeto(Imageout, overwrite=True)
     hdu.close()
 
