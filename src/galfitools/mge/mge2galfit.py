@@ -28,7 +28,7 @@ import argparse
 
 #from galfitools.galin.galfit import Galfit, conver2Sersic, SelectGal, numComps, GetRadAng
 from galfitools.galin.galfit import Galfit
-
+from galfitools.galin.MaskDs9 import GetAxis 
 #def mge2gal(args) -> None:
 
 def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, numgauss) -> None:
@@ -837,16 +837,6 @@ def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
     hdu[0].data = dat
     hdu.writeto(Imageout, overwrite=True)
     hdu.close()
-
-def GetAxis(Image):
-    # k Check
-    "Get number of rows and columns from the image"
-
-    hdu = fits.open(Image)
-    ncol = hdu[0].header["NAXIS1"]
-    nrow = hdu[0].header["NAXIS2"]
-    hdu.close()
-    return ncol, nrow
 
 def GetExpTime(Image):
     # k Check

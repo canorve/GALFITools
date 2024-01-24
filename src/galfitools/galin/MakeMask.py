@@ -9,7 +9,7 @@ import os.path
 import scipy
 import argparse
 
-
+from galfitools.galin.MaskDs9 import GetAxis
 
 
 def makeMask(sexfile: str, image: str, maskfile: str, scale: float, satfileout: str) -> None:
@@ -302,18 +302,6 @@ def MakeImage(newfits, sizex, sizey):
 
     return True
 
-
-def GetAxis(Image):
-    # k Check
-    "Get number of rows and columns from the image"
-
-    i = 0 #index where data is located
-
-    hdu = fits.open(Image)
-    ncol = hdu[i].header["NAXIS1"]
-    nrow = hdu[i].header["NAXIS2"]
-    hdu.close()
-    return ncol, nrow
 
 
 def CatArSort(SexCat,scale,SexArSort,NCol,NRow):

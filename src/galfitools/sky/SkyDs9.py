@@ -9,6 +9,7 @@ from astropy.io import fits
 from matplotlib.path import Path
 
 
+from galfitools.galin.MaskDs9 import GetAxis 
 
 
 def SkyDs9(ImageFile, RegFile, maskfile): 
@@ -363,15 +364,6 @@ def MakeBoxBack(Image,fill,xpos,ypos,rx,ry,angle,ncol,nrow):
 
 
 
-
-def GetAxis(Image):
-    "Get number of rows and columns from the image"
-
-    hdu = fits.open(Image)
-    ncol = hdu[0].header["NAXIS1"]  # for hubble images
-    nrow = hdu[0].header["NAXIS2"]
-    hdu.close()
-    return ncol, nrow
 
 
 

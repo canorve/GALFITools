@@ -299,16 +299,45 @@ def MakeBox(Image,fill,xpos,ypos,rx,ry,angle,ncol,nrow):
     return Image
 
 
-
 def GetAxis(Image):
+    # k Check
     "Get number of rows and columns from the image"
 
-    i = 0 #index of data 
+    i = 0 #index indicated where the data is located
+
+    if(checkCompHDU(image)):
+        i=1
+
+
     hdu = fits.open(Image)
-    ncol = hdu[i].header["NAXIS1"]  # for hubble images
-    nrow = hdu[i].header["NAXIS2"]
+
+    if i = 0:
+        ncol = hdu[i].header["NAXIS1"]
+        nrow = hdu[i].header["NAXIS2"]
+    elif i = 1:
+        ncol = hdu[i].header["ZNAXIS1"]
+        nrow = hdu[i].header["ZNAXIS2"]
+ 
+
+
     hdu.close()
+
     return ncol, nrow
+
+
+def checkCompHDU(file):
+    """ check if fits file is a CompImageHDU"""
+    flag = False
+    hdul = fits.open(file) 
+
+    for i, hdu in enumerate(hdul):
+
+        if isinstance(hdu, CompImageHDU):
+            flag = True
+
+    hdul.close()
+
+    return flag 
 
 
 

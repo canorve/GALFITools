@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import argparse
 
 
+from galfitools.galin.MaskDs9 import GetAxis 
 
 #################################################################
 #################################################################
@@ -85,16 +86,6 @@ def skyRem(imageFile, maskFile, mean, sig, nsig, borValue, bor_flag=False):
     hdu2.close()
 
 
-
-
-def GetAxis(Image):
-    "Get number of rows and columns from the image"
-    i = 0 #index of data 
-    hdu = fits.open(Image)
-    ncol = hdu[i].header["NAXIS1"]  # for hubble images
-    nrow = hdu[i].header["NAXIS2"]
-    hdu.close()
-    return ncol, nrow
 
 
 

@@ -7,6 +7,7 @@ from astropy.io import fits
 
 import argparse
 
+from galfitools.galin.MaskDs9 import GetAxis 
 
 def makeSim(image, GAIN, skymean, skystd, newimage)-> None: 
 
@@ -49,16 +50,6 @@ def makeSim(image, GAIN, skymean, skystd, newimage)-> None:
 
     hdu.close()
 
-
-def GetAxis(Image):
-    # k Check
-    "Get number of rows and columns from the image"
-
-    hdu = fits.open(Image)
-    ncol = hdu[0].header["NAXIS1"]
-    nrow = hdu[0].header["NAXIS2"]
-    hdu.close()
-    return ncol, nrow
 
 
 #end of program

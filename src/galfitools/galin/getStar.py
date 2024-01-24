@@ -9,6 +9,7 @@ import os.path
 
 import argparse
 
+from galfitools.galin.MaskDs9 import GetAxis 
 
 
 def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imout: str, sigma: str , sigout: str)-> None: 
@@ -27,6 +28,10 @@ def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imo
     mask = np.array([]) #empty for the moment
 
     i = 0 #index where data is located at hdu
+
+    if(checkCompHDU(image)):
+        i=1
+
     hdu = fits.open(image)
     img = hdu[i].data
 
@@ -103,24 +108,14 @@ def GetFits(Image, Imageout, sky, xlo, xhi, ylo, yhi):
                         stderr=sp.PIPE, universal_newlines=True)
 
     i = 0 #index indicated where the data is located
+    if(checkCompHDU(image)):
+        i=1
+
     hdu = fits.open(Image)
     dat = hdu[i].data[ylo - 1:yhi, xlo - 1:xhi]
     hdu[i].data = dat - sky
     hdu.writeto(Imageout, overwrite=True)
     hdu.close()
-
-def GetAxis(Image):
-    # k Check
-    "Get number of rows and columns from the image"
-
-    i = 0 #index indicated where the data is located
-    hdu = fits.open(Image)
-    ncol = hdu[i].header["NAXIS1"]
-    nrow = hdu[i].header["NAXIS2"]
-    hdu.close()
-    return ncol, nrow
-
-
 
 def GetInfoEllip(regfile):
 

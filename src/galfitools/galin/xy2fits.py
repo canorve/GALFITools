@@ -8,7 +8,7 @@ from astropy.io import fits
 
 import argparse
 
-
+from galfitools.galin.MaskDs9 import GetAxis
 
 # code to convert ASCII xy positions to FTIS mask 
 
@@ -27,7 +27,7 @@ class xy2fits:
         maskfits = namefile + ".fits"
 
 
-        (ncol, nrow) = self.GetAxis(ImageFile)
+        (ncol, nrow) = GetAxis(ImageFile)
 
         self.MakeImage(maskfits, ncol, nrow)
 
@@ -44,16 +44,6 @@ class xy2fits:
 
 
         return maskfits
-
-    def GetAxis(self,Image):
-        "Get number of rows and columns from the image"
-        i = 0 #index of data
-        hdu = fits.open(Image)
-        ncol = hdu[i].header["NAXIS1"]  # for hubble images
-        nrow = hdu[i].header["NAXIS2"]
-        hdu.close()
-
-        return ncol, nrow
 
     def MakeImage(self,newfits, sizex, sizey):
         "create a new blank Image"

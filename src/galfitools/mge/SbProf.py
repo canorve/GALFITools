@@ -24,6 +24,7 @@ from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,NullFormatter
                                AutoMinorLocator,LogLocator,LinearLocator,AutoLocator)
 
 
+from galfitools.galin.MaskDs9 import GetAxis 
 
 from galfitools.mge.mge2galfit import GetInfoEllip, Ds9ell2Kronell, GetSize, GetPmax 
 
@@ -653,17 +654,6 @@ def GetExpTime(Image):
     except: 
         exptime = 1
     return float(exptime)
-
-
-def GetAxis(Image):
-    # k Check
-    "Get number of rows and columns from the image"
-
-    hdu = fits.open(Image)
-    ncol = hdu[0].header["NAXIS1"]
-    nrow = hdu[0].header["NAXIS2"]
-    hdu.close()
-    return ncol, nrow
 
 
 if __name__ == '__main__':

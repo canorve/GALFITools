@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 
 import argparse
 
+from galfitools.galin.MaskDs9 import GetAxis 
 # computes sky using GALFIT
 #change it and use skyRem instead
 
@@ -355,16 +356,6 @@ def MakeImage(newfits, sizex, sizey):
 
     return True
 
-
-def GetAxis(Image):
-    # k Check
-    "Get number of rows and columns from the image"
-
-    hdu = fits.open(Image)
-    ncol = hdu[0].header["NAXIS1"]
-    nrow = hdu[0].header["NAXIS2"]
-    hdu.close()
-    return ncol, nrow
 
 
 def CatArSort(SexCat,scale,SexArSort,NCol,NRow):
@@ -867,16 +858,6 @@ def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
     hdu[0].data = dat
     hdu.writeto(Imageout, overwrite=True)
     hdu.close()
-
-def GetAxis(Image):
-    # k Check
-    "Get number of rows and columns from the image"
-
-    hdu = fits.open(Image)
-    ncol = hdu[0].header["NAXIS1"]
-    nrow = hdu[0].header["NAXIS2"]
-    hdu.close()
-    return ncol, nrow
 
 def GetExpTime(Image):
     # k Check
