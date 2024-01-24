@@ -4,6 +4,7 @@ import numpy as np
 import sys
 import os.path
 from astropy.io import fits
+from astropy.io.fits import CompImageHDU
 
 import argparse
 
@@ -305,19 +306,16 @@ def GetAxis(Image):
 
     i = 0 #index indicated where the data is located
 
-    if(checkCompHDU(image)):
+    if(checkCompHDU(Image)):
         i=1
 
 
     hdu = fits.open(Image)
 
-    if i = 0:
-        ncol = hdu[i].header["NAXIS1"]
-        nrow = hdu[i].header["NAXIS2"]
-    elif i = 1:
-        ncol = hdu[i].header["ZNAXIS1"]
-        nrow = hdu[i].header["ZNAXIS2"]
- 
+
+    ncol = hdu[i].header["NAXIS1"]
+    nrow = hdu[i].header["NAXIS2"]
+
 
 
     hdu.close()

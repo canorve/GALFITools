@@ -10,7 +10,7 @@ import os.path
 import argparse
 
 from galfitools.galin.MaskDs9 import GetAxis 
-
+from galfitools.galin.MaskDs9 import checkCompHDU
 
 def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imout: str, sigma: str , sigout: str)-> None: 
 
@@ -98,24 +98,39 @@ def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imo
 
 def GetFits(Image, Imageout, sky, xlo, xhi, ylo, yhi):
     "Get a piece from the image"
-# k Check
+    # k Check
 
+
+    #if os.path.isfile(Imageout):
+    #    print("{} deleted; a new one is created \n".format(Imageout))
+    #    runcmd = "rm {}".format(Imageout)
+    #    errrm = sp.run([runcmd], shell=True, stdout=sp.PIPE,
+    #                    stderr=sp.PIPE, universal_newlines=True)
 
     if os.path.isfile(Imageout):
         print("{} deleted; a new one is created \n".format(Imageout))
-        runcmd = "rm {}".format(Imageout)
-        errrm = sp.run([runcmd], shell=True, stdout=sp.PIPE,
-                        stderr=sp.PIPE, universal_newlines=True)
+    #new fits
+
 
     i = 0 #index indicated where the data is located
-    if(checkCompHDU(image)):
+    if(checkCompHDU(Image)):
         i=1
+        newhdu = fits.CompImageHDU()
+    else:
+        newhdu = fits.PrimaryHDU()
 
     hdu = fits.open(Image)
     dat = hdu[i].data[ylo - 1:yhi, xlo - 1:xhi]
-    hdu[i].data = dat - sky
-    hdu.writeto(Imageout, overwrite=True)
+    head = hdu[i].header
+
+    newhdu.data = dat - sky
+    newhdu.header = head
+
+    newhdu.writeto(Imageout, overwrite=True)
+
     hdu.close()
+
+
 
 def GetInfoEllip(regfile):
 
