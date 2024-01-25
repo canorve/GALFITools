@@ -33,7 +33,7 @@ def mainGetStar():
                         help="uses the center given in DS9 region file," + 
                         "otherwise it will find the x,y peaks within DS9 ellipse")
     parser.add_argument("-s","--sky", type=float, 
-                        help="the sky background to be removed. Default = 0",default=0)
+                        help="the sky background to be removed")
     parser.add_argument("-o","--out", type=str, 
                         help="the image output.",default="star.fits")
 

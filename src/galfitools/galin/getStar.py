@@ -35,7 +35,7 @@ def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imo
     hdu = fits.open(image)
     img = hdu[i].data
 
-    img = img.astype(float)
+    #img = img.astype(float)
 
     hdu.close()
     
@@ -46,7 +46,7 @@ def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imo
 
     if center:
         print('center of ds9 ellipse region will be used')
-        xpeak, ypeak = xpos, ypos
+        xpeak, ypeak = round(xpos), round(ypos)
     else:        
         (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, eps, ncol, nrow)
         xpeak, ypeak = GetPmax(img, mask, xmin, xmax, ymin, ymax)
@@ -54,7 +54,11 @@ def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imo
     print("object found at ", xpeak + 1, ypeak + 1)
     print("Ellipticity, Angle = ", eps, theta)
 
-    print("Sky = ", sky)
+    if sky:
+        print("Sky = ", sky)
+    else:
+        print("No sky input")
+
 
 
     if imsize % 2 == 0:
@@ -123,7 +127,11 @@ def GetFits(Image, Imageout, sky, xlo, xhi, ylo, yhi):
     dat = hdu[i].data[ylo - 1:yhi, xlo - 1:xhi]
     head = hdu[i].header
 
-    newhdu.data = dat - sky
+    if sky:
+        newhdu.data = dat - sky
+    else:
+        newhdu.data = dat 
+
     newhdu.header = head
 
     newhdu.writeto(Imageout, overwrite=True)
