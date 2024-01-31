@@ -213,7 +213,7 @@ def mainFWHM() -> None:
    
     num_comp =  args.numcomp
 
-    fwhm, N, theta = getFWHM(galfitFile, dis, angle, num_comp)
+    fwhm, fwhm_arc, N, theta = getFWHM(galfitFile, dis, angle, num_comp)
 
 
     print('number of model components: ',N)
@@ -223,6 +223,11 @@ def mainFWHM() -> None:
 
     line = 'The FWHM is {:.2f} pixels \n'.format(fwhm)
     print(line)
+
+    line = 'The FWHM is {:.2f}"  \n'.format(fwhm_arc)
+    print(line)
+
+
 
 
 #console scripts

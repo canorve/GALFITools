@@ -518,8 +518,9 @@ def getFWHM(galfitFile: str, dis: int, angle: float, num_comp: int):
 
     fwhm = GetFWHM().FindFWHM(comps, theta) 
 
+    fwhm_arc = fwhm * head.scale
 
-    return fwhm, N, theta 
+    return fwhm, fwhm_arc, N, theta
 
 
 
