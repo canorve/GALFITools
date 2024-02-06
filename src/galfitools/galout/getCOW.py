@@ -29,7 +29,7 @@ from galfitools.galin.galfit import GalComps, GalHead
 
 
 def getCOW(galfitFile: str, dis: int, angle: float, frac: float,
-        num_comp: int, plotname: str, galfitF2: str, maxdiff: bool) -> float:
+        num_comp: int, plotname: str, dpival: int, galfitF2: str, maxdiff: bool) -> float:
     '''plots the curve-of-growth from the galfit.XX file. Only for Sersic functions'''
 
 
@@ -101,7 +101,7 @@ def getCOW(galfitFile: str, dis: int, angle: float, frac: float,
 
 
 
-    plt.plot(R, cows, color='blue', label='model 1')
+    plt.plot(R, cows, color='blue', label='model 1', dpi=dpival)
     plt.grid(True)
     plt.minorticks_on()
 
@@ -120,7 +120,7 @@ def getCOW(galfitFile: str, dis: int, angle: float, frac: float,
     
     if galfitF2:
 
-        plt.plot(R, cows2, color='green',label='model 2')
+        plt.plot(R, cows2, color='green',label='model 2', dpi=dpival)
 
         if maxdiff:
             plt.vlines(xline, ymin, ymax, color='red',label='max diff')

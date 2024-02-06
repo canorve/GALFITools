@@ -674,6 +674,7 @@ def maingetCOW() -> None:
 
 
 
+    parser.add_argument("-dpi","--dotsinch", type=int, help="dots per inch used for images files ",default=100)
 
     ## parsing variables
 
@@ -682,6 +683,9 @@ def maingetCOW() -> None:
     galfitFile = args.GalfitFile
     dis = args.dis
     plotfile = args.plotfile
+
+
+    dpival = args.dotsinch 
 
     frac = args.fracrad
 
@@ -695,7 +699,7 @@ def maingetCOW() -> None:
 
     galfitF2 = args.galfitF2
 
-    totmag, N, theta = getCOW(galfitFile, dis, angle, frac, num_comp, plotfile, galfitF2, maxdiff)
+    totmag, N, theta = getCOW(galfitFile, dis, angle, frac, num_comp, plotfile, dpival, galfitF2, maxdiff)
 
 
     print('number of model components: ', N)
