@@ -573,20 +573,20 @@ def PrintHeader(hdl, A, B, C, D, E, F, G, xlo, xhi, ylo, yhi, convx, convy, J, p
 
     lineZ = "==================================================================================================\n"
     lineX = "# IMAGE PARAMETERS \n"
-    lineA = "A) {}                                   # Input Data image (FITS file)                            \n".format(A)
-    lineB = "B) {}                                   # Output data image block                                 \n".format(B)
-    lineC = "C) {}                                   # Sigma image name (made from data if blank or \"none\")  \n".format(C)
-    lineD = "D) {}                                   # Input PSF image and (optional) diffusion kernel         \n".format(D)
-    lineE = "E) {}                                   # PSF fine sampling factor relative to data               \n".format(E)
-    lineF = "F) {}                                   # Bad pixel mask (FITS image or ASCII coord list)         \n".format(F)
-    lineG = "G) {}                                   # File with parameter constraints (ASCII file)            \n".format(G)
-    lineH = "H) {} {} {} {}                          # Image region to fit (xmin xmax ymin ymax)               \n".format(xlo, xhi, ylo, yhi)
-    lineI = "I) {} {}                                # Size of the convolution box (x y)                       \n".format(convx, convy)
-    lineJ = "J) {}                                   # Magnitude photometric zeropoint                         \n".format(J)
-    lineK = "K) {} {}                                # Plate scale (dx dy). \[arcsec per pixel\]               \n".format(platedx, platedy)
-    lineO = "O) {}                                   # Display type (regular, curses, both)                    \n".format(O)
-    lineP = "P) {}                                   # Choose 0=optimize, 1=model, 2=imgblock, 3=subcomps      \n".format(P)
-    lineS = "S) {}                                   # Modify/create objects interactively?                    \n".format(S)
+    lineA = "A) {}    # Input Data image (FITS file)                            \n".format(A)
+    lineB = "B) {}    # Output data image block                                 \n".format(B)
+    lineC = "C) {}    # Sigma image name (made from data if blank or \"none\")  \n".format(C)
+    lineD = "D) {}    # Input PSF image and (optional) diffusion kernel         \n".format(D)
+    lineE = "E) {}    # PSF fine sampling factor relative to data               \n".format(E)
+    lineF = "F) {}    # Bad pixel mask (FITS image or ASCII coord list)         \n".format(F)
+    lineG = "G) {}    # File with parameter constraints (ASCII file)            \n".format(G)
+    lineH = "H) {} {} {} {}   # Image region to fit (xmin xmax ymin ymax)               \n".format(xlo, xhi, ylo, yhi)
+    lineI = "I) {} {}  # Size of the convolution box (x y)                       \n".format(convx, convy)
+    lineJ = "J) {}     # Magnitude photometric zeropoint                         \n".format(J)
+    lineK = "K) {} {}  # Plate scale (dx dy). \[arcsec per pixel\]               \n".format(platedx, platedy)
+    lineO = "O) {}     # Display type (regular, curses, both)                    \n".format(O)
+    lineP = "P) {}     # Choose 0=optimize, 1=model, 2=imgblock, 3=subcomps      \n".format(P)
+    lineS = "S) {}     # Modify/create objects interactively?                    \n".format(S)
     lineY = " \n"
 
     line0 = "# INITIAL FITTING PARAMETERS                                                     \n"
@@ -678,7 +678,7 @@ def PrintSky(hdl, ncomp, sky, Z, fit):
 
     line00 = "# Object number: {}                                                             \n".format(ncomp)
     line01 = " 0)      sky            #    Object type                                        \n"
-    line02 = " 1) {}         {}       # sky background        [ADU counts]                    \n".format(sky, fit)
+    line02 = " 1) {}   {}   # sky background        [ADU counts]                    \n".format(sky, fit)
     line03 = " 2) 0.000      0        # dsky/dx (sky gradient in x)                           \n"
     line04 = " 3) 0.000      0        # dsky/dy (sky gradient in y)                           \n"
     line05 = " Z) {}                  # Skip this model in output image?  (yes=1, no=0)       \n".format(Z)
@@ -707,25 +707,25 @@ def PrintSersic(hdl, ncomp, xpos, ypos, magser, reser, nser, axratser, angleser,
 
     line00 = "# Object number: {}                                                             \n".format(
             ncomp)
-    line01 = " 0)     sersic               #  Object type                                     \n"
-    line02 = " 1) {:.2f}  {:.2f}  {}  {}            #  position x, y     [pixel]                       \n".format(
+    line01 = " 0)     sersic      #  Object type                                     \n"
+    line02 = " 1) {:.2f}  {:.2f}  {}  {}  #  position x, y     [pixel]                       \n".format(
         xpos, ypos, fit, fit)
-    line03 = " 3) {:.2f}       {}              #  total magnitude                                 \n".format(
+    line03 = " 3) {:.2f}  {}    #  total magnitude                                 \n".format(
         magser, fit)
-    line04 = " 4) {:.2f}       {}              #  R_e         [Pixels]                            \n".format(
+    line04 = " 4) {:.2f}  {}    #  R_e         [Pixels]                            \n".format(
             reser, fit)
-    line05 = " 5) {}       {}              #  Sersic exponent (deVauc=4, expdisk=1)           \n".format(
+    line05 = " 5) {}     {}   #  Sersic exponent (deVauc=4, expdisk=1)           \n".format(
         nser, serfit)
     #line05 = " 5) {}       {}              #  Sersic exponent (deVauc=4, expdisk=1)           \n".format(
     #    nser, fit)
     line06 = " 6)  0.0000       0           #  ----------------                                \n"
     line07 = " 7)  0.0000       0           #  ----------------                                \n"
     line08 = " 8)  0.0000       0           #  ----------------                                \n"
-    line09 = " 9) {:.2f}       {}              #  axis ratio (b/a)                                \n".format(
+    line09 = " 9) {:.2f}   {}   #  axis ratio (b/a)                                \n".format(
         axratser, fit)
-    line10 = "10) {:.2f}       {}              #  position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
+    line10 = "10) {:.2f}    {}  #  position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
         angleser, fit)
-    lineZ = " Z) {}                       #  Skip this model in output image?  (yes=1, no=0) \n".format(
+    lineZ = " Z) {}             #  Skip this model in output image?  (yes=1, no=0) \n".format(
         Z)
     line11 = "\n"
 
@@ -754,18 +754,18 @@ def PrintGauss(hdl, ncomp, xpos, ypos, magass, fwhm, axratgass, anglegass, Z, fi
 
     line00 = "# Object number: {}                                                             \n".format(
             ncomp)
-    line01 = " 0)     gaussian               #  Object type                                     \n"
-    line02 = " 1) {:.2f}  {:.2f}  {}  {}            #  position x, y     [pixel]                       \n".format(
+    line01 = " 0)     gaussian   #  Object type                                     \n"
+    line02 = " 1) {:.2f}  {:.2f}  {}  {}  #  position x, y     [pixel]                       \n".format(
         xpos, ypos, fit, fit)
-    line03 = " 3) {:.2f}       {}              #  total magnitude                                 \n".format(
+    line03 = " 3) {:.2f}       {}       #  total magnitude                                 \n".format(
         magass, fit)
-    line04 = " 4) {:.2f}       {}              #  FWHM         [Pixels]                            \n".format(
+    line04 = " 4) {:.2f}       {}       #  FWHM         [Pixels]                            \n".format(
             fwhm, fit)
-    line05 = " 9) {:.2f}       {}              #  axis ratio (b/a)                                \n".format(
+    line05 = " 9) {:.2f}       {}       #  axis ratio (b/a)                                \n".format(
         axratgass, fit)
-    line06 = "10) {:.2f}       {}              #  position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
+    line06 = "10) {:.2f}       {}       #  position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
         anglegass, fit)
-    line07 = " Z) {}                       #  Skip this model in output image?  (yes=1, no=0) \n".format(
+    line07 = " Z) {}               #  Skip this model in output image?  (yes=1, no=0) \n".format(
         Z)
     line08 = "\n"
 
@@ -791,18 +791,18 @@ def PrintExp(hdl, ncomp, xpos, ypos, magexp, rsexp, axratexp, angleexp, Z, fit):
     # by the parameters
 
     line00 = "# Object number: $ncomp                                                        \n"
-    line01 = " 0)     expdisk              # Object type                                     \n"
-    line02 = " 1) {:.2f}  {:.2f}  {}  {}           # position x, y     [pixel]                       \n".format(
+    line01 = " 0)     expdisk        # Object type                                     \n"
+    line02 = " 1) {:.2f}  {:.2f}  {}  {}  # position x, y     [pixel]                       \n".format(
         xpos, ypos, fit, fit)
-    line03 = " 3) {:.2f}        {}             # total magnitude                                 \n".format(
+    line03 = " 3) {:.2f}        {}   # total magnitude                                 \n".format(
         magexp, fit)
-    line04 = " 4) {:.2f}        {}             #      Rs  [Pixels]                               \n".format(
+    line04 = " 4) {:.2f}        {}   #      Rs  [Pixels]                               \n".format(
         rsexp, fit)
-    line05 = " 9) {:.2f}        {}             # axis ratio (b/a)                                \n".format(
+    line05 = " 9) {:.2f}        {}   # axis ratio (b/a)                                \n".format(
         axratexp, fit)
-    line06 = "10) {:.2f}        {}             # position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
+    line06 = "10) {:.2f}        {}   # position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
         angleexp, fit)
-    line07 = " Z) {}                       # Skip this model in output image?  (yes=1, no=0) \n".format(
+    line07 = " Z) {}                 # Skip this model in output image?  (yes=1, no=0) \n".format(
         Z)
     line08 = "\n"
 
