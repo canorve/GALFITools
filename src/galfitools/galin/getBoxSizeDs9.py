@@ -18,7 +18,7 @@ def getBoxSizeDs9(RegFile: str) -> int:
 
 
     if not os.path.exists(RegFile):
-        print ('%s: reg filename does not exist!' %(sys.argv[2]))
+        print ('%s: reg filename does not exist!' %(sys.argv[1]))
         sys.exit(1)
 
     v0 = []

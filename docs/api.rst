@@ -446,6 +446,19 @@ class with the parameters read from sky.
     from galfitools.galin.galfit import GetRadAng
 
 
+**getBoxSizeDs9**
+
+::
+
+    from galfitools.galin.getBoxSizeDs9 import getBoxSizeDs9 
+
+
+    xmin, xmax, ymin, ymax = getBoxSizeDs9(RegFile)
+
+    #RegFile: ds9 box region file
+    #xmin, xmax, ymin, ymax box size for fitting region for galfit file option H) 
+
+
 
 **GALFIT OUTPUT**
 -------------------

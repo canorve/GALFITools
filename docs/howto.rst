@@ -237,6 +237,22 @@ prepare the necessary files for GALFIT input
     -d DIS, --dis DIS  Maximum distance in pixels among components. Default = 10
 
 
+**boxSize** computes the box size from a ds9 box region for galfit header option H) 
+
+::
+
+    
+  usage: boxSize [-h] RegFile
+
+  Computes the Box size from a Ds9 region file for galfit header
+
+  positional arguments:
+    RegFile     Ds9 region file containing the box region
+
+  options:
+    -h, --help  show this help message and exit
+
+
 
 
 **GALFIT OUTPUT**
