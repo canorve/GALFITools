@@ -85,12 +85,12 @@ def getBoxSizeDs9(RegFile: str) -> int:
     ymin = ypos - ry/2
     ymax = ypos + ry/2
 
+    #[0] if there are many, only the first one is take in account
+    xmin = round(xmin[0]) 
+    xmax = round(xmax[0])
 
-    xmin = round(xmin)
-    xmax = round(xmax)
-
-    ymin = round(ymin)
-    ymax = round(ymax)
+    ymin = round(ymin[0])
+    ymax = round(ymax[0])
 
     return xmin, xmax, ymin, ymax
 
