@@ -9,6 +9,7 @@ from collections import Counter
 from galfitools.galin.getStar import getStar
 from galfitools.galin.initgal import InitGal
 from galfitools.galin.MaskDs9 import maskDs9
+from galfitools.galin.getBoxSizeDs9 import getBoxSizeDs9
 
 from galfitools.galin.MakeMask import makeMask
 from galfitools.galin.MaskSky import skyRem
@@ -365,5 +366,26 @@ def maincheckFile() -> None:
  
 
 
+def mainGetBoxSizeDs9(): 
+
+
+    printWelcome()
+
+   #parser argument section
+
+    parser = argparse.ArgumentParser(description="Computes the Box size from a Ds9 region file for galfit header")
+
+    parser.add_argument("RegFile", help="Ds9 region file containing the box region ")
+    args = parser.parse_args()
+
+
+    RegFile = args.RegFile
+
+    xmin, xmax, ymin, ymax = getBoxSizeDs9(RegFile)
+
+
+    line="xmin, xmax, ymin, ymax: {} {} {} {} ".format(xmin, xmax, ymin, ymax)
+    print(line)
+ 
 
 
