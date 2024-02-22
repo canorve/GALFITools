@@ -800,11 +800,12 @@ equal
     sky: sky background value to be removed from computation 
 
 
-    mag = photDs9(ImageFile, RegFile, zeropoint, sky)
+    mag, exptime = photDs9(ImageFile, RegFile, zeropoint, sky)
 
     #output
 
     mag: magnitud of the Ds9 regions 
+    exptime: exposition time of the image 
 
 
 

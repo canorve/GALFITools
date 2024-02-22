@@ -54,8 +54,11 @@ def mainPhotDs9():
     sky = args.sky
 
 
-    mag = photDs9(ImageFile, RegFile, maskfile ,zeropoint, sky)
+    mag, exptime = photDs9(ImageFile, RegFile, maskfile ,zeropoint, sky)
 
+
+    line = "the exposition time is is: {} \n".format(exptime)
+    print(line)
 
     line = "the magnitude from the ds9 region is: {:.2f} \n".format(mag)
     print(line)

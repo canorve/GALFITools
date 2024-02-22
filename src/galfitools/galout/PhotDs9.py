@@ -202,7 +202,7 @@ def photDs9(ImageFile, RegFile, maskfile, zeropoint, sky):
 
 
 
-    return mag
+    return mag, exptime
 
 
 def FluxEllip(Image, xpos, ypos, rx, ry, angle, ncol, nrow):
