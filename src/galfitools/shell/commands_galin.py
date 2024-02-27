@@ -274,7 +274,7 @@ def maincheckFile() -> None:
     dis = args.dis
 
    
-    headinfo, galax, mag = checkFile(galfitFile, dis)
+    headinfo, galax, mag, freepar = checkFile(galfitFile, dis)
 
     testflag = False
 
@@ -364,6 +364,12 @@ def maincheckFile() -> None:
         line="galaxy {} has {} components and a total mag of: {:.2f} ".format(int(item), totcomp, totmag)
         print(line)
  
+
+    line="Total number of free parameters: {} ".format(freepar)
+    print(line)
+ 
+
+
 
 
 def mainGetBoxSizeDs9(): 

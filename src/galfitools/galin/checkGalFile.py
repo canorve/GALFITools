@@ -11,6 +11,7 @@ import copy
 
 from scipy.special import gamma, gammainc, gammaincinv
 
+
 #from scipy.optimize import bisect
 
 #import matplotlib.pyplot as plt
@@ -23,7 +24,7 @@ from galfitools.galin.galfit import Galfit, conver2Sersic, SelectGal, numComps, 
 from galfitools.galin.MaskDs9 import GetAxis
 
 from galfitools.galin.galfit import GalComps, GalHead
-
+from galfitools.galin.galfit import numParFree
 
 
 class HeadInfo():
@@ -169,89 +170,11 @@ def checkFile(galfitFile: str, dis: int) -> float:
      
  
 
+    freepar = numParFree(galcomps) #computing the number of free parameters
 
-    #taking the last component position angle for the whole galaxy
-    '''
-    maskgal = (galcomps.Active == True) 
-    if angle:
-        theta = angle
-    else:
-        theta = galcomps.PosAng[maskgal][-1]  
+   
 
-    #theta = 18.2534 
-
-    #convert all exp, gaussian and de vaucouleurs to Sersic format
-    #comps = conver2Sersic(galcomps) 
-
-
-    N = numComps(comps,'all')
-    #print('number of model components: ',N)
-
-    if N == 0:
-        print('not enough number of components to compute Re')
-        print('exiting..')
-        sys.exit(1)
-
-    line = 'Using a theta value of : {:.2f} degrees \n'.format(theta)
-    #print(line)
-
-
-
-    EffRad, totmag = GetReff().GetReSer(head, comps, eff, theta)
-
-    line = 'Total Magnitude of the galaxy: {:.2f} \n'.format(totmag)
-    #print(line)
-
-
-    line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
-    #print(line)
-
-
-
-    EffRadfrac, totmag = GetReff().GetReSer(head, comps, frac, theta)
-
-
-    line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(frac*100, EffRadfrac)
-    #print(line)
-
-
-
-    comps2 =  copy.deepcopy(comps)
-    meanme = GetMe().MeanMe(totmag, EffRad*head.scale)
-    m0 = GetMe().Me(head, comps2, 0, theta) #substituing effective radius per 0 gives m0
-
-    line = 'Mean Surface Brightness at effective radius: {:.2f} mag/\" \n'.format(meanme)
-    #print(line)
-
-
-    line = 'Surface brightness at effective radius {:.2f} mag/\" \n'.format(me)
-    #print(line)
-
-    sersic = GetN().MeMeanMe(me, meanme)
-
-    line = 'Sersic index with the method of Mean Surface Brightness at effective radius: {:.2f}  \n'.format(sersic)
-    #print(line)
-
-
-    sersic2 = GetN().ReRfrac(EffRad, EffRadfrac, frac)
-
-    line = 'Sersic index with the method of fraction of light at {:.2f}: {:.2f}  \n'.format(frac,sersic2)
-    #print(line)
-
-
-    #sersic3 = GetN().MeM0(me, m0)
-
-    #line = 'Sersic index with the method of me - mo is {:.2f}  \n'.format(sersic3)
-    #print(line)
-
-
-
-    '''
-    
-    #separate in two functions:
-
-    #return Effrad, totmag, meanme, me, N, theta 
-    return headinfo, galax, mag
+    return headinfo, galax, mag, freepar
 
 
 def copy2info(head, head2):
