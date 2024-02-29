@@ -170,6 +170,7 @@ def checkFile(galfitFile: str, dis: int) -> float:
      
  
 
+    galcomps.Active = True
     freepar = numParFree(galcomps) #computing the number of free parameters
 
    
