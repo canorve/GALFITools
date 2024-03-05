@@ -592,6 +592,33 @@ def numParFree(galcomps: GalComps) -> int:
     return int(pt)
 
 
+def numParSkyFree(galsky: GalSky) -> int:
+    '''obtains the number of free parameters for sky function'''
+
+
+    p1 = 0
+    p2 = 0
+    p3 = 0
+
+    parmask1 =  galsky.skyfree == 1 
+    parmask2 =  galsky.dskyxfree == 1 
+    parmask3 =  galsky.dskyyfree == 1 
+
+    if parmask1:
+        p1 = 1 
+    if parmask2:
+        p2 = 1 
+    if parmask3:
+        p3 = 1 
+
+    pt = p1 + p2 + p3 
+
+
+    return int(pt)
+
+
+
+
 
 def numComps(galcomps: GalComps, name: str) -> int:
     '''obtains the number of components'''
