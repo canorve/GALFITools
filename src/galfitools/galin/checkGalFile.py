@@ -12,14 +12,8 @@ import copy
 from scipy.special import gamma, gammainc, gammaincinv
 
 
-#from scipy.optimize import bisect
-
-#import matplotlib.pyplot as plt
-
-
 from galfitools.galin.galfit import Galfit, conver2Sersic, SelectGal, numComps, GetRadAng
 
-#from galfitools.galout.getRads import GetReff, GetMe
 
 from galfitools.galin.MaskDs9 import GetAxis
 
@@ -111,22 +105,20 @@ def checkFile(galfitFile: str, dis: int) -> float:
     if os.path.exists(headinfo.inputimage):
         headinfo.inputimageflag = True
 
-
     if os.path.exists(headinfo.outimage):
         headinfo.outimageflag = True
 
-    if os.path.exists(headinfo.sigimage):
-        headinfo.sigimageflag = True
+    if (os.path.exists(headinfo.sigimage)) or (headinfo.sigimage == 'none') :
+            headinfo.sigimageflag = True
 
-    if os.path.exists(headinfo.psfimage):
-        headinfo.psfimageflag = True
+    if (os.path.exists(headinfo.psfimage)) or (headinfo.psfimage == 'none') :
+            headinfo.psfimageflag = True
+    
+    if (os.path.exists(headinfo.maskimage)) or (headinfo.maskimage == 'none'):
+            headinfo.maskimageflag = True
 
-
-    if os.path.exists(headinfo.maskimage):
-        headinfo.maskimageflag = True
-
-    if os.path.exists(headinfo.constraints):
-        headinfo.constraintsflag = True
+    if (os.path.exists(headinfo.constraints)) or (headinfo.constraints == 'none'):
+            headinfo.constraintsflag = True
 
     if headinfo.xmax > headinfo.xmin:
         headinfo.xsizeflag = True
@@ -145,7 +137,6 @@ def checkFile(galfitFile: str, dis: int) -> float:
 
         if headinfo.convy > ny:
             headinfo.convyflag = True
-
 
     
 

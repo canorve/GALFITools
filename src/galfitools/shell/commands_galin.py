@@ -283,10 +283,10 @@ def maincheckFile() -> None:
         print(line)
         testflag = True
 
-    if not(headinfo.outimageflag):
-        line="File {} not found ".format(headinfo.outimage)
-        print(line)
-        testflag = True
+    #if not(headinfo.outimageflag):
+    #    line="File {} not found ".format(headinfo.outimage)
+    #    print(line)
+    #    testflag = True
 
     if not(headinfo.sigimageflag):
         line="File {} not found ".format(headinfo.sigimage)
