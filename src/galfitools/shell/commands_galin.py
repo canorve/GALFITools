@@ -63,6 +63,8 @@ def mainGetStar():
 
     print("Done. Object fits file: {} created ".format(imout))
 
+    if sigma:
+        print("Done. sigma fits file: {} created ".format(sigout))
 
 
 def mainInitGal(): 

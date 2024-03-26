@@ -90,7 +90,6 @@ def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imo
 
     if sigma:
         GetFits(sigma, sigout, 0, xlo, xhi, ylo, yhi)
-        print("Done. sigma fits file: {} created ".format(imout))
 
 
 
