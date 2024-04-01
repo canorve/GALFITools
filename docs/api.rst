@@ -822,6 +822,27 @@ equal
 
 
 
+**fitlog2csv** converts fit.log file into a CSV file 
+::
+
+
+    from galfitools.galout.fitlog2csv  import log2csv 
+
+    args = parser.parse_args()
+
+
+    #optional for argparse
+
+    zeropoint: number of the fit to be extracted. Default: last one 
+    fileout: name of the output file 
+
+
+    log2csv(num, fileout)
+
+
+
+
+
 
 
 **MGE**

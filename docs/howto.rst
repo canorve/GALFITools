@@ -499,6 +499,18 @@ equal
     -sk SKY, --sky SKY    the value of the sky background to be removed
 
 
+
+**fitlog2csv** converts fit.log file into a comma separated values file 
+::
+
+
+    -h, --help            show this help message and exit
+    -n NUM, --NUM NUM     the number of the fit to be extracted 
+    -o OUTFILE, --fileout OUTFILE 
+                          the name of the output file 
+
+
+
 **MGE**
 ---------------
 
