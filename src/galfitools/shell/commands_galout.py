@@ -25,6 +25,7 @@ from galfitools.galout.PhotDs9 import photDs9
 from galfitools.galout.getCOW import getCOW
 
 
+from galfitools.galout.fitlog2csv import log2csv 
 
 def mainPhotDs9(): 
 
@@ -717,7 +718,25 @@ def maingetCOW() -> None:
     print("plot file: ", plotfile)
 
 
+def mainFitlog2CSV(): 
+
+    printWelcome()
+
+    parser = argparse.ArgumentParser(description="converts fit.log file into a comma separated values file")
+
+
+    parser.add_argument("-o","--fileout", type=str, help="output file",default="fitlog.csv")
+
+
+    parser.add_argument("-n","--num", type=int, help="number of the fit in fit.log to convert to csv. Default: last fit")
 
 
 
+    args = parser.parse_args()
+
+    fileout = args.fileout
+    num = args.num
+
+
+    log2csv(num, fileout)
 
