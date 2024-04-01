@@ -740,3 +740,6 @@ def mainFitlog2CSV():
 
     log2csv(num, fileout)
 
+    print("conversion to CSV file done.")
+
+
