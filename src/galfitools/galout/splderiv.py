@@ -17,10 +17,14 @@ lme= np.log10(me)
 yspl = UnivariateSpline(lrad,lme,s=0,k=4)
 
 plt.plot(lrad,lme,'ro',label = 'data')
+plt.xlabel("rad")
+plt.ylabel("me")
 xran = np.linspace(lrad[0],lrad[-1],1000)
 
 
 plt.plot(xran, yspl(xran))
+plt.xlabel("rad")
+plt.ylabel("slope")
 
 plt.grid(True)
 plt.minorticks_on()
@@ -34,6 +38,9 @@ yspl2d = yspl.derivative(n=2)
 yspl1d = yspl.derivative(n=1)
 
 plt.plot(xran,yspl2d(xran))
+plt.xlabel("rad")
+plt.ylabel("second derivative")
+
 
 plt.grid(True)
 plt.minorticks_on()
@@ -53,6 +60,8 @@ dev2 = yspl2d(xran)
 kappa = np.abs(dev2)/(1 + dev1**2)**(3/2)
 
 plt.plot(xran,kappa)
+plt.xlabel("Radius")
+plt.ylabel("Kappa")
 
 
 plt.grid(True)

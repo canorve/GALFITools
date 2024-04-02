@@ -102,6 +102,10 @@ def getBreak(galfitFile: str, dis: int, inicomp: int, quick: bool, random: int, 
 
 
         plt.plot(R, gam)
+
+        plt.xlabel("Rad")
+        plt.ylabel("Second derivative")
+
         plt.grid(True)
         plt.minorticks_on()
         plt.savefig("Break.png")
@@ -419,6 +423,10 @@ def getBreak2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool
     if plot:
         plt.close()
         plt.plot(R, slp)
+
+        plt.xlabel("Rad")
+        plt.ylabel("Slope")
+
         plt.grid(True)
         plt.minorticks_on()
         plt.savefig("FirstDerivative.png")
@@ -433,6 +441,9 @@ def getBreak2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool
     if plot:
         plt.close()
         plt.plot(lrad,yspl1d(lrad))
+        plt.xlabel("Rad")
+        plt.ylabel("Second derivative")
+
         plt.grid(True)
         plt.minorticks_on()
         plt.savefig("SecondDerivative.png")
@@ -728,6 +739,8 @@ def getKappa(galfitFile: str, dis: int, inicomp: int, quick: bool, random: int, 
 
 
         plt.plot(R, gam)
+        plt.xlabel("Radius")
+        plt.ylabel("Curvature")
         plt.grid(True)
         plt.minorticks_on()
         plt.savefig("Kappa.png")
@@ -1280,6 +1293,8 @@ def getSlope(galfitFile: str, dis: int, slope: float, angle: float, num_comp: in
 
 
         plt.plot(R, gam)
+        plt.xlabel("Radius")
+        plt.ylabel("Slope")
         plt.grid(True)
         plt.minorticks_on()
         plt.savefig("slope.png")

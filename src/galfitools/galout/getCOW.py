@@ -102,6 +102,8 @@ def getCOW(galfitFile: str, dis: int, angle: float, frac: float,
 
 
     plt.plot(R, cows, color='blue', label='model 1', dpi=dpival)
+    plt.xlabel("Rad")
+    plt.ylabel("curve of growth")
     plt.grid(True)
     plt.minorticks_on()
 
@@ -121,6 +123,9 @@ def getCOW(galfitFile: str, dis: int, angle: float, frac: float,
     if galfitF2:
 
         plt.plot(R, cows2, color='green',label='model 2', dpi=dpival)
+
+        plt.xlabel("Rad")
+        plt.ylabel("curve of growth")
 
         if maxdiff:
             plt.vlines(xline, ymin, ymax, color='red',label='max diff')
