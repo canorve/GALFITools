@@ -122,8 +122,8 @@ def main() -> None:
 
 
     plt.plot(R, gam)
-    plt.xlabel("Radius") 
-    plt.ylabel("Slope") 
+    plt.xlabel("rad")
+    plt.xlabel("slope")
     plt.savefig("slope.png")
 
 
@@ -146,6 +146,8 @@ def main() -> None:
 
 
 class GalHead():
+    '''store the header of galfit file'''
+
     '''store the header of galfit file'''
 
     inputimage = "galaxy.fits"
@@ -644,8 +646,6 @@ class GetSlope:
         return SlptotR.sum()
 
 
-    def GalSlope(self, R: list, comps: GalComps, theta: float) -> float:
-
         maskgal = (comps.Active == True) #using active components only 
 
         gam = np.array([])
@@ -679,9 +679,11 @@ class GetSlope:
         a = 0.1 
         b = comps.Rad[maskgal][-1] * 10  # hope it doesn't crash
 
-        Radslp = bisect(self.funGalSlopeSer, a, b, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta, slope))
-
-
+        try:
+            Radslp = bisect(self.funGalSlopeSer, a, b, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta, slope))
+        except:
+            print("solution not found in given range")
+            Radslp=0
 
         return Radslp 
 
