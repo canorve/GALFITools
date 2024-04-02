@@ -656,6 +656,10 @@ def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
 
     n_idx = idx[0].item(0)
 
+    if distmax > 10:
+        print("Warning: maximum distance among components is greater than 10")
+        print("Equations' solutions only apply for components that share the same center")
+
 
     galcomps.Active[n_idx] = True #main component
 
