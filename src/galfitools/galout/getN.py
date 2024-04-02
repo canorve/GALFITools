@@ -208,7 +208,6 @@ class GetN:
         "return the sersic index. It uses Bisection"
 
         try:
-
             N = bisect(self.funMeMeanMe, a, b, args=(me, meanme))
         except:
             print("unable to solve equation in the given range. Setting n to 99")
@@ -305,7 +304,11 @@ class GetN:
     def solveKm0(self, a: float, b: float, me: float, m0: float) -> float:
         "return the sersic index. It uses Bisection"
 
-        K = bisect(self.funMeM0, a, b, args=(me, m0))
+        try:
+            K = bisect(self.funMeM0, a, b, args=(me, m0))
+        except:
+            print("solution not found for the given range")
+            K = 0
 
         return K 
 

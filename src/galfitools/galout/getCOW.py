@@ -310,8 +310,13 @@ class GetN:
     def solveSer(self, a: float, b: float, me: float, meanme: float) -> float:
         "return the sersic index. It uses Bisection"
 
+        try:
 
-        N = bisect(self.funMeMeanMe, a, b, args=(me, meanme))
+            N = bisect(self.funMeMeanMe, a, b, args=(me, meanme))
+
+        except:
+            print("solution not found for the given range")
+            N = 0
 
         return N 
 
@@ -354,8 +359,14 @@ class GetN:
     def solveSerRe(self, a: float, b: float, Re: float, Rfrac: float, frac: float) -> float:
         "return the sersic index. It uses Bisection"
 
+        try:
+            N = bisect(self.funReRfrac, a, b, args=(Re, Rfrac, frac))
 
-        N = bisect(self.funReRfrac, a, b, args=(Re, Rfrac, frac))
+        except:
+            print("solution not found for the given range")
+            N = 0
+
+
 
         return N 
 
@@ -399,7 +410,14 @@ class GetN:
     def solveKm0(self, a: float, b: float, me: float, m0: float) -> float:
         "return the sersic index. It uses Bisection"
 
-        K = bisect(self.funMeM0, a, b, args=(me, m0))
+        try:
+            K = bisect(self.funMeM0, a, b, args=(me, m0))
+
+        except:
+            print("solution not found for the given range")
+            K = 0
+
+
 
         return K 
 
@@ -412,8 +430,14 @@ class GetN:
 
     def solveSerK(self, a: float, b: float, k: float) -> float: 
 
+        try:
+            sersic = bisect(self.funK, a, b, args=(k))
 
-        sersic = bisect(self.funK, a, b, args=(k))
+        except:
+            print("solution not found for the given range")
+            sersic = 0
+
+
 
         return sersic
 

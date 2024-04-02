@@ -4,6 +4,7 @@ from astropy.io import fits
 import numpy as np
 
 
+from scipy.optimize import bisect
 
 import copy
 from scipy.special import gamma, gammainc, gammaincinv
@@ -703,8 +704,12 @@ class GetReff:
     def solveSerRe(self, a: float, b: float, flux: list, rad: list, n: list, q: list, pa: list, totFlux: float, eff: float, theta: float) -> float:
         "return the Re of a set of Sersic functions. It uses Bisection"
 
+        try:
 
-        Re = bisect(self.funReSer, a, b, args=(flux, rad, n, q, pa, totFlux, eff, theta))
+            Re = bisect(self.funReSer, a, b, args=(flux, rad, n, q, pa, totFlux, eff, theta))
+        except:
+            print("solution not found for the given range")
+            Re = 0
 
         return Re
 

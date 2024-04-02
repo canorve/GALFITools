@@ -258,7 +258,12 @@ class GetBreak:
         a = 0.1 
         b = comps.Rad[maskgal][-1] * 10  # hope it doesn't crash
 
-        Radslp = bisect(self.funGalSlopeSer, a, b, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta, slope))
+        try:
+            Radslp = bisect(self.funGalSlopeSer, a, b, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta, slope))
+
+        except:
+            print("unable to solve equation in the given range. Setting n to 99")
+            Radslp = 0 
 
         return Radslp 
 
@@ -579,7 +584,13 @@ class GetFWHM:
         a = 0.001 
         b = comps.Rad[maskgal][-1] * 10  # hope it doesn't crash
 
-        Radslp = bisect(self.funGalFWHMSer, a, b, args=(S0,comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta ))
+        try:
+            Radslp = bisect(self.funGalFWHMSer, a, b, args=(S0,comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta ))
+        
+        except:
+            print("solution not found in given range")
+            Radslp = 0
+
 
         return 2*Radslp 
 
@@ -887,7 +898,14 @@ class GetKappa:
         a = 0.1 
         b = comps.Rad[maskgal][-1] * 10  # hope it doesn't crash
 
-        Radslp = bisect(self.funGalSlopeSer, a, b, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta, slope))
+
+        try:
+            Radslp = bisect(self.funGalSlopeSer, a, b, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta, slope))
+
+        except:
+            print("solution not found in given range")
+            Radslp = 0
+
 
         return Radslp 
 
@@ -1142,8 +1160,14 @@ class GetReff:
     def solveSerRe(self, a: float, b: float, flux: list, rad: list, n: list, q: list, pa: list, totFlux: float, eff: float, theta: float) -> float:
         "return the Re of a set of Sersic functions. It uses Bisection"
 
+        try:
+            Re = bisect(self.funReSer, a, b, args=(flux, rad, n, q, pa, totFlux, eff, theta))
 
-        Re = bisect(self.funReSer, a, b, args=(flux, rad, n, q, pa, totFlux, eff, theta))
+        except:
+            print("solution not found in given range")
+            Re = 0
+
+
 
         return Re
 
@@ -1317,7 +1341,14 @@ class GetSlope:
         a = 0.1 
         b = comps.Rad[maskgal][-1] * 10  # hope it doesn't crash
 
-        Radslp = bisect(self.funGalSlopeSer, a, b, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta, slope))
+        try:
+            Radslp = bisect(self.funGalSlopeSer, a, b, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta, slope))
+
+        except:
+            print("solution not found in given range")
+            Radslp = 0
+
+
 
         return Radslp 
 
@@ -1447,6 +1478,8 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
         plt.plot(R, Idiff)
         plt.grid(True)
         plt.minorticks_on()
+        plt.xlabel("Rad")
+        plt.ylabel("I1 - I2")
         plt.savefig("Idiff.png")
 
 
@@ -1457,6 +1490,8 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
         plt.plot(R, I1)
         plt.plot(R, I2)
         plt.xscale("log")
+        plt.xlabel("Rad")
+        plt.ylabel("I")
         plt.grid(True)
         plt.minorticks_on()
         plt.savefig("BulgeRad.png")
@@ -1465,9 +1500,11 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
 
 
     #computing bulge radius
-
-    rbulge = newton(getDiffx, 0, args=(head1, comps1, comps2, theta)) 
-
+    try:
+        rbulge = newton(getDiffx, 0, args=(head1, comps1, comps2, theta)) 
+    except:
+        print("solution not found for initial parameter")
+        rbulge=0
 
     return rbulge, N1, N2, theta 
 

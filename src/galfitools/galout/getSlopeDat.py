@@ -677,7 +677,12 @@ class GetSlope:
         a = 0.1 
         b = comps.Rad[maskgal][-1] * 10  # hope it doesn't crash
 
-        Radslp = bisect(self.funGalSlopeSer, a, b, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta, slope))
+        try:
+            Radslp = bisect(self.funGalSlopeSer, a, b, args=(comps.Ie[maskgal], comps.Rad[maskgal], comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], theta, slope))
+
+        except:
+            print("solution not found in given range")
+            Radslp=0
 
         return Radslp 
 
