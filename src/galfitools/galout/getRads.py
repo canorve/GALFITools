@@ -1059,7 +1059,9 @@ def getReComp(galfitFile: str, dis: int, eff: float, angle: float, num_comp: int
     meanme = GetMe().MeanMe(totmag, EffRad*head.scale)
     me = GetMe().Me(head, comps, EffRad*head.scale, theta)
 
-    return EffRad, totmag, meanme, me, N, theta 
+    EffRad_arc = EffRad*head.scale
+
+    return EffRad, EffRad_arc, totmag, meanme, me, N, theta 
 
 
 

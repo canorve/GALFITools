@@ -329,7 +329,7 @@ def mainGetReComp() -> None:
     num_comp =  args.numcomp
     angle = args.angle
 
-    EffRad, totmag, meanme, me, N, theta = getReComp(galfitFile, dis, eff, angle, num_comp)
+    EffRad, EffRad_arc, totmag, meanme, me, N, theta = getReComp(galfitFile, dis, eff, angle, num_comp)
 
     print('number of model components: ', N)
 
@@ -347,6 +347,9 @@ def mainGetReComp() -> None:
     print(line)
 
     line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
+    print(line)
+
+    line = 'The radius at {:.0f}% of light is {:.2f} "  \n'.format(eff*100, EffRad_arc)
     print(line)
 
 
