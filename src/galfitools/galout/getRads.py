@@ -441,7 +441,7 @@ def getBreak2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool
     if plot:
         plt.close()
         plt.plot(lrad,yspl1d(lrad))
-        plt.xlabel("Rad")
+        plt.xlabel("Log(Rad)")
         plt.ylabel("Second derivative")
 
         plt.grid(True)
