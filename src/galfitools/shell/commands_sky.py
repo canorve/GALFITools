@@ -89,18 +89,20 @@ def mainSkyDs9():
 
     parser.add_argument("-m","--mask", type=str, help="the mask file")
 
+    parser.add_argument("-ol","--outliers", action="store_true", help="Removes the top 80%% and botttom 20%% of the pixel values to compute sky within ring")
+ 
 
     args = parser.parse_args()
 
     ImageFile = args.ImageFile 
     RegFile = args.RegFile 
     maskfile = args.mask
+    outliers = args.outliers
 
 
-    mean, sig = SkyDs9(ImageFile, RegFile, maskfile) 
+    mean, sig = SkyDs9(ImageFile, RegFile, maskfile, outliers) 
 
 
-    print("Sky with the top 80% and botton 20% removed.") 
 
     print("mean sky: {:.3f} ".format(mean))
     print("std sky: {:.3f} ".format(sig))
@@ -146,6 +148,11 @@ def mainSkyRing():
 
 
     ##end input
+
+
+    print("Major axis of ellipse is used as initial radius.") 
+
+
     mean, std, median, rad = SkyRing(image, mask, ds9regfile, width, center, outliers)
 
 

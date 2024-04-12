@@ -12,7 +12,7 @@ from matplotlib.path import Path
 from galfitools.galin.MaskDs9 import GetAxis 
 
 
-def SkyDs9(ImageFile, RegFile, maskfile): 
+def SkyDs9(ImageFile, RegFile, maskfile, outliers=False): 
 
 
 
@@ -199,15 +199,17 @@ def SkyDs9(ImageFile, RegFile, maskfile):
     Flats.sort()
     tot=len(Flats)
 
-    top=round(.8*tot)
-    bot=round(.2*tot)
+    if (outliers):
+        top=round(.8*tot)
+        bot=round(.2*tot)
+        imgpatch=Flats[bot:top]
+    else:
+        imgpatch=Flats
 
 
-    imgpatch=Flats[bot:top]
 
     mean=np.mean(imgpatch)
     std=np.std(imgpatch)
-
 
 
 
