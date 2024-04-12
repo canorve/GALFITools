@@ -11,7 +11,7 @@ from  galfitools.mge.mge2galfit import GetAxis
 from astropy.io import fits
 
 
-def SkyRing(image, mask, ds9regfile, width, center):
+def SkyRing(image, mask, ds9regfile, width, center, outliers):
     """Computes the sky using gradient over rings """
 
 
@@ -44,7 +44,7 @@ def SkyRing(image, mask, ds9regfile, width, center):
 
     mean, std, median, rad = SkyCal().GetEllipSky(datimg,maskimg,xpeak,ypeak,
                                                         theta,q,Rkron,width,
-                                                        "ring.fits","ringmask.fits")
+                                                        "ring.fits","ringmask.fits", outliers=outliers)
 
 
 
@@ -170,7 +170,9 @@ class SkyCal:
 
         ########################################
         ########################################
-
+        if self.outliers:   # eliminate top 80% and bottom 20%
+             print("removing top 80% and bottom 20% for every ring")
+ 
 
 
         #computing sky in every ring
@@ -224,7 +226,7 @@ class SkyCal:
 
                     print("sky computed in ring {} ".format(savidx+2))
                     
-                    print("Ring radius = {:.2f} marked in {} ".format(radius[1:-1][savidx],namering))
+                    print("Ring radius = {:.2f} ".format(radius[1:-1][savidx]))
                     print("the counts value within ring represent the long axis") 
                     self.img[ymin - 1:ymax, xmin - 1:xmax][maskring] = radius[1:-1][savidx] 
                     break

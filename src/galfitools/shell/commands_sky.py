@@ -124,6 +124,7 @@ def mainSkyRing():
     parser.add_argument("-c","--center", action="store_true", help="use the center of the ellipse. Otherwise it will use the (x,y) position with the highest value of the ellipse")
 
 
+    parser.add_argument("-ol","--outliers", action="store_true", help="Removes the top 80%% and botttom 20%% of the pixel values to compute sky within ring")
   
     # arguments with inputs
 
@@ -141,11 +142,11 @@ def mainSkyRing():
     ds9regfile = args.Ds9regFile
     width = args.width
     center = args.center
-
+    outliers = args.outliers
 
 
     ##end input
-    mean, std, median, rad = SkyRing(image, mask, ds9regfile, width, center)
+    mean, std, median, rad = SkyRing(image, mask, ds9regfile, width, center, outliers)
 
 
 
