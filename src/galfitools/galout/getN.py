@@ -96,7 +96,11 @@ def getN(galfitFile: str, dis: int, frac: float, angle: float,
 
     comps2 =  copy.deepcopy(comps)
     meanme = GetMe().MeanMe(totmag, EffRad*head.scale)
-    me = GetMe().Me(head, comps2, 0, theta) #substituing effective radius per 0 gives m0
+    #me = GetMe().Me(head, comps2, 0, theta) #substituing effective radius per 0 gives m0
+    me = GetMe().Me(head, comps2, EffRad*head.scale, theta) #substituing effective radius per 0 gives m0
+
+
+
 
     line = 'Mean Surface Brightness at effective radius: {:.2f} mag/\" \n'.format(meanme)
     #print(line)
@@ -195,7 +199,6 @@ class GetN:
 
         a = 0.1
         b = 12
-
 
         Sersic = self.solveSer(a, b, me, meanme)
 

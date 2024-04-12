@@ -111,8 +111,8 @@ def test_getFWHM():
    
     num_comp = 1 
 
-    fwhm, N, theta = getFWHM(galfitFile, dis, angle, num_comp)
 
+    fwhm, fwhm_arc, N, theta = getFWHM(galfitFile, dis, angle, num_comp)
 
     result = 8.81 
 
@@ -178,7 +178,10 @@ def test_getReComp():
     num_comp = 1 
     angle = None 
 
-    EffRad, totmag, meanme, me, N, theta = getReComp(galfitFile, dis, eff, angle, num_comp)
+
+
+    EffRad, EffRad_arc, totmag, meanme, me, N, theta = getReComp(galfitFile, dis, eff, angle, num_comp)
+
 
     result = 97.82 
     tol = 1e-2
@@ -384,8 +387,8 @@ def test_photDs9():
     sky = 0 
 
 
-    mag = photDs9(ImageFile, RegFile, maskfile, zeropoint, sky)
 
+    mag, exptime = photDs9(ImageFile, RegFile, maskfile ,zeropoint, sky)
 
 
     result =  11.71

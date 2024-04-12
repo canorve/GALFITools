@@ -93,7 +93,7 @@ def test_SkyDs9():
     maskfile = "none"
  
 
-    mean, sig = SkyDs9(ImageFile, RegFile, maskfile) 
+    mean, sig = SkyDs9(ImageFile, RegFile, maskfile, outliers=True) 
 
 
     tol = 1e-2
@@ -135,7 +135,7 @@ def test_skyring():
 
 
     ##end input
-    mean, std, median, rad = SkyRing(image, mask, ds9regfile, width, center)
+    mean, std, median, rad = SkyRing(image, mask, ds9regfile, width, center,outliers=True)
 
     tol = 1e-2
 
