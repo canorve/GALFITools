@@ -28,9 +28,8 @@
     :alt: Project generated with PyScaffold
     :target: https://pyscaffold.org/
 
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.10968602.svg
-  :target: https://doi.org/10.5281/zenodo.10968602
-
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.8216472.svg 
+  :target: https://doi.org/10.5281/zenodo.8216472 
 
 ==========
 GALFITools
@@ -177,9 +176,7 @@ The codebase of GALFITools is governed by the terms of the **MIT** license.
 To acknowledge the utility of GALFITools in your research, 
 we kindly request that you cite it as follows:
 
-Añorve, Christopher. (2023). canorve/GALFITools: 
-GALFITools v0.15.2 (v0.15.2). Zenodo. https://doi.org/10.5281/zenodo.8216473
-
+Añorve, C. (2024). canorve/GALFITools: GALFITools v1.7.0 (v1.7.0). Zenodo. https://doi.org/10.5281/zenodo.10968602
 
 
 --------------------------
