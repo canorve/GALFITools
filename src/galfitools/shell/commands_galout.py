@@ -339,12 +339,13 @@ def mainGetReComp() -> None:
     line = 'Total Magnitude of the galaxy: {:.2f} \n'.format(totmag)
     print(line)
 
-    line = 'Surface brightness at effective radius (\u03BCe): {:.2f} mag/\" \n'.format(me)
+    line = 'Surface brightness at radius of {:.0f}% of light (\u03BCr): {:.2f} mag/\" \n'.format(eff*100,me)
     print(line)
 
 
     line = 'Mean Surface Brightness at effective radius (<\u03BC>e): {:.2f} mag/\" \n'.format(meanme)
-    print(line)
+    if(eff == 0.5):
+        print(line)
 
     line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
     print(line)
