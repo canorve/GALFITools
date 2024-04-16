@@ -9,11 +9,14 @@ from  galfitools.mge.mge2galfit import GetPmax
 from  galfitools.mge.mge2galfit import GetAxis
 
 from astropy.io import fits
-
+import os
 
 def SkyRing(image, mask, ds9regfile, width, center, outliers):
     """Computes the sky using gradient over rings """
 
+
+    assert os.path.exists(image),"image file does not exists"
+    assert os.path.exists(mask),"mask file does not exists"
 
     ##end input
     obj, xpos, ypos, rx, ry, angle = GetInfoEllip(ds9regfile)
@@ -44,7 +47,7 @@ def SkyRing(image, mask, ds9regfile, width, center, outliers):
 
     mean, std, median, rad = SkyCal().GetEllipSky(datimg,maskimg,xpeak,ypeak,
                                                         theta,q,Rkron,width,
-                                                        "ring.fits","ringmask.fits", outliers=outliers)
+                                                        "skyring.fits","ringmask.fits", outliers=outliers)
 
 
 
@@ -165,9 +168,6 @@ class SkyCal:
             val += 1 
 
 
-        #hdu[0].data=masksky
-        #hdu.writeto(self.ringmask,overwrite=True) 
-
         ########################################
         ########################################
         if self.outliers:   # eliminate top 80% and bottom 20%
@@ -238,8 +238,11 @@ class SkyCal:
                 print("The edge of image has been reached. Sky can not be computed")
                 return 0,0,0,0
 
+        hduout = fits.PrimaryHDU()
+        hduout.data=self.img
+        hduout.writeto(namering,overwrite=True) 
 
-        #hdu[0].data=self.img
+
         #hdu.writeto(namering,overwrite=True) 
 
         finmean,finmedian,finstd,finRad = sky[1:-1][gradmask],skymed[1:-1][gradmask],skystd[1:-1][gradmask],radius[1:-1][gradmask]
