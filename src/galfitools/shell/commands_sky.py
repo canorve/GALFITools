@@ -119,9 +119,11 @@ def mainSkyRing():
     # required arguments
     parser.add_argument("Image",help="Fits image of the objects")
 
-    parser.add_argument("MaskFile",help="Fits Mask image")
-
     parser.add_argument("Ds9regFile", help="the DS9 ellipse region file")
+
+
+    parser.add_argument("-m","--mask", type=str, help="Fits Mask image")
+
 
     parser.add_argument("-c","--center", action="store_true", help="use the center of the ellipse. Otherwise it will use the (x,y) position with the highest value of the ellipse")
 
@@ -140,7 +142,7 @@ def mainSkyRing():
     args = parser.parse_args()
 
     image = args.Image
-    mask = args.MaskFile
+    mask = args.mask
     ds9regfile = args.Ds9regFile
     width = args.width
     center = args.center

@@ -16,7 +16,9 @@ def SkyRing(image, mask, ds9regfile, width, center, outliers):
 
 
     assert os.path.exists(image),"image file does not exists"
-    assert os.path.exists(mask),"mask file does not exists"
+
+    if mask:
+        assert os.path.exists(mask),"mask file does not exists"
 
     ##end input
     obj, xpos, ypos, rx, ry, angle = GetInfoEllip(ds9regfile)
@@ -27,11 +29,13 @@ def SkyRing(image, mask, ds9regfile, width, center, outliers):
     hdu = fits.open(image)
     datimg = hdu[0].data
     hdu.close()
- 
-    hdumask = fits.open(mask)
-    maskimg = hdumask[0].data
-    hdumask.close()
 
+    if mask:
+        hdumask = fits.open(mask)
+        maskimg = hdumask[0].data
+        hdumask.close()
+    else:
+        maskimg=None
 
 
     (ncol, nrow) = GetAxis(image)
@@ -43,6 +47,7 @@ def SkyRing(image, mask, ds9regfile, width, center, outliers):
         (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, eps, ncol, nrow)
         xpeak, ypeak = GetPmax(datimg, maskimg, xmin, xmax, ymin, ymax)
  
+
 
 
     mean, std, median, rad = SkyCal().GetEllipSky(datimg,maskimg,xpeak,ypeak,
@@ -58,7 +63,7 @@ def SkyRing(image, mask, ds9regfile, width, center, outliers):
 class SkyCal:
     "computes sky background "
 
-    def GetEllipSky(self, ImageFile, MaskFile, xx, yy, thetadeg, q, Rinit, width,namering,ringmask,outliers=True):
+    def GetEllipSky(self, ImageFile, MaskImg, xx, yy, thetadeg, q, Rinit, width,namering,ringmask,outliers=True):
         "Gradient sky method"
 
         self.xx = xx 
@@ -81,7 +86,10 @@ class SkyCal:
         #hdumask = fits.open(MaskFile)
         #self.maskimg = hdumask[0].data
         #hdumask.close()
-        self.maskimg = MaskFile.copy()
+        if MaskImg:
+            self.maskimg = MaskImg.copy()
+        else:
+            self.maskimg=None
 
 
 
@@ -114,10 +122,13 @@ class SkyCal:
 
         theta = self.thetadeg * np.pi / 180  # Rads!!!
 
-        patch = self.maskimg[ymin - 1:ymax, xmin - 1:xmax] # logical patch mask image
 
-        self.invpatch=np.logical_not(patch)
+        if self.maskimg: 
+            patch = self.maskimg[ymin - 1:ymax, xmin - 1:xmax] # logical patch mask image
 
+            self.invpatch = np.logical_not(patch)
+        else:
+            self.invpatch = None
 
         Rings=np.arange(self.Rinit,self.R,self.width) # anillos de tamaño width
 
@@ -192,9 +203,9 @@ class SkyCal:
 
 
             if self.outliers:   # eliminate top 80% and bottom 20%
-                imgpatch=flatimg[bot:top]
+                imgpatch = flatimg[bot:top]
             else:
-                imgpatch=flatimg
+                imgpatch = flatimg
 
             mean=np.mean(imgpatch)
             std=np.std(imgpatch)
@@ -258,7 +269,8 @@ class SkyCal:
 
         maskring = masksky == ring 
 
-        maskring=maskring*self.invpatch
+        if self.invpatch:
+            maskring = maskring*self.invpatch
 
         ringcont=0
 
@@ -272,7 +284,8 @@ class SkyCal:
 
             maskring = masksky == ring 
 
-            maskring=maskring*self.invpatch
+            if self.invpatch:
+                maskring=maskring*self.invpatch
 
 
             ringcont+=1 # avoid eternal loop
@@ -285,7 +298,7 @@ class SkyCal:
 
 
 
-        return maskring,idx
+        return maskring, idx
 
 
     def CorSize(self,xell,yell):
