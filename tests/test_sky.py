@@ -157,8 +157,8 @@ def test_skyring():
 
     #assert os.path.isfile("ring.fits")
 
-    #if os.path.isfile("ring.fits"):
-    #    os.remove("ring.fits")
+    if os.path.isfile("skyring.fits"):
+        os.remove("skyring.fits")
 
     #assert os.path.isfile("ringmask.fits")
 

@@ -35,7 +35,7 @@ def SkyRing(image, mask, ds9regfile, width, center, outliers):
         maskimg = hdumask[0].data
         hdumask.close()
     else:
-        maskimg=None
+        maskimg = np.array([])
 
 
     (ncol, nrow) = GetAxis(image)
@@ -86,10 +86,11 @@ class SkyCal:
         #hdumask = fits.open(MaskFile)
         #self.maskimg = hdumask[0].data
         #hdumask.close()
-        if MaskImg:
+
+        if MaskImg.any():
             self.maskimg = MaskImg.copy()
         else:
-            self.maskimg=None
+            self.maskimg = np.array([])
 
 
 
@@ -123,12 +124,12 @@ class SkyCal:
         theta = self.thetadeg * np.pi / 180  # Rads!!!
 
 
-        if self.maskimg: 
+        if self.maskimg.any(): 
             patch = self.maskimg[ymin - 1:ymax, xmin - 1:xmax] # logical patch mask image
 
             self.invpatch = np.logical_not(patch)
         else:
-            self.invpatch = None
+            self.invpatch = np.array([])
 
         Rings=np.arange(self.Rinit,self.R,self.width) # anillos de tamaño width
 
@@ -269,7 +270,7 @@ class SkyCal:
 
         maskring = masksky == ring 
 
-        if self.invpatch:
+        if self.invpatch.any():
             maskring = maskring*self.invpatch
 
         ringcont=0
@@ -284,7 +285,7 @@ class SkyCal:
 
             maskring = masksky == ring 
 
-            if self.invpatch:
+            if self.invpatch.any():
                 maskring=maskring*self.invpatch
 
 
