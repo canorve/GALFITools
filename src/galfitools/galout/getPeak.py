@@ -38,6 +38,8 @@ def getPeak(image: str, regfile: str, center: bool, maskfile: str)-> None:
 
     #mask = np.array([]) #empty for the moment
 
+    i = 0
+
     hdu = fits.open(image)
     img = hdu[i].data
 

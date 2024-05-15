@@ -757,7 +757,7 @@ def maingetPeak():
 
 
     parser.add_argument("Image", help = "image fits file")
-    parser.add_argument("Regfile", help = "DS9 ellipse region file")
+    parser.add_argument("RegFile", help = "DS9 ellipse region file")
 
 
     parser.add_argument("-c","--center", action="store_true", help="takes center of ds9 region file")
@@ -776,11 +776,10 @@ def maingetPeak():
 
     print("peak is at (x, y) = ", X, Y)
 
-    print("axis ratio q = ", AxRat) 
-    print("angular position = ", PA) 
+    print("axis ratio q = {:.2f} ".format(AxRat))
+    print("angular position = {:.2f}".format(PA)) 
 
 
-    print("conversion to CSV file done.")
 
 
 
