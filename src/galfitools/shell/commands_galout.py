@@ -21,9 +21,9 @@ from galfitools.galout.showcube import displayCube
 
 from galfitools.galout.PhotDs9 import photDs9 
 
-
 from galfitools.galout.getCOW import getCOW
 
+from galfitools.galout.getPeak import getPeak
 
 from galfitools.galout.fitlog2csv import log2csv 
 
@@ -611,8 +611,6 @@ def mainMissingLight() -> None:
 
 
 
-
-
 def mainShowCube():
 
 
@@ -668,6 +666,7 @@ def maingetCOW() -> None:
     parser.add_argument("-pf","--plotfile", type=str, help="name of the plot file", default='cow.png')
 
     parser.add_argument("-g","--galfitF2", type=str, help="Second GALFIT file to add to the plot (optional) ")
+
 
     parser.add_argument("-md","--maxdiff", action="store_true", help="plot the maximum difference between model 1 and 2 (a vertical line) ")
 
@@ -745,5 +744,45 @@ def mainFitlog2CSV():
     log2csv(num, fileout)
 
     print("conversion to CSV file done.")
+
+
+
+
+
+def maingetPeak(): 
+
+    printWelcome()
+
+    parser = argparse.ArgumentParser(description="Obtains the center, axis ratio and angular position")
+
+
+    parser.add_argument("Image", help = "image fits file")
+    parser.add_argument("Regfile", help = "DS9 ellipse region file")
+
+
+    parser.add_argument("-c","--center", action="store_true", help="takes center of ds9 region file")
+    parser.add_argument("-m","--mask", type=str, help="the mask file")
+
+    args = parser.parse_args()
+
+    image = args.Image
+    regfile = args.RegFile
+    center = args.center
+    maskfile = args.mask
+
+
+    X, Y, AxRat, PA = getPeak(image, regfile, center, maskfile)
+
+
+    print("peak is at (x, y) = ", X, Y)
+
+    print("axis ratio q = ", AxRat) 
+    print("angular position = ", PA) 
+
+
+    print("conversion to CSV file done.")
+
+
+
 
 
