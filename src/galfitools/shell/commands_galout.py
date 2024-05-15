@@ -753,7 +753,7 @@ def maingetPeak():
 
     printWelcome()
 
-    parser = argparse.ArgumentParser(description="Obtains the center, axis ratio and angular position")
+    parser = argparse.ArgumentParser(description="Obtains the center, axis ratio and angular position from DS9 region")
 
 
     parser.add_argument("Image", help = "image fits file")

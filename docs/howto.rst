@@ -510,6 +510,20 @@ equal
                           the name of the output file 
 
 
+**getPeak**  Obtains the center, axis ratio and angular position from DS9 region
+::
+
+    positional arguments:
+      Image                 image fits file
+      RegFile               DS9 ellipse region file
+
+    options:
+      -h, --help            show this help message and exit
+      -c, --center          takes center of ds9 region file
+      -m MASK, --mask MASK  the mask file
+
+
+
 
 **MGE**
 ---------------

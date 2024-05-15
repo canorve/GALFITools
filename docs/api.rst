@@ -801,24 +801,24 @@ equal
 
     args = parser.parse_args()
 
-    ImageFile =  the image file where the photometry will be computed
+    #ImageFile =  the image file where the photometry will be computed
 
-    RegFile = the DS9 region file
+    #RegFile = the DS9 region file
 
 
 
     #optional for argparse
 
-    zeropoint: magnitude zeropoint 
-    sky: sky background value to be removed from computation 
+    #zeropoint: magnitude zeropoint 
+    #sky: sky background value to be removed from computation 
 
 
     mag, exptime = photDs9(ImageFile, RegFile, zeropoint, sky)
 
     #output
 
-    mag: magnitud of the Ds9 regions 
-    exptime: exposition time of the image 
+    #mag: magnitud of the Ds9 regions 
+    #exptime: exposition time of the image 
 
 
 
@@ -833,13 +833,38 @@ equal
 
     #optional for argparse
 
-    zeropoint: number of the fit to be extracted. Default: last one 
-    fileout: name of the output file 
+    #zeropoint: number of the fit to be extracted. Default: last one 
+    #fileout: name of the output file 
 
 
     log2csv(num, fileout)
 
 
+
+**getPeak**  Obtains the center, axis ratio and angular position from DS9 region
+::
+
+
+    from galfitools.galout.getPeak import getPeak 
+
+    args = parser.parse_args()
+
+    # image: image fits file
+    #regfile: DS9 ellipse region file 
+
+    #optional for argparse
+    # center: optional flag to indicate that center of ds9 file will used instead 
+    # maskfile: mask fits file 
+
+
+    X, Y, AxRat, PA = getPeak(image, regfile, center, maskfile)
+
+
+    #output
+
+    # X, Y: position of the center (peak: coordinate with the highest value) 
+    # AxRat: axis ratio of ellipse
+    # PA: angular position  measured from Y-axis
 
 
 
