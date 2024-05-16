@@ -69,7 +69,7 @@ class SkyCal:
         self.xx = xx 
         self.yy = yy
 
-        self.thetadeg = 90 + thetadeg
+        self.thetadeg =  thetadeg + 90 
         self.q = q
         self.e = (1 - self.q)
         self.Rinit = Rinit
@@ -325,6 +325,9 @@ class SkyCal:
         "this subroutine get the coordinates of the border"
 
         q =  self.q
+
+        if self.thetadeg > 360:
+            self.thetadeg = self.thetadeg - 360 #quick fix
 
         theta = self.thetadeg * (np.pi / 180)  # rads!!
 
