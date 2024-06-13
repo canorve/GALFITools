@@ -1009,7 +1009,7 @@ def Ds9ell2Kronell(xpos,ypos,rx,ry,angle):
         q = ry/rx
         e = 1 - q
         Rkron = rx
-        theta = angle + 90
+        theta = angle - 90
         xx = xpos
         yy = ypos
     else:
