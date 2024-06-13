@@ -2,7 +2,7 @@
 
 import numpy as np 
 
-from  galfitools.sky.SkyDs9 import Ds9ell2Kronell
+from  galfitools.mge.mge2galfit import Ds9ell2Kronellv2
 from  galfitools.mge.mge2galfit import GetInfoEllip
 from  galfitools.mge.mge2galfit import GetSize
 from  galfitools.mge.mge2galfit import GetPmax
@@ -22,7 +22,7 @@ def SkyRing(image, mask, ds9regfile, width, center, outliers):
 
     ##end input
     obj, xpos, ypos, rx, ry, angle = GetInfoEllip(ds9regfile)
-    xx, yy, Rkron, theta, eps = Ds9ell2Kronell(xpos,ypos,rx,ry,angle)
+    xx, yy, Rkron, theta, eps = Ds9ell2Kronellv2(xpos,ypos,rx,ry,angle)
 
     q = 1 - eps
 
