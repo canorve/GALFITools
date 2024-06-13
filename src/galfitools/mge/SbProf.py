@@ -26,7 +26,7 @@ from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,NullFormatter
 
 from galfitools.galin.MaskDs9 import GetAxis 
 
-from galfitools.mge.mge2galfit import GetInfoEllip, Ds9ell2Kronell, GetSize, GetPmax 
+from galfitools.mge.mge2galfit import GetInfoEllip, Ds9ell2Kronellv2, GetSize, GetPmax 
 
 import argparse
 
@@ -89,7 +89,7 @@ def sbProf(args):
  
 
     obj, xpos, ypos, rx, ry, angle2 = GetInfoEllip(conf.ds9reg)
-    xx, yy, Rkron, theta, eps = Ds9ell2Kronell(xpos,ypos,rx,ry,angle2)
+    xx, yy, Rkron, theta, eps = Ds9ell2Kronellv2(xpos,ypos,rx,ry,angle2)
 
     if center:
         print('center of ds9 ellipse region will be used')
@@ -234,8 +234,8 @@ def SectPhot(conf, dataimg, n_sectors = 19, minlevel = 0):
 
 
     # and angle is different as well:
-    angsec = 90 - conf.parg
-    #    angsec=ang
+    #angsec = 90 - conf.parg
+    angsec=conf.parg
 
     ###################################################
     #if fit == 'gal':

@@ -48,7 +48,7 @@ def getPeak(image: str, regfile: str, center: bool, maskfile: str)-> None:
     (ncol, nrow) = GetAxis(image)
     
     obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
-    xx, yy, Rkron, theta, eps = Ds9ell2Kronell(xpos,ypos,rx,ry,angle)
+    xx, yy, Rkron, theta, eps = Ds9ell2Kronellv2(xpos,ypos,rx,ry,angle)
 
 
     if center:
@@ -147,7 +147,7 @@ def GetInfoEllip(regfile):
 
 
 
-def Ds9ell2Kronell(xpos,ypos,rx,ry,angle):
+def Ds9ell2Kronellv2(xpos,ypos,rx,ry,angle):
 
     if rx >= ry:
 
