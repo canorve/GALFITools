@@ -2,7 +2,7 @@
 
 import numpy as np 
 
-from  galfitools.mge.mge2galfit import Ds9ell2Kronell
+from  galfitools.sky.SkyDs9 import Ds9ell2Kronell
 from  galfitools.mge.mge2galfit import GetInfoEllip
 from  galfitools.mge.mge2galfit import GetSize
 from  galfitools.mge.mge2galfit import GetPmax
