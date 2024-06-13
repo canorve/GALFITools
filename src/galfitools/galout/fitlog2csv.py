@@ -34,7 +34,6 @@ def log2csv(num:int, fileout: str):
 
     if num:
         #use user number 
-        num=4 #number to be readed from argpaser
         index = idxfits[0][2*num-2]
         cnt=num*2-1
     else:
