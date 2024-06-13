@@ -267,14 +267,20 @@ class Galfit():
 
                 if tmp[0] == "I)":     # convolution size 
                     galhead.convx = int(tmp[1])
-                    galhead.convy = int(tmp[2])
+                    try:
+                        galhead.convy = int(tmp[2])
+                    except:
+                        galhead.convy = galhead.convx 
 
                 if tmp[0] == "J)":     # mgzpt
                     galhead.mgzpt = float(tmp[1])
 
                 if tmp[0] == "K)":     # plate scale
                     galhead.scale = float(tmp[1])
-                    galhead.scaley = float(tmp[2])
+                    try:
+                        galhead.scaley = float(tmp[2])
+                    except:
+                        galhead.scaley = galhead.scale 
 
                 if tmp[0] == "O)":     # display 
                     galhead.display = tmp[1]
@@ -390,13 +396,22 @@ class Galfit():
                         Expfree = int(tmp[2])
                     if tmp[0] == "6)": 
                         Exp2 = float(tmp[1])
-                        Exp2free = int(tmp[2])
+                        try:
+                            Exp2free = int(tmp[2])
+                        except:
+                            Exp2free = 0 
                     if tmp[0] == "7)":  
                         Exp3 = float(tmp[1])
-                        Exp3free = int(tmp[2])
+                        try:
+                            Exp3free = int(tmp[2])
+                        except:
+                            Exp3free = 0 
                     if tmp[0] == "9)":
                         AxRat = float(tmp[1])
-                        AxRatfree = int(tmp[2])
+                        try:
+                            AxRatfree = int(tmp[2])
+                        except:
+                            AxRatfree = 0 
                     if tmp[0] == "10)":
                         PosAng = float(tmp[1])
                         PosAngfree = int(tmp[2])
