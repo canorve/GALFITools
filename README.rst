@@ -156,6 +156,24 @@ usage, accessible via the following link:
 This comprehensive resource elaborates on the 
 practical implementation of each individual routine.
 
+
+***Tutorial***
+
+Here is a tutorial video for galaxy NGC720 using GALFITools:
+
+.. image:: https://img.youtube.com/vi/2npeGmC1mCg/maxresdefault.jpg
+    :alt: IMAGE ALT TEXT HERE
+    :target: https://www.youtube.com/watch?v=2npeGmC1mCg
+
+Here is another for galaxy NGC1198 using GALFITools:
+
+.. image:: https://img.youtube.com/vi/VmJJkKVd37U/maxresdefault.jpg
+    :alt: IMAGE ALT TEXT HERE
+    :target: https://www.youtube.com/watch?v=VmJJkKVd37U
+
+
+
+
 ---------------------
 
 **API Reference**
