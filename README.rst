@@ -112,7 +112,11 @@ Alternatively, you can install it via pip:
 
 Here is tutorial for the installation of GALFITools:
 
-..  youtube:: rqZLxR1yRCs  
+
+.. image:: https://img.youtube.com/vi/rqZLxR1yRCs/maxresdefault.jpg
+    :alt: IMAGE ALT TEXT HERE
+    :target: https://www.youtube.com/watch?v=rqZLxR1yRCs
+
 
 
 
