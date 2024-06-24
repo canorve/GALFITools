@@ -23,7 +23,6 @@ def SkyRing(image, mask, ds9regfile, width, center, outliers):
     ##end input
     obj, xpos, ypos, rx, ry, angle = GetInfoEllip(ds9regfile)
     xx, yy, Rkron, theta, eps = Ds9ell2Kronellv2(xpos,ypos,rx,ry,angle)
-
     q = 1 - eps
 
     hdu = fits.open(image)
@@ -335,7 +334,11 @@ class SkyCal:
         thetay=np.sqrt((q**2)*(np.cos(theta))**2 + (np.sin(theta))**2 )
 
 
-        if (self.thetadeg >-45 and self.thetadeg <= 45):
+        if self.thetadeg < 0:
+            self.thetadeg = 360 - self.thetadeg
+
+
+        if (self.thetadeg > 315 or self.thetadeg <= 45):
 
             xmax=self.ncol
             xmin =1
@@ -347,7 +350,7 @@ class SkyCal:
             else:
                 R = R2
 
-        elif (self.thetadeg >45 and self.thetadeg <= 135):
+        elif (self.thetadeg > 45 and self.thetadeg <= 135):
             ymax=self.nrow
             ymin =1
             R1 = (ymax - self.yy)/thetay
@@ -358,7 +361,7 @@ class SkyCal:
             else:
                 R = R2
 
-        elif (self.thetadeg >135 and self.thetadeg <= 225):
+        elif (self.thetadeg > 135 and self.thetadeg <= 225):
             xmax=1
             xmin =self.ncol
 
@@ -371,7 +374,7 @@ class SkyCal:
                 R = R2
 
      
-        elif (self.thetadeg >225 and self.thetadeg <= 315):
+        elif (self.thetadeg > 225 and self.thetadeg <= 315):
             ymax=1
             ymin =self.nrow
             R1 = (ymax - self.yy)/thetay
