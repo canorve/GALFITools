@@ -462,9 +462,9 @@ def maingetSersic():
     obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
 
     if rx >= ry:
-        Re = rx
+        Re = rx/4 #wild guess
     else:
-        Re = ry
+        Re = ry/4 #same
 
 
     print("the Sersic component of the DS9 ellipse region is: ")
