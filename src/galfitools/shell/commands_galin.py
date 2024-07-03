@@ -426,6 +426,8 @@ def maingetSersic():
     regfile = args.RegFile
     center = args.center
     maskfile = args.mask
+    zerpoint = args.zeropoint
+    sky = args.sky
 
 
     X, Y, AxRat, PA = getPeak(image, regfile, center, maskfile)
