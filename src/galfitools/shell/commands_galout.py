@@ -137,7 +137,15 @@ def mainGetBreak() -> None:
     print(line)
 
 
-    line = 'The break radius is {:.2f} pixels \n'.format(rbreak)
+    galfit = Galfit(galfitFile)
+
+    head = galfit.ReadHead()
+
+    plate = head.scale 
+    rbreak_arc = rbreak*plate
+ 
+
+    line = 'The break radius is {:.2f} pixels or {:.2f} "  \n'.format(rbreak,rbreak_arc)
     print(line)
 
 
@@ -178,13 +186,23 @@ def mainGetBreak2():
     rbreak, N, theta =  getBreak2(galfitFile, dis, angle, num_comp, plot, ranx)
 
 
+    galfit = Galfit(galfitFile)
+
+    head = galfit.ReadHead()
+
+    plate = head.scale 
+    rbreak_arc = rbreak*plate
+ 
+
+
+
     print('number of model components: ',N)
 
     line = 'Using a theta value of: {:.2f} degrees\n'.format(theta)
     print(line)
 
 
-    line = 'The break radius is {:.2f} pixels \n'.format(rbreak)
+    line = 'The break radius is {:.2f} pixels or {:.2f} " \n'.format(rbreak, rbreak_arc)
     print(line)
 
 
@@ -303,9 +321,17 @@ def mainKappa() -> None:
 
     rkappa, N, theta = getKappa(galfitFile, dis, inicomp, quick, random, angle, num_comp, plot, ranx) 
 
+    galfit = Galfit(galfitFile)
+
+    head = galfit.ReadHead()
+
+    plate = head.scale 
+    rkappa_arc = rkappa*plate
+ 
+
     print('number of model components: ',N)
 
-    line = 'The Kappa radius  is {:.2f} pixels \n'.format(rkappa)
+    line = 'The Kappa radius  is {:.2f} pixels or {:.2f} " \n'.format(rkappa, rkappa_arc)
     print(line)
 
 
@@ -577,6 +603,13 @@ def mainGetBulgeRad() -> None:
 
     rbulge, N1, N2, theta = getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx)
 
+    galfit = Galfit(galfitFile)
+
+    head = galfit.ReadHead()
+
+    plate = head.scale 
+    rbulge_arc = rbulge*plate
+ 
 
     print('number of model components for the bulge: ',N1)
     print('number of model components for the rest of the galaxy: ',N2)
@@ -586,7 +619,7 @@ def mainGetBulgeRad() -> None:
     print(line)
 
 
-    line = 'The bulge radius is {:.2f} pixels \n'.format(rbulge)
+    line = 'The bulge radius is {:.2f} pixels or {:.2f} "  \n'.format(rbulge)
     print(line)
 
 
