@@ -426,7 +426,7 @@ def maingetSersic():
     regfile = args.RegFile
     center = args.center
     maskfile = args.mask
-    zerpoint = args.zeropoint
+    zeropoint = args.zeropoint
     sky = args.sky
 
 
