@@ -534,9 +534,8 @@ def getFWHM(galfitFile: str, dis: int, angle: float, num_comp: int):
 
     fwhm = GetFWHM().FindFWHM(comps, theta) 
 
-    fwhm_arc = fwhm * head.scale
 
-    return fwhm, fwhm_arc, N, theta
+    return fwhm, N, theta
 
 
 
@@ -1059,9 +1058,9 @@ def getReComp(galfitFile: str, dis: int, eff: float, angle: float, num_comp: int
     meanme = GetMe().MeanMe(totmag, EffRad*head.scale)
     me = GetMe().Me(head, comps, EffRad*head.scale, theta)
 
-    EffRad_arc = EffRad*head.scale
+    #EffRad_arc = EffRad*head.scale
 
-    return EffRad, EffRad_arc, totmag, meanme, me, N, theta 
+    return EffRad, totmag, meanme, me, N, theta 
 
 
 

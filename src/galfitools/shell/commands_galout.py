@@ -27,6 +27,12 @@ from galfitools.galout.getPeak import getPeak
 
 from galfitools.galout.fitlog2csv import log2csv 
 
+
+
+from galfitools.galin.galfit import Galfit, conver2Sersic, SelectGal, numComps, GetRadAng
+
+
+
 def mainPhotDs9(): 
 
     printWelcome()
@@ -217,7 +223,16 @@ def mainFWHM() -> None:
    
     num_comp =  args.numcomp
 
-    fwhm, fwhm_arc, N, theta = getFWHM(galfitFile, dis, angle, num_comp)
+    fwhm, N, theta = getFWHM(galfitFile, dis, angle, num_comp)
+
+
+    galfit = Galfit(galfitFile)
+
+    head = galfit.ReadHead()
+
+    plate = head.scale 
+    fwhm_arc = fwhm*plate
+ 
 
 
     print('number of model components: ',N)
@@ -225,10 +240,7 @@ def mainFWHM() -> None:
     line = 'Using a theta value of : {:.2f} degrees\n'.format(theta)
     print(line)
 
-    line = 'The FWHM is {:.2f} pixels \n'.format(fwhm)
-    print(line)
-
-    line = 'The FWHM is {:.2f}"  \n'.format(fwhm_arc)
+    line = 'The FWHM is {:.2f} pixels or {:.2f} " \n'.format(fwhm, fwhm_arc)
     print(line)
 
 
@@ -329,7 +341,19 @@ def mainGetReComp() -> None:
     num_comp =  args.numcomp
     angle = args.angle
 
-    EffRad, EffRad_arc, totmag, meanme, me, N, theta = getReComp(galfitFile, dis, eff, angle, num_comp)
+
+
+    EffRad,  totmag, meanme, me, N, theta = getReComp(galfitFile, dis, eff, angle, num_comp)
+
+
+    galfit = Galfit(galfitFile)
+
+    head = galfit.ReadHead()
+
+    plate = head.scale 
+    EffRad_arc = EffRad*plate
+ 
+
 
     print('number of model components: ', N)
 
@@ -347,11 +371,9 @@ def mainGetReComp() -> None:
     if(eff == 0.5):
         print(line)
 
-    line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
+    line = 'The radius at {:.0f}% of light is {:.2f} pixels or {:.2f} " \n'.format(eff*100, EffRad, EffRad_arc)
     print(line)
 
-    line = 'The radius at {:.0f}% of light is {:.2f} "  \n'.format(eff*100, EffRad_arc)
-    print(line)
 
 
 
@@ -403,8 +425,18 @@ def maingetSlope() -> None:
 
 
 
-
     rgam, N, theta = getSlope(galfitFile, dis, slope, angle, num_comp, plot, ranx)
+
+
+
+    galfit = Galfit(galfitFile)
+
+    head = galfit.ReadHead()
+
+    plate = head.scale 
+    rgam_arc = rgam*plate
+ 
+
 
 
     print('number of model components: ',N)
@@ -412,7 +444,7 @@ def maingetSlope() -> None:
     line = 'Using a theta value of : {:.2f} degrees\n'.format(theta)
     print(line)
 
-    line = 'The radius with slope {:.2f} is {:.2f} pixels \n'.format(slope,rgam)
+    line = 'The radius with slope {:.2f} is {:.2f} pixels, or {:.2f} " \n'.format(slope,rgam,rgam_arc)
     print(line)
 
 
