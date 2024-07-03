@@ -18,6 +18,9 @@ from galfitools.galin.xy2fits import xy2fits
 
 from galfitools.galin.checkGalFile import checkFile 
 
+from galfitools.galout.getPeak import getPeak
+from galfitools.galout.PhotDs9 import photDs9 
+from galfitools.mge.mge2galfit import GetInfoEllip
 
 from galfitools.shell.prt import printWelcome
 
@@ -395,5 +398,89 @@ def mainGetBoxSizeDs9():
     line="xmin, xmax, ymin, ymax: {} {} {} {} ".format(xmin, xmax, ymin, ymax)
     print(line)
  
+
+def maingetSersic(): 
+
+    printWelcome()
+
+    parser = argparse.ArgumentParser(description="prints the Sersic function from DS9 ellipse region")
+
+
+    parser.add_argument("Image", help = "image fits file")
+    parser.add_argument("RegFile", help = "DS9 ellipse region file")
+
+
+    parser.add_argument("-zp","--zeropoint", type=float, help="The value of the zero point. Default = 25 ",default=25)
+
+
+    parser.add_argument("-sk","--sky", default=0, type=float, help="Sky background value to be removed from image before photometry. Default = 0")
+
+
+
+    parser.add_argument("-c","--center", action="store_true", help="takes center of ds9 region file")
+    parser.add_argument("-m","--mask", type=str, help="the mask file")
+
+    args = parser.parse_args()
+
+    image = args.Image
+    regfile = args.RegFile
+    center = args.center
+    maskfile = args.mask
+
+
+    X, Y, AxRat, PA = getPeak(image, regfile, center, maskfile)
+
+
+    mag, exptime = photDs9(ImageFile, regfile, maskfile ,zeropoint, sky)
+
+
+    print("peak is at (x, y) = ", X, Y)
+
+    print("axis ratio q = {:.2f} ".format(AxRat))
+    print("angular position = {:.2f}".format(PA)) 
+
+
+    # Component number: 1
+    # 0) sersic                 #  Component type
+    # 1) 1004.8679 1004.6602 1 1  #  Position x, y
+    # 3) 13.6692     1          #  Integrated magnitude 
+    # 4) 10.9837     1          #  R_e (effective radius)   [pix]
+    # 5) 0.5000      0          #  Sersic index n (de Vaucouleurs n=4) 
+    # 6) 0.0000      0          #     ----- 
+    # 7) 0.0000      0          #     ----- 
+    # 8) 0.0000      0          #     ----- 
+    # 9) 0.8284      1          #  Axis ratio (b/a)  
+    #10) -34.1784    1          #  Position angle (PA) [deg: Up=0, Left=90]
+    # Z) 0                      #  Skip this model in output image?  (yes=1, no=0)
+
+
+    #guesses for n and Re
+    n = 2
+
+    obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
+
+    if rx >= ry:
+        Re = rx
+    else:
+        Re = ry
+
+
+    print("the Sersic component of the DS9 ellipse region is: ")
+    print("")
+
+    print("Component number: 1")
+    print("0) sersic # Component type")
+    print("1) {:.2f} {:.2f}   # Position x, y".format(X, Y))
+    print("3) {:.2f}          # Integrated magnitude ".format(mag))
+    print("4) {:.2f}          # R_e (effective radius) ".format(Re))
+    print("5) {:.2f}          # Sersic index n  ".format(n))
+    print("6) 0.0000   0      # ----  ")
+    print("7) 0.0000   0      # ----  ")
+    print("8) 0.0000   0      # ----  ")
+    print("9) {:.2f}          # Axis Ratio (b/a)  ".format(AxRat))
+    print("10) {:.2f}         # Position angle (PA)  ".format(PA))
+    print("Z) 0               # Skip this model in output image?  ")
+
+
 
 
