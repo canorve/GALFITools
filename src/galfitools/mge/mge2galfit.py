@@ -167,6 +167,8 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
     (ncol, nrow) = GetAxis(image)
     
     obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
+
+
     xx, yy, Rkron, theta, eps = Ds9ell2Kronellv2(xpos,ypos,rx,ry,angle)
     if center:
         print('center of ds9 ellipse region will be used')
@@ -976,6 +978,13 @@ def GetInfoEllip(regfile):
             axratio = rx/ry 
             eps = 1 - axratio 
             theta = angle 
+
+        #avoids ds9 regions with Area = 0
+        if rx<1:
+            rx=1
+        if ry<1:
+            ry=1
+
 
         return obj, xpos, ypos, rx, ry, angle
         #return eps, theta, xpos, ypos

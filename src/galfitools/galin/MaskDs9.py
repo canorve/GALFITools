@@ -155,7 +155,7 @@ def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool,
 
     maskry = ry < 1
     if maskry.any():
-        rx[maskry] = 1
+        ry[maskry] = 1
     #
 
 
