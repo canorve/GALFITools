@@ -431,7 +431,7 @@ def maingetSersic():
     X, Y, AxRat, PA = getPeak(image, regfile, center, maskfile)
 
 
-    mag, exptime = photDs9(ImageFile, regfile, maskfile ,zeropoint, sky)
+    mag, exptime = photDs9(image, regfile, maskfile ,zeropoint, sky)
 
 
     print("peak is at (x, y) = ", X, Y)
