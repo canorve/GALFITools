@@ -254,6 +254,49 @@ prepare the necessary files for GALFIT input
 
 
 
+**getPeak**  Obtains the center, axis ratio and angular position from DS9 region
+
+::
+
+    positional arguments:
+      Image                 image fits file
+      RegFile               DS9 ellipse region file
+
+    options:
+      -h, --help            show this help message and exit
+      -c, --center          takes center of ds9 region file
+      -m MASK, --mask MASK  the mask file
+
+
+**imarith** makes arithmetic operations on image 
+
+::
+
+    
+  usage: imarith [-h] ImageFile 
+
+  makes arithmetic operations on image 
+
+  positional arguments:
+    ImageFile   The input image
+
+  options:
+
+   -h, --help  show this help message and exit
+
+
+   -o --output    The output image
+
+   -i  --image2   second input image to make arithmetic operations with ImageFile. Image2 must be of the same size of ImageFile. If this second image is provided it will make operations indicated by arithmetic flag ignoring its constant input
+
+   -a   --add   add constant to image pixels
+   -d   --div   divide all pixels by constant
+   -m   --mul   multiply all pixels by constant
+   -s   --sub   substract constant to all pixels
+
+
+
+
 
 **GALFIT OUTPUT**
 -------------------
@@ -508,19 +551,6 @@ equal
     -n NUM, --NUM NUM     the number of the fit to be extracted 
     -o OUTFILE, --fileout OUTFILE 
                           the name of the output file 
-
-
-**getPeak**  Obtains the center, axis ratio and angular position from DS9 region
-::
-
-    positional arguments:
-      Image                 image fits file
-      RegFile               DS9 ellipse region file
-
-    options:
-      -h, --help            show this help message and exit
-      -c, --center          takes center of ds9 region file
-      -m MASK, --mask MASK  the mask file
 
 
 

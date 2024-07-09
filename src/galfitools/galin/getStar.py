@@ -7,7 +7,6 @@ import sys
 import subprocess as sp
 import os.path
 
-import argparse
 
 from galfitools.galin.MaskDs9 import GetAxis 
 from galfitools.galin.MaskDs9 import checkCompHDU

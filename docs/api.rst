@@ -458,6 +458,31 @@ class with the parameters read from sky.
     #RegFile: ds9 box region file
     #xmin, xmax, ymin, ymax box size for fitting region for galfit file option H) 
 
+    
+**imarith** makes arithmetic operations on images 
+
+::
+
+
+    from galfitools.galin.imarith import imarith 
+
+
+    #Imagefile  input image file
+    #output  output image file
+    #image2 second optional input image to perform arithmetic operations
+
+    #add add constant to all pixels on the image
+    #mul multiply constant to all pixels on the image
+    #div divide constant to all pixels on the image 
+    #sub substract constant to all pixels on the image 
+
+    #please perform one arithmetic operation per call to imarith
+
+    imarith(ImageFile, output, image2, add, mul, div, sub)
+
+
+
+
 
 
 **GALFIT OUTPUT**

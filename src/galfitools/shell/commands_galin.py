@@ -18,6 +18,10 @@ from galfitools.galin.xy2fits import xy2fits
 
 from galfitools.galin.checkGalFile import checkFile 
 
+
+from galfitools.galin.imarith import imarith 
+
+
 from galfitools.galout.getPeak import getPeak
 from galfitools.galout.PhotDs9 import photDs9 
 from galfitools.mge.mge2galfit import GetInfoEllip
@@ -485,4 +489,44 @@ def maingetSersic():
 
 
 
+def main_imarith() -> None: 
 
+    printWelcome()
+    #reading arguments parsing
+
+    parser = argparse.ArgumentParser(description = "imarith: makes arithmetics operations on images")
+
+    # required arguments
+    parser.add_argument("ImageFile", help = "The input image")
+
+
+    parser.add_argument("-o", "--output", type=str, default="output.fits", help = "The output image")
+
+    parser.add_argument("-i", "--image2", type=str, help = "second input image to make arithmetic operations with ImageFile. Image2 must be of the same size of ImageFile. If this second image is provided it will make operations indicated by arithmetic flag ignoring its constant input")
+
+    parser.add_argument("-a","--add", type=float, help="add constant to image pixels" )
+    parser.add_argument("-d","--div", type=float, help="divide all pixels by constant" )
+    parser.add_argument("-m","--mul", type=float, help="multiply all pixels by constant" )
+    parser.add_argument("-s","--sub", type=float, help="substract constant to all pixels")
+
+
+
+    ## parsing variables
+
+    args = parser.parse_args()
+
+    Imagefile = args.ImageFile
+    output = args.output
+    image2 = args.image2
+
+    add = args.add
+    mul = args.mul
+    div = args.div
+    sub = args.sub
+
+    imarith(ImageFile, output, image2, add, mul, div, sub)
+
+
+    print("done")
+
+ 
