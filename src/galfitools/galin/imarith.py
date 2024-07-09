@@ -6,7 +6,7 @@ from astropy.io import fits
 import sys
 import os
 
-def imarith(ImageFile: str, output: str image2: str, add: float, mul: float, div: float, sub: float)-> None: 
+def imarith(ImageFile: str, output: str, image2: str, add: float, mul: float, div: float, sub: float)-> None: 
 
     if not os.path.exists(ImageFile):
         print ('{} image filename does not exist!'.format(ImageFile))
