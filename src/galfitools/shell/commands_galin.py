@@ -515,7 +515,7 @@ def main_imarith() -> None:
 
     args = parser.parse_args()
 
-    Imagefile = args.ImageFile
+    ImageFile = args.ImageFile
     output = args.output
     image2 = args.image2
 
