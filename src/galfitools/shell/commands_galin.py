@@ -213,6 +213,8 @@ def mainMaskSky():
     parser.add_argument("-ss","--skysigma",default=0,type=float, help="sigma of the sky background")
     parser.add_argument("-ns","--numbersig",default=1,type=float, help="number of times that the sigma of the sky will be multiplied to remove the sky background")
 
+    parser.add_argument("-r","--region", type=str, help="Ds9 region to remove from mask")
+
     parser.add_argument("-b","--border", action="store_true", help="Mask the borders when their value is zero")
 
     parser.add_argument("-bv","--borValue",default=0,type=float, help="value of the border if it is different from zero")
@@ -224,15 +226,20 @@ def mainMaskSky():
     sky_sig = args.skysigma
     nsig = args.numbersig
 
+    region = args.region
+
     bor_flag = args.border
     borValue = args.borValue
 
 
     skyRem(image, mask, sky_mean, sky_sig, nsig, borValue, bor_flag)
 
+
+    if region:
+        maskDs9(mask, region, 0, None, False, 0)  #remove ds9 region if provided
+
+
     print('Done. Mask file {} created'.format(mask))
-
-
 
 
 def mainxy2fits(): 
