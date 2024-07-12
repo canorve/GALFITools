@@ -15,7 +15,7 @@ def mainMGE():
 
     #parser.add_argument("image", help="the Mask image file to modify or create")
     parser.add_argument("GalfitFile", help="GALFIT file to obtain the header options")
-    parser.add_argument("Ds9regFile", help="the DS9 ellipse region file containing the galaxy")
+    parser.add_argument("Ds9regFile", help="the DS9 ellipse region file containing the galaxy. Ignored if -xy option is used")
     #parser.add_argument("magzpt", help="the magnitude zero point ")
     parser.add_argument("-t","--twist", action="store_true", help="uses twist option for mge ")
     #parser.add_argument("-r","--regu", action="store_true", 
@@ -40,9 +40,9 @@ def mainMGE():
     parser.add_argument("-ng","--numgauss", type=int, help="number of gaussians that will be used for galfit. Starting from the first one")
 
 
+    parser.add_argument("-xy","--xypos",nargs=2, type=float, help="provides the (x y) position center of the object to fit")
 
     args = parser.parse_args()
-
 
 
 
@@ -60,11 +60,13 @@ def mainMGE():
     freeser = args.freeser
     freesky = args.freesky
 
+    xypos = args.xypos
+
     numgauss = args.numgauss 
 
     #mge2gal(args) 
 
-    mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, numgauss) 
+    mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, numgauss, xypos=xypos) 
 
 
 
