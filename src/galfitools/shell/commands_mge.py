@@ -40,7 +40,7 @@ def mainMGE():
     parser.add_argument("-ng","--numgauss", type=int, help="number of gaussians that will be used for galfit. Starting from the first one")
 
 
-    parser.add_argument("-xy","--xypos",nargs=2, type=float, help="provides the (x y) position center of the object to fit")
+    parser.add_argument("-xy","--xypos", nargs=2, type=int, help="provides the (x y) position center of the object to fit")
 
     args = parser.parse_args()
 
