@@ -31,7 +31,7 @@ from galfitools.galin.galfit import Galfit
 from galfitools.galin.MaskDs9 import GetAxis 
 #def mge2gal(args) -> None:
 
-def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, numgauss, xypos=None) -> None:
+def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, numgauss, xypos=None, ellip = None, posang = None) -> None:
 
 
 
@@ -177,9 +177,18 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
         (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, eps, ncol, nrow)
         xpeak, ypeak = GetPmax(img, mask, xmin, xmax, ymin, ymax)
 
+
+    #ignore the previous data of the object if any of the next options flags are activated 
     if xypos:
         xpeak = xypos[0] - 1
         ypeak = xypos[1] - 1
+
+    if ellip:
+        eps = ellip
+
+    if posang:
+        theta = posang 
+
 
     print("galaxy found at ", xpeak + 1, ypeak + 1)
     print("Ellipticity, Angle = ", eps, theta)

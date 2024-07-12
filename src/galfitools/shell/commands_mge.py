@@ -42,6 +42,11 @@ def mainMGE():
 
     parser.add_argument("-xy","--xypos", nargs=2, type=int, help="provides the (x y) position center of the object to fit")
 
+
+    parser.add_argument("-e","--ellip", type=float, help="ellipticity of object")
+    parser.add_argument("-pa","--posang", type=float, help="position angle of object. Measured from Y-axis")
+
+
     args = parser.parse_args()
 
 
@@ -60,13 +65,17 @@ def mainMGE():
     freeser = args.freeser
     freesky = args.freesky
 
-    xypos = args.xypos
-
     numgauss = args.numgauss 
+
+    xypos = args.xypos
+    ellip = args.ellip
+    posang = args.posang
+
+
 
     #mge2gal(args) 
 
-    mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, numgauss, xypos=xypos) 
+    mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, numgauss, xypos=xypos, ellip = ellip , posang = posang) 
 
 
 
