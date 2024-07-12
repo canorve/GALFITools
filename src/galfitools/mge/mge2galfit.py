@@ -165,17 +165,20 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
     plt.clf()
 
     (ncol, nrow) = GetAxis(image)
-    
-    obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
 
 
-    xx, yy, Rkron, theta, eps = Ds9ell2Kronellv2(xpos,ypos,rx,ry,angle)
-    if center:
-        print('center of ds9 ellipse region will be used')
-        xpeak, ypeak = xpos, ypos
-    else:        
-        (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, eps, ncol, nrow)
-        xpeak, ypeak = GetPmax(img, mask, xmin, xmax, ymin, ymax)
+    if os.path.isfile(regfile):
+
+        obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
+
+
+        xx, yy, Rkron, theta, eps = Ds9ell2Kronellv2(xpos,ypos,rx,ry,angle)
+        if center:
+            print('center of ds9 ellipse region will be used')
+            xpeak, ypeak = xpos, ypos
+        else:        
+            (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, eps, ncol, nrow)
+            xpeak, ypeak = GetPmax(img, mask, xmin, xmax, ymin, ymax)
 
 
     #ignore the previous data of the object if any of the next options flags are activated 
