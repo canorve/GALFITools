@@ -3,6 +3,7 @@
 from astropy.io import fits
 import numpy as np
 
+import os 
 
 from scipy.optimize import bisect
 
@@ -828,6 +829,24 @@ def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
 
 
 
+def galfitLastFit(directory) -> str:
+
+
+    # Directory containing the files
+    #directory = "."
+
+    # List all files in the directory
+    files = os.listdir(directory)
+
+    # Filter files that match the prefix 'galfit.'
+    galfit_files = [f for f in files if f.startswith('galfit.') and f[7:].isdigit()]
+
+    # Extract the numerical suffix and find the maximum
+    max_file = max(galfit_files, key=lambda x: int(x[7:]))
+
+    #print(f"The file with the largest suffix is: {max_file}")
+
+    return max_file
 
 
 
