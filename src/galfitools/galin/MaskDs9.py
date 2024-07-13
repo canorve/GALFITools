@@ -13,7 +13,7 @@ from matplotlib.path import Path
 
 
 
-def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool, borValue: int) -> None:
+def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool, borValue: int, skymean=None, skystd=None) -> None:
 
     if not os.path.exists(MaskFile):
 
@@ -176,7 +176,7 @@ def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool,
 
 
             Image = MakeBox(Image, fill, xpos[idx], ypos[idx], rx[idx], 
-                            ry[idx], angle[idx], ncol, nrow)
+                            ry[idx], angle[idx], ncol, nrow, skymean=skymean, skystd=skystd)
 
 
 
@@ -248,7 +248,7 @@ def MakePolygon(Image,fill,tupVerts,ncol,nrow):
 
 
 
-def MakeBox(Image,fill,xpos,ypos,rx,ry,angle,ncol,nrow):
+def MakeBox(Image,fill,xpos,ypos,rx,ry,angle,ncol,nrow, skymean=None, skystd=None):
     "Make a box in an image"
 
 
@@ -293,7 +293,15 @@ def MakeBox(Image,fill,xpos,ypos,rx,ry,angle,ncol,nrow):
     mask = grid.reshape(nrow, ncol) # now you have a mask with points inside a polygon
 
 
-    Image[mask] = fill
+    if skymean:
+
+        sky = np.random.normal(skymean, skystd, (ncol, nrow))
+       
+        Image[mask] = sky[mask]  
+
+    else:
+
+        Image[mask] = fill
 
 
 

@@ -190,6 +190,8 @@ def mainMaskDs9():
     parser.add_argument("-bv","--borValue",default=0,type=float, help="value of the border if it is different from zero")
 
 
+    parser.add_argument("-sm","--skymean", type=float, help="sky mean to be used as a patch of sky")
+    parser.add_argument("-sd","--skystd", type=float, help="sky standard deviation to be used with skymean as a patch of sky",default=1)
 
 
     args = parser.parse_args()
@@ -202,9 +204,10 @@ def mainMaskDs9():
     bor_flag = args.border
     borValue = args.borValue
 
+    skymean = args.skymean
+    skystd = args.skystd
 
-
-    maskDs9(MaskFile, RegFile, fill, image, bor_flag, borValue) 
+    maskDs9(MaskFile, RegFile, fill, image, bor_flag, borValue, skymean=skymean, skystd=skystd) 
 
     print('Done. Mask {} created (or modified)'.format(MaskFile))
 
