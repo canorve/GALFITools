@@ -17,6 +17,7 @@ from galfitools.galin.galfit import galfitLastFit
 from galfitools.galin.galfit import GalComps, GalHead
 
 from galfitools.mge.mge2galfit import PrintHeader, PrintSky, PrintSersic
+from galfitools.mge.mge2galfit import mge2gal
 
 from galfitools.galin.MakeMask import makeMask
 from galfitools.galin.MaskSky import skyRem
@@ -37,7 +38,7 @@ from galfitools.mge.mge2galfit import GetInfoEllip
 from galfitools.shell.prt import printWelcome
 
 
-
+import sys
 
 def mainGetStar():
 
@@ -569,8 +570,8 @@ def mainMakePSF():
     #parser.add_argument("-s","--sky", type=float, 
     #                    help="the sky background to be removed")
 
-    #parser.add_argument("-o","--out", type=str, 
-    #                    help="the PSF image output.",default="psf.fits")
+    parser.add_argument("-o","--out", type=str, 
+                        help="the PSF model image",default="psf.fits")
 
     parser.add_argument("-sig","--sigma", type=str, 
                         help="introduce the sigma image")
@@ -581,10 +582,11 @@ def mainMakePSF():
     #
     parser.add_argument("-t","--twist", action="store_true", help="uses twist option for mge ")
 
-    parser.add_argument("-xy","--xypos", nargs=2, type=int, help="provides the (x y) position center of the object to fit")
+    parser.add_argument("-ng","--numgauss", type=int, help="number of gaussians that will be used for galfit. Starting from the first one")
+    #parser.add_argument("-xy","--xypos", nargs=2, type=int, help="provides the (x y) position center of the object to fit")
 
-    parser.add_argument("-e","--ellip", type=float, help="ellipticity of object")
-    parser.add_argument("-pa","--posang", type=float, help="position angle of object. Measured from Y-axis")
+    #parser.add_argument("-e","--ellip", type=float, help="ellipticity of object")
+    #parser.add_argument("-pa","--posang", type=float, help="position angle of object. Measured from Y-axis")
 
 
     #######################
@@ -595,8 +597,10 @@ def mainMakePSF():
     #imsize = args.size
     center = args.center
 
+    psfout = args.out
+
     #sky = args.sky
-    imout = args.out
+    #imout = args.out
 
     sigma = args.sigma
     #sigout = args.sigout
@@ -605,10 +609,11 @@ def mainMakePSF():
     galfitFile = args.GalfitFile
     twist = args.twist
 
-    xypos = args.xypos
-    ellip = args.ellip
-    posang = args.posang
+    #xypos = args.xypos
+    #ellip = args.ellip
+    #posang = args.posang
 
+    numgauss = args.numgauss 
 
     #######################
     # reading options from galfit header
@@ -654,7 +659,7 @@ def mainMakePSF():
     #center = args.center
 
     psf = 2
-    gauss = args.gauss
+    gauss = None
 
     #psfile = args.psfile
     #sigfile = args.sigfile
@@ -662,7 +667,6 @@ def mainMakePSF():
     freeser = False 
     freesky = False 
 
-    numgauss = None 
 
 
     #checking the center
@@ -673,51 +677,59 @@ def mainMakePSF():
 
     
     if even:
-        lx = int(imsize/2)
+        lx = imsize/2
 
         #xlo = xpeak - lx + 1 
-        xpeak = xlo + lx - 1
+        xpeak = int(lx + 1) 
 
         #ylo = ypeak - lx + 1 
-        ypeak = ylo + lx - 1
+        ypeak = int(lx + 1) 
 
         #xhi = xpeak + lx 
         #yhi = ypeak + lx
         
     else:
-        lx = int(imsize/2 + 0.5)
+        lx = imsize/2
 
         #xlo = xpeak - lx + 2 
-        xpeak = xlo + lx - 2
+        xpeak = int(lx + 0.5) 
 
         #ylo = ypeak - lx + 2
-        ypeak = ylo + lx - 2
+        ypeak = int(lx + 0.5) 
 
         #xhi = xpeak + lx 
         #yhi = ypeak + lx 
 
-
     ####
 
     xypos = [xpeak, ypeak]  
-    ellip = 0 
-    posang = 0 
+    ellip = 0.1 
+    posang = 1 
+    regmgefile = None
 
 
 
     #mge2gal(args) 
 
-    mge2gal(galfitFile, None, center, psf, twist, gauss, freeser, freesky, numgauss, xypos=xypos, ellip = ellip , posang = posang) 
+    mge2gal(galfitFile, regmgefile, center, psf, twist, gauss, freeser, freesky, numgauss, xypos=xypos, ellip = ellip, posang = posang) 
 
+
+
+    print("calling to GALFIT to fit MGE")
 
     rungal = "galfit  {}".format("mseGALFIT.txt")
     errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
                 universal_newlines=True)
 
-    # llamar a galfitlastfile
-    galastfile = galfitLastFit(".")
 
-    galfit = Galfit(galfitFile)
+    try: 
+        # llamar a galfitlastfile
+        lastfit_file = galfitLastFit(".")
+    except:
+        print("probably GALFIT has been unable to find a solution. Exiting now")
+        sys.exit(1)
+
+    galfit = Galfit(lastfit_file)
     head = galfit.ReadHead()
     galcomps = galfit.ReadComps()
     galsky = galfit.ReadSky()
@@ -726,11 +738,11 @@ def mainMakePSF():
     #printing output file to create psf model
     fout1 = open("psfmodel.txt", "w")
 
-    head.outimage="psf.fits"
+    head.outimage = psfout
     head.P = 1 #just print the model
 
     PrintHeader(fout1, head.inputimage, head.outimage, head.sigimage, head.psfimage, head.psfsamp, head.maskimage, head.constraints, head.xmin, head.xmax, head.ymin,
-                head.ymax, head.convx, head.convy, head.magzpt, head.scale, head.scaley, 
+                head.ymax, head.convx, head.convy, head.mgzpt, head.scale, head.scaley, 
                 head.display, head.P, 0)
 
 
@@ -754,10 +766,13 @@ def mainMakePSF():
 
     fout1.close()
 
+
+    print("calling to GALFIT to create final model")
+
     rungal = "galfit  {}".format("psfmodel.txt")
     errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
                 universal_newlines=True)
 
-    print("Done")
+    print("Done. PSF model file: ", psfout)
 
 

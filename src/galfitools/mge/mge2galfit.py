@@ -167,18 +167,19 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
     (ncol, nrow) = GetAxis(image)
 
 
-    if os.path.isfile(regfile):
+    if regfile:
+        if os.path.isfile(regfile):
 
-        obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
+            obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
 
 
-        xx, yy, Rkron, theta, eps = Ds9ell2Kronellv2(xpos,ypos,rx,ry,angle)
-        if center:
-            print('center of ds9 ellipse region will be used')
-            xpeak, ypeak = xpos, ypos
-        else:        
-            (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, eps, ncol, nrow)
-            xpeak, ypeak = GetPmax(img, mask, xmin, xmax, ymin, ymax)
+            xx, yy, Rkron, theta, eps = Ds9ell2Kronellv2(xpos,ypos,rx,ry,angle)
+            if center:
+                print('center of ds9 ellipse region will be used')
+                xpeak, ypeak = xpos, ypos
+            else:        
+                (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, eps, ncol, nrow)
+                xpeak, ypeak = GetPmax(img, mask, xmin, xmax, ymin, ymax)
 
 
     #ignore the previous data of the object if any of the next options flags are activated 
@@ -191,7 +192,6 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
 
     if posang:
         theta = posang 
-
 
     print("galaxy found at ", xpeak + 1, ypeak + 1)
     print("Ellipticity, Angle = ", eps, theta)
