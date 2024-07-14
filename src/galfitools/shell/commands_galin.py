@@ -745,7 +745,6 @@ def mainMakePSF():
                     galcomps.MagFree[index], galcomps.ExpFree[index])
 
 
-        index+=1
 
 
     galsky.skip = 1

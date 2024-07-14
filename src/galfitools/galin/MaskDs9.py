@@ -169,7 +169,7 @@ def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool,
         if obj[idx] == "ellipse":
 
             Image = MakeEllip(Image, fill, xpos[idx], ypos[idx], rx[idx], 
-                                ry[idx], angle[idx], ncol, nrow)
+                                ry[idx], angle[idx], ncol, nrow, skymean=skymean, skystd=skystd)
 
 
         if obj[idx] == "box":
@@ -186,7 +186,7 @@ def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool,
 
         if Pol[idx] == "polygon":
 
-            Image = MakePolygon(Image, fill, tupVerts[idx], ncol, nrow)
+            Image = MakePolygon(Image, fill, tupVerts[idx], ncol, nrow, skymean=skymean, skystd=skystd)
 
 
 
@@ -214,16 +214,17 @@ def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool,
     hdu.close()
 
 
-def MakeEllip(Image,fill,xpos,ypos,rx,ry,angle,ncol,nrow):
+def MakeEllip(Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow, skymean=None, skystd=None):
     "Make an ellipse in an image"
 
     xx, yy, Rkron, theta, e = Ds9ell2Kronell(xpos,ypos,rx,ry,angle)
     (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, e, ncol, nrow)
-    Image = MakeKron(Image, fill, xx, yy, Rkron, theta, e, xmin, xmax, ymin, ymax)
+    Image = MakeKron(Image, fill, xx, yy, Rkron, theta, e, xmin, xmax, 
+                    ymin, ymax, ncol, nrow, skymean=skymean, skystd=skystd)
 
     return Image
 
-def MakePolygon(Image,fill,tupVerts,ncol,nrow):
+def MakePolygon(Image, fill, tupVerts, ncol, nrow, skymean=None, skystd=None):
     "Make a polygon in an image"
 
 
@@ -238,7 +239,16 @@ def MakePolygon(Image,fill,tupVerts,ncol,nrow):
     mask = grid.reshape(nrow, ncol) # now you have a mask with points inside a polygon
 
 
-    Image[mask] = fill
+    if skymean:
+
+        sky = np.random.normal(skymean, skystd, (nrow, ncol))
+        Image[mask] = sky[mask]  
+
+    else:
+
+        Image[mask] = fill
+
+
 
 
 
@@ -295,8 +305,7 @@ def MakeBox(Image,fill,xpos,ypos,rx,ry,angle,ncol,nrow, skymean=None, skystd=Non
 
     if skymean:
 
-        sky = np.random.normal(skymean, skystd, (ncol, nrow))
-       
+        sky = np.random.normal(skymean, skystd, (nrow, ncol))
         Image[mask] = sky[mask]  
 
     else:
@@ -371,7 +380,7 @@ def Ds9ell2Kronell(xpos,ypos,rx,ry,angle):
 
 
 
-def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
+def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax, ncol, nrow, skymean=None, skystd=None):
     "This subroutine create a Kron ellipse within a box defined by: xmin, xmax, ymin, ymax"
 
     # Check
@@ -410,7 +419,16 @@ def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     dist = np.sqrt(dx**2 + dy**2)
 
     mask = dist <= dell
-    imagemat[ypos[mask], xpos[mask]] = idn
+
+
+    if skymean:
+
+        sky = np.random.normal(skymean, skystd, (nrow, ncol))
+        imagemat[ypos[mask], xpos[mask]] = sky[ypos[mask], xpos[mask]]
+
+    else:
+
+        imagemat[ypos[mask], xpos[mask]] = idn
 
     return imagemat
 
