@@ -836,8 +836,8 @@ def maingetPeak():
     center = args.center
     maskfile = args.mask
 
-    zeropoint = args.zeropoint
-    sky = args.sky
+    #zeropoint = args.zeropoint
+    #sky = args.sky
 
 
     X, Y, AxRat, PA = getPeak(image, regfile, center, maskfile)

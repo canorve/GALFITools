@@ -56,6 +56,7 @@ def getPeak(image: str, regfile: str, center: bool, maskfile: str)-> None:
         xpeak, ypeak = round(xpos), round(ypos)
     else:        
         (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, eps, ncol, nrow)
+
         xpeak, ypeak = GetPmax(img, mask, xmin, xmax, ymin, ymax)
 
 
@@ -178,7 +179,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 
     theta = theta * (np.pi / 180)  # rads!!
 
-# getting size
+    # getting size
 
     xmin = x - np.sqrt((R**2) * (np.cos(theta))**2 +
                        (bim**2) * (np.sin(theta))**2)
@@ -194,20 +195,21 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 
     mask = xmin < 1
     if mask.any():
-        xmin[mask] = 1
+        xmin = 1
 
     mask = xmax > ncol
     if mask.any():
-        xmax[mask] = ncol
+        xmax = ncol
 
     mask = ymin < 1
     if mask.any():
-        ymin[mask] = 1
+        ymin = 1
 
-    mask = ymax > nrow
+    mask = ymax > nrow 
     if mask.any():
-        ymax[mask] = nrow
+        ymax = nrow
 
+    
     return (xmin, xmax, ymin, ymax)
 
 
