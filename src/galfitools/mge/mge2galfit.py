@@ -166,6 +166,8 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
 
     (ncol, nrow) = GetAxis(image)
 
+    eps = 0 
+    theta = 0
 
     if regfile:
         if os.path.isfile(regfile):

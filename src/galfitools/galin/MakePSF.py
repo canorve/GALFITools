@@ -8,6 +8,7 @@ import subprocess as sp
 import os.path
 
 import os
+import re
 
 from galfitools.galin.MaskDs9 import GetAxis 
 from galfitools.galin.MaskDs9 import checkCompHDU
@@ -18,7 +19,7 @@ from galfitools.galin.galfit import galfitLastFit
 from galfitools.galin.getStar import getStar
 
 from galfitools.mge.mge2galfit import PrintHeader, PrintSky, PrintSersic
-from galfitools.mge.mge2galfit import mge2gal
+from galfitools.mge.mge2galfit import mge2gal, GetInfoEllip, Ds9ell2Kronellv2
 
 
 def makePSF(galfitFile: str, image: str, regfile: str, center: bool, psfout: str, sigma: str, twist: bool, numgauss: int)-> None: 
@@ -83,14 +84,20 @@ def makePSF(galfitFile: str, image: str, regfile: str, center: bool, psfout: str
 
     ####
 
-    psf = 2
+    psf = 0
     gauss = None
     freeser = False 
     freesky = False 
 
     xypos = [xpeak, ypeak]  
-    ellip = 0.1 
-    posang = 1 
+
+    #calling to these two functions to obtain eps and theta
+    obj_trash, xpos_trash, ypos_trash, rx_trash, ry_trash, angle_trash = GetInfoEllip(regfile)
+    xx_trash, yy_trash, Rkron_trash, theta, eps = Ds9ell2Kronellv2(xpos_trash,ypos_trash,rx_trash,ry_trash,angle_trash)
+
+
+    ellip = eps 
+    posang = theta 
     regmgefile = None
 
 
@@ -99,20 +106,23 @@ def makePSF(galfitFile: str, image: str, regfile: str, center: bool, psfout: str
 
 
 
-    print("calling to GALFIT to fit MGE")
+    print("calling GALFIT to fit MGE")
 
     rungal = "galfit  {}".format("mseGALFIT.txt")
     errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
                 universal_newlines=True)
 
 
-    try: 
-        lastfit_file = galfitLastFit(".")
-    except:
-        print("probably GALFIT has been unable to find a solution")
+
+    #check if galfit failed
+    if re.search("Doh!", errgal.stdout): 
+        print("ERROR: GALFIT has been unable to find a solution")
         print("Try to reduce the number of gaussians with -ng option")
         print("Exiting now")
         sys.exit(1)
+
+
+    lastfit_file = galfitLastFit(".")
 
     galfit = Galfit(lastfit_file)
     head = galfit.ReadHead()
@@ -152,7 +162,7 @@ def makePSF(galfitFile: str, image: str, regfile: str, center: bool, psfout: str
     fout1.close()
 
 
-    print("calling to GALFIT to create final model")
+    print("calling GALFIT again to create final model")
 
     rungal = "galfit  {}".format("psfmodel.txt")
     errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
