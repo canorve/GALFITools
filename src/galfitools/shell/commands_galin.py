@@ -562,13 +562,9 @@ def mainMakePSF():
 
     parser.add_argument("Ds9regFile", help="the DS9 ellipse region file containing the star to model")
 
-    #parser.add_argument("size", type=int, help="the size of the psf image in pixels")
     parser.add_argument("-c","--center", action="store_true", 
                         help="uses the center given in DS9 region file," + 
                         "otherwise it will find the x,y peaks within DS9 ellipse")
-
-    #parser.add_argument("-s","--sky", type=float, 
-    #                    help="the sky background to be removed")
 
     parser.add_argument("-o","--out", type=str, 
                         help="the PSF model image",default="psf.fits")
@@ -576,203 +572,32 @@ def mainMakePSF():
     parser.add_argument("-sig","--sigma", type=str, 
                         help="introduce the sigma image")
 
-    #parser.add_argument("-so","--sigout", type=str, 
-    #                    help="the sigma image output.",default="psfsigma.fits")
-
-    #
     parser.add_argument("-t","--twist", action="store_true", help="uses twist option for mge ")
 
     parser.add_argument("-ng","--numgauss", type=int, help="number of gaussians that will be used for galfit. Starting from the first one")
-    #parser.add_argument("-xy","--xypos", nargs=2, type=int, help="provides the (x y) position center of the object to fit")
-
-    #parser.add_argument("-e","--ellip", type=float, help="ellipticity of object")
-    #parser.add_argument("-pa","--posang", type=float, help="position angle of object. Measured from Y-axis")
-
 
     #######################
     args = parser.parse_args()
+    ##
 
     image = args.image
     regfile = args.Ds9regFile 
-    #imsize = args.size
     center = args.center
 
     psfout = args.out
 
-    #sky = args.sky
-    #imout = args.out
-
     sigma = args.sigma
-    #sigout = args.sigout
 
 
     galfitFile = args.GalfitFile
     twist = args.twist
 
-    #xypos = args.xypos
-    #ellip = args.ellip
-    #posang = args.posang
-
     numgauss = args.numgauss 
 
     #######################
-    # reading options from galfit header
-
-    galfit = Galfit(galfitFile)
-    head = galfit.ReadHead()
-    galsky = galfit.ReadSky()
-
-    inputimage = head.inputimage
-
-    imageout = head.outimage
-    magzpt = head.mgzpt
-    maskfile = head.maskimage
-
-    sky = galsky.sky
-
-    scale = head.scale
-    psfile = head.psfimage
-
-    sigfile = head.sigimage
-
-    convbox =  head.convx
-    convboxy = head.convy
-
-    xlo = head.xmin
-    ylo = head.ymin
-    xhi = head.xmax
-    yhi = head.ymax
- 
-    imsize = head.xmax - head.xmin +  1
-
-    #################
-
-    #inputimage of galfit header will be the outpuut of getStar
-    getStar(image, regfile, imsize, center, sky,  inputimage, sigma, sigfile)
 
 
-    ################### mge2galfit #############
-    #galfitFile = args.GalfitFile
-    #regfile = args.Ds9regFile 
-    #twist = args.twist
-    #regu = args.regu
-    #center = args.center
+    makePSF(galfitFile, image, regfile, center, imout, sigma, sigout, twist, numgauss) 
 
-    psf = 2
-    gauss = None
-
-    #psfile = args.psfile
-    #sigfile = args.sigfile
-
-    freeser = False 
-    freesky = False 
-
-
-
-    #checking the center
-    even = False
-
-    if imsize % 2 == 0:
-        even = True
-
-    
-    if even:
-        lx = imsize/2
-
-        #xlo = xpeak - lx + 1 
-        xpeak = int(lx + 1) 
-
-        #ylo = ypeak - lx + 1 
-        ypeak = int(lx + 1) 
-
-        #xhi = xpeak + lx 
-        #yhi = ypeak + lx
-        
-    else:
-        lx = imsize/2
-
-        #xlo = xpeak - lx + 2 
-        xpeak = int(lx + 0.5) 
-
-        #ylo = ypeak - lx + 2
-        ypeak = int(lx + 0.5) 
-
-        #xhi = xpeak + lx 
-        #yhi = ypeak + lx 
-
-    ####
-
-    xypos = [xpeak, ypeak]  
-    ellip = 0.1 
-    posang = 1 
-    regmgefile = None
-
-
-
-    #mge2gal(args) 
-
-    mge2gal(galfitFile, regmgefile, center, psf, twist, gauss, freeser, freesky, numgauss, xypos=xypos, ellip = ellip, posang = posang) 
-
-
-
-    print("calling to GALFIT to fit MGE")
-
-    rungal = "galfit  {}".format("mseGALFIT.txt")
-    errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
-                universal_newlines=True)
-
-
-    try: 
-        # llamar a galfitlastfile
-        lastfit_file = galfitLastFit(".")
-    except:
-        print("probably GALFIT has been unable to find a solution. Exiting now")
-        sys.exit(1)
-
-    galfit = Galfit(lastfit_file)
-    head = galfit.ReadHead()
-    galcomps = galfit.ReadComps()
-    galsky = galfit.ReadSky()
-
-
-    #printing output file to create psf model
-    fout1 = open("psfmodel.txt", "w")
-
-    head.outimage = psfout
-    head.P = 1 #just print the model
-
-    PrintHeader(fout1, head.inputimage, head.outimage, head.sigimage, head.psfimage, head.psfsamp, head.maskimage, head.constraints, head.xmin, head.xmax, head.ymin,
-                head.ymax, head.convx, head.convy, head.mgzpt, head.scale, head.scaley, 
-                head.display, head.P, 0)
-
-
-    index = 0
-
-
-    for index, item in enumerate(galcomps.N):
-
-            PrintSersic(fout1, index+1, galcomps.PosX[index], galcomps.PosY[index], 
-                    galcomps.Mag[index], galcomps.Rad[index], galcomps.Exp[index], 
-                    galcomps.AxRat[index], galcomps.PosAng[index], galcomps.skip[index], 
-                    galcomps.MagFree[index], galcomps.ExpFree[index])
-
-
-
-
-    galsky.skip = 1
- 
-    PrintSky(fout1, index+1, galsky.sky, galsky.skip, galsky.skyfree)
-
-
-    fout1.close()
-
-
-    print("calling to GALFIT to create final model")
-
-    rungal = "galfit  {}".format("psfmodel.txt")
-    errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
-                universal_newlines=True)
-
-    print("Done. PSF model file: ", psfout)
 
 
