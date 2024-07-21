@@ -597,7 +597,7 @@ def mainMakePSF():
     #######################
 
 
-    makePSF(galfitFile, image, regfile, center, imout, sigma, sigout, twist, numgauss) 
+    makePSF(galfitFile, image, regfile, center, psfout, sigma, twist, numgauss) 
 
 
 

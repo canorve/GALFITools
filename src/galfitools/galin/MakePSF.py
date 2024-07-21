@@ -21,7 +21,7 @@ from galfitools.mge.mge2galfit import PrintHeader, PrintSky, PrintSersic
 from galfitools.mge.mge2galfit import mge2gal
 
 
-def makePSF(galfitFile: str, image: str, regfile: str, center: bool, imout: str, sigma: str , sigout: str, twist: bool, numgauss: int)-> None: 
+def makePSF(galfitFile: str, image: str, regfile: str, center: bool, psfout: str, sigma: str, twist: bool, numgauss: int)-> None: 
 
 
     #######################
@@ -56,7 +56,7 @@ def makePSF(galfitFile: str, image: str, regfile: str, center: bool, imout: str,
 
     #################
 
-    #inputimage of galfit header will be the outpuut of getStar
+    #inputimage of galfit header will be the output of getStar
     getStar(image, regfile, imsize, center, sky,  inputimage, sigma, sigfile)
 
 
