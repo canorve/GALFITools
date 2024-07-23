@@ -15,10 +15,10 @@ from galfitools.galin.MaskDs9 import checkCompHDU
 
 from galfitools.galin.galfit import Galfit
 from galfitools.galin.galfit import galfitLastFit 
+from galfitools.galin.galfit import galPrintHeader, galPrintSky, galPrintComp
 
 from galfitools.galin.getStar import getStar
 
-from galfitools.mge.mge2galfit import PrintHeader, PrintSky, PrintSersic
 from galfitools.mge.mge2galfit import mge2gal, GetInfoEllip, Ds9ell2Kronellv2
 
 
@@ -136,9 +136,12 @@ def makePSF(galfitFile: str, image: str, regfile: str, center: bool, psfout: str
     head.outimage = psfout
     head.P = 1 
 
-    PrintHeader(fout1, head.inputimage, head.outimage, head.sigimage, head.psfimage, head.psfsamp, head.maskimage, head.constraints, head.xmin, head.xmax, head.ymin,
-                head.ymax, head.convx, head.convy, head.mgzpt, head.scale, head.scaley, 
-                head.display, head.P, 0)
+    #PrintHeader(fout1, head.inputimage, head.outimage, head.sigimage, head.psfimage, head.psfsamp, head.maskimage, head.constraints, head.xmin, head.xmax, head.ymin,
+    #            head.ymax, head.convx, head.convy, head.mgzpt, head.scale, head.scaley, 
+    #            head.display, head.P, 0)
+
+    galPrintHeader(fout1, head)
+
 
 
     index = 0
@@ -146,17 +149,20 @@ def makePSF(galfitFile: str, image: str, regfile: str, center: bool, psfout: str
 
     for index, item in enumerate(galcomps.N):
 
-            PrintSersic(fout1, index+1, galcomps.PosX[index], galcomps.PosY[index], 
-                    galcomps.Mag[index], galcomps.Rad[index], galcomps.Exp[index], 
-                    galcomps.AxRat[index], galcomps.PosAng[index], galcomps.skip[index], 
-                    galcomps.MagFree[index], galcomps.ExpFree[index])
+            #PrintSersic(fout1, index+1, galcomps.PosX[index], galcomps.PosY[index], 
+            #        galcomps.Mag[index], galcomps.Rad[index], galcomps.Exp[index], 
+            #        galcomps.AxRat[index], galcomps.PosAng[index], galcomps.skip[index], 
+            #        galcomps.MagFree[index], galcomps.ExpFree[index])
+
+            galPrintComp(fout1, index+1, index, galcomps)
 
 
 
 
     galsky.skip = 1
  
-    PrintSky(fout1, index+1, galsky.sky, galsky.skip, galsky.skyfree)
+    #PrintSky(fout1, index+1, galsky.sky, galsky.skip, galsky.skyfree)
+    galPrintSky(fout1, index+1, galsky)
 
 
     fout1.close()

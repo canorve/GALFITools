@@ -541,7 +541,7 @@ class Galfit():
                 galsky.sky = sky
                 galsky.dskyx =  dskyx
                 galsky.dskyy =  dskyy
-                galskyskip =  skip
+                galsky.skip =  skip
 
                 galsky.skyfree =  skyfree
                 galsky.dskyxfree = dskyxfree
@@ -829,11 +829,11 @@ def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
 
 
 
-def galfitLastFit(directory) -> str:
+def galfitLastFit(directory: str) -> str:
 
 
     # Directory containing the files
-    #directory = "."
+    #directory = "." #actual directory
 
     # List all files in the directory
     files = os.listdir(directory)
@@ -844,9 +844,210 @@ def galfitLastFit(directory) -> str:
     # Extract the numerical suffix and find the maximum
     max_file = max(galfit_files, key=lambda x: int(x[7:]))
 
-    #print(f"The file with the largest suffix is: {max_file}")
 
     return max_file
 
+#print galfit files
+def galPrintHeader(hdl, galhead: GalHead)-> bool:
+    "print GALFIT header in a file"
+
+
+    A = galhead.inputimage
+    B = galhead.outimage
+    C = galhead.sigimage 
+    D = galhead.psfimage 
+    E = galhead.psfamp
+    F = galhead.maskimage
+    G = galhead.constraints
+    xlo = galhead.xmin
+    xhi = galhead.xmax
+    ylo = galhead.ymin
+    yhi = galhead.ymax
+    convx = galhead.convx
+    convy = galhead.convy
+    J = galhead.mgzpt
+    platedx = galhead.scale
+    platedy = galhead.scaley 
+    O = galhead.display
+    P = galhead.P
+    #S = 0 
+
+
+    # k Check
+    # print to filehandle
+    # the header for GALFIT
+
+    lineZ = "==================================================================================================\n"
+    lineX = "# IMAGE PARAMETERS \n"
+    lineA = "A) {}    # Input Data image (FITS file)                            \n".format(A)
+    lineB = "B) {}    # Output data image block                                 \n".format(B)
+    lineC = "C) {}    # Sigma image name (made from data if blank or \"none\")  \n".format(C)
+    lineD = "D) {}    # Input PSF image and (optional) diffusion kernel         \n".format(D)
+    lineE = "E) {}    # PSF fine sampling factor relative to data               \n".format(E)
+    lineF = "F) {}    # Bad pixel mask (FITS image or ASCII coord list)         \n".format(F)
+    lineG = "G) {}    # File with parameter constraints (ASCII file)            \n".format(G)
+    lineH = "H) {} {} {} {}   # Image region to fit (xmin xmax ymin ymax)               \n".format(xlo, xhi, ylo, yhi)
+    lineI = "I) {} {}  # Size of the convolution box (x y)                       \n".format(convx, convy)
+    lineJ = "J) {}     # Magnitude photometric zeropoint                         \n".format(J)
+    lineK = "K) {} {}  # Plate scale (dx dy). \[arcsec per pixel\]               \n".format(platedx, platedy)
+    lineO = "O) {}     # Display type (regular, curses, both)                    \n".format(O)
+    lineP = "P) {}     # Choose 0=optimize, 1=model, 2=imgblock, 3=subcomps      \n".format(P)
+    #lineS = "S) {}     # Modify/create objects interactively?                    \n".format(S)
+    lineY = " \n"
+
+    line0 = "# INITIAL FITTING PARAMETERS                                                     \n"
+    line1 = "# \n"
+    line2 = "#   For object type, allowed functions are:                                      \n"
+    line3 = "#       nuker, sersic, expdisk, devauc, king, psf, gaussian, moffat,             \n"
+    line4 = "#       ferrer, powsersic, sky, and isophote.                                    \n"
+    line5 = "# \n"
+    line6 = "#  Hidden parameters will only appear when they're specified:                    \n"
+    line7 = "#      C0 (diskyness/boxyness),                                                  \n"
+    line8 = "#      Fn (n=integer, Azimuthal Fourier Modes),                                  \n"
+    line9 = "#      R0-R10 (PA rotation, for creating spiral structures).                     \n"
+    line10 = "# \n"
+
+    line11 = "# column 1:  Parameter number                                                               \n"
+    line12 = "# column 2:                                                                                 \n"
+    line13 = "#          -- Parameter 0:    the allowed functions are: sersic, nuker, expdisk             \n"
+    line14 = "#                             edgedisk, devauc, king, moffat, gaussian, ferrer, psf, sky    \n"
+    line15 = "#          -- Parameter 1-10: value of the initial parameters                               \n"
+    line16 = "#          -- Parameter C0:   For diskiness/boxiness                                        \n"
+    line17 = "#                             <0 = disky                                                    \n"
+    line18 = "#                             >0 = boxy                                                     \n"
+    line19 = "#          -- Parameter Z:    Outputting image options, the options are:                    \n"
+    line20 = "#                             0 = normal, i.e. subtract final model from the data to create \n"
+    line21 = "#                             the residual image                                            \n"
+    line22 = "#                             1 = Leave in the model -- do not subtract from the data       \n"
+    line23 = "#                                                                                           \n"
+    line24 = "# column 3: allow parameter to vary (yes = 1, no = 0)                                       \n"
+    line25 = "# column 4: comment                                                                         \n"
+    line26 = " \n"
+
+    line27 = "==================================================================================================\n"
+
+    hdl.write(lineZ)
+    hdl.write(lineX)
+    hdl.write(lineA)
+    hdl.write(lineB)
+    hdl.write(lineC)
+    hdl.write(lineD)
+    hdl.write(lineE)
+    hdl.write(lineF)
+    hdl.write(lineG)
+    hdl.write(lineH)
+    hdl.write(lineI)
+    hdl.write(lineJ)
+    hdl.write(lineK)
+    hdl.write(lineO)
+    hdl.write(lineP)
+    hdl.write(lineS)
+    hdl.write(lineY)
+
+    hdl.write(line0)
+    hdl.write(line1)
+    hdl.write(line2)
+    hdl.write(line3)
+    hdl.write(line4)
+    hdl.write(line5)
+    hdl.write(line6)
+    hdl.write(line7)
+    hdl.write(line8)
+    hdl.write(line9)
+    hdl.write(line10)
+
+    hdl.write(line11)
+    hdl.write(line12)
+    hdl.write(line13)
+    hdl.write(line14)
+    hdl.write(line15)
+    hdl.write(line16)
+    hdl.write(line17)
+    hdl.write(line18)
+    hdl.write(line19)
+    hdl.write(line20)
+    hdl.write(line21)
+    hdl.write(line22)
+    hdl.write(line23)
+    hdl.write(line24)
+    hdl.write(line25)
+    hdl.write(line26)
+    hdl.write(line27)
+
+    return True
+
+
+def galPrintComp(hdl: str, ncomp: int, idx: int, galcomps: GalComps)-> bool:
+    "print GALFIT Sersic function to filehandle"
+    # k Check
+
+    # print to filehandle
+
+    #lastmod agregar idx a cada galcomps.namecomp[idx]
+    line00 = "# Object number: {}   \n".format(ncomp)
+    line01 = " 0)   {}   #  Object type      \n".format(galcomps.NameComp[idx])
+    line02 = " 1) {:.2f}  {:.2f}  {}  {}  #  position x, y  [pixel] \n".format(
+        galcomps.PosX[idx], galcomps.PosY[idx], galcomps.Xfree[idx], galcomps.Yfree[idx])
+    line03 = " 3) {:.2f}  {}    #  total magnitude  \n".format(
+        galcomps.Mag[idx], galcomps.Magfree[idx])
+    line04 = " 4) {:.2f}  {}    #  R_e     [Pixels] \n".format(
+            galcomps.Rad[idx], galcomps.Radfree[idx])
+    line05 = " 5) {}     {}   #  Sersic exponent (deVauc=4, expdisk=1) \n".format(
+        galcomps.Exp[idx], galcomps.Expfree[idx])
+    line06 = " 6)  {}  {}      #  ---------------- \n".format(galcomps.Exp2[idx],
+                galcomps.Exp2free[idx])
+    line07 = " 7)  {}  {}      #  ---------------- \n".format(galcomps.Exp3[idx], 
+            galcmps.Exp3free[idx])
+    line08 = " 8)  0.0000       0   #  ----------------                                \n"
+    line09 = " 9) {:.2f}   {}   #  axis ratio (b/a)  \n".format(
+        galcomps.AxRat[idx], galcomps.AxRatfree[idx])
+    line10 = "10) {:.2f}    {}  #  position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
+        galcomps.PosAng[idx], galcomps.PosAngfree[idx])
+    lineZ = " Z) {}         #  Skip this model in output image?  (yes=1, no=0) \n".format(
+        galcomps.skip[idx])
+    line11 = "\n"
+
+    hdl.write(line00)
+    hdl.write(line01)
+    hdl.write(line02)
+    hdl.write(line03)
+    hdl.write(line04)
+    hdl.write(line05)
+    hdl.write(line06)
+    hdl.write(line07)
+    hdl.write(line08)
+    hdl.write(line09)
+    hdl.write(line10)
+    hdl.write(lineZ)
+    hdl.write(line11)
+
+    return True
+
+
+
+
+def galPrintSky(hdl: str , ncomp: int, galsky: GalSky) -> bool:
+    "Print GALFIT sky function to filehandle using  GalSky class"
+
+
+    line00 = "# Object number: {}                 \n".format(ncomp)
+    line01 = " 0)      sky            #    Object type                                        \n"
+    line02 = " 1) {.2f}   {}   # sky background        [ADU counts]  \n".format(galsky.sky, galsky.skyfree)
+    line03 = " 2) {.2f}  {}    # dsky/dx (sky gradient in x) \n".format(galsky.dskyx,galsky.dskyxfree)
+    line04 = " 3) {.2f}  {}    # dsky/dy (sky gradient in y) \n".format(galsky.dskyy,galsky.dskyyfree)
+    line05 = " Z) {}           # Skip this model in output image?  (yes=1, no=0) \n".format(galsky.sky.skip)
+    line06 = "\n"
+    line07 = "================================================================================\n"
+
+    hdl.write(line00)
+    hdl.write(line01)
+    hdl.write(line02)
+    hdl.write(line03)
+    hdl.write(line04)
+    hdl.write(line05)
+    hdl.write(line06)
+    hdl.write(line07)
+
+    return True
 
 
