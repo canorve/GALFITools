@@ -14,6 +14,8 @@ from galfitools.galin.MakePSF import makePSF
 from galfitools.galin.galfit import Galfit
 from galfitools.galin.galfit import galfitLastFit 
 
+from galfitools.galin.getSersic import getSersic
+
 from galfitools.galin.galfit import GalComps, GalHead
 
 from galfitools.mge.mge2galfit import PrintHeader, PrintSky, PrintSersic
@@ -31,9 +33,6 @@ from galfitools.galin.checkGalFile import checkFile
 from galfitools.galin.imarith import imarith 
 
 
-from galfitools.galout.getPeak import getPeak
-from galfitools.galout.PhotDs9 import photDs9 
-from galfitools.mge.mge2galfit import GetInfoEllip
 
 from galfitools.shell.prt import printWelcome
 
@@ -442,9 +441,14 @@ def maingetSersic():
     parser.add_argument("-sk","--sky", default=0, type=float, help="Sky background value to be removed from image before photometry. Default = 0")
 
 
+    parser.add_argument("-bt","--bulgetot", type=float, help="Bulge to total ratio. If set it will print two sersics: one for the bulge and the other for the disk")
 
     parser.add_argument("-c","--center", action="store_true", help="takes center of ds9 region file")
+
+    parser.add_argument("-n","--noprint", action="store_true", help="avoids to print Sersic functionts to stdout")
     parser.add_argument("-m","--mask", type=str, help="the mask file")
+
+    parser.add_argument("-b","--bards9", type=str, help="DS9 ellipse region file that containts the bar region. bulgetot flag must be activated")
 
     args = parser.parse_args()
 
@@ -454,60 +458,13 @@ def maingetSersic():
     maskfile = args.mask
     zeropoint = args.zeropoint
     sky = args.sky
+    bulgetot = args.bulgetot
+    noprint = args.noprint
+    bards9 = args.bards9
 
 
-    X, Y, AxRat, PA = getPeak(image, regfile, center, maskfile)
+    getSersic(image, regfile, center, maskfile, zeropoint, sky, noprint, bulgetot, bards9)
 
-
-    mag, exptime = photDs9(image, regfile, maskfile ,zeropoint, sky)
-
-
-    print("peak is at (x, y) = ", X, Y)
-
-    print("axis ratio q = {:.2f} ".format(AxRat))
-    print("angular position = {:.2f}".format(PA)) 
-
-
-    # Component number: 1
-    # 0) sersic                 #  Component type
-    # 1) 1004.8679 1004.6602 1 1  #  Position x, y
-    # 3) 13.6692     1          #  Integrated magnitude 
-    # 4) 10.9837     1          #  R_e (effective radius)   [pix]
-    # 5) 0.5000      0          #  Sersic index n (de Vaucouleurs n=4) 
-    # 6) 0.0000      0          #     ----- 
-    # 7) 0.0000      0          #     ----- 
-    # 8) 0.0000      0          #     ----- 
-    # 9) 0.8284      1          #  Axis ratio (b/a)  
-    #10) -34.1784    1          #  Position angle (PA) [deg: Up=0, Left=90]
-    # Z) 0                      #  Skip this model in output image?  (yes=1, no=0)
-
-
-    #guesses for n and Re
-    n = 2
-
-    obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
-
-    if rx >= ry:
-        Re = rx/4 #wild guess
-    else:
-        Re = ry/4 #same
-
-
-    print("the Sersic component of the DS9 ellipse region is: ")
-    print("")
-
-    print("Component number: 1")
-    print("0) sersic # Component type")
-    print("1) {:.2f} {:.2f}   # Position x, y".format(X, Y))
-    print("3) {:.2f}          # Integrated magnitude ".format(mag))
-    print("4) {:.2f}          # R_e (effective radius) ".format(Re))
-    print("5) {:.2f}          # Sersic index n  ".format(n))
-    print("6) 0.0000   0      # ----  ")
-    print("7) 0.0000   0      # ----  ")
-    print("8) 0.0000   0      # ----  ")
-    print("9) {:.2f}          # Axis Ratio (b/a)  ".format(AxRat))
-    print("10) {:.2f}         # Position angle (PA)  ".format(PA))
-    print("Z) 0               # Skip this model in output image?  ")
 
 
 

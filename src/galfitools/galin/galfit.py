@@ -983,7 +983,6 @@ def galPrintComp(hdl: str, ncomp: int, idx: int, galcomps: GalComps)-> bool:
 
     # print to filehandle
 
-    #lastmod agregar idx a cada galcomps.namecomp[idx]
     line00 = "# Object number: {}   \n".format(ncomp)
     line01 = " 0)   {}   #  Object type      \n".format(galcomps.NameComp[idx])
     line02 = " 1) {:.2f}  {:.2f}  {}  {}  #  position x, y  [pixel] \n".format(
@@ -997,7 +996,7 @@ def galPrintComp(hdl: str, ncomp: int, idx: int, galcomps: GalComps)-> bool:
     line06 = " 6)  {}  {}      #  ---------------- \n".format(galcomps.Exp2[idx],
                 galcomps.Exp2free[idx])
     line07 = " 7)  {}  {}      #  ---------------- \n".format(galcomps.Exp3[idx], 
-            galcmps.Exp3free[idx])
+            galcomps.Exp3free[idx])
     line08 = " 8)  0.0000       0   #  ----------------                                \n"
     line09 = " 9) {:.2f}   {}   #  axis ratio (b/a)  \n".format(
         galcomps.AxRat[idx], galcomps.AxRatfree[idx])
