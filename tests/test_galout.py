@@ -112,7 +112,7 @@ def test_getFWHM():
     num_comp = 1 
 
 
-    fwhm, fwhm_arc, N, theta = getFWHM(galfitFile, dis, angle, num_comp)
+    fwhm, N, theta = getFWHM(galfitFile, dis, angle, num_comp)
 
     result = 8.81 
 
@@ -180,7 +180,7 @@ def test_getReComp():
 
 
 
-    EffRad, EffRad_arc, totmag, meanme, me, N, theta = getReComp(galfitFile, dis, eff, angle, num_comp)
+    EffRad, totmag, meanme, me, N, theta = getReComp(galfitFile, dis, eff, angle, num_comp)
 
 
     result = 97.82 
