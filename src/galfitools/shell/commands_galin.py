@@ -463,8 +463,7 @@ def maingetSersic():
     bards9 = args.bards9
 
 
-    getSersic(image, regfile, center, maskfile, zeropoint, sky, noprint, bulgetot, bards9)
-
+    galcomps = getSersic(image, regfile, center, maskfile, zeropoint, sky, noprint, bulgetot, bards9)
 
 
 
