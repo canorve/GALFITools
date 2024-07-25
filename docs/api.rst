@@ -481,6 +481,48 @@ class with the parameters read from sky.
     imarith(ImageFile, output, image2, add, mul, div, sub)
 
 
+**getSersic** Its estimates and prints initial parameters for Sersic components. It
+              addtion if proved options for single Sersic, bulge/disk and bulge/bar/disk
+
+::
+
+    from galfitools.galin.getSersic import getSersic
+
+
+    #image: fits  image of the galaxy
+    #regfile: Ds9 ellipse region containing the galaxy
+    #center: if activated, it then uses the center of the Ds9 ellipse region
+    #maskfile: fits mask  file (the same file provided for GALFIT)
+    #zeropoint: magnitude zero point
+    #sky: value of the sky background in pixel units 
+    #bulgetot: if provided it divides the magnitud in two components: bulge and disk according
+    # to the value of bulgetot (value expected to be between 0 and 1)
+    #noprint: avoids to print to stdout and just returns the galcomps data class
+    #bards9: if provided it used the info of the ds9 ellipse region to estimate the
+    # initial parameter of the bar. Note: This is a different file of the one provided in regfile
+
+    #galcomps: data class containing the initial parameters of every component
+
+    galcomps = getSersic(image, regfile, center, maskfile, zeropoint, sky, noprint, bulgetot, bards9)
+
+
+**makePSF** Makes a PSF fits model from a star using Multi Gaussian Expansion (MGE) 
+::
+
+    # galfitFile: GALFIT file. Used to read header and sky component value
+    # image: Fits image containing the galaxy 
+    # regfile: Ds9 ellipse region file containing the star
+    # center: If activated, it used the center of the Ds9 region instead of 
+    # the peak (default mode)
+    # psfout: name of the output PSF fits model
+    # sigma: Sigma image used for galfit (if any)
+    # twist: use twist mode for MGE 
+
+    numgauss: maximum number of gaussians used for MGE
+
+
+
+    makePSF(galfitFile, image, regfile, center, psfout, sigma, twist, numgauss) 
 
 
 

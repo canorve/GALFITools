@@ -16,28 +16,18 @@ def mainMGE():
     #parser.add_argument("image", help="the Mask image file to modify or create")
     parser.add_argument("GalfitFile", help="GALFIT file to obtain the header options")
     parser.add_argument("Ds9regFile", help="the DS9 ellipse region file containing the galaxy. Ignored if -xy option is used")
-    #parser.add_argument("magzpt", help="the magnitude zero point ")
     parser.add_argument("-t","--twist", action="store_true", help="uses twist option for mge ")
-    #parser.add_argument("-r","--regu", action="store_true", 
-    #                    help="regularized mode for mge_fit_sectors ")
     parser.add_argument("-c","--center", action="store_true", 
-                        help="uses the center given in DS9 region file," + 
+                        help="uses the center given in DS9 region file, " + 
                         "otherwise it will found the x,y peaks within DS9 ellipse")
     parser.add_argument("-p","--psf", type=float, help="the value of PSF sigma ",default=0)
-    #parser.add_argument("-s","--sky", type=float, help="the sky background value",default=0)
-    #parser.add_argument("-m","--mask", type=str, help="the mask file")
-    #parser.add_argument("-ps","--plate", type=float, help="plate scale of the image",default=1)
     parser.add_argument("-gas","--gauss", action="store_true", help="uses gauss function for galfit file")
 
     parser.add_argument("-fser","--freeser", action="store_true", help="leaves the sersic index as a free parameter to fit")
     parser.add_argument("-fsk","--freesky", action="store_true", help="leaves the sky as a free parameter to fit")
 
-    #parser.add_argument("-pf","--psfile", type=str, help="name of the psf file for GALFIT. default = psf.fits")
-    
-#    parser.add_argument("-sf","--sigfile", type=str, help="name of the sigma image for GALFIT. default = sigma.fits",default="sigma.fits")
 
-
-    parser.add_argument("-ng","--numgauss", type=int, help="number of gaussians that will be used for galfit. Starting from the first one")
+    parser.add_argument("-ng","--numgauss", type=int, help="number of gaussians that will be used for galfit. ")
 
 
     parser.add_argument("-xy","--xypos", nargs=2, type=int, help="provides the (x y) position center of the object to fit")

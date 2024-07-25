@@ -519,8 +519,8 @@ def mainMakePSF():
     parser.add_argument("Ds9regFile", help="the DS9 ellipse region file containing the star to model")
 
     parser.add_argument("-c","--center", action="store_true", 
-                        help="uses the center given in DS9 region file," + 
-                        "otherwise it will find the x,y peaks within DS9 ellipse")
+                        help="uses the center given in DS9 region file, " + 
+                        "otherwise it will find the (x,y) peak within DS9 ellipse")
 
     parser.add_argument("-o","--out", type=str, 
                         help="the PSF model image",default="psf.fits")
@@ -530,7 +530,7 @@ def mainMakePSF():
 
     parser.add_argument("-t","--twist", action="store_true", help="uses twist option for mge ")
 
-    parser.add_argument("-ng","--numgauss", type=int, help="number of gaussians that will be used for galfit. Starting from the first one")
+    parser.add_argument("-ng","--numgauss", type=int, help="number of gaussians that will be used for galfit.")
 
     #######################
     args = parser.parse_args()

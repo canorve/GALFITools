@@ -76,7 +76,7 @@ prepare the necessary files for GALFIT input
   options:
     -h, --help            show this help message and exit
     -c, --center          uses the center given in DS9 region file,otherwise it will find the x,y
-                          peaks within DS9 ellipse
+                          peak within DS9 ellipse
     -s SKY, --sky SKY     the sky background to be removed. Default = 0
     -o OUT, --out OUT     the image output.
     -sig SIGMA, --sigma SIGMA
@@ -295,7 +295,63 @@ prepare the necessary files for GALFIT input
    -s   --sub   substract constant to all pixels
 
 
+ 
 
+**getSersic** Its estimates and prints initial parameters for Sersic components. It
+              addtion if proved options for single Sersic, bulge/disk and bulge/bar/disk
+
+::
+
+
+
+  usage: getSersic [-h] [-zp ZEROPOINT] [-sk SKY] [-bt BULGETOT] [-c] [-n] [-m MASK] [-b BARDS9]
+                 Image RegFile
+
+  prints the Sersic function from DS9 ellipse region
+
+  positional arguments:
+    Image                 image fits file
+    RegFile               DS9 ellipse region file
+
+  options:
+    -h, --help            show this help message and exit
+    -zp ZEROPOINT, --zeropoint ZEROPOINT
+                          The value of the zero point. Default = 25
+    -sk SKY, --sky SKY    Sky background value to be removed from image before photometry. Default = 0
+    -bt BULGETOT, --bulgetot BULGETOT
+                          Bulge to total ratio. If set it will print two sersics: one for the bulge and
+                          the other for the disk
+    -c, --center          takes center of ds9 region file
+    -n, --noprint         avoids to print Sersic functionts to stdout
+    -m MASK, --mask MASK  the mask file
+    -b BARDS9, --bards9 BARDS9
+                          DS9 ellipse region file that containts the bar region. bulgetot flag must be
+                          activated
+
+
+**MakePSF**
+
+::
+
+  usage: makePSF [-h] [-c] [-o OUT] [-sig SIGMA] [-t] [-ng NUMGAUSS] image GalfitFile Ds9regFile
+
+  Makes a PSF model of a star using Multi Gaussian Expansion
+
+  positional arguments:
+    image                 the image file where it contains the star to be modelled
+    GalfitFile            GALFIT file to obtain the header options
+    Ds9regFile            the DS9 ellipse region file containing the star to model
+
+  options:
+    -h, --help            show this help message and exit
+    -c, --center          uses the center given in DS9 region file, otherwise it will find the (x,y) peak
+                          within DS9 ellipse
+    -o OUT, --out OUT     the PSF model image
+    -sig SIGMA, --sigma SIGMA
+                          introduce the sigma image
+    -t, --twist           uses twist option for mge
+    -ng NUMGAUSS, --numgauss NUMGAUSS
+                          number of gaussians that will be used for galfit.
 
 
 **GALFIT OUTPUT**
@@ -570,7 +626,7 @@ Routines that use the Multi-Gaussian Expansion.
   options:
     -h, --help            show this help message and exit
     -t, --twist           uses twist option for mge
-    -c, --center          uses the center given in DS9 region file,otherwise it will found the x,y peaks within DS9
+    -c, --center          uses the center given in DS9 region file,otherwise it will found the x,y peak within DS9
                           ellipse
     -p PSF, --psf PSF     the value of PSF sigma
     -gas, --gauss         uses gauss function for galfit file
@@ -604,7 +660,7 @@ Routines that use the Multi-Gaussian Expansion.
     -o OUTPUT, --output OUTPUT
                           output file
     -c, --center          uses the center given in DS9 region file,otherwise it will found the x,y
-                          peaks within DS9 ellipse
+                          peak within DS9 ellipse
     -rx RANX RANX, --ranx RANX RANX
                           provide a range for x-axis: xmin - xmax
     -ry RANY RANY, --rany RANY RANY
