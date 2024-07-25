@@ -29,10 +29,9 @@ import argparse
 #from galfitools.galin.galfit import Galfit, conver2Sersic, SelectGal, numComps, GetRadAng
 from galfitools.galin.galfit import Galfit
 from galfitools.galin.MaskDs9 import GetAxis 
-#def mge2gal(args) -> None:
 
-def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, numgauss, xypos=None, ellip = None, posang = None) -> None:
-
+def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, 
+                freesky, numgauss, xypos=None, ellip = None, posang = None) -> str:
 
 
     # reading options from galfit header
@@ -486,6 +485,8 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, freesky, n
 
     print("Done. Gaussians are stored in {}, and {} for galfit format ".format(mgeoutfile,parfile))
 
+    #returns output name
+    return T2
 ####################################################
 ####################################################
 #####################################################

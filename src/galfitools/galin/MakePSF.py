@@ -102,7 +102,8 @@ def makePSF(galfitFile: str, image: str, regfile: str, center: bool, psfout: str
 
 
 
-    mge2gal(galfitFile, regmgefile, center, psf, twist, gauss, freeser, freesky, numgauss, xypos=xypos, ellip = ellip, posang = posang) 
+    outname = mge2gal(galfitFile, regmgefile, center, psf, twist, gauss, 
+            freeser, freesky, numgauss, xypos=xypos, ellip = ellip, posang = posang) 
 
 
 
@@ -136,10 +137,6 @@ def makePSF(galfitFile: str, image: str, regfile: str, center: bool, psfout: str
     head.outimage = psfout
     head.P = 1 
 
-    #PrintHeader(fout1, head.inputimage, head.outimage, head.sigimage, head.psfimage, head.psfsamp, head.maskimage, head.constraints, head.xmin, head.xmax, head.ymin,
-    #            head.ymax, head.convx, head.convy, head.mgzpt, head.scale, head.scaley, 
-    #            head.display, head.P, 0)
-
     galPrintHeader(fout1, head)
 
 
@@ -149,10 +146,6 @@ def makePSF(galfitFile: str, image: str, regfile: str, center: bool, psfout: str
 
     for index, item in enumerate(galcomps.N):
 
-            #PrintSersic(fout1, index+1, galcomps.PosX[index], galcomps.PosY[index], 
-            #        galcomps.Mag[index], galcomps.Rad[index], galcomps.Exp[index], 
-            #        galcomps.AxRat[index], galcomps.PosAng[index], galcomps.skip[index], 
-            #        galcomps.MagFree[index], galcomps.ExpFree[index])
 
             galPrintComp(fout1, index+1, index, galcomps)
 
@@ -161,7 +154,6 @@ def makePSF(galfitFile: str, image: str, regfile: str, center: bool, psfout: str
 
     galsky.skip = 1
  
-    #PrintSky(fout1, index+1, galsky.sky, galsky.skip, galsky.skyfree)
     galPrintSky(fout1, index+1, galsky)
 
 
@@ -177,6 +169,7 @@ def makePSF(galfitFile: str, image: str, regfile: str, center: bool, psfout: str
     print("Done. PSF model file: ", psfout)
 
 
+    print("Check the image, model and residual: ",outname)
 
 
 
