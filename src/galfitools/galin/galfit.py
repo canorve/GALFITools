@@ -856,7 +856,7 @@ def galPrintHeader(hdl, galhead: GalHead)-> bool:
     B = galhead.outimage
     C = galhead.sigimage 
     D = galhead.psfimage 
-    E = galhead.psfamp
+    E = galhead.psfsamp
     F = galhead.maskimage
     G = galhead.constraints
     xlo = galhead.xmin
@@ -941,7 +941,7 @@ def galPrintHeader(hdl, galhead: GalHead)-> bool:
     hdl.write(lineK)
     hdl.write(lineO)
     hdl.write(lineP)
-    hdl.write(lineS)
+    #hdl.write(lineS)
     hdl.write(lineY)
 
     hdl.write(line0)
@@ -986,22 +986,22 @@ def galPrintComp(hdl: str, ncomp: int, idx: int, galcomps: GalComps)-> bool:
     line00 = "# Object number: {}   \n".format(ncomp)
     line01 = " 0)   {}   #  Object type      \n".format(galcomps.NameComp[idx])
     line02 = " 1) {:.2f}  {:.2f}  {}  {}  #  position x, y  [pixel] \n".format(
-        galcomps.PosX[idx], galcomps.PosY[idx], galcomps.Xfree[idx], galcomps.Yfree[idx])
+        galcomps.PosX[idx], galcomps.PosY[idx], galcomps.PosXFree[idx], galcomps.PosYFree[idx])
     line03 = " 3) {:.2f}  {}    #  total magnitude  \n".format(
-        galcomps.Mag[idx], galcomps.Magfree[idx])
+        galcomps.Mag[idx], galcomps.MagFree[idx])
     line04 = " 4) {:.2f}  {}    #  R_e     [Pixels] \n".format(
-            galcomps.Rad[idx], galcomps.Radfree[idx])
+            galcomps.Rad[idx], galcomps.RadFree[idx])
     line05 = " 5) {}     {}   #  Sersic exponent (deVauc=4, expdisk=1) \n".format(
-        galcomps.Exp[idx], galcomps.Expfree[idx])
+        galcomps.Exp[idx], galcomps.ExpFree[idx])
     line06 = " 6)  {}  {}      #  ---------------- \n".format(galcomps.Exp2[idx],
-                galcomps.Exp2free[idx])
+                galcomps.Exp2Free[idx])
     line07 = " 7)  {}  {}      #  ---------------- \n".format(galcomps.Exp3[idx], 
-            galcomps.Exp3free[idx])
+            galcomps.Exp3Free[idx])
     line08 = " 8)  0.0000       0   #  ----------------                                \n"
     line09 = " 9) {:.2f}   {}   #  axis ratio (b/a)  \n".format(
-        galcomps.AxRat[idx], galcomps.AxRatfree[idx])
+        galcomps.AxRat[idx], galcomps.AxRatFree[idx])
     line10 = "10) {:.2f}    {}  #  position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
-        galcomps.PosAng[idx], galcomps.PosAngfree[idx])
+        galcomps.PosAng[idx], galcomps.PosAngFree[idx])
     lineZ = " Z) {}         #  Skip this model in output image?  (yes=1, no=0) \n".format(
         galcomps.skip[idx])
     line11 = "\n"
@@ -1031,10 +1031,10 @@ def galPrintSky(hdl: str , ncomp: int, galsky: GalSky) -> bool:
 
     line00 = "# Object number: {}                 \n".format(ncomp)
     line01 = " 0)      sky            #    Object type                                        \n"
-    line02 = " 1) {.2f}   {}   # sky background        [ADU counts]  \n".format(galsky.sky, galsky.skyfree)
-    line03 = " 2) {.2f}  {}    # dsky/dx (sky gradient in x) \n".format(galsky.dskyx,galsky.dskyxfree)
-    line04 = " 3) {.2f}  {}    # dsky/dy (sky gradient in y) \n".format(galsky.dskyy,galsky.dskyyfree)
-    line05 = " Z) {}           # Skip this model in output image?  (yes=1, no=0) \n".format(galsky.sky.skip)
+    line02 = " 1) {:.2f}   {}   # sky background        [ADU counts]  \n".format(galsky.sky, galsky.skyfree)
+    line03 = " 2) {:.2f}  {}    # dsky/dx (sky gradient in x) \n".format(galsky.dskyx,galsky.dskyxfree)
+    line04 = " 3) {:.2f}  {}    # dsky/dy (sky gradient in y) \n".format(galsky.dskyy,galsky.dskyyfree)
+    line05 = " Z) {}           # Skip this model in output image?  (yes=1, no=0) \n".format(galsky.skip)
     line06 = "\n"
     line07 = "================================================================================\n"
 
