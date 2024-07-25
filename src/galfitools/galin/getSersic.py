@@ -129,6 +129,17 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
 
 
 
+            print("")
+            print("for parameter constraints file: ") 
+            if bards9:
+
+                print(" 1_2_3    x    offset ")
+                print(" 1_2_3    y    offset ")
+            else:
+
+                print(" 1_2    x    offset ")
+                print(" 1_2    y    offset ")
+ 
         #first component: bulge
         galcomps.PosX = np.append(galcomps.PosX, X)
         galcomps.PosY = np.append(galcomps.PosY, Y)
