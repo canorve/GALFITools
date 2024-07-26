@@ -178,8 +178,8 @@ Here is another for galaxy NGC1198 using GALFITools:
     :target: https://www.youtube.com/watch?v=VmJJkKVd37U
 
 
-Here is another where I model  the barred spiral galaxy PGC 34232
-for GALFITools v1.11.0:
+Here I model the barred spiral galaxy PGC 34232
+with GALFITools v1.11.0:
 
 .. image:: https://img.youtube.com/vi/wUA-sigVSts/maxresdefault.jpg
     :alt: IMAGE ALT TEXT HERE
