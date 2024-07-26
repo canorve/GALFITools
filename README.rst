@@ -159,6 +159,8 @@ practical implementation of each individual routine.
 
 **Video Tutorials:**
 
+Turn on English subtitles.
+
 Here is a tutorial video for galaxy NGC720 using GALFITools:
 
 
@@ -175,6 +177,13 @@ Here is another for galaxy NGC1198 using GALFITools:
     :alt: IMAGE ALT TEXT HERE
     :target: https://www.youtube.com/watch?v=VmJJkKVd37U
 
+
+Here is another where I model  the barred spiral galaxy PGC 34232
+for GALFITools v1.11.0:
+
+.. image:: https://img.youtube.com/vi/wUA-sigVSts/maxresdefault.jpg
+    :alt: IMAGE ALT TEXT HERE
+    :target: https://www.youtube.com/watch?v=wUA-sigVSts
 
 
 
