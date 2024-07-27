@@ -355,7 +355,7 @@ class GetBreak:
 
 
 def getBreak2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool, ranx: list) -> float:
-    '''gets the break radius from a set of Sersics using another method'''
+    '''gets the Kappa radius (maximum curvature) from a set of Sersics using another method'''
 
 
     galfit = Galfit(galfitFile)
@@ -398,7 +398,7 @@ def getBreak2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool
     N = numComps(comps,'all')
 
     if N == 0:
-        print('not enough number of components to compute Re')
+        print('not enough number of components to compute break radius')
         print('exiting..')
         sys.exit(1)
 
@@ -456,16 +456,128 @@ def getBreak2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool
     brad = lrad[idx]
 
 
-
-
     rbreak = 10**brad
 
 
 
     return rbreak, N, theta  
+
+
+def getKappa2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool, ranx: list) -> float:
+    '''gets the break radius from a set of Sersics using another method'''
+
+
+    galfit = Galfit(galfitFile)
+
+    head = galfit.ReadHead()
+    galcomps = galfit.ReadComps()
+
+
+
+    #convert all exp, gaussian and de vaucouleurs to Sersic format
+    comps = conver2Sersic(galcomps) 
+
+
+
+    comps.Flux = 10**((-comps.Mag)/2.5)
+
+    k = gammaincinv(2*comps.Exp, 0.5)
+
+    denom1 = (2*np.pi*comps.Rad**2)*(np.exp(k))
+    denom2 = (comps.Exp)*(k**(-2*comps.Exp))
+    denom3 = (gamma(2*comps.Exp))*(comps.AxRat) 
+
+    denom = denom1*denom2*denom3 
+    
+    comps.Ie = comps.Flux/denom
+
+
+
+    comps = SelectGal(comps, dis, num_comp)
+
+
+    maskgal = (comps.Active == True) 
+    if angle:
+        theta = angle
+    else:
+        #taking the last component position angle for the whole galaxy
+        theta = comps.PosAng[maskgal][-1]  
+
+
+    N = numComps(comps,'all')
+
+    if N == 0:
+        print('not enough number of components to compute kappa radius')
+        print('exiting..')
+        sys.exit(1)
+
+
+
+    #########################
+    ### computing the slope
+    #########################
+    if ranx:
+        (xmin,xmax)=ranx[0], ranx[1]
+    else:
+        xmin = 0.1
+        xmax = 100
+
+
+    R = np.arange(xmin,xmax,.1)
+
+    lrad= np.log10(R)
+    slp = GetSlope().GalSlope(R, comps, theta) 
+
+
+    #if plot:
+    #    plt.close()
+    #    plt.plot(R, slp)
+
+    #    plt.xlabel("Rad")
+    #    plt.ylabel("Slope")
+
+    #    plt.grid(True)
+    #    plt.minorticks_on()
+    #    plt.savefig("FirstDerivative.png")
+
+
+    ###
+    yspl = UnivariateSpline(lrad,slp,s=0,k=4) 
+
+    yspl1d = yspl.derivative(n=1) # this is the second derivative of the Sersics
+    yspl2d = yspl.derivative(n=2) # this is the Third derivative of the Sersics
+
+    kap1d = np.abs(yspl1d(lrad))/(1+slp**2)**(3/2)  
+
+
+    if plot:
+        plt.close()
+        plt.plot(lrad,kap1d)
+        plt.xlabel("Log(Rad)")
+        plt.ylabel("Curvature radius")
+
+        plt.grid(True)
+        plt.minorticks_on()
+        plt.savefig("kappaRadius.png")
+
+
+
+
+    idx = np.where(kap1d == max(kap1d))[0][0]
+
+    krad = lrad[idx]
+
+
+    rkappa = 10**krad
+
+
+
+    return rkappa, N, theta  
+
 ############################
 ############################
 ############################
+
 
 
 
