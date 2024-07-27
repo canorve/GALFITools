@@ -457,6 +457,27 @@ alternative method to getBreak
 
 
 
+**getKappa2** gets the kappa radius from a set of Sersics using an 
+alternative method to getKappa
+
+::
+
+  positional arguments:
+    GalfitFile            Galfit File containing the Sersics or gaussians components
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components
+    -n NUMCOMP, --numcomp NUMCOMP
+                          Number of component where it'll obtain center of all components, default = 1
+    -a ANGLE, --angle ANGLE
+                          Angle of the major axis of the galaxy. Default= it will take the angle of the
+                          last components
+    -p, --plot            makes plot of double derivative vs. radius
+    -rx RANX RANX, --ranx RANX RANX
+                          x-axis range to search for the Break radius: xmin - xmax
+
+
 
 **getReComp** gets the effective radius from a set of Sersics
 ::

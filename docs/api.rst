@@ -667,6 +667,34 @@ alternative method to getBreak.
     #  is computed in that angle orientation
 
 
+**getKappa2** gets the kappa radius from a set of Sersics using an 
+alternative method to getKappa.
+
+::
+
+    from galfitools.galout.getRads import getBreak2
+
+
+    #galfitFile: Galfit File containing the Sersics or gaussians components
+
+    #optional from argparse:
+    #dis: Maximum distance among components
+    #angle:  Angle of the major axis of the galaxy measured from the image Y-axis
+    #num_comp: Number of component where it'll obtain center of all components, default = 1
+    #plot: boolean flag that indicates to  make a plot of double derivative vs. radius
+    #ranx: list that indicates the range for the plot x-axis: xmin - xmax
+
+    rkappa, N, theta =  getKappa2(galfitFile, dis, angle, num_comp, plot, ranx)
+
+    # output variables:
+
+    #rkappa: the kappa radius in pixels  
+    #N: number of surface brightness model components of the galaxy
+    #theta: the angle used to determine the break radius. Break radius
+    #  is computed in that angle orientation
+
+
+
 
 
 
