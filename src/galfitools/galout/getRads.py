@@ -414,7 +414,7 @@ def getBreak2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool
         xmax = 100
 
 
-    R = np.arange(xmin,xmax,.1)
+    R = np.arange(xmin, xmax, .1)
 
     lrad= np.log10(R)
     slp = GetSlope().GalSlope(R, comps, theta) 
@@ -433,15 +433,15 @@ def getBreak2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool
 
 
     ###
-    yspl = UnivariateSpline(lrad,slp,s=0,k=4)
+    yspl = UnivariateSpline(lrad, slp, s=0, k=4)
 
     yspl2d = yspl.derivative(n=2)
     yspl1d = yspl.derivative(n=1)
 
     if plot:
         plt.close()
-        plt.plot(lrad,yspl1d(lrad))
-        plt.xlabel("Log(Rad)")
+        plt.plot(10**(lrad),yspl1d(lrad))
+        plt.xlabel("Rad (pixels)")
         plt.ylabel("Second derivative")
 
         plt.grid(True)
@@ -523,22 +523,11 @@ def getKappa2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool
         xmax = 100
 
 
-    R = np.arange(xmin,xmax,.1)
+    R = np.arange(xmin, xmax,.1)
 
     lrad= np.log10(R)
     slp = GetSlope().GalSlope(R, comps, theta) 
 
-
-    #if plot:
-    #    plt.close()
-    #    plt.plot(R, slp)
-
-    #    plt.xlabel("Rad")
-    #    plt.ylabel("Slope")
-
-    #    plt.grid(True)
-    #    plt.minorticks_on()
-    #    plt.savefig("FirstDerivative.png")
 
 
     ###
@@ -552,8 +541,8 @@ def getKappa2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool
 
     if plot:
         plt.close()
-        plt.plot(lrad,kap1d)
-        plt.xlabel("Log(Rad)")
+        plt.plot(10**(lrad),kap1d)
+        plt.xlabel("Rad (pixels)")
         plt.ylabel("Curvature radius")
 
         plt.grid(True)
