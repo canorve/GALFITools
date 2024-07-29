@@ -74,7 +74,6 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
     #store in GalComps data class
     galcomps = GalComps()
 
-
     if (bulgetot): 
         if not(noprint):
             print("The initial parameters for the Sersic component based on the DS9 ellipse region are: ")
@@ -130,16 +129,33 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
 
 
             print("")
-            print("for parameter constraints file: ") 
+            print("parameter constraints file: ",fileconst) 
+
+            fileconst = "constraints.txt"
+            fout = open(fileconst, "w")
+
             if bards9:
 
                 print(" 1_2_3    x    offset ")
                 print(" 1_2_3    y    offset ")
+                constlinex= " 1_2_3    x    offset \n"
+                constliney= " 1_2_3    y    offset \n"
+                fout.write(constlinex)
+                fout.write(constliney)
+
             else:
 
                 print(" 1_2    x    offset ")
                 print(" 1_2    y    offset ")
- 
+
+                constlinex= " 1_2_3    x    offset \n"
+                constliney= " 1_2_3    y    offset \n"
+                fout.write(constlinex)
+                fout.write(constliney)
+
+
+            fout.close()
+
         #first component: bulge
         galcomps.PosX = np.append(galcomps.PosX, X)
         galcomps.PosY = np.append(galcomps.PosY, Y)
@@ -223,7 +239,6 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
         galcomps.Exp3Free = np.append(galcomps.Exp3Free, 0)
         galcomps.AxRatFree = np.append(galcomps.AxRatFree, 1)
  
-
 
     else:
 
