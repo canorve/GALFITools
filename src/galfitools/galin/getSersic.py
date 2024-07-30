@@ -127,11 +127,11 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
             print("Z) {}  # Skip this model in output image?  ".format(skip))
 
 
+            fileconst = "constraints.txt"
 
             print("")
             print("parameter constraints file: ",fileconst) 
 
-            fileconst = "constraints.txt"
             fout = open(fileconst, "w")
 
             if bards9:
@@ -148,8 +148,8 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
                 print(" 1_2    x    offset ")
                 print(" 1_2    y    offset ")
 
-                constlinex= " 1_2_3    x    offset \n"
-                constliney= " 1_2_3    y    offset \n"
+                constlinex= " 1_2    x    offset \n"
+                constliney= " 1_2    y    offset \n"
                 fout.write(constlinex)
                 fout.write(constliney)
 
