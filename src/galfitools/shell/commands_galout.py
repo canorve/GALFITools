@@ -92,8 +92,8 @@ def mainGetBreak() -> None:
 
     parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
 
-    parser.add_argument("-a","--angle", type=float, 
-                        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components")
+    parser.add_argument("-pa","--angle", type=float, 
+                        help="Position angle of the major axis of the galaxy. Default= it will take the angle of the last components")
 
 
     parser.add_argument("-ni","--numinitial", type=int, help="Number of component where it'll obtain the initial parameter to search break radius or to generated random initial radius. ", default=2)
@@ -167,8 +167,8 @@ def mainGetBreak2():
     parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
     parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
 
-    parser.add_argument("-a","--angle", type=float, 
-                        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components")
+    parser.add_argument("-pa","--angle", type=float, 
+                        help="Position angle of the major axis of the galaxy. Default= it will take the angle of the last components")
 
 
     parser.add_argument("-p","--plot", action="store_true", help='makes plot of double derivative vs. radius ') 
@@ -226,8 +226,10 @@ def mainFWHM() -> None:
 
     parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
 
-    parser.add_argument("-a","--angle", type=float, 
-                        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components")
+    parser.add_argument("-pa","--angle", type=float, 
+                        help="Position angle of the major axis of the galaxy. Default= it will take the angle of the last components")
+
+
 
 
 
@@ -284,8 +286,9 @@ def mainKappa() -> None:
 
     parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
 
-    parser.add_argument("-a","--angle", type=float, 
-                        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components")
+    parser.add_argument("-pa","--angle", type=float, 
+                        help="Position angle of the major axis of the galaxy. Default= it will take the angle of the last components")
+
 
 
     parser.add_argument("-ni","--numinitial", type=int, help="Number of component where it'll obtain the initial parameter to search break radius or to generated random initial radius. ", default=2)
@@ -353,8 +356,9 @@ def mainKappa2():
     parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
     parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
 
-    parser.add_argument("-a","--angle", type=float, 
-                        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components")
+    parser.add_argument("-pa","--angle", type=float, 
+                        help="Position angle of the major axis of the galaxy. Default= it will take the angle of the last components")
+
 
 
     parser.add_argument("-p","--plot", action="store_true", help='makes plot of double derivative vs. radius ') 
