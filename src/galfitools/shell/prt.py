@@ -1,5 +1,5 @@
 
-import galfitools 
+import galfitools
 
 
 def printWelcome():

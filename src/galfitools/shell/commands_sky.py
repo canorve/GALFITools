@@ -1,16 +1,12 @@
 
 import argparse
 
-
-
+from galfitools.shell.prt import printWelcome
 from galfitools.sky.GalfitSky import galfitSky
-
 from galfitools.sky.Sky import sky
 from galfitools.sky.SkyDs9 import SkyDs9
 from galfitools.sky.SkyRing import SkyRing
 
-
-from galfitools.shell.prt import printWelcome
 
 def mainGalfitSky():
 

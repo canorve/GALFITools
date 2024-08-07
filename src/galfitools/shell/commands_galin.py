@@ -1,43 +1,27 @@
 
 
 import argparse
-
-import numpy as np
-
+import subprocess as sp
+import sys
 from collections import Counter
 
-from galfitools.galin.getStar import getStar
-from galfitools.galin.initgal import InitGal
-from galfitools.galin.MaskDs9 import maskDs9
+import numpy as np
+from galfitools.galin.checkGalFile import checkFile
+from galfitools.galin.galfit import GalComps, Galfit, GalHead, galfitLastFit
 from galfitools.galin.getBoxSizeDs9 import getBoxSizeDs9
-from galfitools.galin.MakePSF import makePSF
-from galfitools.galin.galfit import Galfit
-from galfitools.galin.galfit import galfitLastFit 
-
 from galfitools.galin.getSersic import getSersic
-
-from galfitools.galin.galfit import GalComps, GalHead
-
-from galfitools.mge.mge2galfit import PrintHeader, PrintSky, PrintSersic
-from galfitools.mge.mge2galfit import mge2gal
-
+from galfitools.galin.getStar import getStar
+from galfitools.galin.imarith import imarith
+from galfitools.galin.initgal import InitGal
 from galfitools.galin.MakeMask import makeMask
+from galfitools.galin.MakePSF import makePSF
+from galfitools.galin.MaskDs9 import maskDs9
 from galfitools.galin.MaskSky import skyRem
 from galfitools.galin.xy2fits import xy2fits
-
-import subprocess as sp
-
-from galfitools.galin.checkGalFile import checkFile 
-
-
-from galfitools.galin.imarith import imarith 
-
-
-
+from galfitools.mge.mge2galfit import (PrintHeader, PrintSersic, PrintSky,
+                                       mge2gal)
 from galfitools.shell.prt import printWelcome
 
-
-import sys
 
 def mainGetStar():
 

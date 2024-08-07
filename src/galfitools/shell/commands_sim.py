@@ -2,9 +2,9 @@
 
 import argparse
 
+from galfitools.shell.prt import printWelcome
 from galfitools.sim.MakeSim import makeSim
 
-from galfitools.shell.prt import printWelcome
 
 def mainMakeSim():
 

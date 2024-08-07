@@ -2,40 +2,20 @@
 
 import argparse
 
-
-from galfitools.shell.prt import printWelcome
-
-from galfitools.galout.getRads import getBreak
-from galfitools.galout.getRads import getBreak2
-from galfitools.galout.getRads import getFWHM
-from galfitools.galout.getRads import getKappa
-from galfitools.galout.getRads import getKappa2
-from galfitools.galout.getRads import getReComp
-from galfitools.galout.getRads import getSlope
-from galfitools.galout.getRads import getBulgeRad
-
-from galfitools.galout.getMissingLight import getMissLight
-
-from galfitools.galout.getN import getN
-
-from galfitools.galout.showcube import displayCube
-
-from galfitools.galout.PhotDs9 import photDs9 
-
-from galfitools.galout.getCOW import getCOW
-
-from galfitools.galout.getPeak import getPeak
-
-from galfitools.galout.fitlog2csv import log2csv 
-
-
-from galfitools.galout.getBarSize import getBarSize
-
-
 from galfitools.galin.galfit import Galfit
-
+from galfitools.galout.fitlog2csv import log2csv
+from galfitools.galout.getBarSize import getBarSize
+from galfitools.galout.getCOW import getCOW
+from galfitools.galout.getMissingLight import getMissLight
+from galfitools.galout.getN import getN
+from galfitools.galout.getPeak import getPeak
+from galfitools.galout.getRads import (getBreak, getBreak2, getBulgeRad,
+                                       getFWHM, getKappa, getKappa2, getReComp,
+                                       getSlope)
+from galfitools.galout.PhotDs9 import photDs9
+from galfitools.galout.showcube import displayCube
 from galfitools.mge.mge2galfit import GetInfoEllip
-
+from galfitools.shell.prt import printWelcome
 
 
 def mainPhotDs9(): 

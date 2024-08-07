@@ -2,11 +2,11 @@
 
 import argparse
 
-
 from galfitools.mge.mge2galfit import mge2gal
 from galfitools.mge.SbProf import sbProf
-
 from galfitools.shell.prt import printWelcome
+
+
 #check modify: remove initgauss
 def mainMGE():
 
