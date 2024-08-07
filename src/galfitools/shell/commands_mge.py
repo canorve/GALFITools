@@ -17,7 +17,8 @@ def mainMGE():
     parser.add_argument("GalfitFile", help="GALFIT file to obtain the header options")
     parser.add_argument(
         "Ds9regFile",
-        help="the DS9 ellipse region file containing the galaxy. Ignored if -xy option is used",
+        help="the DS9 ellipse region file containing the galaxy."
+             + " Ignored if -xy option is used",
     )
     parser.add_argument(
         "-t", "--twist", action="store_true", help="uses twist option for mge "
@@ -119,7 +120,8 @@ def mainSbProf():
 
     printWelcome()
     parser = argparse.ArgumentParser(
-        description="SbProf: creates a surface brightness profile from a ellipse ds9 region"
+        description="SbProf: creates a surface brightness profile"
+                    + " from a ellipse ds9 region"
     )
 
     # required arguments
