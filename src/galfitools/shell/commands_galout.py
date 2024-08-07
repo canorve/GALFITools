@@ -226,7 +226,7 @@ def mainGetBarSize():
     parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
     parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
 
-    parser.add_argument("-o","--out", type=str,,default="bar.reg" 
+    parser.add_argument("-o","--out", type=str, default="bar.reg",
                         help="output DS9 ellipse region file")
 
     parser.add_argument("-p","--plot", action="store_true", help='makes plot of double derivatives and Kappa radius ') 

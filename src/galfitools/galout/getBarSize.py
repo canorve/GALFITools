@@ -9,16 +9,9 @@ import scipy
 import sys
 import copy
 
-from scipy.special import gamma, gammainc, gammaincinv
 
-from scipy.optimize import bisect, fmin, newton
-
-import matplotlib.pyplot as plt
-
-from scipy.interpolate import UnivariateSpline
 
 from galfitools.galin.galfit import Galfit, conver2Sersic, SelectGal, numComps, GetRadAng
-
 
 from galfitools.galin.galfit import GalComps, GalHead
 
