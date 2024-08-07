@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 
-import numpy as np
-import sys
+import argparse
 import os
+import os.path
 import stat
 import subprocess as sp
-import os.path
-from astropy.io import fits
+import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
 import scipy
 import scipy.special
-import matplotlib.pyplot as plt
-
-
-import argparse
+from astropy.io import fits
 
 #introducir sky box y sky ring
 #use maskds9 para obtener los pixeles de las regiones

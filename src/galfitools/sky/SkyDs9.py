@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 
-import numpy as np
-import sys
 import os.path
+import sys
+
+import numpy as np
 from astropy.io import fits
-
-
+from galfitools.galin.MaskDs9 import GetAxis
 from matplotlib.path import Path
-
-
-from galfitools.galin.MaskDs9 import GetAxis 
 
 
 def SkyDs9(ImageFile, RegFile, maskfile, outliers=False): 

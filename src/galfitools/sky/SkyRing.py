@@ -1,15 +1,12 @@
 #! /usr/bin/env python
 
-import numpy as np 
-
-from  galfitools.mge.mge2galfit import Ds9ell2Kronellv2
-from  galfitools.mge.mge2galfit import GetInfoEllip
-from  galfitools.mge.mge2galfit import GetSize
-from  galfitools.mge.mge2galfit import GetPmax
-from  galfitools.mge.mge2galfit import GetAxis
-
-from astropy.io import fits
 import os
+
+import numpy as np
+from astropy.io import fits
+from galfitools.mge.mge2galfit import (Ds9ell2Kronellv2, GetAxis, GetInfoEllip,
+                                       GetPmax, GetSize)
+
 
 def SkyRing(image, mask, ds9regfile, width, center, outliers):
     """Computes the sky using gradient over rings """
