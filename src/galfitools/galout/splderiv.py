@@ -1,7 +1,7 @@
 
 import matplotlib.pyplot as plt
-from scipy.interpolate import UnivariateSpline
 import numpy as np
+from scipy.interpolate import UnivariateSpline
 
 #check modify
 

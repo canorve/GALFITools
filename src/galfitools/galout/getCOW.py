@@ -1,31 +1,20 @@
 #! /usr/bin/env python
 
-import numpy as np
 import argparse
-import os
-from astropy.io import fits
-import subprocess as sp
-import scipy
-import sys
 import copy
-
-from scipy.special import gamma, gammainc, gammaincinv
-
-from scipy.optimize import bisect
+import os
+import subprocess as sp
+import sys
 
 import matplotlib.pyplot as plt
-
-
-from galfitools.galin.galfit import Galfit, conver2Sersic, SelectGal, numComps,GetRadAng
-
-from galfitools.galout.getRads import GetReff, GetMe
-
-
-
-from galfitools.galin.galfit import GalComps, GalHead
-
-
-
+import numpy as np
+import scipy
+from astropy.io import fits
+from galfitools.galin.galfit import (GalComps, Galfit, GalHead, GetRadAng,
+                                     SelectGal, conver2Sersic, numComps)
+from galfitools.galout.getRads import GetMe, GetReff
+from scipy.optimize import bisect
+from scipy.special import gamma, gammainc, gammaincinv
 
 
 def getCOW(galfitFile: str, dis: int, angle: float, frac: float,

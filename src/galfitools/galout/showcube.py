@@ -1,18 +1,15 @@
 #! /usr/bin/env python3
 
 
-import matplotlib.pyplot as plt
-import numpy as np
-from matplotlib import colors
-from astropy.io import fits
-from scipy import stats
-from matplotlib.patches import Ellipse
-
-from astropy import units as U
-
 import argparse
 
-
+import matplotlib.pyplot as plt
+import numpy as np
+from astropy import units as U
+from astropy.io import fits
+from matplotlib import colors
+from matplotlib.patches import Ellipse
+from scipy import stats
 
 
 def displayCube(cubeimage: str, namecube: str, dpival: int, brightness: float, contrast:float, 

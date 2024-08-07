@@ -1,9 +1,9 @@
 #! /usr/bin/env python3 
 
 
-import numpy as np
-
 import re
+
+import numpy as np
 
 
 def log2csv(num:int, fileout: str):

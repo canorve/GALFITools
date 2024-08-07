@@ -1,19 +1,14 @@
 #!/usr/bin/env python3
 
 
+import argparse
+import os.path
+import subprocess as sp
+import sys
+
 import numpy as np
 from astropy.io import fits
-import sys
-import subprocess as sp
-import os.path
-
-import argparse
-
-from galfitools.galin.MaskDs9 import GetAxis 
-
-from galfitools.galin.MaskDs9 import checkCompHDU
-
-
+from galfitools.galin.MaskDs9 import GetAxis, checkCompHDU
 
 
 def getPeak(image: str, regfile: str, center: bool, maskfile: str)-> None: 

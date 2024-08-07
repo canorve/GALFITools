@@ -1,22 +1,17 @@
 #! /usr/bin/env python
 
-import numpy as np
 import argparse
-import os
-from astropy.io import fits
-import subprocess as sp
-import scipy
-import sys
 import copy
+import os
+import subprocess as sp
+import sys
 
-
-
-from galfitools.galin.galfit import Galfit, conver2Sersic, SelectGal, numComps, GetRadAng
-
-from galfitools.galin.galfit import GalComps, GalHead
-
-from galfitools.galout.getRads import getKappa2
-from galfitools.galout.getRads import getBreak2
+import numpy as np
+import scipy
+from astropy.io import fits
+from galfitools.galin.galfit import (GalComps, Galfit, GalHead, GetRadAng,
+                                     SelectGal, conver2Sersic, numComps)
+from galfitools.galout.getRads import getBreak2, getKappa2
 
 
 def getBarSize(galfitFile: str, dis: int, num_comp: int, plot: bool, ranx: list, out: str) -> float:
