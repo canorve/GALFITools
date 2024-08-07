@@ -1,25 +1,19 @@
 #!/usr/bin/env python3
 
 
+import os
+import os.path
+import re
+import subprocess as sp
+import sys
+
 import numpy as np
 from astropy.io import fits
-import sys
-import subprocess as sp
-import os.path
-
-import os
-import re
-
-from galfitools.galin.MaskDs9 import GetAxis 
-from galfitools.galin.MaskDs9 import checkCompHDU
-
-from galfitools.galin.galfit import Galfit
-from galfitools.galin.galfit import galfitLastFit 
-from galfitools.galin.galfit import galPrintHeader, galPrintSky, galPrintComp
-
+from galfitools.galin.galfit import (Galfit, galfitLastFit, galPrintComp,
+                                     galPrintHeader, galPrintSky)
 from galfitools.galin.getStar import getStar
-
-from galfitools.mge.mge2galfit import mge2gal, GetInfoEllip, Ds9ell2Kronellv2
+from galfitools.galin.MaskDs9 import GetAxis, checkCompHDU
+from galfitools.mge.mge2galfit import Ds9ell2Kronellv2, GetInfoEllip, mge2gal
 
 
 def makePSF(galfitFile: str, image: str, regfile: str, center: bool, psfout: str, sigma: str, twist: bool, numgauss: int)-> None: 

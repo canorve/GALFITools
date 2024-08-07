@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
 
-import numpy as np
-import sys
+import argparse
 import os
+import os.path
 import stat
 import subprocess as sp
-import os.path
-from astropy.io import fits
+import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
 import scipy
 import scipy.special
-import matplotlib.pyplot as plt
-
-import argparse
-
-
-from galfitools.galin.MaskDs9 import GetAxis 
+from astropy.io import fits
+from galfitools.galin.MaskDs9 import GetAxis
 
 #################################################################
 #################################################################

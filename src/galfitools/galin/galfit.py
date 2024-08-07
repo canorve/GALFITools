@@ -1,14 +1,13 @@
 
 
-from astropy.io import fits
-import numpy as np
-
-import os 
-
-from scipy.optimize import bisect
-
 import copy
+import os
+
+import numpy as np
+from astropy.io import fits
+from scipy.optimize import bisect
 from scipy.special import gamma, gammainc, gammaincinv
+
 
 class GalHead():
     '''store the header of galfit file'''

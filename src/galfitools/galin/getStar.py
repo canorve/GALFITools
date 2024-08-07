@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 
 
+import os.path
+import subprocess as sp
+import sys
+
 import numpy as np
 from astropy.io import fits
-import sys
-import subprocess as sp
-import os.path
+from galfitools.galin.MaskDs9 import GetAxis, checkCompHDU
 
-
-from galfitools.galin.MaskDs9 import GetAxis 
-from galfitools.galin.MaskDs9 import checkCompHDU
 
 def getStar(image: str, regfile: str, imsize: int, center: bool, sky: float, imout: str, sigma: str , sigout: str)-> None: 
 

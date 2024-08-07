@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 
-import numpy as np
-import sys
+import argparse
 import os.path
+import sys
+
+import numpy as np
 from astropy.io import fits
 from astropy.io.fits import CompImageHDU
-
-import argparse
-
 from matplotlib.path import Path
-
-
 
 
 def getBoxSizeDs9(RegFile: str) -> int:

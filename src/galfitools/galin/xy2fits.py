@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
-import numpy as np
-import os
-import subprocess as sp
-import os.path
-from astropy.io import fits
-
 import argparse
+import os
+import os.path
+import subprocess as sp
 
+import numpy as np
+from astropy.io import fits
 from galfitools.galin.MaskDs9 import GetAxis
 
 # code to convert ASCII xy positions to FTIS mask 

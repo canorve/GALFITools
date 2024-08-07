@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
 
+import os
+import sys
+
 import numpy as np
 from astropy.io import fits
-import sys
-import os
+
 
 def imarith(ImageFile: str, output: str, image2: str, add: float, mul: float, div: float, sub: float)-> None: 
 

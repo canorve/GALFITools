@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 
 
+import os.path
+import subprocess as sp
+import sys
+
 import numpy as np
 from astropy.io import fits
-import sys
-import subprocess as sp
-import os.path
-
-
-from galfitools.galout.getPeak import getPeak
-from galfitools.galout.PhotDs9 import photDs9 
-
-from galfitools.mge.mge2galfit import GetInfoEllip
 from galfitools.galin.galfit import GalComps, GalHead
+from galfitools.galout.getPeak import getPeak
+from galfitools.galout.PhotDs9 import photDs9
+from galfitools.mge.mge2galfit import GetInfoEllip
+
 
 def getSersic(image: float, regfile: str, center: bool, maskfile: str, 
                 zeropoint: float, sky: float, noprint: float, 

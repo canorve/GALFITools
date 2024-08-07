@@ -1,14 +1,14 @@
 #! /usr/bin/env python
 
-import numpy as np
-import sys
-import os
-import subprocess as sp
-from astropy.io import fits
-import os.path
-import scipy
 import argparse
+import os
+import os.path
+import subprocess as sp
+import sys
 
+import numpy as np
+import scipy
+from astropy.io import fits
 from galfitools.galin.MaskDs9 import GetAxis
 
 

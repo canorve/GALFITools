@@ -1,11 +1,11 @@
 #! /usr/bin/python3
 
 
-import numpy as np
 import argparse
 import glob
-
 from pathlib import Path
+
+import numpy as np
 
 # code to make init galfit files 
 

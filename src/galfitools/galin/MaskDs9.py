@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 
-import numpy as np
-import sys
+import argparse
 import os.path
+import sys
+
+import numpy as np
 from astropy.io import fits
 from astropy.io.fits import CompImageHDU
-
-import argparse
-
 from matplotlib.path import Path
-
-
 
 
 def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool, borValue: int, skymean=None, skystd=None) -> None:
