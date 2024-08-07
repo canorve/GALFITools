@@ -1,34 +1,29 @@
 #!/usr/bin/env python3
 
-import numpy as np
-import sys
+import argparse
 import os
+import os.path
 import stat
 import subprocess as sp
-import os.path
-from astropy.io import fits
+import sys
+
+import matplotlib.pyplot as plt
+import mgefit
+import numpy as np
 import scipy
 import scipy.special
-import matplotlib.pyplot as plt
-from scipy.special import gammaincinv
-
-import mgefit
-from mgefit.find_galaxy import find_galaxy
-from mgefit.sectors_photometry import sectors_photometry
-from mgefit.sectors_photometry_twist import sectors_photometry_twist
-
-
-from mgefit.mge_fit_sectors import mge_fit_sectors
-from mgefit.mge_fit_sectors_twist import mge_fit_sectors_twist
-
-from mgefit.mge_fit_sectors_regularized import mge_fit_sectors_regularized 
-
-import argparse
-
-
+from astropy.io import fits
 #from galfitools.galin.galfit import Galfit, conver2Sersic, SelectGal, numComps, GetRadAng
 from galfitools.galin.galfit import Galfit
-from galfitools.galin.MaskDs9 import GetAxis 
+from galfitools.galin.MaskDs9 import GetAxis
+from mgefit.find_galaxy import find_galaxy
+from mgefit.mge_fit_sectors import mge_fit_sectors
+from mgefit.mge_fit_sectors_regularized import mge_fit_sectors_regularized
+from mgefit.mge_fit_sectors_twist import mge_fit_sectors_twist
+from mgefit.sectors_photometry import sectors_photometry
+from mgefit.sectors_photometry_twist import sectors_photometry_twist
+from scipy.special import gammaincinv
+
 
 def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, 
                 freesky, numgauss, xypos=None, ellip = None, posang = None) -> str:
@@ -86,7 +81,8 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser,
 
     if regu:
         try:
-            from mgefit.mge_fit_sectors_twist_regularized import mge_fit_sectors_twist_regularized 
+            from mgefit.mge_fit_sectors_twist_regularized import \
+                mge_fit_sectors_twist_regularized 
         except: 
             print("mge_fit_sectors_twist_regularized is not installed. Regu desactivated")
             regu = False

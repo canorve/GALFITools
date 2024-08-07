@@ -1,35 +1,29 @@
 #! /usr/bin/env python3
 
-import numpy as np
-import sys
+import argparse
 import os
+import os.path
 import subprocess as sp
-from astropy.io import fits
-import os.path  
+import sys
+
+import matplotlib.cm as cmx
+import matplotlib.colors as colors
+import matplotlib.pyplot as plt
+import numpy as np
 import scipy
 import scipy.special
-import matplotlib.pyplot as plt
-import matplotlib.colors as colors
-import matplotlib.cm as cmx
-
-
-from scipy import stats
-from matplotlib import gridspec
-
+from astropy.io import fits
 from astropy.io.votable import parse
-from mgefit.sectors_photometry import sectors_photometry
+from galfitools.galin.MaskDs9 import GetAxis
+from galfitools.mge.mge2galfit import (Ds9ell2Kronellv2, GetInfoEllip, GetPmax,
+                                       GetSize)
+from matplotlib import gridspec
+from matplotlib.ticker import (AutoLocator, AutoMinorLocator,
+                               FormatStrFormatter, LinearLocator, LogLocator,
+                               MultipleLocator, NullFormatter)
 from mgefit.find_galaxy import find_galaxy
-
-from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,NullFormatter,
-                               AutoMinorLocator,LogLocator,LinearLocator,AutoLocator)
-
-
-from galfitools.galin.MaskDs9 import GetAxis 
-
-from galfitools.mge.mge2galfit import GetInfoEllip, Ds9ell2Kronellv2, GetSize, GetPmax 
-
-import argparse
-
+from mgefit.sectors_photometry import sectors_photometry
+from scipy import stats
 
 
 def sbProf(args):
