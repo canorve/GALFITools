@@ -136,8 +136,8 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
 
             if bards9:
 
-                print(" 1_2_3    x    offset ")
-                print(" 1_2_3    y    offset ")
+                print("# 1_2_3    x    offset ")
+                print("# 1_2_3    y    offset ")
                 constlinex= " 1_2_3    x    offset \n"
                 constliney= " 1_2_3    y    offset \n"
                 fout.write(constlinex)
@@ -145,8 +145,8 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
 
             else:
 
-                print(" 1_2    x    offset ")
-                print(" 1_2    y    offset ")
+                print("# 1_2    x    offset ")
+                print("# 1_2    y    offset ")
 
                 constlinex= " 1_2    x    offset \n"
                 constliney= " 1_2    y    offset \n"

@@ -355,7 +355,7 @@ class GetBreak:
 
 
 def getBreak2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool, ranx: list) -> float:
-    '''gets the Kappa radius (maximum curvature) from a set of Sersics using another method'''
+    '''gets the break radius from a set of Sersics using another method'''
 
 
     galfit = Galfit(galfitFile)
@@ -464,7 +464,7 @@ def getBreak2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool
 
 
 def getKappa2(galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool, ranx: list) -> float:
-    '''gets the break radius from a set of Sersics using another method'''
+    '''gets the kappa radius (maximum curvature) from a set of Sersics using another method'''
 
 
     galfit = Galfit(galfitFile)

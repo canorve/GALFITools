@@ -29,6 +29,9 @@ from galfitools.galout.getPeak import getPeak
 from galfitools.galout.fitlog2csv import log2csv 
 
 
+from galfitools.galout.getBarSize import getBarSize
+
+
 from galfitools.galin.galfit import Galfit
 
 from galfitools.mge.mge2galfit import GetInfoEllip
@@ -206,6 +209,61 @@ def mainGetBreak2():
 
     line = 'The break radius is {:.2f} pixels or {:.2f} " \n'.format(rbreak, rbreak_arc)
     print(line)
+
+
+def mainGetBarSize():
+    '''gets the bar size from a model of Bulge, Bar, disk'''
+
+
+    printWelcome()
+
+    parser = argparse.ArgumentParser(description = "getBarSize: gets the bar size from Sersic models: Bulge, Bar and disk. It assumes that bar is galfit component 2 ")
+
+
+    # required arguments
+    parser.add_argument("GalfitFile", help = "Galfit File containing the Sersics components bulge, bar, disk")
+
+    parser.add_argument("-d","--dis", type=int, help="Maximum distance among components", default=10)
+    parser.add_argument("-n","--numcomp", type=int, help="Number of component where it'll obtain center of all components, default = 1 ", default=1)
+
+    parser.add_argument("-o","--out", type=str,,default="bar.reg" 
+                        help="output DS9 ellipse region file")
+
+    parser.add_argument("-p","--plot", action="store_true", help='makes plot of double derivatives and Kappa radius ') 
+
+    parser.add_argument("-rx","--ranx",nargs=2, type=float, help="x-axis range to search for the Break and Kappa radius: xmin - xmax ")
+
+
+    args = parser.parse_args()
+
+    galfitFile = args.GalfitFile
+    dis = args.dis
+    out = args.out
+    num_comp =  args.numcomp
+    plot = args.plot
+    ranx = args.ranx
+
+    rbar, N, theta =  getBarSize(galfitFile, dis, num_comp, plot, ranx, out)
+
+
+    galfit = Galfit(galfitFile)
+
+    head = galfit.ReadHead()
+
+    plate = head.scale 
+    rbar_arc = rbar*plate
+ 
+
+
+    print('number of model components: ',N)
+
+    line = 'Using a theta value of: {:.2f} degrees\n'.format(theta)
+    print(line)
+
+
+    line = 'The bar size is {:.2f} pixels or {:.2f} " \n'.format(rbar, rbar_arc)
+    print(line)
+
 
 
 
