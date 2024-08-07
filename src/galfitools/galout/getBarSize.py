@@ -65,6 +65,8 @@ def getBarSize(galfitFile: str, dis: int, num_comp: int, plot: bool, ranx: list,
         xmin = 1
         xmax = 2.5*Re 
 
+        ranx=[xmin,xmax]
+
 
     rbreak, N, theta =  getBreak2(galfitFile, dis, theta, num_comp, plot, ranx)
 
@@ -88,7 +90,8 @@ def getBarSize(galfitFile: str, dis: int, num_comp: int, plot: bool, ranx: list,
 
     rbarminor = rbar*AxRat
 
-    elline = "ellipse({:.2f}, {:.2f}, {:.2f}, {:.2f} {:.2f}) \n".format(X,Y, rbar, rbarminor, theta)
+    elline = "ellipse({:.2f}, {:.2f}, {:.2f}, {:.2f} {:.2f}) \n".format(X, Y, 
+                rbarminor, rbar, theta)
     fout.write(elline)
 
     fout.close()

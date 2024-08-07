@@ -962,7 +962,26 @@ equal
     # PA: angular position  measured from Y-axis
 
 
+**getBarSize**  Computes the bar size assuming the model is a composed of three 
+Sersic function: Bulge, bar and disk. 
 
+::
+
+
+    from galfitools.galout.getBarSize import getBarSize
+
+    #galfitFile: galfit file: galfit.XX  
+    #dis: maximum distance among components to be considered as part of the same galaxy
+    #out: name of the Ds9 ellipse region output file
+    #num_comp: number of component to obtain center and find galaxy (if simultaneaous fitting) 
+    #plot: if true, it creates plot file of radio break and radio kappa
+    #ranx: search range for bar size
+
+    rbar, N, theta =  getBarSize(galfitFile, dis, num_comp, plot, ranx, out)
+
+    #rbar: size of bar in pixels
+    #N: number of components of the galaxy
+    #theta: angle of bar measured from Y-axis (same as GALFIT)
 
 
 **MGE**

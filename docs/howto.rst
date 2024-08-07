@@ -608,6 +608,8 @@ equal
 ::
 
 
+  usage: photDs9 [-h] [-zp ZEROPOINT] [-m MASK] [-sk SKY] ImageFile RegFile
+
   positional arguments:
     ImageFile             the image file where the photometry will be computed
     RegFile               the DS9 region file
@@ -623,6 +625,7 @@ equal
 **fitlog2csv** converts fit.log file into a comma separated values file 
 ::
 
+  usage: fitlog2csv [-h] [-o FILEOUT] [-n NUM]
 
     -h, --help            show this help message and exit
     -n NUM, --NUM NUM     the number of the fit to be extracted 
@@ -631,6 +634,30 @@ equal
 
 
 
+**getBarSize** computes the barsize from a composed Sersic model: Bulge, bar and disk.
+. It assumes that bar is a gaussian (Sersic index = 0.5) and it is positioned as a 
+second component in galfit file galfit.XX
+
+::
+
+
+  usage: getBarSize [-h] [-d DIS] [-n NUMCOMP] [-o OUT] [-p] [-rx RANX RANX] GalfitFile
+
+  getBarSize: gets the bar size from Sersic models: Bulge, Bar and disk. It assumes that bar is galfit
+  component 2
+
+  positional arguments:
+    GalfitFile            Galfit File containing the Sersics components bulge, bar, disk
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components
+    -n NUMCOMP, --numcomp NUMCOMP
+                          Number of component where it'll obtain center of all components, default = 1
+    -o OUT, --out OUT     output DS9 ellipse region file
+    -p, --plot            makes plot of double derivatives and Kappa radius
+    -rx RANX RANX, --ranx RANX RANX
+                          x-axis range to search for the Break and Kappa radius: xmin - xmax
 
 **MGE**
 ---------------
