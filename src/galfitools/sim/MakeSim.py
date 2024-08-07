@@ -1,13 +1,13 @@
 #! /usr/bin/env python3
 
-import numpy as np
-import matplotlib.pyplot as plt
-import sys
-from astropy.io import fits
-
 import argparse
+import sys
 
-from galfitools.galin.MaskDs9 import GetAxis 
+import matplotlib.pyplot as plt
+import numpy as np
+from astropy.io import fits
+from galfitools.galin.MaskDs9 import GetAxis
+
 
 def makeSim(image, GAIN, skymean, skystd, newimage)-> None: 
 

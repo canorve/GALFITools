@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
-import numpy as np
-import matplotlib.pyplot as plt
-from astropy.io import fits
 from os import path
 
+import matplotlib.pyplot as plt
 import mgefit
+import numpy as np
+from astropy.io import fits
 from mgefit.mge_fit_1d import mge_fit_1d
+from scipy.interpolate import UnivariateSpline
 from scipy.special import gammaincinv
 
-
-from scipy.interpolate import UnivariateSpline
 
 def main():
 
