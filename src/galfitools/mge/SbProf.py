@@ -1,32 +1,19 @@
 #! /usr/bin/env python3
 
-import argparse
 import os
 import os.path
-import subprocess as sp
-import sys
 
-import matplotlib.cm as cmx
-import matplotlib.colors as colors
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy
-import scipy.special
 from astropy.io import fits
-from astropy.io.votable import parse
 from galfitools.galin.MaskDs9 import GetAxis
 from galfitools.mge.mge2galfit import Ds9ell2Kronellv2, GetInfoEllip, GetPmax, GetSize
-from matplotlib import gridspec
 from matplotlib.ticker import (
     AutoLocator,
     AutoMinorLocator,
-    FormatStrFormatter,
-    LinearLocator,
     LogLocator,
-    MultipleLocator,
     NullFormatter,
 )
-from mgefit.find_galaxy import find_galaxy
 from mgefit.sectors_photometry import sectors_photometry
 from scipy import stats
 
@@ -166,7 +153,7 @@ def readDataImg(conf):
     dataimg.img = (hdu[0].data.copy()).astype(float)
     hdu.close()
 
-    ### reading mask image from file
+    # reading mask image from file
 
     if conf.mask:
 
@@ -241,15 +228,6 @@ def SectPhot(conf, dataimg, n_sectors=19, minlevel=0):
     plt.pause(1)  # Allow plot to appear on the screen
     plt.savefig(conf.namesec)
 
-    # if fit == 'mod':
-    #  model:
-    #    sectimg = sectors_photometry(dataimg.model, eps, angsec, xctemp, yctemp, minlevel=0,
-    #            plot = ellconf.dplot, badpixels = maskb, n_sectors = n_sectors)
-
-    #    if ellconf.dplot:
-    #        plt.pause(1)  # Allow plot to appear on the screen
-    #        plt.savefig(ellconf.namemod)
-
     return sectimg
 
 
@@ -297,7 +275,7 @@ def sect2xy(sect, conf, n_sectors):
     xarc = aellarc[stidxq]
     ymge = mgesb[stidxq]
 
-    ######  Function to order SB along X-axis for model
+    #  Function to order SB along X-axis for model
 
     xrad, ysb, ysberr = FindSB(xarc, ymge, n_sectors)
 
@@ -403,15 +381,12 @@ def PlotSB(xradq, ysbq, ysberrq, conf, scale):
         linewidth=2,
     )
 
-    # if ellconf.flagalax == False:
-    #    axsec.errorbar(xradm, ysbm,yerr=ysberrm,fmt='o-',capsize=2,color='blue',markersize=0.7,label="Model",linewidth=2)
-
-    if conf.rany == True:
+    if conf.rany is True:
         axsec.set_ylim(ymax, ymin)  # inverted
     else:
         axsec.set_ylim(yran)
 
-    if conf.logx == True:
+    if conf.logx is True:
 
         axsec.set_xscale("log")
 
@@ -501,7 +476,7 @@ def PlotSB(xradq, ysbq, ysberrq, conf, scale):
         axsec.set_xlim(xran)
     # axred.set_xlim(xran) #ulises plot
 
-    if conf.pix == True:
+    if conf.pix is True:
 
         axpix = axsec.twiny()
 
@@ -512,7 +487,7 @@ def PlotSB(xradq, ysbq, ysberrq, conf, scale):
 
         axpix.figure.canvas.draw()
 
-        if conf.logx == True:
+        if conf.logx is True:
             axpix.set_xscale("log")
             locmaj = LogLocator(base=10, numticks=12)
             axpix.xaxis.set_major_locator(locmaj)
@@ -532,7 +507,7 @@ def PlotSB(xradq, ysbq, ysberrq, conf, scale):
     else:
         axret = axsec
 
-    if conf.grid == True:
+    if conf.grid is True:
         # Customize the major grid
         axsec.grid(which="major", linestyle="-", linewidth="0.7", color="black")
         # Customize the minor grid
@@ -554,7 +529,7 @@ def PlotSB(xradq, ysbq, ysberrq, conf, scale):
     return xran, yran, axret
 
 
-## class for parameters
+# class for parameters
 class Config:
 
     logx = False
@@ -611,11 +586,6 @@ def GetExpTime(Image):
         hdu = fits.open(Image)
         exptime = hdu[0].header["EXPTIME"]
         hdu.close()
-    except:
+    except Exception:
         exptime = 1
     return float(exptime)
-
-
-if __name__ == "__main__":
-
-    mainSbProf()

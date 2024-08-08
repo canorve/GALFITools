@@ -6,6 +6,7 @@ from astropy import units as U
 from astropy.io import fits
 from matplotlib import colors
 from matplotlib.patches import Ellipse
+import matplotlib.cm as cmx
 
 
 def displayCube(
@@ -54,7 +55,7 @@ def Comp2Ellip(galhead, galcomps, N, lw=1):
     values = range(N)
     jet = cm = plt.get_cmap("jet")
     cNorm = colors.Normalize(vmin=0, vmax=values[-1])
-    scalarMap = cm.ScalarMappable(norm=cNorm, cmap=jet)
+    scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 
     for idx, item in enumerate(galcomps.N):
 

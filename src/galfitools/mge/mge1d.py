@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 
-from os import path
-
 import matplotlib.pyplot as plt
-import mgefit
 import numpy as np
-from astropy.io import fits
 from mgefit.mge_fit_1d import mge_fit_1d
 from scipy.special import gammaincinv
 
@@ -14,13 +10,9 @@ from scipy.special import gammaincinv
 def main():
 
     rad, me = np.genfromtxt("Blackout.txt", unpack=True)
-    # rad,me=np.genfromtxt("Blueout.txt",unpack=True)
-    # rad,me=np.genfromtxt("Redout.txt",unpack=True)
-    # rad,me=np.genfromtxt("Greenout.txt",unpack=True)
-    # rad,me=np.genfromtxt("Magentaout.txt",unpack=True)
 
-    lrad = np.log10(rad)
-    lme = np.log10(me)
+    # lrad = np.log10(rad)
+    # lme = np.log10(me)
 
     print("\nFitting 1-dim profile-----------------------------------\n")
     counts, sigma = fit_1d(rad, me)
@@ -129,9 +121,15 @@ def main():
 
         Re = (K ** (0.5)) * h
 
-        outline = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f} Re: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(
-            mgemag, SigPix, FWHM, Re, qobs, anglegass
+        outlinea = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f} \n".format(
+                mgemag, SigPix, FWHM
         )
+
+        outlineb = "Re: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(
+                Re, qobs, anglegass
+        )
+
+        outline = outlinea + outlineb
         print(outline)
 
         outline2 = "{:.2f} {:.2f} {:.2f} {:.2f} {:.2f} {:.2f} \n".format(
@@ -205,7 +203,7 @@ def PrintHeader(
     J,
     platedx,
     platedy,
-    O,
+    Olin,
     P,
     S,
 ):
@@ -215,82 +213,84 @@ def PrintHeader(
     # print to filehandle
     # the header for GALFIT
 
-    lineZ = "==================================================================================================\n"
+    lineZ = "========================================"
+    + "==========================================================\n"
     lineX = "# IMAGE PARAMETERS \n"
-    lineA = "A) {}                                   # Input Data image (FITS file)                            \n".format(
+    lineA = "A) {}      # Input Data image (FITS file)   \n".format(
         A
     )
-    lineB = "B) {}                                   # Output data image block                                 \n".format(
+    lineB = "B) {}      # Output data image block \n".format(
         B
     )
-    lineC = 'C) {}                                   # Sigma image name (made from data if blank or "none")  \n'.format(
+    lineC = 'C) {}   # Sigma image name (made from data if blank or "none") \n'.format(
         C
     )
-    lineD = "D) {}                                   # Input PSF image and (optional) diffusion kernel         \n".format(
+    lineD = "D) {}      # Input PSF image and (optional) diffusion kernel \n".format(
         D
     )
-    lineE = "E) {}                                   # PSF fine sampling factor relative to data               \n".format(
+    lineE = "E) {}      # PSF fine sampling factor relative to data     \n".format(
         E
     )
-    lineF = "F) {}                                   # Bad pixel mask (FITS image or ASCII coord list)         \n".format(
+    lineF = "F) {}     # Bad pixel mask (FITS image or ASCII coord list)  \n".format(
         F
     )
-    lineG = "G) {}                                   # File with parameter constraints (ASCII file)            \n".format(
+    lineG = "G) {}     # File with parameter constraints (ASCII file)     \n".format(
         G
     )
-    lineH = "H) {} {} {} {}                          # Image region to fit (xmin xmax ymin ymax)               \n".format(
+    lineH = "H) {} {} {} {}   # Image region to fit (xmin xmax ymin ymax) \n".format(
         xlo, xhi, ylo, yhi
     )
-    lineI = "I) {} {}                                # Size of the convolution box (x y)                       \n".format(
+    lineI = "I) {} {}     # Size of the convolution box (x y)   \n".format(
         convx, convy
     )
-    lineJ = "J) {}                                   # Magnitude photometric zeropoint                         \n".format(
+    lineJ = "J) {}        # Magnitude photometric zeropoint     \n".format(
         J
     )
-    lineK = "K) {} {}                                # Plate scale (dx dy). \[arcsec per pixel\]               \n".format(
+    lineK = "K) {} {}     # Plate scale (dx dy). [arcsec per pixel] \n".format(
         platedx, platedy
     )
-    lineO = "O) {}                                   # Display type (regular, curses, both)                    \n".format(
-        O
+    lineO = "O) {}        # Display type (regular, curses, both)   \n".format(
+        Olin
     )
-    lineP = "P) {}                                   # Choose 0=optimize, 1=model, 2=imgblock, 3=subcomps      \n".format(
+    lineP = "P) {}  # Choose 0=optimize, 1=model, 2=imgblock, 3=subcomps \n".format(
         P
     )
-    lineS = "S) {}                                   # Modify/create objects interactively?                    \n".format(
+    lineS = "S) {}  # Modify/create objects interactively? \n".format(
         S
     )
     lineY = " \n"
 
-    line0 = "# INITIAL FITTING PARAMETERS                                                     \n"
+    line0 = "# INITIAL FITTING PARAMETERS      \n"
     line1 = "# \n"
-    line2 = "#   For object type, allowed functions are:                                      \n"
-    line3 = "#       nuker, sersic, expdisk, devauc, king, psf, gaussian, moffat,             \n"
-    line4 = "#       ferrer, powsersic, sky, and isophote.                                    \n"
+    line2 = "#   For object type, allowed functions are:       \n"
+    line3 = "#       nuker, sersic, expdisk, devauc, king, psf, gaussian, moffat,\n"
+    line4 = "#       ferrer, powsersic, sky, and isophote.        \n"
     line5 = "# \n"
-    line6 = "#  Hidden parameters will only appear when they're specified:                    \n"
-    line7 = "#      C0 (diskyness/boxyness),                                                  \n"
-    line8 = "#      Fn (n=integer, Azimuthal Fourier Modes),                                  \n"
-    line9 = "#      R0-R10 (PA rotation, for creating spiral structures).                     \n"
+    line6 = "#  Hidden parameters will only appear when they're specified: \n"
+    line7 = "#      C0 (diskyness/boxyness),          \n"
+    line8 = "#      Fn (n=integer, Azimuthal Fourier Modes),  \n"
+    line9 = "#      R0-R10 (PA rotation, for creating spiral structures).  \n"
     line10 = "# \n"
 
-    line11 = "# column 1:  Parameter number                                                               \n"
-    line12 = "# column 2:                                                                                 \n"
-    line13 = "#          -- Parameter 0:    the allowed functions are: sersic, nuker, expdisk             \n"
-    line14 = "#                             edgedisk, devauc, king, moffat, gaussian, ferrer, psf, sky    \n"
-    line15 = "#          -- Parameter 1-10: value of the initial parameters                               \n"
-    line16 = "#          -- Parameter C0:   For diskiness/boxiness                                        \n"
-    line17 = "#                             <0 = disky                                                    \n"
-    line18 = "#                             >0 = boxy                                                     \n"
-    line19 = "#          -- Parameter Z:    Outputting image options, the options are:                    \n"
-    line20 = "#                             0 = normal, i.e. subtract final model from the data to create \n"
-    line21 = "#                             the residual image                                            \n"
-    line22 = "#                             1 = Leave in the model -- do not subtract from the data       \n"
-    line23 = "#                                                                                           \n"
-    line24 = "# column 3: allow parameter to vary (yes = 1, no = 0)                                       \n"
-    line25 = "# column 4: comment                                                                         \n"
+    line11 = "# column 1:  Parameter number  \n"
+    line12 = "# column 2:    \n"
+    line13 = "#    -- Parameter 0: the allowed functions are: sersic, nuker, expdisk\n"
+    line14 = "#    edgedisk, devauc, king, moffat, gaussian, ferrer, psf, sky    \n"
+    line15 = "#    -- Parameter 1-10: value of the initial parameters\n"
+    line16 = "#    -- Parameter C0:   For diskiness/boxiness     \n"
+    line17 = "#    <0 = disky \n"
+    line18 = "#    >0 = boxy  \n"
+    line19 = "#    -- Parameter Z:    Outputting image options, the options are: \n"
+    line20 = "#    0 = normal, i.e. subtract final model from the data to create \n"
+    line21 = "#    the residual image                                            \n"
+    line22 = "#    1 = Leave in the model -- do not subtract from the data       \n"
+    line23 = "#                 \n"
+    line24 = "# column 3: allow parameter to vary (yes = 1, no = 0) \n"
+    line25 = "# column 4: comment     \n"
     line26 = " \n"
 
-    line27 = "==================================================================================================\n"
+    line27 = "=========================================="
+    + "========================================================\n"
 
     hdl.write(lineZ)
     hdl.write(lineX)
@@ -348,20 +348,21 @@ def PrintSky(hdl, ncomp, sky, Z, fit):
 
     # k Check
 
-    line00 = "# Object number: {}                                                             \n".format(
+    line00 = "# Object number: {}   \n".format(
         ncomp
     )
-    line01 = " 0)      sky            #    Object type                                        \n"
-    line02 = " 1) {}         {}       # sky background        [ADU counts]                    \n".format(
+    line01 = " 0)      sky       #    Object type \n"
+    line02 = " 1) {}         {}  # sky background [ADU counts]  \n".format(
         sky, fit
     )
-    line03 = " 2) 0.000      0        # dsky/dx (sky gradient in x)                           \n"
-    line04 = " 3) 0.000      0        # dsky/dy (sky gradient in y)                           \n"
-    line05 = " Z) {}                  # Skip this model in output image?  (yes=1, no=0)       \n".format(
+    line03 = " 2) 0.000      0  # dsky/dx (sky gradient in x)\n"
+    line04 = " 3) 0.000      0  # dsky/dy (sky gradient in y)\n"
+    line05 = " Z) {}    # Skip this model in output image?    \n".format(
         Z
     )
     line06 = "\n"
-    line07 = "================================================================================\n"
+    line07 = "============================================"
+    + "====================================\n"
 
     hdl.write(line00)
     hdl.write(line01)
@@ -385,34 +386,32 @@ def PrintSersic(
     # a sersic function given
     # by the parameters
 
-    line00 = "# Object number: {}                                                             \n".format(
+    line00 = "# Object number: {}       \n".format(
         ncomp
     )
-    line01 = " 0)     sersic               #  Object type                                     \n"
-    line02 = " 1) {:.2f}  {:.2f}  {}  {}            #  position x, y     [pixel]                       \n".format(
+    line01 = " 0)     sersic     #  Object type   \n"
+    line02 = " 1) {:.2f}  {:.2f}  {}  {}   #  position x, y     [pixel]\n".format(
         xpos, ypos, fit, fit
     )
-    line03 = " 3) {:.2f}       {}              #  total magnitude                                 \n".format(
+    line03 = " 3) {:.2f}       {} #  total magnitude \n".format(
         magser, fit
     )
-    line04 = " 4) {:.2f}       {}              #  R_e         [Pixels]                            \n".format(
+    line04 = " 4) {:.2f}  {} #  R_e  [Pixels]\n".format(
         reser, fit
     )
-    line05 = " 5) {}       {}              #  Sersic exponent (deVauc=4, expdisk=1)           \n".format(
+    line05 = " 5) {} {} #  Sersic exponent (deVauc=4, expdisk=1) \n".format(
         nser, serfit
     )
-    # line05 = " 5) {}       {}              #  Sersic exponent (deVauc=4, expdisk=1)           \n".format(
-    #    nser, fit)
-    line06 = " 6)  0.0000       0           #  ----------------                                \n"
-    line07 = " 7)  0.0000       0           #  ----------------                                \n"
-    line08 = " 8)  0.0000       0           #  ----------------                                \n"
-    line09 = " 9) {:.2f}       {}              #  axis ratio (b/a)                                \n".format(
+    line06 = " 6)  0.0000       0   #  ----------------\n"
+    line07 = " 7)  0.0000       0   #  ----------------\n"
+    line08 = " 8)  0.0000       0   #  ----------------\n"
+    line09 = " 9) {:.2f}       {}   #  axis ratio (b/a)\n".format(
         axratser, fit
     )
-    line10 = "10) {:.2f}       {}              #  position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
+    line10 = "10) {:.2f}  {} #  position angle (PA)  \n".format(
         angleser, fit
     )
-    lineZ = " Z) {}                       #  Skip this model in output image?  (yes=1, no=0) \n".format(
+    lineZ = " Z) {}   #  Skip this model in output image?  (yes=1, no=0) \n".format(
         Z
     )
     line11 = "\n"
@@ -435,7 +434,7 @@ def PrintSersic(
 
 
 #############################################################################
-######################### End of program  ###################################
+#   End of program  ###################################
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
