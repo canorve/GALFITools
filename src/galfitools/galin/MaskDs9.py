@@ -10,41 +10,47 @@ from astropy.io.fits import CompImageHDU
 from matplotlib.path import Path
 
 
-def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool, borValue: int, skymean=None, skystd=None) -> None:
+def maskDs9(
+    MaskFile: str,
+    RegFile: str,
+    fill: bool,
+    image: str,
+    bor_flag: bool,
+    borValue: int,
+    skymean=None,
+    skystd=None,
+) -> None:
 
     if not os.path.exists(MaskFile):
 
-        print ('%s: image filename does not exist!' %(MaskFile))
-        print ('Creating a new image file ')
+        print("%s: image filename does not exist!" % (MaskFile))
+        print("Creating a new image file ")
 
-        hdu=fits.PrimaryHDU()
+        hdu = fits.PrimaryHDU()
 
         if image:
             (nx, ny) = GetAxis(image)
         else:
-            nx = input("enter numbers of pixels in X ") 
-            ny = input("enter numbers of pixels in Y ") 
+            nx = input("enter numbers of pixels in X ")
+            ny = input("enter numbers of pixels in Y ")
 
             nx = np.int64(nx)
             ny = np.int64(ny)
 
-        Image = np.zeros([ny,nx])
+        Image = np.zeros([ny, nx])
         hdu.data = Image
-        hdu.writeto(MaskFile,overwrite=True) 
-
+        hdu.writeto(MaskFile, overwrite=True)
 
     (ncol, nrow) = GetAxis(MaskFile)
 
-    i = 0 #index of data 
+    i = 0  # index of data
 
     hdu = fits.open(MaskFile)
 
     Image = hdu[i].data
 
-
-
     if not os.path.exists(RegFile):
-        print ('%s: reg filename does not exist!' %(sys.argv[2]))
+        print("%s: reg filename does not exist!" % (sys.argv[2]))
         sys.exit(1)
 
     v0 = []
@@ -57,8 +63,7 @@ def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool,
     tupVerts = []
     Pol = []
 
-
-    f1 = open(RegFile,'r')
+    f1 = open(RegFile, "r")
 
     lines = f1.readlines()
 
@@ -66,7 +71,7 @@ def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool,
 
     flag = False
     flagpoly = False
-    #reading reg file
+    # reading reg file
     for line in lines:
 
         line = line.split("#")
@@ -88,18 +93,16 @@ def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool,
             x2 = x1[4:]
             flag = True
 
-
         if b1[0] == "polygon":
 
             polv = line.split(")")
             pol, ver = polv[0].split("(")
 
-
             points = ver.split(",")
 
             N = len(points)
 
-            i=0
+            i = 0
 
             x = np.array([])
             y = np.array([])
@@ -109,15 +112,17 @@ def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool,
 
             verts = []
 
-            #make tuple for vertices
+            # make tuple for vertices
             while i < N:
 
-                verts = verts + [(round(float(points[i])-1),round(float(points[i+1])-1)) ]
+                verts = verts + [
+                    (round(float(points[i]) - 1), round(float(points[i + 1]) - 1))
+                ]
                 i = i + 2
 
             flagpoly = True
 
-        if (flag == True):
+        if flag == True:
 
             x3 = p[4]
             x4 = x3[:-2]
@@ -131,21 +136,20 @@ def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool,
 
             flag = False
 
-        if (flagpoly  == True):
+        if flagpoly == True:
 
-            Pol.append(pol) 
+            Pol.append(pol)
             tupVerts.append(verts)
             flagpoly = False
 
-    obj  = np.array(v0)
-    xpos = np.array(v1) 
+    obj = np.array(v0)
+    xpos = np.array(v1)
     ypos = np.array(v2)
     rx = np.array(v3)
     ry = np.array(v4)
     angle = np.array(v5)
 
-
-    #avoids ds9 regions with Area = 0
+    # avoids ds9 regions with Area = 0
     maskrx = rx < 1
     if maskrx.any():
         rx[maskrx] = 1
@@ -155,161 +159,177 @@ def maskDs9(MaskFile: str, RegFile: str, fill: bool, image: str, bor_flag: bool,
         ry[maskry] = 1
     #
 
-
-
     Pol = np.array(Pol)
 
     for idx, item in enumerate(obj):
 
-        #converting ellipse from DS9 ell to kron ellipse
+        # converting ellipse from DS9 ell to kron ellipse
 
         if obj[idx] == "ellipse":
 
-            Image = MakeEllip(Image, fill, xpos[idx], ypos[idx], rx[idx], 
-                                ry[idx], angle[idx], ncol, nrow, skymean=skymean, skystd=skystd)
-
+            Image = MakeEllip(
+                Image,
+                fill,
+                xpos[idx],
+                ypos[idx],
+                rx[idx],
+                ry[idx],
+                angle[idx],
+                ncol,
+                nrow,
+                skymean=skymean,
+                skystd=skystd,
+            )
 
         if obj[idx] == "box":
 
-
-            Image = MakeBox(Image, fill, xpos[idx], ypos[idx], rx[idx], 
-                            ry[idx], angle[idx], ncol, nrow, skymean=skymean, skystd=skystd)
-
-
+            Image = MakeBox(
+                Image,
+                fill,
+                xpos[idx],
+                ypos[idx],
+                rx[idx],
+                ry[idx],
+                angle[idx],
+                ncol,
+                nrow,
+                skymean=skymean,
+                skystd=skystd,
+            )
 
     for idx, item in enumerate(Pol):
 
-        #converting ellipse from DS9 ell to kron ellipse
+        # converting ellipse from DS9 ell to kron ellipse
 
         if Pol[idx] == "polygon":
 
-            Image = MakePolygon(Image, fill, tupVerts[idx], ncol, nrow, skymean=skymean, skystd=skystd)
-
-
+            Image = MakePolygon(
+                Image, fill, tupVerts[idx], ncol, nrow, skymean=skymean, skystd=skystd
+            )
 
     if image:
 
-        hduim=fits.open(image)
+        hduim = fits.open(image)
         dataImage = hduim[0].data
 
-        #masking the border in case:
+        # masking the border in case:
         bor_val = 100
         if bor_flag:
-            #print("masking the border")
-            bor_mask = dataImage == borValue 
+            # print("masking the border")
+            bor_mask = dataImage == borValue
 
             if bor_mask.any():
-                Image[bor_mask] = bor_val 
- 
+                Image[bor_mask] = bor_val
+
         hduim.close()
 
+    # writing mask file
 
-    #writing mask file
-
-    hdu.data=Image
-    hdu.writeto(MaskFile,overwrite=True) 
+    hdu.data = Image
+    hdu.writeto(MaskFile, overwrite=True)
     hdu.close()
 
 
-def MakeEllip(Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow, skymean=None, skystd=None):
+def MakeEllip(
+    Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow, skymean=None, skystd=None
+):
     "Make an ellipse in an image"
 
-    xx, yy, Rkron, theta, e = Ds9ell2Kronell(xpos,ypos,rx,ry,angle)
+    xx, yy, Rkron, theta, e = Ds9ell2Kronell(xpos, ypos, rx, ry, angle)
     (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, e, ncol, nrow)
-    Image = MakeKron(Image, fill, xx, yy, Rkron, theta, e, xmin, xmax, 
-                    ymin, ymax, ncol, nrow, skymean=skymean, skystd=skystd)
+    Image = MakeKron(
+        Image,
+        fill,
+        xx,
+        yy,
+        Rkron,
+        theta,
+        e,
+        xmin,
+        xmax,
+        ymin,
+        ymax,
+        ncol,
+        nrow,
+        skymean=skymean,
+        skystd=skystd,
+    )
 
     return Image
+
 
 def MakePolygon(Image, fill, tupVerts, ncol, nrow, skymean=None, skystd=None):
     "Make a polygon in an image"
 
-
-
-
-    x, y = np.meshgrid(np.arange(ncol), np.arange(nrow)) # make a canvas with coordinates
+    x, y = np.meshgrid(
+        np.arange(ncol), np.arange(nrow)
+    )  # make a canvas with coordinates
     x, y = x.flatten(), y.flatten()
-    points = np.vstack((x,y)).T 
-    p = Path(tupVerts) # make a polygon
+    points = np.vstack((x, y)).T
+    p = Path(tupVerts)  # make a polygon
 
     grid = p.contains_points(points)
-    mask = grid.reshape(nrow, ncol) # now you have a mask with points inside a polygon
-
+    mask = grid.reshape(nrow, ncol)  # now you have a mask with points inside a polygon
 
     if skymean:
 
         sky = np.random.normal(skymean, skystd, (nrow, ncol))
-        Image[mask] = sky[mask]  
+        Image[mask] = sky[mask]
 
     else:
 
         Image[mask] = fill
-
-
-
-
 
     return Image
 
 
-
-
-
-def MakeBox(Image,fill,xpos,ypos,rx,ry,angle,ncol,nrow, skymean=None, skystd=None):
+def MakeBox(
+    Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow, skymean=None, skystd=None
+):
     "Make a box in an image"
 
+    anglerad = angle * np.pi / 180
+    beta = np.pi / 2 - anglerad
 
-    anglerad = angle*np.pi/180
-    beta = np.pi/2 - anglerad
+    lx = (rx / 2) * np.cos(anglerad) - (ry / 2) * np.cos(beta)
+    lx2 = (rx / 2) * np.cos(anglerad) + (ry / 2) * np.cos(beta)
+    ly = (rx / 2) * np.sin(anglerad) + (ry / 2) * np.sin(beta)
+    ly2 = (rx / 2) * np.sin(anglerad) - (ry / 2) * np.sin(beta)
 
-    lx = (rx/2)*np.cos(anglerad) - (ry/2)*np.cos(beta)
-    lx2 = (rx/2)*np.cos(anglerad) + (ry/2)*np.cos(beta)
-    ly = (rx/2)*np.sin(anglerad) + (ry/2)*np.sin(beta)
-    ly2 = (rx/2)*np.sin(anglerad) - (ry/2)*np.sin(beta)
+    v1x = round(xpos - lx)
+    v1y = round(ypos - ly)
 
+    v2x = round(xpos - lx2)
+    v2y = round(ypos - ly2)
 
-    v1x = round(xpos - lx)  
-    v1y = round(ypos - ly) 
-
-
-    v2x = round(xpos - lx2) 
-    v2y = round(ypos - ly2) 
-
-
-    v3x = round(xpos + lx)  
-    v3y = round(ypos + ly) 
-
+    v3x = round(xpos + lx)
+    v3y = round(ypos + ly)
 
     v4x = round(xpos + lx2)
     v4y = round(ypos + ly2)
 
+    Verts = [(v1x, v1y), (v2x, v2y), (v3x, v3y), (v4x, v4y)]
 
-
-    Verts = [(v1x,v1y),(v2x,v2y),(v3x,v3y),(v4x,v4y)]
-
-
-
-    x, y = np.meshgrid(np.arange(ncol), np.arange(nrow)) # make a canvas with coordinates
+    x, y = np.meshgrid(
+        np.arange(ncol), np.arange(nrow)
+    )  # make a canvas with coordinates
     x, y = x.flatten(), y.flatten()
-    points = np.vstack((x,y)).T 
+    points = np.vstack((x, y)).T
 
-    p = Path(Verts) # make a polygon
+    p = Path(Verts)  # make a polygon
 
     grid = p.contains_points(points)
 
-    mask = grid.reshape(nrow, ncol) # now you have a mask with points inside a polygon
-
+    mask = grid.reshape(nrow, ncol)  # now you have a mask with points inside a polygon
 
     if skymean:
 
         sky = np.random.normal(skymean, skystd, (nrow, ncol))
-        Image[mask] = sky[mask]  
+        Image[mask] = sky[mask]
 
     else:
 
         Image[mask] = fill
-
-
 
     return Image
 
@@ -318,19 +338,15 @@ def GetAxis(Image):
     # k Check
     "Get number of rows and columns from the image"
 
-    i = 0 #index indicated where the data is located
+    i = 0  # index indicated where the data is located
 
-    if(checkCompHDU(Image)):
-        i=1
-
+    if checkCompHDU(Image):
+        i = 1
 
     hdu = fits.open(Image)
 
-
     ncol = hdu[i].header["NAXIS1"]
     nrow = hdu[i].header["NAXIS2"]
-
-
 
     hdu.close()
 
@@ -340,7 +356,7 @@ def GetAxis(Image):
 def checkCompHDU(file):
     """ check if fits file is a CompImageHDU"""
     flag = False
-    hdul = fits.open(file) 
+    hdul = fits.open(file)
 
     for i, hdu in enumerate(hdul):
 
@@ -349,35 +365,47 @@ def checkCompHDU(file):
 
     hdul.close()
 
-    return flag 
+    return flag
 
 
-
-def Ds9ell2Kronell(xpos,ypos,rx,ry,angle):
-
+def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
 
     if rx >= ry:
 
-        q = ry/rx
+        q = ry / rx
         e = 1 - q
         Rkron = rx
         theta = angle
         xx = xpos
         yy = ypos
     else:
-        q = rx/ry
+        q = rx / ry
         e = 1 - q
         Rkron = ry
         theta = angle + 90
         xx = xpos
         yy = ypos
- 
-     
-    return xx, yy, Rkron, theta, e 
+
+    return xx, yy, Rkron, theta, e
 
 
-
-def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax, ncol, nrow, skymean=None, skystd=None):
+def MakeKron(
+    imagemat,
+    idn,
+    x,
+    y,
+    R,
+    theta,
+    ell,
+    xmin,
+    xmax,
+    ymin,
+    ymax,
+    ncol,
+    nrow,
+    skymean=None,
+    skystd=None,
+):
     "This subroutine create a Kron ellipse within a box defined by: xmin, xmax, ymin, ymax"
 
     # Check
@@ -387,12 +415,12 @@ def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax, ncol, n
     ymin = int(ymin)
     ymax = int(ymax)
 
-    q = (1 - ell)
+    q = 1 - ell
     bim = q * R
 
     theta = theta * np.pi / 180  # Rads!!!
 
-    ypos, xpos = np.mgrid[ymin - 1 : ymax + 1, xmin - 1: xmax +1]
+    ypos, xpos = np.mgrid[ymin - 1 : ymax + 1, xmin - 1 : xmax + 1]
 
     dx = xpos - x
     dy = ypos - y
@@ -401,22 +429,19 @@ def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax, ncol, n
 
     mask = landa < 0
     if mask.any():
-        landa[mask] = landa[mask] + 2*np.pi
+        landa[mask] = landa[mask] + 2 * np.pi
 
     landa = landa - theta
 
     angle = np.arctan2(np.sin(landa) / bim, np.cos(landa) / R)
 
-    xell = x + R * np.cos(angle) * np.cos(theta) - bim * \
-        np.sin(angle) * np.sin(theta)
-    yell = y + R * np.cos(angle) * np.sin(theta) + bim * \
-        np.sin(angle) * np.cos(theta)
+    xell = x + R * np.cos(angle) * np.cos(theta) - bim * np.sin(angle) * np.sin(theta)
+    yell = y + R * np.cos(angle) * np.sin(theta) + bim * np.sin(angle) * np.cos(theta)
 
-    dell = np.sqrt((xell - x)**2 + (yell - y)**2)
-    dist = np.sqrt(dx**2 + dy**2)
+    dell = np.sqrt((xell - x) ** 2 + (yell - y) ** 2)
+    dist = np.sqrt(dx ** 2 + dy ** 2)
 
     mask = dist <= dell
-
 
     if skymean:
 
@@ -434,23 +459,24 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     "this subroutine get the maximun"
     "and minimim pixels for Kron and sky ellipse"
     # k Check
-    q = (1 - ell)
+    q = 1 - ell
     bim = q * R
 
     theta = theta * (np.pi / 180)  # rads!!
 
     # getting size
 
-    constx =  np.sqrt((R**2)*(np.cos(theta))**2 + (bim**2)*(np.sin(theta))**2)
-    consty =  np.sqrt((R**2)*(np.sin(theta))**2 + (bim**2)*(np.cos(theta))**2)
+    constx = np.sqrt(
+        (R ** 2) * (np.cos(theta)) ** 2 + (bim ** 2) * (np.sin(theta)) ** 2
+    )
+    consty = np.sqrt(
+        (R ** 2) * (np.sin(theta)) ** 2 + (bim ** 2) * (np.cos(theta)) ** 2
+    )
 
-
-
-    xmin = x - constx                       
+    xmin = x - constx
     xmax = x + constx
     ymin = y - consty
     ymax = y + consty
-                    
 
     mask = xmin < 1
     if mask.any():
@@ -471,8 +497,6 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     return (round(xmin), round(xmax), round(ymin), round(ymax))
 
 
-
-  
 #############################################################################
 ######################### End of program  ###################################
 #     ______________________________________________________________________
@@ -484,7 +508,5 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-if __name__ == '__main__':
-  mainMaskDs9()
-
-
+if __name__ == "__main__":
+    mainMaskDs9()

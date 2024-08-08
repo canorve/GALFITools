@@ -12,10 +12,8 @@ from matplotlib.path import Path
 
 def getBoxSizeDs9(RegFile: str) -> int:
 
-
-
     if not os.path.exists(RegFile):
-        print ('%s: reg filename does not exist!' %(sys.argv[1]))
+        print("%s: reg filename does not exist!" % (sys.argv[1]))
         sys.exit(1)
 
     v0 = []
@@ -25,16 +23,14 @@ def getBoxSizeDs9(RegFile: str) -> int:
     v4 = []
     v5 = []
 
-
-
-    f1 = open(RegFile,'r')
+    f1 = open(RegFile, "r")
 
     lines = f1.readlines()
 
     f1.close()
 
     flag = False
-    #reading reg file
+    # reading reg file
     for line in lines:
 
         line = line.split("#")
@@ -50,8 +46,7 @@ def getBoxSizeDs9(RegFile: str) -> int:
             x2 = x1[4:]
             flag = True
 
-
-        if (flag == True):
+        if flag == True:
 
             x3 = p[4]
             x4 = x3[:-2]
@@ -65,25 +60,23 @@ def getBoxSizeDs9(RegFile: str) -> int:
 
             flag = False
 
-
-    obj  = np.array(v0)
-    xpos = np.array(v1) 
+    obj = np.array(v0)
+    xpos = np.array(v1)
     ypos = np.array(v2)
     rx = np.array(v3)
     ry = np.array(v4)
     angle = np.array(v5)
 
+    # converting for galfit header:
 
-    #converting for galfit header:
+    xmin = xpos - rx / 2
+    xmax = xpos + rx / 2
 
-    xmin = xpos - rx/2
-    xmax = xpos + rx/2
+    ymin = ypos - ry / 2
+    ymax = ypos + ry / 2
 
-    ymin = ypos - ry/2
-    ymax = ypos + ry/2
-
-    #[0] if there are many, only the first one is take in account
-    xmin = round(xmin[0]) 
+    # [0] if there are many, only the first one is take in account
+    xmin = round(xmin[0])
     xmax = round(xmax[0])
 
     ymin = round(ymin[0])
@@ -92,7 +85,6 @@ def getBoxSizeDs9(RegFile: str) -> int:
     return xmin, xmax, ymin, ymax
 
 
-  
 #############################################################################
 ######################### End of program  ###################################
 #     ______________________________________________________________________
@@ -104,7 +96,5 @@ def getBoxSizeDs9(RegFile: str) -> int:
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-if __name__ == '__main__':
-  mainMaskDs9()
-
-
+if __name__ == "__main__":
+    mainMaskDs9()

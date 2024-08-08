@@ -17,75 +17,57 @@ from galfitools.galin.MaskDs9 import GetAxis
 #################################################################
 #################################################################
 
+
 def skyRem(imageFile, maskFile, mean, sig, nsig, borValue, bor_flag=False):
 
     bor_val = 100
 
     if not os.path.exists(imageFile):
-        print ('{} image filename does not exist!'.format(imageFile))
+        print("{} image filename does not exist!".format(imageFile))
         sys.exit()
-
 
     (ncol, nrow) = GetAxis(imageFile)
 
-
-
     if not os.path.exists(maskFile):
-        print ('{} mask image does not exist, creating one ... '.format(maskFile)) 
+        print("{} mask image does not exist, creating one ... ".format(maskFile))
     else:
-        print ('overwriting {} mask image '.format(maskFile)) 
+        print("overwriting {} mask image ".format(maskFile))
 
     MakeImage(maskFile, ncol, nrow)
 
-
-
-
-    i = 0 #index of data 
+    i = 0  # index of data
     # original file
     hdu = fits.open(imageFile)
     dataImage = hdu[i].data
-
 
     # output file
     hdu2 = fits.open(maskFile)
     maskImage = hdu2[0].data
 
+    topsky = mean + sig * nsig
 
-    topsky = mean + sig*nsig
-
-
-    mask = dataImage >= topsky 
-
-
+    mask = dataImage >= topsky
 
     if mask.any():
-        maskImage[mask] = dataImage[mask] - topsky 
+        maskImage[mask] = dataImage[mask] - topsky
 
-
-    #masking the border in case:
+    # masking the border in case:
 
     if bor_flag:
         print("masking the border")
-        bor_mask = dataImage == borValue 
+        bor_mask = dataImage == borValue
 
         if bor_mask.any():
-            maskImage[bor_mask] = bor_val 
- 
+            maskImage[bor_mask] = bor_val
 
-
-    #writing mask file:
+    # writing mask file:
 
     hdu2[0].data = maskImage
 
     hdu2.writeto(maskFile, overwrite=True)
 
-
     hdu.close()
     hdu2.close()
-
-
-
-
 
 
 def MakeImage(newfits, sizex, sizey):
@@ -95,20 +77,21 @@ def MakeImage(newfits, sizex, sizey):
         print("{} deleted; a new one is created \n".format(newfits))
 
         runcmd = "rm {}".format(newfits)
-        errrm = sp.run([runcmd], shell=True, stdout=sp.PIPE,
-                        stderr=sp.PIPE, universal_newlines=True)
-
+        errrm = sp.run(
+            [runcmd],
+            shell=True,
+            stdout=sp.PIPE,
+            stderr=sp.PIPE,
+            universal_newlines=True,
+        )
 
     hdu = fits.PrimaryHDU()
-    hdu.data = np.zeros((sizey, sizex),dtype=np.float64)
+    hdu.data = np.zeros((sizey, sizex), dtype=np.float64)
     hdu.writeto(newfits, overwrite=True)
 
     return True
 
 
-
-
-  
 #############################################################################
 ######################### End of program  ###################################
 #     ______________________________________________________________________
@@ -120,7 +103,5 @@ def MakeImage(newfits, sizex, sizey):
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-if __name__ == '__main__':
-  mainMaskSky()
-
-
+if __name__ == "__main__":
+    mainMaskSky()

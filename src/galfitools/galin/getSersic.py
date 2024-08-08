@@ -13,79 +13,82 @@ from galfitools.galout.PhotDs9 import photDs9
 from galfitools.mge.mge2galfit import GetInfoEllip
 
 
-def getSersic(image: float, regfile: str, center: bool, maskfile: str, 
-                zeropoint: float, sky: float, noprint: float, 
-                bulgetot: float, bards9: str) -> GalComps:
-
+def getSersic(
+    image: float,
+    regfile: str,
+    center: bool,
+    maskfile: str,
+    zeropoint: float,
+    sky: float,
+    noprint: float,
+    bulgetot: float,
+    bards9: str,
+) -> GalComps:
 
     X, Y, AxRat, PA = getPeak(image, regfile, center, maskfile)
 
     mag, exptime = photDs9(image, regfile, maskfile, zeropoint, sky)
 
-
     obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
-
 
     if bards9:
 
         Xbar, Ybar, AxRatbar, PAbar = getPeak(image, bards9, center, maskfile)
-        magbar, exptimebar = photDs9(image, bards9, maskfile ,zeropoint, sky)
+        magbar, exptimebar = photDs9(image, bards9, maskfile, zeropoint, sky)
         objbar, xposbar, yposbar, rxbar, rybar, anglebar = GetInfoEllip(bards9)
 
-
-
-
-
     if bulgetot:
-        Fluxtot = 10**(-mag/2.5)
-        FluxBulge = Fluxtot*bulgetot
+        Fluxtot = 10 ** (-mag / 2.5)
+        FluxBulge = Fluxtot * bulgetot
         FluxDisk = Fluxtot - FluxBulge
-        mag = -2.5*np.log10(FluxBulge)
-        mag2 = -2.5*np.log10(FluxDisk)
+        mag = -2.5 * np.log10(FluxBulge)
+        mag2 = -2.5 * np.log10(FluxDisk)
 
         if bards9:
-            Fluxbar = 10**(-magbar/2.5) #assuming bar flux containts bulge flux
+            Fluxbar = 10 ** (-magbar / 2.5)  # assuming bar flux containts bulge flux
             FluxDisk = Fluxtot - Fluxbar
-            FluxBulge = Fluxbar*.3   #wild guess
-            Fluxbar = Fluxbar*.7   #wild guess
-            mag = -2.5*np.log10(FluxBulge)
-            mag2 = -2.5*np.log10(FluxDisk)
-            magbar = -2.5*np.log10(Fluxbar)
+            FluxBulge = Fluxbar * 0.3  # wild guess
+            Fluxbar = Fluxbar * 0.7  # wild guess
+            mag = -2.5 * np.log10(FluxBulge)
+            mag2 = -2.5 * np.log10(FluxDisk)
+            magbar = -2.5 * np.log10(Fluxbar)
 
             if rxbar >= rybar:
-                Rebar = rxbar/2 #wild guess
+                Rebar = rxbar / 2  # wild guess
             else:
-                Rebar = rybar/2 #same
-
-
+                Rebar = rybar / 2  # same
 
     if rx >= ry:
-        Re = rx/2 #wild guess
+        Re = rx / 2  # wild guess
     else:
-        Re = ry/2 #same
+        Re = ry / 2  # same
 
-    #wild guesses for n and Re
+    # wild guesses for n and Re
     n = 2
     skip = 0
 
-
     N = 1
-    #store in GalComps data class
+    # store in GalComps data class
     galcomps = GalComps()
 
-    if (bulgetot): 
-        if not(noprint):
-            print("The initial parameters for the Sersic component based on the DS9 ellipse region are: ")
+    if bulgetot:
+        if not (noprint):
+            print(
+                "The initial parameters for the Sersic component based on the DS9 ellipse region are: "
+            )
             print("")
-            print("WARNING: these are initial parameters. True values will be computed by GALFIT")
+            print(
+                "WARNING: these are initial parameters. True values will be computed by GALFIT"
+            )
             print("")
-
 
             print("# Component number: 1")
             print("0) sersic # Component type")
             print("1) {:.2f} {:.2f} 1 1   # Position x, y".format(X, Y))
             print("3) {:.2f}   1       # Integrated magnitude ".format(mag))
-            print("4) {:.2f}   1       # R_e (effective radius) ".format(Re*bulgetot)) #wild guess
+            print(
+                "4) {:.2f}   1       # R_e (effective radius) ".format(Re * bulgetot)
+            )  # wild guess
             print("5) {:.2f}   1       # Sersic index n  ".format(n))
             print("6) 0.0000   0      # ----  ")
             print("7) 0.0000   0      # ----  ")
@@ -111,7 +114,6 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
                 print("Z) {}  # Skip this model in output image?  ".format(skip))
                 print("")
 
-
             print("# Component number: 2")
             print("0) sersic # Component type")
             print("1) {:.2f} {:.2f} 1 1   # Position x, y".format(X, Y))
@@ -125,11 +127,10 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
             print("10) {:.2f}   1      # Position angle (PA)  ".format(PA))
             print("Z) {}  # Skip this model in output image?  ".format(skip))
 
-
             fileconst = "constraints.txt"
 
             print("")
-            print("parameter constraints file: ",fileconst) 
+            print("parameter constraints file: ", fileconst)
 
             fout = open(fileconst, "w")
 
@@ -137,8 +138,8 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
 
                 print("# 1_2_3    x    offset ")
                 print("# 1_2_3    y    offset ")
-                constlinex= " 1_2_3    x    offset \n"
-                constliney= " 1_2_3    y    offset \n"
+                constlinex = " 1_2_3    x    offset \n"
+                constliney = " 1_2_3    y    offset \n"
                 fout.write(constlinex)
                 fout.write(constliney)
 
@@ -147,22 +148,21 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
                 print("# 1_2    x    offset ")
                 print("# 1_2    y    offset ")
 
-                constlinex= " 1_2    x    offset \n"
-                constliney= " 1_2    y    offset \n"
+                constlinex = " 1_2    x    offset \n"
+                constliney = " 1_2    y    offset \n"
                 fout.write(constlinex)
                 fout.write(constliney)
 
-
             fout.close()
 
-        #first component: bulge
+        # first component: bulge
         galcomps.PosX = np.append(galcomps.PosX, X)
         galcomps.PosY = np.append(galcomps.PosY, Y)
         galcomps.NameComp = np.append(galcomps.NameComp, "sersic")
         galcomps.N = np.append(galcomps.N, N)
-                        
+
         galcomps.Mag = np.append(galcomps.Mag, mag)
-        galcomps.Rad = np.append(galcomps.Rad, Re*bulgetot)
+        galcomps.Rad = np.append(galcomps.Rad, Re * bulgetot)
         galcomps.Exp = np.append(galcomps.Exp, n)
         galcomps.Exp2 = np.append(galcomps.Exp2, 0)
         galcomps.Exp3 = np.append(galcomps.Exp3, 0)
@@ -170,7 +170,7 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
         galcomps.PosAng = np.append(galcomps.PosAng, 0)
         galcomps.skip = np.append(galcomps.skip, skip)
 
-        #free parameters
+        # free parameters
         galcomps.PosXFree = np.append(galcomps.PosXFree, 1)
         galcomps.PosYFree = np.append(galcomps.PosYFree, 1)
         galcomps.MagFree = np.append(galcomps.MagFree, 1)
@@ -179,18 +179,16 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
         galcomps.Exp2Free = np.append(galcomps.Exp2Free, 0)
         galcomps.Exp3Free = np.append(galcomps.Exp3Free, 0)
         galcomps.AxRatFree = np.append(galcomps.AxRatFree, 1)
- 
-
 
         if bards9:
 
-            #alternative component: bar
+            # alternative component: bar
             N = N + 1
             galcomps.PosX = np.append(galcomps.PosX, X)
             galcomps.PosY = np.append(galcomps.PosY, Y)
             galcomps.NameComp = np.append(galcomps.NameComp, "sersic")
             galcomps.N = np.append(galcomps.N, N)
-                            
+
             galcomps.Mag = np.append(galcomps.Mag, magbar)
             galcomps.Rad = np.append(galcomps.Rad, Rebar)
             galcomps.Exp = np.append(galcomps.Exp, 0.5)
@@ -200,7 +198,7 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
             galcomps.PosAng = np.append(galcomps.PosAng, PAbar)
             galcomps.skip = np.append(galcomps.skip, skip)
 
-            #free parameters
+            # free parameters
             galcomps.PosXFree = np.append(galcomps.PosXFree, 1)
             galcomps.PosYFree = np.append(galcomps.PosYFree, 1)
             galcomps.MagFree = np.append(galcomps.MagFree, 1)
@@ -209,15 +207,14 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
             galcomps.Exp2Free = np.append(galcomps.Exp2Free, 0)
             galcomps.Exp3Free = np.append(galcomps.Exp3Free, 0)
             galcomps.AxRatFree = np.append(galcomps.AxRatFree, 1)
-     
 
-        #second component: disk
+        # second component: disk
         N = N + 1
         galcomps.PosX = np.append(galcomps.PosX, X)
         galcomps.PosY = np.append(galcomps.PosY, Y)
         galcomps.NameComp = np.append(galcomps.NameComp, "sersic")
         galcomps.N = np.append(galcomps.N, N)
-                        
+
         galcomps.Mag = np.append(galcomps.Mag, mag2)
         galcomps.Rad = np.append(galcomps.Rad, Re)
         galcomps.Exp = np.append(galcomps.Exp, 1)
@@ -227,8 +224,7 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
         galcomps.PosAng = np.append(galcomps.PosAng, PA)
         galcomps.skip = np.append(galcomps.skip, skip)
 
-
-        #free parameters
+        # free parameters
         galcomps.PosXFree = np.append(galcomps.PosXFree, 1)
         galcomps.PosYFree = np.append(galcomps.PosYFree, 1)
         galcomps.MagFree = np.append(galcomps.MagFree, 1)
@@ -237,14 +233,17 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
         galcomps.Exp2Free = np.append(galcomps.Exp2Free, 0)
         galcomps.Exp3Free = np.append(galcomps.Exp3Free, 0)
         galcomps.AxRatFree = np.append(galcomps.AxRatFree, 1)
- 
 
     else:
 
-        if not(noprint):
-            print("The initial parameters for the Sersic component based on the DS9 ellipse region are: ")
+        if not (noprint):
+            print(
+                "The initial parameters for the Sersic component based on the DS9 ellipse region are: "
+            )
             print("")
-            print("WARNING: these are initial parameters. True values will be computed by GALFIT")
+            print(
+                "WARNING: these are initial parameters. True values will be computed by GALFIT"
+            )
             print("")
 
             print("# Component number: 1")
@@ -260,13 +259,11 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
             print("10) {:.2f}   1      # Position angle (PA)  ".format(PA))
             print("Z) {}  # Skip this model in output image?  ".format(skip))
 
-
-
         galcomps.PosX = np.append(galcomps.PosX, X)
         galcomps.PosY = np.append(galcomps.PosY, Y)
         galcomps.NameComp = np.append(galcomps.NameComp, "sersic")
         galcomps.N = np.append(galcomps.N, N)
-                        
+
         galcomps.Mag = np.append(galcomps.Mag, mag)
         galcomps.Rad = np.append(galcomps.Rad, Re)
         galcomps.Exp = np.append(galcomps.Exp, n)
@@ -276,7 +273,7 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
         galcomps.PosAng = np.append(galcomps.PosAng, PA)
         galcomps.skip = np.append(galcomps.skip, skip)
 
-        #free parameters
+        # free parameters
         galcomps.PosXFree = np.append(galcomps.PosXFree, 1)
         galcomps.PosYFree = np.append(galcomps.PosYFree, 1)
         galcomps.MagFree = np.append(galcomps.MagFree, 1)
@@ -285,10 +282,5 @@ def getSersic(image: float, regfile: str, center: bool, maskfile: str,
         galcomps.Exp2Free = np.append(galcomps.Exp2Free, 0)
         galcomps.Exp3Free = np.append(galcomps.Exp3Free, 0)
         galcomps.AxRatFree = np.append(galcomps.AxRatFree, 1)
- 
 
-
-    return galcomps 
-
-
-
+    return galcomps

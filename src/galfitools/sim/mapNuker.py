@@ -13,87 +13,81 @@ from scipy.special import gammaincinv
 
 def main():
 
-
-
-    rb = 10 
+    rb = 10
 
     print("computing mean of Rbreak/Rgamma")
 
-    mean, dev, mi,ma = Rgamean(rb)
+    mean, dev, mi, ma = Rgamean(rb)
 
-    print("mean = {:.2f} ; std = {:.2f} ".format(mean,dev))
-    print("min value = {:.2f} ; max = {:.2f}".format(mi,ma))
-
-
-def Rgamma(Rb,alpha,beta,gamma):
+    print("mean = {:.2f} ; std = {:.2f} ".format(mean, dev))
+    print("min value = {:.2f} ; max = {:.2f}".format(mi, ma))
 
 
-    rgam = Rb*(((0.5-gamma)/(beta-0.5))**(1/alpha)) #formula
+def Rgamma(Rb, alpha, beta, gamma):
+
+    rgam = Rb * (((0.5 - gamma) / (beta - 0.5)) ** (1 / alpha))  # formula
 
     if np.isscalar(rgam):
-        Rg  = rgam
+        Rg = rgam
     else:
         mask = np.isfinite(rgam)
-        Rg  = rgam[mask]
+        Rg = rgam[mask]
 
-    return Rg 
-
+    return Rg
 
 
 def Rgamean(Rb):
 
-    alpha = np.arange(2,4.1,0.01) #range of alpha to search
-    beta = np.arange(0.5,3.1,0.01) #range of beta to search
-    gamma = np.arange(0,0.5,0.01) #range of gamma to search
+    alpha = np.arange(2, 4.1, 0.01)  # range of alpha to search
+    beta = np.arange(0.5, 3.1, 0.01)  # range of beta to search
+    gamma = np.arange(0, 0.5, 0.01)  # range of gamma to search
 
-    alpha = np.arange(1,4.1,0.01) #range of alpha to search
-    beta = np.arange(0.5,2.1,0.01) #range of beta to search
-    gamma = np.arange(0,0.5,0.01) #range of gamma to search
+    alpha = np.arange(1, 4.1, 0.01)  # range of alpha to search
+    beta = np.arange(0.5, 2.1, 0.01)  # range of beta to search
+    gamma = np.arange(0, 0.5, 0.01)  # range of gamma to search
 
+    albega = cartesian((alpha, beta, gamma))
 
+    alpha = albega[:, 0]
+    beta = albega[:, 1]
+    gamma = albega[:, 2]
 
-    albega = cartesian((alpha,beta,gamma))
-    
-    alpha= albega[:,0]
-    beta = albega[:,1]
-    gamma = albega[:,2]
+    Rg = Rgamma(Rb, alpha, beta, gamma)
 
-    Rg = Rgamma(Rb,alpha,beta,gamma)
+    # mask = np.isfinite(Rg)
+    # output[~np.isfinite(output)] = 0
 
-    #mask = np.isfinite(Rg)
-    #output[~np.isfinite(output)] = 0
-
-    kons=Rb/Rg
+    kons = Rb / Rg
 
     kons.sort()
 
-    tot=len(kons)
-    
+    tot = len(kons)
+
     print("removing top 80% and bottom 20%")
 
-    top=round(.8*tot)
-    bot=round(.2*tot)
-    #top=np.int(top)
-    #bot=np.int(bot)
+    top = round(0.8 * tot)
+    bot = round(0.2 * tot)
+    # top=np.int(top)
+    # bot=np.int(bot)
 
-    kon=kons[bot:top]
+    kon = kons[bot:top]
 
     n = len(kon)
 
-    print("the total number of parameters combinations is",n)
+    print("the total number of parameters combinations is", n)
 
-    if n%2 == 0:
-        idmed1 = int(n/2 - 1)
-        idmed2 = int(n/2) 
-        median = (kon[idmed1] + kon[idmed2])/2 
+    if n % 2 == 0:
+        idmed1 = int(n / 2 - 1)
+        idmed2 = int(n / 2)
+        median = (kon[idmed1] + kon[idmed2]) / 2
     else:
-        idmed = int((n+1)/2 - 1)
+        idmed = int((n + 1) / 2 - 1)
         median = kon[idmed]
 
     print("the median is {:.2f} ".format(median))
 
     m = np.mean(kon)
-    s = np.std(kon) 
+    s = np.std(kon)
     mi = np.min(kon)
     ma = np.max(kon)
 
@@ -103,27 +97,19 @@ def Rgamean(Rb):
     counts, bins = np.histogram(kon)
     plt.stairs(counts, bins)
     plt.hist(bins[:-1], bins, weights=counts)
-    #counts,bins,patches=plt.hist(kon)
+    # counts,bins,patches=plt.hist(kon)
 
-    idmod = np.where(counts==max(counts))[0][0] 
+    idmod = np.where(counts == max(counts))[0][0]
 
     print("the mode is {:.2f} ".format(bins[idmod]))
 
-    #plt.hist(kon)
-
+    # plt.hist(kon)
 
     plt.grid(True)
     plt.minorticks_on()
     plt.savefig("histn.png")
- 
 
-
-    return m,s,mi,ma
-
-
-
-
-
+    return m, s, mi, ma
 
 
 def cartesian(arrays, out=None):
@@ -168,16 +154,15 @@ def cartesian(arrays, out=None):
     if out is None:
         out = np.zeros([n, len(arrays)], dtype=dtype)
 
-    #m = n / arrays[0].size
+    # m = n / arrays[0].size
     m = int(n / arrays[0].size)
-    out[:,0] = np.repeat(arrays[0], m)
+    out[:, 0] = np.repeat(arrays[0], m)
     if arrays[1:]:
         cartesian(arrays[1:], out=out[0:m, 1:])
         for j in range(1, arrays[0].size):
-        #for j in xrange(1, arrays[0].size):
-            out[j*m:(j+1)*m, 1:] = out[0:m, 1:]
+            # for j in xrange(1, arrays[0].size):
+            out[j * m : (j + 1) * m, 1:] = out[0:m, 1:]
     return out
-
 
 
 #############################################################################
@@ -191,5 +176,5 @@ def cartesian(arrays, out=None):
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

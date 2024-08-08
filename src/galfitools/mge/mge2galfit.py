@@ -13,7 +13,8 @@ import numpy as np
 import scipy
 import scipy.special
 from astropy.io import fits
-#from galfitools.galin.galfit import Galfit, conver2Sersic, SelectGal, numComps, GetRadAng
+
+# from galfitools.galin.galfit import Galfit, conver2Sersic, SelectGal, numComps, GetRadAng
 from galfitools.galin.galfit import Galfit
 from galfitools.galin.MaskDs9 import GetAxis
 from mgefit.find_galaxy import find_galaxy
@@ -25,9 +26,20 @@ from mgefit.sectors_photometry_twist import sectors_photometry_twist
 from scipy.special import gammaincinv
 
 
-def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser, 
-                freesky, numgauss, xypos=None, ellip = None, posang = None) -> str:
-
+def mge2gal(
+    galfitFile,
+    regfile,
+    center,
+    psf,
+    twist,
+    gauss,
+    freeser,
+    freesky,
+    numgauss,
+    xypos=None,
+    ellip=None,
+    posang=None,
+) -> str:
 
     # reading options from galfit header
     galfit = Galfit(galfitFile)
@@ -46,7 +58,7 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser,
 
     sigfile = head.sigimage
 
-    convbox =  head.convx
+    convbox = head.convx
     convboxy = head.convy
 
     consfile = head.constraints
@@ -54,65 +66,56 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser,
     ylo = head.ymin
     xhi = head.xmax
     yhi = head.ymax
- 
-
 
     #################
 
     initgauss = 12
-    regu = None #regu option now available
+    regu = None  # regu option now available
 
-
-    mgeoutfile="mgegas.txt"
-
-
+    mgeoutfile = "mgegas.txt"
 
     ######Updating variables for empty files ###########
 
     if (maskfile == "None") or (maskfile == "none"):
         maskfile = None
 
-    if (sigfile == "None") or  (sigfile == "none"):
+    if (sigfile == "None") or (sigfile == "none"):
         sigfile = None
 
     if (psfile == "None") or (psfile == "none"):
         psfile = None
 
-
     if regu:
         try:
-            from mgefit.mge_fit_sectors_twist_regularized import \
-                mge_fit_sectors_twist_regularized 
-        except: 
-            print("mge_fit_sectors_twist_regularized is not installed. Regu desactivated")
+            from mgefit.mge_fit_sectors_twist_regularized import (
+                mge_fit_sectors_twist_regularized,
+            )
+        except:
+            print(
+                "mge_fit_sectors_twist_regularized is not installed. Regu desactivated"
+            )
             regu = False
 
     ##########################################
     ############################################
 
-
     if regu:
-        print('regularization mode activated')
-
+        print("regularization mode activated")
 
     root_ext = os.path.splitext(image)
-    timg= root_ext[0]
+    timg = root_ext[0]
 
+    namepng = timg + ".png"
 
-    namepng=timg+".png"
+    sectorspng = "sectors.png"
 
-    sectorspng="sectors.png"
+    magzpt = float(magzpt)
 
-    magzpt=float(magzpt)
+    fit = 1
+    serfit = 0
+    skyfit = 0
 
-
-
-    fit=1
-    serfit=0
-    skyfit=0
-
-    Z=0
-
+    Z = 0
 
     ###################################################
     #  Create GALFIT input file header to compute sky #
@@ -121,30 +124,25 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser,
     #    image = "ngc4342.fits"
 
     root_ext = os.path.splitext(imageout)
-    TNAM= root_ext[0]
-
-
-
+    TNAM = root_ext[0]
 
     exptime = GetExpTime(image)
-
-
 
     ######################
     #    Mask file
     #################
     if maskfile:
 
-        errmsg="file {} does not exist".format(maskfile)
+        errmsg = "file {} does not exist".format(maskfile)
         assert os.path.isfile(maskfile), errmsg
         hdu = fits.open(maskfile)
         mask = hdu[0].data
-        maskb=np.array(mask,dtype=bool)
-        maskbt=maskb.T
+        maskb = np.array(mask, dtype=bool)
+        maskbt = maskb.T
         hdu.close()
 
     else:
-        mask=np.array([])
+        mask = np.array([])
 
     ######################
     #    sky=back
@@ -153,15 +151,15 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser,
     hdu = fits.open(image)
     img = hdu[0].data
 
-    img=img.astype(float)
+    img = img.astype(float)
 
-    minlevel = 0  
+    minlevel = 0
 
     plt.clf()
 
     (ncol, nrow) = GetAxis(image)
 
-    eps = 0 
+    eps = 0
     theta = 0
 
     if regfile:
@@ -169,17 +167,17 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser,
 
             obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
 
-
-            xx, yy, Rkron, theta, eps = Ds9ell2Kronellv2(xpos,ypos,rx,ry,angle)
+            xx, yy, Rkron, theta, eps = Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle)
             if center:
-                print('center of ds9 ellipse region will be used')
+                print("center of ds9 ellipse region will be used")
                 xpeak, ypeak = xpos, ypos
-            else:        
-                (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, eps, ncol, nrow)
+            else:
+                (xmin, xmax, ymin, ymax) = GetSize(
+                    xx, yy, Rkron, theta, eps, ncol, nrow
+                )
                 xpeak, ypeak = GetPmax(img, mask, xmin, xmax, ymin, ymax)
 
-
-    #ignore the previous data of the object if any of the next options flags are activated 
+    # ignore the previous data of the object if any of the next options flags are activated
     if xypos:
         xpeak = xypos[0] - 1
         ypeak = xypos[1] - 1
@@ -188,31 +186,33 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser,
         eps = ellip
 
     if posang:
-        theta = posang 
+        theta = posang
 
     print("galaxy found at ", xpeak + 1, ypeak + 1)
     print("Ellipticity, Angle = ", eps, theta)
 
     print("Sky = ", sky)
 
-    img = img - sky   # subtract sky
+    img = img - sky  # subtract sky
 
     # I have to switch x and y coordinates, don't ask me why
-    xtemp=xpeak
-    xpeak=ypeak
-    ypeak=xtemp
+    xtemp = xpeak
+    xpeak = ypeak
+    ypeak = xtemp
 
     plt.clf()
 
     if twist:
         print("twist mode mge fit sectors is used")
-                        # Perform galaxy photometry
+        # Perform galaxy photometry
         if maskfile:
-            s = sectors_photometry_twist(img, theta, xpeak, ypeak, 
-                                         minlevel=minlevel, badpixels=maskb ,plot=1)
+            s = sectors_photometry_twist(
+                img, theta, xpeak, ypeak, minlevel=minlevel, badpixels=maskb, plot=1
+            )
         else:
-            s = sectors_photometry_twist(img, theta, xpeak, ypeak, minlevel=minlevel, 
-                                         plot=1)
+            s = sectors_photometry_twist(
+                img, theta, xpeak, ypeak, minlevel=minlevel, plot=1
+            )
 
         plt.savefig(sectorspng)
 
@@ -224,84 +224,147 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser,
 
         if np.abs(psf) > tolpsf:
             if regu:
-                m = mge_fit_sectors_twist_regularized(s.radius, s.angle, s.counts, eps, ngauss=initgauss,
-                                            sigmapsf=psf, scale=scale, plot=1)
+                m = mge_fit_sectors_twist_regularized(
+                    s.radius,
+                    s.angle,
+                    s.counts,
+                    eps,
+                    ngauss=initgauss,
+                    sigmapsf=psf,
+                    scale=scale,
+                    plot=1,
+                )
             else:
-                m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=initgauss,
-                                            sigmapsf=psf, scale=scale, plot=1)
- 
+                m = mge_fit_sectors_twist(
+                    s.radius,
+                    s.angle,
+                    s.counts,
+                    eps,
+                    ngauss=initgauss,
+                    sigmapsf=psf,
+                    scale=scale,
+                    plot=1,
+                )
+
         else:
             print("No convolution")
             if regu:
-                m = mge_fit_sectors_twist_regularized(s.radius, s.angle, s.counts, eps, ngauss=initgauss,
-                                             scale=scale, plot=1)
+                m = mge_fit_sectors_twist_regularized(
+                    s.radius,
+                    s.angle,
+                    s.counts,
+                    eps,
+                    ngauss=initgauss,
+                    scale=scale,
+                    plot=1,
+                )
             else:
-                m = mge_fit_sectors_twist(s.radius, s.angle, s.counts, eps, ngauss=initgauss,
-                                             scale=scale, plot=1)
- 
-
+                m = mge_fit_sectors_twist(
+                    s.radius,
+                    s.angle,
+                    s.counts,
+                    eps,
+                    ngauss=initgauss,
+                    scale=scale,
+                    plot=1,
+                )
 
         plt.pause(1)  # Allow plot to appear on the screen
 
         plt.savefig(namepng)
-
 
     else:
-    #elif twist == False:
+        # elif twist == False:
 
         if maskfile:
-            s = sectors_photometry(img, eps, theta, xpeak, ypeak, minlevel=minlevel, badpixels=maskb ,plot=1)
+            s = sectors_photometry(
+                img,
+                eps,
+                theta,
+                xpeak,
+                ypeak,
+                minlevel=minlevel,
+                badpixels=maskb,
+                plot=1,
+            )
         else:
 
-            s = sectors_photometry(img, eps, theta, xpeak, ypeak, minlevel=minlevel, plot=1)
+            s = sectors_photometry(
+                img, eps, theta, xpeak, ypeak, minlevel=minlevel, plot=1
+            )
 
-#            s = sectors_photometry(img, eps, theta, xpeak, ypeak, minlevel=minlevel, plot=1)
+        #            s = sectors_photometry(img, eps, theta, xpeak, ypeak, minlevel=minlevel, plot=1)
 
         plt.pause(1)  # Allow plot to appear on the screen
 
         plt.savefig(sectorspng)
 
-    ###########################
+        ###########################
 
         plt.clf()
-
-
 
         tolpsf = 0.001
         if np.abs(psf) > tolpsf:
 
             if regu:
- 
-                m = mge_fit_sectors_regularized(s.radius, s.angle, s.counts, eps,
-                                    ngauss=initgauss, sigmapsf=psf,
-                                    scale=scale, plot=1, bulge_disk=0, linear=0)
+
+                m = mge_fit_sectors_regularized(
+                    s.radius,
+                    s.angle,
+                    s.counts,
+                    eps,
+                    ngauss=initgauss,
+                    sigmapsf=psf,
+                    scale=scale,
+                    plot=1,
+                    bulge_disk=0,
+                    linear=0,
+                )
             else:
-                m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
-                                    ngauss=initgauss, sigmapsf=psf,
-                                    scale=scale, plot=1, bulge_disk=0, linear=0)
- 
+                m = mge_fit_sectors(
+                    s.radius,
+                    s.angle,
+                    s.counts,
+                    eps,
+                    ngauss=initgauss,
+                    sigmapsf=psf,
+                    scale=scale,
+                    plot=1,
+                    bulge_disk=0,
+                    linear=0,
+                )
 
         else:
             print("No convolution")
 
             if regu:
-                m = mge_fit_sectors_regularized(s.radius, s.angle, s.counts, eps,
-                                    ngauss=initgauss, scale=scale, plot=1, 
-                                    bulge_disk=0, linear=0)
+                m = mge_fit_sectors_regularized(
+                    s.radius,
+                    s.angle,
+                    s.counts,
+                    eps,
+                    ngauss=initgauss,
+                    scale=scale,
+                    plot=1,
+                    bulge_disk=0,
+                    linear=0,
+                )
             else:
-                m = mge_fit_sectors(s.radius, s.angle, s.counts, eps,
-                                    ngauss=initgauss, scale=scale, plot=1, 
-                                    bulge_disk=0, linear=0)
- 
+                m = mge_fit_sectors(
+                    s.radius,
+                    s.angle,
+                    s.counts,
+                    eps,
+                    ngauss=initgauss,
+                    scale=scale,
+                    plot=1,
+                    bulge_disk=0,
+                    linear=0,
+                )
 
         plt.pause(1)  # Allow plot to appear on the screen
 
         plt.savefig(namepng)
-
-
-
-
-
 
     if twist:
 
@@ -312,83 +375,90 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser,
         alphaf = alpha1 - 90
 
     else:
-        #elif twist == False:
+        # elif twist == False:
         (counts, sigma, axisrat) = m.sol
-        #anglegass = 90 - theta
-        anglegass =  theta
-
+        # anglegass = 90 - theta
+        anglegass = theta
 
     ####################
     ### print GALFIT files
     #####################
 
     if gauss:
-        parfile="mgeGALFIT.txt"
+        parfile = "mgeGALFIT.txt"
     else:
-        parfile="mseGALFIT.txt"
+        parfile = "mseGALFIT.txt"
 
-    outname=TNAM
+    outname = TNAM
 
-    rmsname = sigfile 
+    rmsname = sigfile
     if psfile:
         psfname = psfile
     else:
         psfname = "None"
 
-
     # switch back
-    xtemp=xpeak
-    xpeak=ypeak
-    ypeak=xtemp
-
-
+    xtemp = xpeak
+    xpeak = ypeak
+    ypeak = xtemp
 
     T1 = "{}".format(image)
     T2 = outname + "-mge.fits"
     T3 = "{}".format(rmsname)
 
-
     # now this is read from galfit file
 
-    #xlo=1
-    #ylo=1
-    #(xhi, yhi) = (ncol, nrow)
-
-
+    # xlo=1
+    # ylo=1
+    # (xhi, yhi) = (ncol, nrow)
 
     fout1 = open(parfile, "w")
     fout2 = open(mgeoutfile, "w")
 
-
     outline2 = "# Mag Sig(pixels) FWHM(pixels) q angle \n"
     fout2.write(outline2)
 
-    #sersic K for n = 0.5
+    # sersic K for n = 0.5
 
-    K = gammaincinv(1,0.5)
-
+    K = gammaincinv(1, 0.5)
 
     if psfile:
         (ncol, nrow) = GetAxis(psfname)
         convbox = ncol + 1
         convboxy = nrow + 1
 
-
-
-    PrintHeader(fout1, T1, T2, T3, psfname, 1, maskfile, consfile, xlo, xhi, ylo,
-                yhi, convbox, convboxy, magzpt, scale, scale, "regular", 0, 0)
-
+    PrintHeader(
+        fout1,
+        T1,
+        T2,
+        T3,
+        psfname,
+        1,
+        maskfile,
+        consfile,
+        xlo,
+        xhi,
+        ylo,
+        yhi,
+        convbox,
+        convboxy,
+        magzpt,
+        scale,
+        scale,
+        "regular",
+        0,
+        0,
+    )
 
     if freeser:
         serfit = 1
     else:
         serfit = 0
 
-
-    #removing the last components:
+    # removing the last components:
     totGauss = len(counts)
 
-    if not(numgauss):
+    if not (numgauss):
         numgauss = totGauss
 
     print("total number of gaussians by mge_fit_sectors: ", totGauss)
@@ -400,188 +470,250 @@ def  mge2gal(galfitFile, regfile, center, psf, twist, gauss, freeser,
 
     print("total number of gaussians used by GALFIT: ", numgauss)
 
-
-
     index = 0
 
-    while index < numgauss: 
-
+    while index < numgauss:
 
         TotCounts = counts[index]
-        SigPix =  sigma[index]
-        qobs =  axisrat[index]
+        SigPix = sigma[index]
+        qobs = axisrat[index]
 
         TotCounts = float(TotCounts)
         SigPix = float(SigPix)
         qobs = float(qobs)
 
         if twist:
-            anglegass = alphaf[index] #- 90
+            anglegass = alphaf[index]  # - 90
             anglegass = float(anglegass)
 
-
         if gauss:
-            
-            C0=TotCounts/(2*np.pi*qobs*SigPix**2)
 
-            Ftot = 2*np.pi*SigPix**2*C0*qobs
+            C0 = TotCounts / (2 * np.pi * qobs * SigPix ** 2)
 
-            mgemag = magzpt + 0.1  + 2.5*np.log10(exptime)  - 2.5*np.log10(Ftot)
+            Ftot = 2 * np.pi * SigPix ** 2 * C0 * qobs
 
-            FWHM = 2.35482*SigPix
+            mgemag = magzpt + 0.1 + 2.5 * np.log10(exptime) - 2.5 * np.log10(Ftot)
 
-            outline = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(mgemag, SigPix, FWHM, qobs, anglegass)
+            FWHM = 2.35482 * SigPix
+
+            outline = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(
+                mgemag, SigPix, FWHM, qobs, anglegass
+            )
             print(outline)
 
-            outline2 = "{:.2f} {:.2f} {:.2f} {:.2f} {:.2f} \n".format(mgemag, SigPix, FWHM, qobs, anglegass)
+            outline2 = "{:.2f} {:.2f} {:.2f} {:.2f} {:.2f} \n".format(
+                mgemag, SigPix, FWHM, qobs, anglegass
+            )
             fout2.write(outline2)
 
-
-            PrintGauss(fout1, index+1, xpeak + 1, ypeak + 1, mgemag, FWHM, qobs, anglegass, Z, fit)
-
+            PrintGauss(
+                fout1,
+                index + 1,
+                xpeak + 1,
+                ypeak + 1,
+                mgemag,
+                FWHM,
+                qobs,
+                anglegass,
+                Z,
+                fit,
+            )
 
         else:
 
-            C0=TotCounts/(2*np.pi*qobs*SigPix**2)
+            C0 = TotCounts / (2 * np.pi * qobs * SigPix ** 2)
 
-            Ftot = 2*np.pi*SigPix**2*C0*qobs
+            Ftot = 2 * np.pi * SigPix ** 2 * C0 * qobs
 
-            mgemag = magzpt + 0.1  + 2.5*np.log10(exptime)  - 2.5*np.log10(Ftot)
-            
-            FWHM = 2.35482*SigPix
+            mgemag = magzpt + 0.1 + 2.5 * np.log10(exptime) - 2.5 * np.log10(Ftot)
 
-            h  = np.sqrt(2) * SigPix
-             
-            Re = (K**(0.5))*h
+            FWHM = 2.35482 * SigPix
 
-            outline = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f} Re: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(mgemag, SigPix, FWHM, Re, qobs, anglegass)
+            h = np.sqrt(2) * SigPix
+
+            Re = (K ** (0.5)) * h
+
+            outline = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f} Re: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(
+                mgemag, SigPix, FWHM, Re, qobs, anglegass
+            )
             print(outline)
 
-            outline2 = "{:.2f} {:.2f} {:.2f} {:.2f} {:.2f} {:.2f} \n".format(mgemag, SigPix, FWHM, Re,  qobs, anglegass)
+            outline2 = "{:.2f} {:.2f} {:.2f} {:.2f} {:.2f} {:.2f} \n".format(
+                mgemag, SigPix, FWHM, Re, qobs, anglegass
+            )
             fout2.write(outline2)
 
+            PrintSersic(
+                fout1,
+                index + 1,
+                xpeak + 1,
+                ypeak + 1,
+                mgemag,
+                Re,
+                0.5,
+                qobs,
+                anglegass,
+                Z,
+                fit,
+                serfit,
+            )
 
-            PrintSersic(fout1, index+1, xpeak + 1, ypeak + 1, mgemag, Re, 0.5, qobs, anglegass, Z, fit, serfit)
-
-
-
-        index+=1
-
+        index += 1
 
     if freesky:
         skyfit = 1
     else:
         skyfit = 0
 
-    PrintSky(fout1, index+1, sky, Z, skyfit)
+    PrintSky(fout1, index + 1, sky, Z, skyfit)
     fout1.close()
     fout2.close()
 
     makeConstraints(consfile, len(counts))
 
-    print("Done. Gaussians are stored in {}, and {} for galfit format ".format(mgeoutfile,parfile))
+    print(
+        "Done. Gaussians are stored in {}, and {} for galfit format ".format(
+            mgeoutfile, parfile
+        )
+    )
 
-    #returns output name
+    # returns output name
     return T2
+
+
 ####################################################
 ####################################################
 #####################################################
 
+
 def ReadMgePsf(psfile):
 
+    counts, mag, sigpix, fwhm, qobs, angle = np.genfromtxt(
+        psfile, skip_header=1, delimiter="", unpack=True
+    )
 
-    counts,mag,sigpix,fwhm,qobs,angle = np.genfromtxt(psfile, skip_header=1, delimiter="", unpack=True)
+    tot = counts.sum()
+    psfs = sigpix
 
-    tot=counts.sum()
-    psfs=sigpix
+    normpsf = counts / tot
 
-    normpsf=counts/tot
-
-    return psfs,normpsf
+    return psfs, normpsf
 
 
-def Sextractor(filimage,X,Y):
+def Sextractor(filimage, X, Y):
 
-    sexfile="default.sex"
-    CatSex="sim.cat"
+    sexfile = "default.sex"
+    CatSex = "sim.cat"
 
-    runcmd="sextractor -c {} {} ".format(sexfile,filimage)
+    runcmd = "sextractor -c {} {} ".format(sexfile, filimage)
     print(runcmd)
 
-    err = sp.run([runcmd],shell=True,stdout=sp.PIPE,stderr=sp.PIPE,universal_newlines=True)  # Run GALFIT
+    err = sp.run(
+        [runcmd], shell=True, stdout=sp.PIPE, stderr=sp.PIPE, universal_newlines=True
+    )  # Run GALFIT
 
-    KronScale=1
-###############  Read in sextractor sorted data ################
-    if os.stat(CatSex).st_size != 0 :
-        Num, RA, Dec, XPos, YPos, Mag, Kron, FluxRad, IsoArea, AIm, E, Theta, Background, Class, Flag = np.genfromtxt(
-           CatSex, delimiter="", unpack=True)  # sorted
-## checking if they are numpy arrays:
+    KronScale = 1
+    ###############  Read in sextractor sorted data ################
+    if os.stat(CatSex).st_size != 0:
+        (
+            Num,
+            RA,
+            Dec,
+            XPos,
+            YPos,
+            Mag,
+            Kron,
+            FluxRad,
+            IsoArea,
+            AIm,
+            E,
+            Theta,
+            Background,
+            Class,
+            Flag,
+        ) = np.genfromtxt(
+            CatSex, delimiter="", unpack=True
+        )  # sorted
+        ## checking if they are numpy arrays:
 
-
-#        index =  Mag.argsort()
-#        i=0
-        dist=100
+        #        index =  Mag.argsort()
+        #        i=0
+        dist = 100
 
         for idx, item in enumerate(Num):
 
+            #        if(isinstance(Num,np.ndarray)):
+            dx = XPos[idx] - X
+            dy = YPos[idx] - Y
+            dt = np.sqrt(dx ** 2 + dy ** 2)
 
-#        if(isinstance(Num,np.ndarray)):
-            dx= XPos[idx] - X
-            dy= YPos[idx] - Y
-            dt= np.sqrt(dx**2 + dy**2)
-
-            cflag=CheckFlag(4,Flag[idx])
-            if cflag==False and dt < dist:
+            cflag = CheckFlag(4, Flag[idx])
+            if cflag == False and dt < dist:
                 dist = dt
-                sindex=idx
+                sindex = idx
 
+        Num = Num[sindex]
+        RA = RA[sindex]
+        Dec = Dec[sindex]
+        XPos = XPos[sindex]
+        YPos = YPos[sindex]
+        Mag = Mag[sindex]
+        Kron = Kron[sindex]
+        FluxRad = FluxRad[sindex]
+        IsoArea = IsoArea[sindex]
+        AIm = AIm[sindex]
+        E = E[sindex]
+        Theta = Theta[sindex]
+        Background = Background[sindex]
+        Class = Class[sindex]
+        Flag = Flag[sindex]
 
-
-        Num=Num[sindex]
-        RA=RA[sindex]
-        Dec=Dec[sindex]
-        XPos=XPos[sindex]
-        YPos=YPos[sindex]
-        Mag=Mag[sindex]
-        Kron=Kron[sindex]
-        FluxRad=FluxRad[sindex]
-        IsoArea=IsoArea[sindex]
-        AIm=AIm[sindex]
-        E=E[sindex]
-        Theta=Theta[sindex]
-        Background=Background[sindex]
-        Class=Class[sindex]
-        Flag=Flag[sindex]
-
-##
+        ##
         Angle = np.abs(Theta)
         AR = 1 - E
         RKron = KronScale * AIm * Kron
         Sky = Background
 
+        ############
 
-############
+        XPos = round(XPos)
+        YPos = round(YPos)
 
-        XPos=round(XPos)
-        YPos=round(YPos)
-
-        XPos=int(XPos)
-        YPos=int(YPos)
+        XPos = int(XPos)
+        YPos = int(YPos)
 
     else:
         print("Sextractor cat file not found ")
 
     print("Sextractor done")
-    return E,Angle,XPos,YPos,Background
-
-
-
-
+    return E, Angle, XPos, YPos, Background
 
 
 ### GALFIT functions
 
-def PrintHeader(hdl, A, B, C, D, E, F, G, xlo, xhi, ylo, yhi, convx, convy, J, platedx, platedy, O, P, S):
+
+def PrintHeader(
+    hdl,
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
+    G,
+    xlo,
+    xhi,
+    ylo,
+    yhi,
+    convx,
+    convy,
+    J,
+    platedx,
+    platedy,
+    O,
+    P,
+    S,
+):
     "print GALFIT header in a file"
 
     # k Check
@@ -590,20 +722,48 @@ def PrintHeader(hdl, A, B, C, D, E, F, G, xlo, xhi, ylo, yhi, convx, convy, J, p
 
     lineZ = "==================================================================================================\n"
     lineX = "# IMAGE PARAMETERS \n"
-    lineA = "A) {}    # Input Data image (FITS file)                            \n".format(A)
-    lineB = "B) {}    # Output data image block                                 \n".format(B)
-    lineC = "C) {}    # Sigma image name (made from data if blank or \"none\")  \n".format(C)
-    lineD = "D) {}    # Input PSF image and (optional) diffusion kernel         \n".format(D)
-    lineE = "E) {}    # PSF fine sampling factor relative to data               \n".format(E)
-    lineF = "F) {}    # Bad pixel mask (FITS image or ASCII coord list)         \n".format(F)
-    lineG = "G) {}    # File with parameter constraints (ASCII file)            \n".format(G)
-    lineH = "H) {} {} {} {}   # Image region to fit (xmin xmax ymin ymax)               \n".format(xlo, xhi, ylo, yhi)
-    lineI = "I) {} {}  # Size of the convolution box (x y)                       \n".format(convx, convy)
-    lineJ = "J) {}     # Magnitude photometric zeropoint                         \n".format(J)
-    lineK = "K) {} {}  # Plate scale (dx dy). \[arcsec per pixel\]               \n".format(platedx, platedy)
-    lineO = "O) {}     # Display type (regular, curses, both)                    \n".format(O)
-    lineP = "P) {}     # Choose 0=optimize, 1=model, 2=imgblock, 3=subcomps      \n".format(P)
-    lineS = "S) {}     # Modify/create objects interactively?                    \n".format(S)
+    lineA = "A) {}    # Input Data image (FITS file)                            \n".format(
+        A
+    )
+    lineB = "B) {}    # Output data image block                                 \n".format(
+        B
+    )
+    lineC = 'C) {}    # Sigma image name (made from data if blank or "none")  \n'.format(
+        C
+    )
+    lineD = "D) {}    # Input PSF image and (optional) diffusion kernel         \n".format(
+        D
+    )
+    lineE = "E) {}    # PSF fine sampling factor relative to data               \n".format(
+        E
+    )
+    lineF = "F) {}    # Bad pixel mask (FITS image or ASCII coord list)         \n".format(
+        F
+    )
+    lineG = "G) {}    # File with parameter constraints (ASCII file)            \n".format(
+        G
+    )
+    lineH = "H) {} {} {} {}   # Image region to fit (xmin xmax ymin ymax)               \n".format(
+        xlo, xhi, ylo, yhi
+    )
+    lineI = "I) {} {}  # Size of the convolution box (x y)                       \n".format(
+        convx, convy
+    )
+    lineJ = "J) {}     # Magnitude photometric zeropoint                         \n".format(
+        J
+    )
+    lineK = "K) {} {}  # Plate scale (dx dy). \[arcsec per pixel\]               \n".format(
+        platedx, platedy
+    )
+    lineO = "O) {}     # Display type (regular, curses, both)                    \n".format(
+        O
+    )
+    lineP = "P) {}     # Choose 0=optimize, 1=model, 2=imgblock, 3=subcomps      \n".format(
+        P
+    )
+    lineS = "S) {}     # Modify/create objects interactively?                    \n".format(
+        S
+    )
     lineY = " \n"
 
     line0 = "# INITIAL FITTING PARAMETERS                                                     \n"
@@ -693,12 +853,18 @@ def PrintSky(hdl, ncomp, sky, Z, fit):
 
     # k Check
 
-    line00 = "# Object number: {}                                                             \n".format(ncomp)
+    line00 = "# Object number: {}                                                             \n".format(
+        ncomp
+    )
     line01 = " 0)      sky            #    Object type                                        \n"
-    line02 = " 1) {}   {}   # sky background        [ADU counts]                    \n".format(sky, fit)
+    line02 = " 1) {}   {}   # sky background        [ADU counts]                    \n".format(
+        sky, fit
+    )
     line03 = " 2) 0.000      0        # dsky/dx (sky gradient in x)                           \n"
     line04 = " 3) 0.000      0        # dsky/dy (sky gradient in y)                           \n"
-    line05 = " Z) {}                  # Skip this model in output image?  (yes=1, no=0)       \n".format(Z)
+    line05 = " Z) {}                  # Skip this model in output image?  (yes=1, no=0)       \n".format(
+        Z
+    )
     line06 = "\n"
     line07 = "================================================================================\n"
 
@@ -714,7 +880,9 @@ def PrintSky(hdl, ncomp, sky, Z, fit):
     return True
 
 
-def PrintSersic(hdl, ncomp, xpos, ypos, magser, reser, nser, axratser, angleser, Z, fit, serfit):
+def PrintSersic(
+    hdl, ncomp, xpos, ypos, magser, reser, nser, axratser, angleser, Z, fit, serfit
+):
     "print GALFIT Sersic function to filehandle"
     # k Check
 
@@ -723,27 +891,35 @@ def PrintSersic(hdl, ncomp, xpos, ypos, magser, reser, nser, axratser, angleser,
     # by the parameters
 
     line00 = "# Object number: {}                                                             \n".format(
-            ncomp)
+        ncomp
+    )
     line01 = " 0)     sersic      #  Object type                                     \n"
     line02 = " 1) {:.2f}  {:.2f}  {}  {}  #  position x, y     [pixel]                       \n".format(
-        xpos, ypos, fit, fit)
+        xpos, ypos, fit, fit
+    )
     line03 = " 3) {:.2f}  {}    #  total magnitude                                 \n".format(
-        magser, fit)
+        magser, fit
+    )
     line04 = " 4) {:.2f}  {}    #  R_e         [Pixels]                            \n".format(
-            reser, fit)
+        reser, fit
+    )
     line05 = " 5) {}     {}   #  Sersic exponent (deVauc=4, expdisk=1)           \n".format(
-        nser, serfit)
-    #line05 = " 5) {}       {}              #  Sersic exponent (deVauc=4, expdisk=1)           \n".format(
+        nser, serfit
+    )
+    # line05 = " 5) {}       {}              #  Sersic exponent (deVauc=4, expdisk=1)           \n".format(
     #    nser, fit)
     line06 = " 6)  0.0000       0           #  ----------------                                \n"
     line07 = " 7)  0.0000       0           #  ----------------                                \n"
     line08 = " 8)  0.0000       0           #  ----------------                                \n"
     line09 = " 9) {:.2f}   {}   #  axis ratio (b/a)                                \n".format(
-        axratser, fit)
+        axratser, fit
+    )
     line10 = "10) {:.2f}    {}  #  position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
-        angleser, fit)
+        angleser, fit
+    )
     lineZ = " Z) {}             #  Skip this model in output image?  (yes=1, no=0) \n".format(
-        Z)
+        Z
+    )
     line11 = "\n"
 
     hdl.write(line00)
@@ -762,6 +938,7 @@ def PrintSersic(hdl, ncomp, xpos, ypos, magser, reser, nser, axratser, angleser,
 
     return True
 
+
 def PrintGauss(hdl, ncomp, xpos, ypos, magass, fwhm, axratgass, anglegass, Z, fit):
     "print GALFIT GAUSS function to filehandle"
 
@@ -770,20 +947,27 @@ def PrintGauss(hdl, ncomp, xpos, ypos, magass, fwhm, axratgass, anglegass, Z, fi
     # by the parameters
 
     line00 = "# Object number: {}                                                             \n".format(
-            ncomp)
+        ncomp
+    )
     line01 = " 0)     gaussian   #  Object type                                     \n"
     line02 = " 1) {:.2f}  {:.2f}  {}  {}  #  position x, y     [pixel]                       \n".format(
-        xpos, ypos, fit, fit)
+        xpos, ypos, fit, fit
+    )
     line03 = " 3) {:.2f}       {}       #  total magnitude                                 \n".format(
-        magass, fit)
+        magass, fit
+    )
     line04 = " 4) {:.2f}       {}       #  FWHM         [Pixels]                            \n".format(
-            fwhm, fit)
+        fwhm, fit
+    )
     line05 = " 9) {:.2f}       {}       #  axis ratio (b/a)                                \n".format(
-        axratgass, fit)
+        axratgass, fit
+    )
     line06 = "10) {:.2f}       {}       #  position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
-        anglegass, fit)
+        anglegass, fit
+    )
     line07 = " Z) {}               #  Skip this model in output image?  (yes=1, no=0) \n".format(
-        Z)
+        Z
+    )
     line08 = "\n"
 
     hdl.write(line00)
@@ -797,6 +981,7 @@ def PrintGauss(hdl, ncomp, xpos, ypos, magass, fwhm, axratgass, anglegass, Z, fi
     hdl.write(line08)
 
     return True
+
 
 def PrintExp(hdl, ncomp, xpos, ypos, magexp, rsexp, axratexp, angleexp, Z, fit):
     "print GALFIT exponential function to filehandle"
@@ -808,19 +993,27 @@ def PrintExp(hdl, ncomp, xpos, ypos, magexp, rsexp, axratexp, angleexp, Z, fit):
     # by the parameters
 
     line00 = "# Object number: $ncomp                                                        \n"
-    line01 = " 0)     expdisk        # Object type                                     \n"
+    line01 = (
+        " 0)     expdisk        # Object type                                     \n"
+    )
     line02 = " 1) {:.2f}  {:.2f}  {}  {}  # position x, y     [pixel]                       \n".format(
-        xpos, ypos, fit, fit)
+        xpos, ypos, fit, fit
+    )
     line03 = " 3) {:.2f}        {}   # total magnitude                                 \n".format(
-        magexp, fit)
+        magexp, fit
+    )
     line04 = " 4) {:.2f}        {}   #      Rs  [Pixels]                               \n".format(
-        rsexp, fit)
+        rsexp, fit
+    )
     line05 = " 9) {:.2f}        {}   # axis ratio (b/a)                                \n".format(
-        axratexp, fit)
+        axratexp, fit
+    )
     line06 = "10) {:.2f}        {}   # position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
-        angleexp, fit)
+        angleexp, fit
+    )
     line07 = " Z) {}                 # Skip this model in output image?  (yes=1, no=0) \n".format(
-        Z)
+        Z
+    )
     line08 = "\n"
 
     hdl.write(line00)
@@ -836,24 +1029,27 @@ def PrintExp(hdl, ncomp, xpos, ypos, magexp, rsexp, axratexp, angleexp, Z, fit):
     return True
 
 
-
 def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
     "Get a piece from the image"
-# k Check
-
+    # k Check
 
     if os.path.isfile(Imageout):
         print("{} deleted; a new one is created \n".format(Imageout))
         runcmd = "rm {}".format(Imageout)
-        errrm = sp.run([runcmd], shell=True, stdout=sp.PIPE,
-                        stderr=sp.PIPE, universal_newlines=True)
-
+        errrm = sp.run(
+            [runcmd],
+            shell=True,
+            stdout=sp.PIPE,
+            stderr=sp.PIPE,
+            universal_newlines=True,
+        )
 
     hdu = fits.open(Image)
-    dat = hdu[0].data[ylo - 1:yhi, xlo - 1:xhi]
+    dat = hdu[0].data[ylo - 1 : yhi, xlo - 1 : xhi]
     hdu[0].data = dat
     hdu.writeto(Imageout, overwrite=True)
     hdu.close()
+
 
 def GetExpTime(Image):
     # k Check
@@ -863,31 +1059,29 @@ def GetExpTime(Image):
         hdu = fits.open(Image)
         exptime = hdu[0].header["EXPTIME"]
         hdu.close()
-    except: 
+    except:
         exptime = 1
     return float(exptime)
+
 
 def makeConstraints(consfile: str, numcomp: int) -> True:
     "creates a contraints file with the number of components"
 
-
     fout = open(consfile, "w")
-
 
     line00 = "#Component/    parameter   constraint	Comment           \n"
     line01 = "# operation	(see below)   range         \n"
 
-    linempty = "                  \n"				
+    linempty = "                  \n"
 
-    comp = np.arange(2,numcomp+1)
+    comp = np.arange(2, numcomp + 1)
 
     cad = "1"
     for idx, item in enumerate(comp):
         cad = cad + "_" + str(item)
 
-    line02 = "    " + cad + "    " + "x" + "    "  + "offset \n"				
-    line03 = "    " + cad + "    " + "y" + "    "  + "offset \n"				
-
+    line02 = "    " + cad + "    " + "x" + "    " + "offset \n"
+    line03 = "    " + cad + "    " + "y" + "    " + "offset \n"
 
     fout.write(line00)
     fout.write(line01)
@@ -897,12 +1091,7 @@ def makeConstraints(consfile: str, numcomp: int) -> True:
 
     fout.close()
 
-
-
     return True
-
-
-
 
 
 def CheckFlag(val, check):
@@ -910,14 +1099,13 @@ def CheckFlag(val, check):
 
     flag = False
     mod = 1
-    maxx=128
+    maxx = 128
 
-
-    while (mod != 0):
+    while mod != 0:
 
         res = int(val / maxx)
 
-        if (maxx == check and res == 1):
+        if maxx == check and res == 1:
 
             flag = True
 
@@ -932,10 +1120,10 @@ def CheckFlag(val, check):
 def GetInfoEllip(regfile):
 
     if not os.path.exists(regfile):
-        print ('%s: reg filename does not exist!' %(regfile))
+        print("%s: reg filename does not exist!" % (regfile))
         sys.exit()
 
-    f1 = open(regfile,'r')
+    f1 = open(regfile, "r")
 
     lines = f1.readlines()
 
@@ -944,9 +1132,8 @@ def GetInfoEllip(regfile):
     flag = False
     found = False
 
-    #reading reg file
+    # reading reg file
     for line in lines:
-
 
         line = line.split("#")
         line = line[0]
@@ -962,10 +1149,9 @@ def GetInfoEllip(regfile):
             flag = True
             found = True
 
-        if (flag == True):
+        if flag == True:
             x3 = p[4]
             x4 = x3[:-2]
-
 
             v0 = x0
 
@@ -978,7 +1164,7 @@ def GetInfoEllip(regfile):
             flag = False
 
     if found:
-        obj  = v0
+        obj = v0
         xpos = v1
         ypos = v2
         rx = v3
@@ -986,23 +1172,22 @@ def GetInfoEllip(regfile):
         angle = v5
 
         if rx >= ry:
-            axratio = ry/rx 
-            eps = 1 - axratio 
-            theta = angle + 90 
+            axratio = ry / rx
+            eps = 1 - axratio
+            theta = angle + 90
         else:
-            axratio = rx/ry 
-            eps = 1 - axratio 
-            theta = angle 
+            axratio = rx / ry
+            eps = 1 - axratio
+            theta = angle
 
-        #avoids ds9 regions with Area = 0
-        if rx<1:
-            rx=1
-        if ry<1:
-            ry=1
-
+        # avoids ds9 regions with Area = 0
+        if rx < 1:
+            rx = 1
+        if ry < 1:
+            ry = 1
 
         return obj, xpos, ypos, rx, ry, angle
-        #return eps, theta, xpos, ypos
+        # return eps, theta, xpos, ypos
     else:
         print("ellipse region was not found in file. Exiting.. ")
         sys.exit()
@@ -1010,12 +1195,11 @@ def GetInfoEllip(regfile):
     return 0, 0, 0, 0
 
 
+##new:
 
-##new: 
+# Image = MakeEllip(Image,Value,xpos[idx],ypos[idx],rx[idx],ry[idx],angle[idx],ncol,nrow)
 
-#Image = MakeEllip(Image,Value,xpos[idx],ypos[idx],rx[idx],ry[idx],angle[idx],ncol,nrow)
-
-#def MakeEllip(Image,Value,xpos,ypos,rx,ry,angle,ncol,nrow):
+# def MakeEllip(Image,Value,xpos,ypos,rx,ry,angle,ncol,nrow):
 #    "Make an ellipse in an image"
 
 #    xx, yy, Rkron, theta, e = Ds9ell2Kronell(xpos,ypos,rx,ry,angle)
@@ -1025,51 +1209,53 @@ def GetInfoEllip(regfile):
 #    return Image
 
 
-def Ds9ell2Kronellv2(xpos,ypos,rx,ry,angle):
-
+def Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle):
 
     if rx >= ry:
 
-        q = ry/rx
+        q = ry / rx
         e = 1 - q
         Rkron = rx
         theta = angle - 90
         xx = xpos
         yy = ypos
     else:
-        q = rx/ry
+        q = rx / ry
         e = 1 - q
         Rkron = ry
-        theta = angle# + 90
+        theta = angle  # + 90
         xx = xpos
         yy = ypos
- 
-     
-    return xx, yy, Rkron, theta, e 
+
+    return xx, yy, Rkron, theta, e
 
 
 def GetSize(x, y, R, theta, ell, ncol, nrow):
     "this subroutine get the maximun"
     "and minimim pixels for Kron and sky ellipse"
     # k Check
-    q = (1 - ell)
+    q = 1 - ell
     bim = q * R
 
     theta = theta * (np.pi / 180)  # rads!!
 
-# getting size
+    # getting size
 
-    xmin = x - np.sqrt((R**2) * (np.cos(theta))**2 +
-                       (bim**2) * (np.sin(theta))**2)
+    xmin = x - np.sqrt(
+        (R ** 2) * (np.cos(theta)) ** 2 + (bim ** 2) * (np.sin(theta)) ** 2
+    )
 
-    xmax = x + np.sqrt((R**2) * (np.cos(theta))**2 +
-                       (bim**2) * (np.sin(theta))**2)
+    xmax = x + np.sqrt(
+        (R ** 2) * (np.cos(theta)) ** 2 + (bim ** 2) * (np.sin(theta)) ** 2
+    )
 
-    ymin = y - np.sqrt((R**2) * (np.sin(theta))**2 +
-                       (bim**2) * (np.cos(theta))**2)
+    ymin = y - np.sqrt(
+        (R ** 2) * (np.sin(theta)) ** 2 + (bim ** 2) * (np.cos(theta)) ** 2
+    )
 
-    ymax = y + np.sqrt((R**2) * (np.sin(theta))**2 +
-                       (bim**2) * (np.cos(theta))**2)
+    ymax = y + np.sqrt(
+        (R ** 2) * (np.sin(theta)) ** 2 + (bim ** 2) * (np.cos(theta)) ** 2
+    )
 
     mask = xmin < 1
     if mask.any():
@@ -1090,34 +1276,29 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     return (xmin, xmax, ymin, ymax)
 
 
-
 def GetPmax(image, mask, xmin, xmax, ymin, ymax):
-
 
     xmin = int(xmin)
     xmax = int(xmax)
     ymin = int(ymin)
     ymax = int(ymax)
 
-    chuckimg = image[ymin - 1:ymax, xmin - 1:xmax]
+    chuckimg = image[ymin - 1 : ymax, xmin - 1 : xmax]
     if mask.any():
-        chuckmsk = mask[ymin - 1:ymax, xmin - 1:xmax]
+        chuckmsk = mask[ymin - 1 : ymax, xmin - 1 : xmax]
 
         invmask = np.logical_not(chuckmsk)
 
-        invmask = invmask*1
+        invmask = invmask * 1
 
-        chuckimg = chuckimg*invmask
+        chuckimg = chuckimg * invmask
 
     maxy, maxx = np.where(chuckimg == np.max(chuckimg))
-    
+
     xpos = maxx[0] + xmin - 1
     ypos = maxy[0] + ymin - 1
 
     return (xpos, ypos)
-
-
-
 
 
 #############################################################################
@@ -1131,5 +1312,5 @@ def GetPmax(image, mask, xmin, xmax, ymin, ymax):
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

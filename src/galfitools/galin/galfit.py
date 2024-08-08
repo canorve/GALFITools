@@ -1,5 +1,3 @@
-
-
 import copy
 import os
 
@@ -9,8 +7,8 @@ from scipy.optimize import bisect
 from scipy.special import gamma, gammainc, gammaincinv
 
 
-class GalHead():
-    '''store the header of galfit file'''
+class GalHead:
+    """store the header of galfit file"""
 
     inputimage = "none.fits"
     outimage = "none-out.fits"
@@ -31,7 +29,7 @@ class GalHead():
     display = "regular"
     P = 0
 
-    #extra info  
+    # extra info
     imgidx = "sci"
     flagidx = False
     num = 1
@@ -39,37 +37,38 @@ class GalHead():
     exptime = 1
     tempmask = "tempmask.fits"
 
+
 ### class for Galfit components
 class GalComps:
-    '''stores the components of galfit file'''
+    """stores the components of galfit file"""
 
     N = np.array([])
-    NameComp = np.array([])        #0)
-    PosX = np.array([])            #1)   
-    PosY = np.array([])            #2)   
-    Mag = np.array([])             #3)
-    Rad = np.array([])             #4)
-    Exp = np.array([])             #5)
-    Exp2 = np.array([])            #6)  for moffat
-    Exp3 = np.array([])            #7)  for moffat
-                                   #8)  There is No 8 in any galfit model
-    AxRat = np.array([])           #9)  AxisRatio
-    PosAng = np.array([])          #10) position angle
-    skip = np.array([])            #z)  skip model
+    NameComp = np.array([])  # 0)
+    PosX = np.array([])  # 1)
+    PosY = np.array([])  # 2)
+    Mag = np.array([])  # 3)
+    Rad = np.array([])  # 4)
+    Exp = np.array([])  # 5)
+    Exp2 = np.array([])  # 6)  for moffat
+    Exp3 = np.array([])  # 7)  for moffat
+    # 8)  There is No 8 in any galfit model
+    AxRat = np.array([])  # 9)  AxisRatio
+    PosAng = np.array([])  # 10) position angle
+    skip = np.array([])  # z)  skip model
 
-    Active = np.array([])            #activate component  for galaxy
+    Active = np.array([])  # activate component  for galaxy
 
     # store the flags related to parameters
-    PosXFree = np.array([])            #1)   
-    PosYFree = np.array([])            #2)   
-    MagFree = np.array([])             #3)
-    RadFree = np.array([])             #4)
-    ExpFree = np.array([])             #5)
-    Exp2Free = np.array([])            #6)  for moffat
-    Exp3Free = np.array([])            #7)  for moffat
-                                   #8)  There is No 8 in any galfit model
-    AxRatFree = np.array([])           #9)  AxisRatio
-    PosAngFree = np.array([])          #10) position angle
+    PosXFree = np.array([])  # 1)
+    PosYFree = np.array([])  # 2)
+    MagFree = np.array([])  # 3)
+    RadFree = np.array([])  # 4)
+    ExpFree = np.array([])  # 5)
+    Exp2Free = np.array([])  # 6)  for moffat
+    Exp3Free = np.array([])  # 7)  for moffat
+    # 8)  There is No 8 in any galfit model
+    AxRatFree = np.array([])  # 9)  AxisRatio
+    PosAngFree = np.array([])  # 10) position angle
 
     # computed parameters:
     Rad50 = np.array([])
@@ -85,46 +84,42 @@ class GalComps:
     mme = np.array([])
     kser = np.array([])
 
-
     KronRad = np.array([])
     PetRad = np.array([])
 
 
-
-
-
 class GalSky:
-    '''stores the value of the GALFIT file'''
+    """stores the value of the GALFIT file"""
 
-    sky = 0 
+    sky = 0
     dskyx = 0
     dskyy = 0
-    skip = 0 
+    skip = 0
 
-    skyfree = 1 
-    dskyxfree = 0 
-    dskyyfree = 0 
- 
+    skyfree = 1
+    dskyxfree = 0
+    dskyyfree = 0
+
 
 class DataImg:
 
-    img = np.array([[1,1],[1,1]])
-    model = np.array([[1,1],[1,1]])
-    imres = np.array([[1,1],[1,1]])
+    img = np.array([[1, 1], [1, 1]])
+    model = np.array([[1, 1], [1, 1]])
+    imres = np.array([[1, 1], [1, 1]])
 
-    mask = np.array([[1,1],[1,1]])
-    sigma = np.array([[1,1],[1,1]])
-    imsnr = np.array([[1,1],[1,1]])
-    imchi = np.array([[1,1],[1,1]])
-    impsf = np.array([[1,1],[1,1]])
+    mask = np.array([[1, 1], [1, 1]])
+    sigma = np.array([[1, 1], [1, 1]])
+    imsnr = np.array([[1, 1], [1, 1]])
+    imchi = np.array([[1, 1], [1, 1]])
+    impsf = np.array([[1, 1], [1, 1]])
 
 
 def readDataImg(ellconf, galhead):
 
     dataimg = DataImg()
 
-    #reading galaxy and model images from file
-    errmsg="file {} does not exist".format(galhead.outimage)
+    # reading galaxy and model images from file
+    errmsg = "file {} does not exist".format(galhead.outimage)
 
     assert os.path.isfile(galhead.outimage), errmsg
 
@@ -139,11 +134,11 @@ def readDataImg(ellconf, galhead):
     else:
         hdu = fits.open(galhead.inputimage)
 
-        i = 0 #index of data 
+        i = 0  # index of data
         if galhead.flagidx:
             if galhead.flagnum:
                 dataimg.img = (hdu[galhead.imgidx, galhead.num].data).astype(float)
-            else:    
+            else:
                 dataimg.img = (hdu[galhead.imgidx].data).astype(float)
         else:
             dataimg.img = (hdu[i].data).astype(float)
@@ -156,54 +151,49 @@ def readDataImg(ellconf, galhead):
 
         dataimg.imres = galpar.img - galpar.model
 
-
     ### reading mask image from file
 
     if galhead.tempmask is not None:
 
-        errmsg="file {} does not exist".format(galhead.tempmask)
+        errmsg = "file {} does not exist".format(galhead.tempmask)
         assert os.path.isfile(galhead.tempmask), errmsg
 
-        i = 0 #index of data 
+        i = 0  # index of data
         if ellconf.flagmodel == False:
             hdu = fits.open(galhead.tempmask)
             mask = hdu[i].data
-            dataimg.mask=np.array(mask,dtype=bool)
+            dataimg.mask = np.array(mask, dtype=bool)
             hdu.close()
         else:
             hdu = fits.open(galhead.maskimage)
             mask = hdu[i].data
-            dataimg.mask=np.array(mask,dtype=bool)
+            dataimg.mask = np.array(mask, dtype=bool)
             hdu.close()
 
     else:
         dataimg.mask = None
- 
 
     return dataimg
 
 
-
-class Galfit():
-
+class Galfit:
     def __init__(self, File: str):
         self.File = File
 
-
     def ReadHead(self) -> GalHead:
-        '''reads header of galfit file'''
-        inputf = self.File 
+        """reads header of galfit file"""
+        inputf = self.File
 
-        galhead = GalHead() # class for header
+        galhead = GalHead()  # class for header
 
         maskimage = ""
         #    skylevel=0
 
-        GalfitFile = open(inputf,"r")
+        GalfitFile = open(inputf, "r")
 
         # All lines including the blank ones
         lines = (line.rstrip() for line in GalfitFile)
-        lines = (line.split('#', 1)[0] for line in lines)  # remove comments
+        lines = (line.split("#", 1)[0] for line in lines)  # remove comments
         # remove lines containing only comments
         lines = (line.rstrip() for line in lines)
         lines = (line for line in lines if line)  # Non-blank lines
@@ -213,120 +203,116 @@ class Galfit():
 
         while index < len(lines):
 
-            #================================================================================
+            # ================================================================================
             # IMAGE and GALFIT CONTROL PARAMETERS
-            #A) tempfits/A2399-3-2.fits      # Input data image (FITS file)
-            #B) A2399-215615.96-m073822.7-337-out.fits      # Output data image block
-            #C) tempfits/none-3-2.fits      # Sigma image name (made from data if blank or "none")
-            #D) psfs/PSF-1309-721.fits          # Input PSF image and (optional) diffusion kernel
-            #E) 1                   # PSF fine sampling factor relative to data
-            #F) mask-337            # Bad pixel mask (FITS image or ASCII coord list)
-            #G) constraints         # File with parameter constraints (ASCII file)
-            #H) 129  809  265  809  # Image region to fit (xmin xmax ymin ymax)
-            #I) 60     60           # Size of the convolution box (x y)
-            #J) 21.672              # Magnitude photometric zeropoint
-            #K) 0.680  0.680        # Plate scale (dx dy)   [arcsec per pixel]
-            #O) regular             # Display type (regular, curses, both)
-            #P) 0                   # Choose: 0=optimize, 1=model, 2=imgblock, 3=subcomps
+            # A) tempfits/A2399-3-2.fits      # Input data image (FITS file)
+            # B) A2399-215615.96-m073822.7-337-out.fits      # Output data image block
+            # C) tempfits/none-3-2.fits      # Sigma image name (made from data if blank or "none")
+            # D) psfs/PSF-1309-721.fits          # Input PSF image and (optional) diffusion kernel
+            # E) 1                   # PSF fine sampling factor relative to data
+            # F) mask-337            # Bad pixel mask (FITS image or ASCII coord list)
+            # G) constraints         # File with parameter constraints (ASCII file)
+            # H) 129  809  265  809  # Image region to fit (xmin xmax ymin ymax)
+            # I) 60     60           # Size of the convolution box (x y)
+            # J) 21.672              # Magnitude photometric zeropoint
+            # K) 0.680  0.680        # Plate scale (dx dy)   [arcsec per pixel]
+            # O) regular             # Display type (regular, curses, both)
+            # P) 0                   # Choose: 0=optimize, 1=model, 2=imgblock, 3=subcomps
 
             line = lines[index]
             (tmp) = line.split()
 
-            if len(tmp) > 1: #avoids empty options
+            if len(tmp) > 1:  # avoids empty options
 
-                if tmp[0] == "A)":     # input image
-                    galhead.inputimage=tmp[1]
+                if tmp[0] == "A)":  # input image
+                    galhead.inputimage = tmp[1]
 
-                if tmp[0] == "B)":     # out image
+                if tmp[0] == "B)":  # out image
                     galhead.outimage = tmp[1]
 
-                if tmp[0] == "C)":   # sigma 
+                if tmp[0] == "C)":  # sigma
                     galhead.sigimage = tmp[1]
 
-                if tmp[0] == "D)":  # psf file 
+                if tmp[0] == "D)":  # psf file
                     galhead.psfimage = tmp[1]
 
-                if tmp[0] == "E)":  #psf sampling 
+                if tmp[0] == "E)":  # psf sampling
                     galhead.psfsamp = int(tmp[1])
 
-                if tmp[0] == "F)":     # mask image
+                if tmp[0] == "F)":  # mask image
                     try:
                         galhead.maskimage = tmp[1]
                     except IndexError:
                         galhead.maskimage = "None"
 
-                if tmp[0] == "G)":  # psf file 
+                if tmp[0] == "G)":  # psf file
                     galhead.constraints = tmp[1]
 
-
-                if tmp[0] == "H)":     # region fit box
+                if tmp[0] == "H)":  # region fit box
                     galhead.xmin = int(tmp[1])
                     galhead.xmax = int(tmp[2])
                     galhead.ymin = int(tmp[3])
                     galhead.ymax = int(tmp[4])
 
-                if tmp[0] == "I)":     # convolution size 
+                if tmp[0] == "I)":  # convolution size
                     galhead.convx = int(tmp[1])
                     try:
                         galhead.convy = int(tmp[2])
                     except:
-                        galhead.convy = galhead.convx 
+                        galhead.convy = galhead.convx
 
-                if tmp[0] == "J)":     # mgzpt
+                if tmp[0] == "J)":  # mgzpt
                     galhead.mgzpt = float(tmp[1])
 
-                if tmp[0] == "K)":     # plate scale
+                if tmp[0] == "K)":  # plate scale
                     galhead.scale = float(tmp[1])
                     try:
                         galhead.scaley = float(tmp[2])
                     except:
-                        galhead.scaley = galhead.scale 
+                        galhead.scaley = galhead.scale
 
-                if tmp[0] == "O)":     # display 
+                if tmp[0] == "O)":  # display
                     galhead.display = tmp[1]
 
-                if tmp[0] == "P)":     # optional output 
+                if tmp[0] == "P)":  # optional output
                     galhead.P = int(tmp[1])
-
 
             index += 1
 
-
         ###### check for extension in name #####
-        chars = set('[]') 
-        numbers=set('1234567890')
-        if any((c in chars) for c in galhead.inputimage): 
-            print("Ext Found") 
-            galhead.flagidx=True
-            (filename,imgidxc) = galhead.inputimage.split("[")
-            (imgidx,trash)=imgidxc.split("]")
+        chars = set("[]")
+        numbers = set("1234567890")
+        if any((c in chars) for c in galhead.inputimage):
+            print("Ext Found")
+            galhead.flagidx = True
+            (filename, imgidxc) = galhead.inputimage.split("[")
+            (imgidx, trash) = imgidxc.split("]")
 
             if any((n in numbers) for n in imgidx):
-                galhead.flagnum=True
-                (imgidx,num)=imgidx.split(",")
-                num=int(num)
+                galhead.flagnum = True
+                (imgidx, num) = imgidx.split(",")
+                num = int(num)
 
-            galhead.inputimage=filename
-            galhead.imgidx=imgidx
-            galhead.num=num
-      
+            galhead.inputimage = filename
+            galhead.imgidx = imgidx
+            galhead.num = num
+
         ####################
 
         return galhead
 
-
     def ReadComps(self) -> GalComps:
-        '''reads all the components in the galfit file'''
+        """reads all the components in the galfit file"""
 
         File = self.File
 
         galcomps = GalComps()
-         
-        GalfitFile = open(File,"r")
+
+        GalfitFile = open(File, "r")
 
         # All lines including the blank ones
         lines = (line.rstrip() for line in GalfitFile)
-        lines = (line.split('#', 1)[0] for line in lines)  # remove comments
+        lines = (line.split("#", 1)[0] for line in lines)  # remove comments
         # remove lines containing only comments
         lines = (line.rstrip() for line in lines)
         lines = (line for line in lines if line)  # Non-blank lines
@@ -336,13 +322,12 @@ class Galfit():
 
         N = 0
 
-
         while index < len(lines):
 
             line = lines[index]
             (tmp) = line.split()
 
-            #init values
+            # init values
             NameComp = "none"
             PosX = 0
             PosY = 0
@@ -355,7 +340,7 @@ class Galfit():
             PosAng = 0
             skip = 0
 
-            flagcomp = False 
+            flagcomp = False
 
             Xfree = 1
             Yfree = 1
@@ -367,62 +352,60 @@ class Galfit():
             AxRatfree = 1
             PosAngfree = 1
 
+            if (tmp[0] == "0)") and (tmp[1] != "sky"):
 
-
-            if (tmp[0] == "0)") and (tmp[1] != 'sky'):
-
-                namec = tmp[1] 
-                N = N + 1 
+                namec = tmp[1]
+                N = N + 1
                 NameComp = namec
-                while (tmp[0] != "Z)"):
+                while tmp[0] != "Z)":
 
                     index += 1
                     line = lines[index]
                     (tmp) = line.split()
 
-                    if tmp[0] == "1)":   # center
+                    if tmp[0] == "1)":  # center
                         PosX = float(tmp[1])
                         PosY = float(tmp[2])
                         Xfree = int(tmp[3])
                         Yfree = int(tmp[4])
-                    if tmp[0] == "3)" :    # mag 
+                    if tmp[0] == "3)":  # mag
                         Mag = float(tmp[1])
                         Magfree = int(tmp[2])
-                    if tmp[0] == "4)" :
+                    if tmp[0] == "4)":
                         Rad = float(tmp[1])
                         Radfree = int(tmp[2])
-                    if tmp[0] == "5)" : 
+                    if tmp[0] == "5)":
                         Exp = float(tmp[1])
                         Expfree = int(tmp[2])
-                    if tmp[0] == "6)": 
+                    if tmp[0] == "6)":
                         Exp2 = float(tmp[1])
                         try:
                             Exp2free = int(tmp[2])
                         except:
-                            Exp2free = 0 
-                    if tmp[0] == "7)":  
+                            Exp2free = 0
+                    if tmp[0] == "7)":
                         Exp3 = float(tmp[1])
                         try:
                             Exp3free = int(tmp[2])
                         except:
-                            Exp3free = 0 
+                            Exp3free = 0
                     if tmp[0] == "9)":
                         AxRat = float(tmp[1])
                         try:
                             AxRatfree = int(tmp[2])
                         except:
-                            AxRatfree = 0 
+                            AxRatfree = 0
                     if tmp[0] == "10)":
                         PosAng = float(tmp[1])
                         PosAngfree = int(tmp[2])
                     if tmp[0] == "Z)":
-                        skip=int(tmp[1])
+                        skip = int(tmp[1])
 
                 galcomps.PosX = np.append(galcomps.PosX, PosX)
                 galcomps.PosY = np.append(galcomps.PosY, PosY)
                 galcomps.NameComp = np.append(galcomps.NameComp, NameComp)
                 galcomps.N = np.append(galcomps.N, N)
-                    
+
                 galcomps.Mag = np.append(galcomps.Mag, Mag)
                 galcomps.Rad = np.append(galcomps.Rad, Rad)
                 galcomps.Exp = np.append(galcomps.Exp, Exp)
@@ -432,7 +415,6 @@ class Galfit():
                 galcomps.PosAng = np.append(galcomps.PosAng, PosAng)
                 galcomps.skip = np.append(galcomps.skip, skip)
                 galcomps.Active = np.append(galcomps.Active, flagcomp)
-
 
                 galcomps.PosXFree = np.append(galcomps.PosXFree, Xfree)
                 galcomps.PosYFree = np.append(galcomps.PosYFree, Yfree)
@@ -444,13 +426,11 @@ class Galfit():
                 galcomps.AxRatFree = np.append(galcomps.AxRatFree, AxRatfree)
                 galcomps.PosAngFree = np.append(galcomps.PosAngFree, PosAngfree)
 
-
-
             index += 1
 
         GalfitFile.close()
 
-        #filling the rest of arrays with zeros: 
+        # filling the rest of arrays with zeros:
         arsiz = len(galcomps.N)
 
         galcomps.Rad50 = np.zeros(arsiz)
@@ -468,23 +448,20 @@ class Galfit():
         galcomps.KronRad = np.zeros(arsiz)
         galcomps.PetRad = np.zeros(arsiz)
 
-
-
-        return galcomps 
-
+        return galcomps
 
     def ReadSky(self) -> GalSky:
-        '''reads the sky value of the galfit file'''
+        """reads the sky value of the galfit file"""
 
-        File = self.File    
+        File = self.File
 
         galsky = GalSky()
 
-        GalfitFile = open(File,"r")
+        GalfitFile = open(File, "r")
 
         # All lines including the blank ones
         lines = (line.rstrip() for line in GalfitFile)
-        lines = (line.split('#', 1)[0] for line in lines)  # remove comments
+        lines = (line.split("#", 1)[0] for line in lines)  # remove comments
         # remove lines containing only comments
         lines = (line.rstrip() for line in lines)
         lines = (line for line in lines if line)  # Non-blank lines
@@ -494,13 +471,12 @@ class Galfit():
 
         N = 0
 
-
         while index < len(lines):
 
             line = lines[index]
             (tmp) = line.split()
 
-            #init values
+            # init values
             NameComp = "sky"
             sky = 0
             dskyx = 0
@@ -511,55 +487,50 @@ class Galfit():
             dskyxfree = 0
             dskyyfree = 0
 
-
             if (tmp[0] == "0)") and (tmp[1] == NameComp):
 
-                namec = tmp[1] 
+                namec = tmp[1]
 
-                while (tmp[0] != "Z)"):
+                while tmp[0] != "Z)":
 
                     index += 1
                     line = lines[index]
                     (tmp) = line.split()
 
-                    if tmp[0] == "1)":   # center
+                    if tmp[0] == "1)":  # center
                         sky = float(tmp[1])
                         skyfree = float(tmp[2])
-                    if tmp[0] == "2)" :    # mag 
+                    if tmp[0] == "2)":  # mag
                         dskyx = float(tmp[1])
                         dskyxfree = int(tmp[2])
-                    if tmp[0] == "3)" :
+                    if tmp[0] == "3)":
                         dskyy = float(tmp[1])
                         dskyyfree = int(tmp[2])
                     if tmp[0] == "Z)":
-                        skip=int(tmp[1])
+                        skip = int(tmp[1])
 
-                #note if this work in this way or using append
-                galsky.NameComp =  NameComp
-                    
+                # note if this work in this way or using append
+                galsky.NameComp = NameComp
+
                 galsky.sky = sky
-                galsky.dskyx =  dskyx
-                galsky.dskyy =  dskyy
-                galsky.skip =  skip
+                galsky.dskyx = dskyx
+                galsky.dskyy = dskyy
+                galsky.skip = skip
 
-                galsky.skyfree =  skyfree
+                galsky.skyfree = skyfree
                 galsky.dskyxfree = dskyxfree
-                galsky.dskyyfree =  dskyyfree
-     
+                galsky.dskyyfree = dskyyfree
 
             index += 1
 
         GalfitFile.close()
 
-     
         return galsky
 
 
 def numParFree(galcomps: GalComps) -> int:
-    '''obtains the number of free parameters. This function does NOT 
-    count the sky as a free param'''
-
-
+    """obtains the number of free parameters. This function does NOT 
+    count the sky as a free param"""
 
     p1 = 0
     p2 = 0
@@ -571,16 +542,15 @@ def numParFree(galcomps: GalComps) -> int:
     p8 = 0
     p9 = 0
 
-
-    parmask1 = (galcomps.Active == True) & (galcomps.PosXFree == 1) 
-    parmask2 = (galcomps.Active == True) & (galcomps.PosYFree == 1) 
-    parmask3 = (galcomps.Active == True) & (galcomps.MagFree == 1) 
-    parmask4 = (galcomps.Active == True) & (galcomps.RadFree == 1) 
-    parmask5 = (galcomps.Active == True) & (galcomps.ExpFree == 1) 
-    parmask6 = (galcomps.Active == True) & (galcomps.Exp2Free == 1) 
-    parmask7 = (galcomps.Active == True) & (galcomps.Exp3Free == 1) 
-    parmask8 = (galcomps.Active == True) & (galcomps.AxRatFree == 1) 
-    parmask9 = (galcomps.Active == True) & (galcomps.PosAngFree == 1) 
+    parmask1 = (galcomps.Active == True) & (galcomps.PosXFree == 1)
+    parmask2 = (galcomps.Active == True) & (galcomps.PosYFree == 1)
+    parmask3 = (galcomps.Active == True) & (galcomps.MagFree == 1)
+    parmask4 = (galcomps.Active == True) & (galcomps.RadFree == 1)
+    parmask5 = (galcomps.Active == True) & (galcomps.ExpFree == 1)
+    parmask6 = (galcomps.Active == True) & (galcomps.Exp2Free == 1)
+    parmask7 = (galcomps.Active == True) & (galcomps.Exp3Free == 1)
+    parmask8 = (galcomps.Active == True) & (galcomps.AxRatFree == 1)
+    parmask9 = (galcomps.Active == True) & (galcomps.PosAngFree == 1)
 
     if parmask1.any():
         p1 = np.sum(galcomps.PosXFree[parmask1])
@@ -601,260 +571,269 @@ def numParFree(galcomps: GalComps) -> int:
     if parmask9.any():
         p9 = np.sum(galcomps.PosAngFree[parmask9])
 
-
     pt = p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9
-
 
     return int(pt)
 
 
 def numParSkyFree(galsky: GalSky) -> int:
-    '''obtains the number of free parameters for sky function'''
-
+    """obtains the number of free parameters for sky function"""
 
     p1 = 0
     p2 = 0
     p3 = 0
 
-    parmask1 =  galsky.skyfree == 1 
-    parmask2 =  galsky.dskyxfree == 1 
-    parmask3 =  galsky.dskyyfree == 1 
+    parmask1 = galsky.skyfree == 1
+    parmask2 = galsky.dskyxfree == 1
+    parmask3 = galsky.dskyyfree == 1
 
     if parmask1:
-        p1 = 1 
+        p1 = 1
     if parmask2:
-        p2 = 1 
+        p2 = 1
     if parmask3:
-        p3 = 1 
+        p3 = 1
 
-    pt = p1 + p2 + p3 
-
+    pt = p1 + p2 + p3
 
     return int(pt)
 
 
-
-
-
 def numComps(galcomps: GalComps, name: str) -> int:
-    '''obtains the number of components'''
+    """obtains the number of components"""
 
-
-    if name == 'all':
-        nummask = (galcomps.Active == True) & ( (galcomps.NameComp == 'sersic') 
-                    | (galcomps.NameComp == 'expdisk') | (galcomps.NameComp == 'gaussian')
-                    | (galcomps.NameComp == 'devauc'))
+    if name == "all":
+        nummask = (galcomps.Active == True) & (
+            (galcomps.NameComp == "sersic")
+            | (galcomps.NameComp == "expdisk")
+            | (galcomps.NameComp == "gaussian")
+            | (galcomps.NameComp == "devauc")
+        )
 
     else:
         nummask = (galcomps.Active == True) & (galcomps.NameComp == name)
-
-
-
 
     N = galcomps.Active[nummask].size
 
     return N
 
 
-
-
-
 def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
-    '''changes Flag to true for those components who belongs
-        to the same galaxy of n_comp'''
+    """changes Flag to true for those components who belongs
+        to the same galaxy of n_comp"""
 
     galcomps.Active.fill(False)
 
-    idx = np.where(galcomps.N ==  n_comp)
+    idx = np.where(galcomps.N == n_comp)
 
-    assert idx[0].size !=0, 'component not found'
+    assert idx[0].size != 0, "component not found"
 
     n_idx = idx[0].item(0)
 
     if distmax > 10:
         print("Warning: maximum distance among components is greater than 10")
-        print("Equations' solutions only apply for components that share the same center")
+        print(
+            "Equations' solutions only apply for components that share the same center"
+        )
 
+    galcomps.Active[n_idx] = True  # main component
 
-    galcomps.Active[n_idx] = True #main component
-
-    posx = galcomps.PosX[n_idx] 
-    posy = galcomps.PosY[n_idx]      
+    posx = galcomps.PosX[n_idx]
+    posy = galcomps.PosY[n_idx]
 
     dx = galcomps.PosX - posx
     dy = galcomps.PosY - posy
 
-    dist = np.sqrt((dx)**2 + (dy)**2)
+    dist = np.sqrt((dx) ** 2 + (dy) ** 2)
 
-    maskdist = (dist <= distmax ) 
+    maskdist = dist <= distmax
 
     galcomps.Active[maskdist] = True
 
     return galcomps
 
 
-
-### Sersic components 
+### Sersic components
 class GetReff:
-    '''class to obtain the effective radius for the whole galaxy'''
+    """class to obtain the effective radius for the whole galaxy"""
 
-    def GetReSer(self, galhead: GalHead, comps: GalComps, eff: float, theta: float) -> float:
+    def GetReSer(
+        self, galhead: GalHead, comps: GalComps, eff: float, theta: float
+    ) -> float:
 
+        maskgal = comps.Active == True
 
-        maskgal = (comps.Active == True) 
-
-        comps.Flux = 10**((galhead.mgzpt - comps.Mag)/2.5)
+        comps.Flux = 10 ** ((galhead.mgzpt - comps.Mag) / 2.5)
 
         totFlux = comps.Flux[maskgal].sum()
 
-        totmag = -2.5*np.log10(totFlux) + galhead.mgzpt
+        totmag = -2.5 * np.log10(totFlux) + galhead.mgzpt
 
         a = 0.1
         b = comps.Rad[maskgal][-1] * 1000  # hope it doesn't crash
 
-        Reff = self.solveSerRe(a, b, comps.Flux[maskgal], comps.Rad[maskgal], 
-                comps.Exp[maskgal], comps.AxRat[maskgal], comps.PosAng[maskgal], totFlux, eff, theta)
-
+        Reff = self.solveSerRe(
+            a,
+            b,
+            comps.Flux[maskgal],
+            comps.Rad[maskgal],
+            comps.Exp[maskgal],
+            comps.AxRat[maskgal],
+            comps.PosAng[maskgal],
+            totFlux,
+            eff,
+            theta,
+        )
 
         return Reff, totmag
 
-
-
-    def solveSerRe(self, a: float, b: float, flux: list, rad: list, n: list, q: list, pa: list, totFlux: float, eff: float, theta: float) -> float:
+    def solveSerRe(
+        self,
+        a: float,
+        b: float,
+        flux: list,
+        rad: list,
+        n: list,
+        q: list,
+        pa: list,
+        totFlux: float,
+        eff: float,
+        theta: float,
+    ) -> float:
         "return the Re of a set of Sersic functions. It uses Bisection"
 
         try:
 
-            Re = bisect(self.funReSer, a, b, args=(flux, rad, n, q, pa, totFlux, eff, theta))
+            Re = bisect(
+                self.funReSer, a, b, args=(flux, rad, n, q, pa, totFlux, eff, theta)
+            )
         except:
             print("solution not found for the given range")
             Re = 0
 
         return Re
 
+    def funReSer(
+        self,
+        R: float,
+        flux: list,
+        rad: list,
+        n: list,
+        q: list,
+        pa: list,
+        totFlux: float,
+        eff: float,
+        theta: float,
+    ) -> float:
 
-    def funReSer(self, R: float, flux: list, rad: list, n: list, q: list, pa: list, totFlux: float, eff: float, theta: float) -> float:
-        
-
-        fun = self.Ftotser(R, flux, rad, n, q, pa, theta) - totFlux*eff
+        fun = self.Ftotser(R, flux, rad, n, q, pa, theta) - totFlux * eff
 
         return fun
-     
-    def Ftotser(self, R: float, flux: list, rad: list, n: list, q: list, pa: list, theta: float) -> float:
 
-        ftotR = self.Fser(R, flux, rad, n, q, pa, theta) 
+    def Ftotser(
+        self, R: float, flux: list, rad: list, n: list, q: list, pa: list, theta: float
+    ) -> float:
+
+        ftotR = self.Fser(R, flux, rad, n, q, pa, theta)
 
         return ftotR.sum()
 
+    def Fser(
+        self, R: float, Flux: list, Re: list, n: list, q: list, pa: list, theta: float
+    ) -> float:
+        """sersic flux to a determined R"""
 
+        k = gammaincinv(2 * n, 0.5)
 
-    def Fser(self, R: float, Flux: list, Re: list, n: list, q: list, pa: list, theta: float) -> float:
-        '''sersic flux to a determined R'''
-        
-        k = gammaincinv(2*n, 0.5)
+        Rcor = GetRadAng(R, q, pa, theta)
 
-        Rcor = GetRadAng(R, q, pa, theta) 
+        X = k * (Rcor / Re) ** (1 / n)
 
-        X = k*(Rcor/Re)**(1/n) 
+        Fr = Flux * gammainc(2 * n, X)  ##esta funcion esta mal
 
-        Fr = Flux*gammainc(2*n, X) ##esta funcion esta mal 
-        
         return Fr
 
 
-
 def conver2Sersic(galcomps: GalComps) -> GalComps:
-    ''' function to convert exponential, gaussian params to Sersic params'''
+    """ function to convert exponential, gaussian params to Sersic params"""
 
-    comps =  copy.deepcopy(galcomps)
+    comps = copy.deepcopy(galcomps)
 
     maskdev = comps.NameComp == "devauc"
     maskexp = comps.NameComp == "expdisk"
     maskgas = comps.NameComp == "gaussian"
 
+    K_GAUSS = 0.6931471805599455  # constant k for gaussian
+    K_EXP = 1.6783469900166612  # constant k for expdisk
+    SQ2 = np.sqrt(2)
 
-    K_GAUSS = 0.6931471805599455 #constant k for gaussian
-    K_EXP = 1.6783469900166612 # constant k for expdisk
-    SQ2 = np.sqrt(2) 
-
-    #for gaussian functions
+    # for gaussian functions
     if maskgas.any():
-        comps.Exp[maskgas] = 0.5 
-        comps.Rad[maskgas] = comps.Rad[maskgas]/2.354 #converting to sigma 
-        comps.Rad[maskgas] = SQ2*(K_GAUSS**0.5)*comps.Rad[maskgas] #converting to Re 
+        comps.Exp[maskgas] = 0.5
+        comps.Rad[maskgas] = comps.Rad[maskgas] / 2.354  # converting to sigma
+        comps.Rad[maskgas] = (
+            SQ2 * (K_GAUSS ** 0.5) * comps.Rad[maskgas]
+        )  # converting to Re
 
-
-    #for de vaucouleurs
+    # for de vaucouleurs
     if maskdev.any():
         comps.Exp[maskdev] = 4
 
-    #for exponential disks
+    # for exponential disks
     if maskexp.any():
         comps.Exp[maskexp] = 1
-        comps.Rad[maskexp] = K_EXP*comps.Rad[maskexp] #converting to Re
-
+        comps.Rad[maskexp] = K_EXP * comps.Rad[maskexp]  # converting to Re
 
     return comps
 
 
-
 def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
-    '''Given an ellipse and an angle it returns the radius in angle direction. 
-    Theta are the values for the galaxy and the others for every component'''
+    """Given an ellipse and an angle it returns the radius in angle direction. 
+    Theta are the values for the galaxy and the others for every component"""
 
-
-
-    #changing measured angle from y-axis to x-axis
+    # changing measured angle from y-axis to x-axis
     # and changing to rads:
-    newpa = (pa + 90)*np.pi/180 #angle of every component
-    theta = (theta + 90)*np.pi/180 #angle of direction of R 
+    newpa = (pa + 90) * np.pi / 180  # angle of every component
+    theta = (theta + 90) * np.pi / 180  # angle of direction of R
 
-    #bim = q * R
+    # bim = q * R
 
-    ecc = np.sqrt(1 - q**2)
+    ecc = np.sqrt(1 - q ** 2)
 
-    alpha = theta - newpa #this is the direction 
+    alpha = theta - newpa  # this is the direction
 
+    bell = R * np.sqrt(1 - (ecc * np.cos(alpha)) ** 2)
 
-    bell =  R*np.sqrt(1 - (ecc*np.cos(alpha))**2)
+    aell = bell / q  # rad to evalue for every component
 
-
-    aell = bell/q  #rad to evalue for every component
-
-
-
-    return aell 
-
-
+    return aell
 
 
 def galfitLastFit(directory: str) -> str:
 
-
     # Directory containing the files
-    #directory = "." #actual directory
+    # directory = "." #actual directory
 
     # List all files in the directory
     files = os.listdir(directory)
 
     # Filter files that match the prefix 'galfit.'
-    galfit_files = [f for f in files if f.startswith('galfit.') and f[7:].isdigit()]
+    galfit_files = [f for f in files if f.startswith("galfit.") and f[7:].isdigit()]
 
     # Extract the numerical suffix and find the maximum
     max_file = max(galfit_files, key=lambda x: int(x[7:]))
 
-
     return max_file
 
-#print galfit files
-def galPrintHeader(hdl, galhead: GalHead)-> bool:
-    "print GALFIT header in a file"
 
+# print galfit files
+def galPrintHeader(hdl, galhead: GalHead) -> bool:
+    "print GALFIT header in a file"
 
     A = galhead.inputimage
     B = galhead.outimage
-    C = galhead.sigimage 
-    D = galhead.psfimage 
+    C = galhead.sigimage
+    D = galhead.psfimage
     E = galhead.psfsamp
     F = galhead.maskimage
     G = galhead.constraints
@@ -866,11 +845,10 @@ def galPrintHeader(hdl, galhead: GalHead)-> bool:
     convy = galhead.convy
     J = galhead.mgzpt
     platedx = galhead.scale
-    platedy = galhead.scaley 
+    platedy = galhead.scaley
     O = galhead.display
     P = galhead.P
-    #S = 0 
-
+    # S = 0
 
     # k Check
     # print to filehandle
@@ -878,20 +856,46 @@ def galPrintHeader(hdl, galhead: GalHead)-> bool:
 
     lineZ = "==================================================================================================\n"
     lineX = "# IMAGE PARAMETERS \n"
-    lineA = "A) {}    # Input Data image (FITS file)                            \n".format(A)
-    lineB = "B) {}    # Output data image block                                 \n".format(B)
-    lineC = "C) {}    # Sigma image name (made from data if blank or \"none\")  \n".format(C)
-    lineD = "D) {}    # Input PSF image and (optional) diffusion kernel         \n".format(D)
-    lineE = "E) {}    # PSF fine sampling factor relative to data               \n".format(E)
-    lineF = "F) {}    # Bad pixel mask (FITS image or ASCII coord list)         \n".format(F)
-    lineG = "G) {}    # File with parameter constraints (ASCII file)            \n".format(G)
-    lineH = "H) {} {} {} {}   # Image region to fit (xmin xmax ymin ymax)               \n".format(xlo, xhi, ylo, yhi)
-    lineI = "I) {} {}  # Size of the convolution box (x y)                       \n".format(convx, convy)
-    lineJ = "J) {}     # Magnitude photometric zeropoint                         \n".format(J)
-    lineK = "K) {} {}  # Plate scale (dx dy). \[arcsec per pixel\]               \n".format(platedx, platedy)
-    lineO = "O) {}     # Display type (regular, curses, both)                    \n".format(O)
-    lineP = "P) {}     # Choose 0=optimize, 1=model, 2=imgblock, 3=subcomps      \n".format(P)
-    #lineS = "S) {}     # Modify/create objects interactively?                    \n".format(S)
+    lineA = "A) {}    # Input Data image (FITS file)                            \n".format(
+        A
+    )
+    lineB = "B) {}    # Output data image block                                 \n".format(
+        B
+    )
+    lineC = 'C) {}    # Sigma image name (made from data if blank or "none")  \n'.format(
+        C
+    )
+    lineD = "D) {}    # Input PSF image and (optional) diffusion kernel         \n".format(
+        D
+    )
+    lineE = "E) {}    # PSF fine sampling factor relative to data               \n".format(
+        E
+    )
+    lineF = "F) {}    # Bad pixel mask (FITS image or ASCII coord list)         \n".format(
+        F
+    )
+    lineG = "G) {}    # File with parameter constraints (ASCII file)            \n".format(
+        G
+    )
+    lineH = "H) {} {} {} {}   # Image region to fit (xmin xmax ymin ymax)               \n".format(
+        xlo, xhi, ylo, yhi
+    )
+    lineI = "I) {} {}  # Size of the convolution box (x y)                       \n".format(
+        convx, convy
+    )
+    lineJ = "J) {}     # Magnitude photometric zeropoint                         \n".format(
+        J
+    )
+    lineK = "K) {} {}  # Plate scale (dx dy). \[arcsec per pixel\]               \n".format(
+        platedx, platedy
+    )
+    lineO = "O) {}     # Display type (regular, curses, both)                    \n".format(
+        O
+    )
+    lineP = "P) {}     # Choose 0=optimize, 1=model, 2=imgblock, 3=subcomps      \n".format(
+        P
+    )
+    # lineS = "S) {}     # Modify/create objects interactively?                    \n".format(S)
     lineY = " \n"
 
     line0 = "# INITIAL FITTING PARAMETERS                                                     \n"
@@ -940,7 +944,7 @@ def galPrintHeader(hdl, galhead: GalHead)-> bool:
     hdl.write(lineK)
     hdl.write(lineO)
     hdl.write(lineP)
-    #hdl.write(lineS)
+    # hdl.write(lineS)
     hdl.write(lineY)
 
     hdl.write(line0)
@@ -976,7 +980,7 @@ def galPrintHeader(hdl, galhead: GalHead)-> bool:
     return True
 
 
-def galPrintComp(hdl: str, ncomp: int, idx: int, galcomps: GalComps)-> bool:
+def galPrintComp(hdl: str, ncomp: int, idx: int, galcomps: GalComps) -> bool:
     "print GALFIT Sersic function to filehandle"
     # k Check
 
@@ -985,24 +989,38 @@ def galPrintComp(hdl: str, ncomp: int, idx: int, galcomps: GalComps)-> bool:
     line00 = "# Object number: {}   \n".format(ncomp)
     line01 = " 0)   {}   #  Object type      \n".format(galcomps.NameComp[idx])
     line02 = " 1) {:.2f}  {:.2f}  {}  {}  #  position x, y  [pixel] \n".format(
-        galcomps.PosX[idx], galcomps.PosY[idx], galcomps.PosXFree[idx], galcomps.PosYFree[idx])
+        galcomps.PosX[idx],
+        galcomps.PosY[idx],
+        galcomps.PosXFree[idx],
+        galcomps.PosYFree[idx],
+    )
     line03 = " 3) {:.2f}  {}    #  total magnitude  \n".format(
-        galcomps.Mag[idx], galcomps.MagFree[idx])
+        galcomps.Mag[idx], galcomps.MagFree[idx]
+    )
     line04 = " 4) {:.2f}  {}    #  R_e     [Pixels] \n".format(
-            galcomps.Rad[idx], galcomps.RadFree[idx])
+        galcomps.Rad[idx], galcomps.RadFree[idx]
+    )
     line05 = " 5) {}     {}   #  Sersic exponent (deVauc=4, expdisk=1) \n".format(
-        galcomps.Exp[idx], galcomps.ExpFree[idx])
-    line06 = " 6)  {}  {}      #  ---------------- \n".format(galcomps.Exp2[idx],
-                galcomps.Exp2Free[idx])
-    line07 = " 7)  {}  {}      #  ---------------- \n".format(galcomps.Exp3[idx], 
-            galcomps.Exp3Free[idx])
-    line08 = " 8)  0.0000       0   #  ----------------                                \n"
+        galcomps.Exp[idx], galcomps.ExpFree[idx]
+    )
+    line06 = " 6)  {}  {}      #  ---------------- \n".format(
+        galcomps.Exp2[idx], galcomps.Exp2Free[idx]
+    )
+    line07 = " 7)  {}  {}      #  ---------------- \n".format(
+        galcomps.Exp3[idx], galcomps.Exp3Free[idx]
+    )
+    line08 = (
+        " 8)  0.0000       0   #  ----------------                                \n"
+    )
     line09 = " 9) {:.2f}   {}   #  axis ratio (b/a)  \n".format(
-        galcomps.AxRat[idx], galcomps.AxRatFree[idx])
+        galcomps.AxRat[idx], galcomps.AxRatFree[idx]
+    )
     line10 = "10) {:.2f}    {}  #  position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
-        galcomps.PosAng[idx], galcomps.PosAngFree[idx])
+        galcomps.PosAng[idx], galcomps.PosAngFree[idx]
+    )
     lineZ = " Z) {}         #  Skip this model in output image?  (yes=1, no=0) \n".format(
-        galcomps.skip[idx])
+        galcomps.skip[idx]
+    )
     line11 = "\n"
 
     hdl.write(line00)
@@ -1022,18 +1040,23 @@ def galPrintComp(hdl: str, ncomp: int, idx: int, galcomps: GalComps)-> bool:
     return True
 
 
-
-
-def galPrintSky(hdl: str , ncomp: int, galsky: GalSky) -> bool:
+def galPrintSky(hdl: str, ncomp: int, galsky: GalSky) -> bool:
     "Print GALFIT sky function to filehandle using  GalSky class"
-
 
     line00 = "# Object number: {}                 \n".format(ncomp)
     line01 = " 0)      sky            #    Object type                                        \n"
-    line02 = " 1) {:.2f}   {}   # sky background        [ADU counts]  \n".format(galsky.sky, galsky.skyfree)
-    line03 = " 2) {:.2f}  {}    # dsky/dx (sky gradient in x) \n".format(galsky.dskyx,galsky.dskyxfree)
-    line04 = " 3) {:.2f}  {}    # dsky/dy (sky gradient in y) \n".format(galsky.dskyy,galsky.dskyyfree)
-    line05 = " Z) {}           # Skip this model in output image?  (yes=1, no=0) \n".format(galsky.skip)
+    line02 = " 1) {:.2f}   {}   # sky background        [ADU counts]  \n".format(
+        galsky.sky, galsky.skyfree
+    )
+    line03 = " 2) {:.2f}  {}    # dsky/dx (sky gradient in x) \n".format(
+        galsky.dskyx, galsky.dskyxfree
+    )
+    line04 = " 3) {:.2f}  {}    # dsky/dy (sky gradient in y) \n".format(
+        galsky.dskyy, galsky.dskyyfree
+    )
+    line05 = " Z) {}           # Skip this model in output image?  (yes=1, no=0) \n".format(
+        galsky.skip
+    )
     line06 = "\n"
     line07 = "================================================================================\n"
 
@@ -1047,5 +1070,3 @@ def galPrintSky(hdl: str , ncomp: int, galsky: GalSky) -> bool:
     hdl.write(line07)
 
     return True
-
-

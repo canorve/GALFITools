@@ -9,15 +9,28 @@ import sys
 
 import numpy as np
 from astropy.io import fits
-from galfitools.galin.galfit import (Galfit, galfitLastFit, galPrintComp,
-                                     galPrintHeader, galPrintSky)
+from galfitools.galin.galfit import (
+    Galfit,
+    galfitLastFit,
+    galPrintComp,
+    galPrintHeader,
+    galPrintSky,
+)
 from galfitools.galin.getStar import getStar
 from galfitools.galin.MaskDs9 import GetAxis, checkCompHDU
 from galfitools.mge.mge2galfit import Ds9ell2Kronellv2, GetInfoEllip, mge2gal
 
 
-def makePSF(galfitFile: str, image: str, regfile: str, center: bool, psfout: str, sigma: str, twist: bool, numgauss: int)-> None: 
-
+def makePSF(
+    galfitFile: str,
+    image: str,
+    regfile: str,
+    center: bool,
+    psfout: str,
+    sigma: str,
+    twist: bool,
+    numgauss: int,
+) -> None:
 
     #######################
     # reading options from galfit header
@@ -39,83 +52,88 @@ def makePSF(galfitFile: str, image: str, regfile: str, center: bool, psfout: str
 
     sigfile = head.sigimage
 
-    convbox =  head.convx
+    convbox = head.convx
     convboxy = head.convy
 
     xlo = head.xmin
     ylo = head.ymin
     xhi = head.xmax
     yhi = head.ymax
- 
-    imsize = head.xmax - head.xmin +  1
+
+    imsize = head.xmax - head.xmin + 1
 
     #################
 
-    #inputimage of galfit header will be the output of getStar
-    getStar(image, regfile, imsize, center, sky,  inputimage, sigma, sigfile)
+    # inputimage of galfit header will be the output of getStar
+    getStar(image, regfile, imsize, center, sky, inputimage, sigma, sigfile)
 
-
-
-    #checking the center position
+    # checking the center position
     even = False
 
     if imsize % 2 == 0:
         even = True
 
-    
     if even:
-        lx = imsize/2
+        lx = imsize / 2
 
-        xpeak = int(lx + 1) 
-        ypeak = int(lx + 1) 
-        
+        xpeak = int(lx + 1)
+        ypeak = int(lx + 1)
+
     else:
-        lx = imsize/2
+        lx = imsize / 2
 
-        xpeak = int(lx + 0.5) 
-        ypeak = int(lx + 0.5) 
-
+        xpeak = int(lx + 0.5)
+        ypeak = int(lx + 0.5)
 
     ####
 
     psf = 0
     gauss = None
-    freeser = False 
-    freesky = False 
+    freeser = False
+    freesky = False
 
-    xypos = [xpeak, ypeak]  
+    xypos = [xpeak, ypeak]
 
-    #calling to these two functions to obtain eps and theta
-    obj_trash, xpos_trash, ypos_trash, rx_trash, ry_trash, angle_trash = GetInfoEllip(regfile)
-    xx_trash, yy_trash, Rkron_trash, theta, eps = Ds9ell2Kronellv2(xpos_trash,ypos_trash,rx_trash,ry_trash,angle_trash)
+    # calling to these two functions to obtain eps and theta
+    obj_trash, xpos_trash, ypos_trash, rx_trash, ry_trash, angle_trash = GetInfoEllip(
+        regfile
+    )
+    xx_trash, yy_trash, Rkron_trash, theta, eps = Ds9ell2Kronellv2(
+        xpos_trash, ypos_trash, rx_trash, ry_trash, angle_trash
+    )
 
-
-    ellip = eps 
-    posang = theta 
+    ellip = eps
+    posang = theta
     regmgefile = None
 
-
-
-    outname = mge2gal(galfitFile, regmgefile, center, psf, twist, gauss, 
-            freeser, freesky, numgauss, xypos=xypos, ellip = ellip, posang = posang) 
-
-
+    outname = mge2gal(
+        galfitFile,
+        regmgefile,
+        center,
+        psf,
+        twist,
+        gauss,
+        freeser,
+        freesky,
+        numgauss,
+        xypos=xypos,
+        ellip=ellip,
+        posang=posang,
+    )
 
     print("calling GALFIT to fit MGE")
 
     rungal = "galfit  {}".format("mseGALFIT.txt")
-    errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
-                universal_newlines=True)
+    errgal = sp.run(
+        [rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE, universal_newlines=True
+    )
 
-
-
-    #check if galfit failed
-    if re.search("Doh!", errgal.stdout): 
+    # check if galfit failed
+    if re.search("Doh!", errgal.stdout):
         print("ERROR: GALFIT has been unable to find a solution")
         print("Try to reduce the number of gaussians with -ng option")
         print("Exiting now")
         sys.exit(1)
-
 
     lastfit_file = galfitLastFit(".")
 
@@ -124,47 +142,36 @@ def makePSF(galfitFile: str, image: str, regfile: str, center: bool, psfout: str
     galcomps = galfit.ReadComps()
     galsky = galfit.ReadSky()
 
-
-    #printing output file to create psf model
+    # printing output file to create psf model
     fout1 = open("psfmodel.txt", "w")
 
     head.outimage = psfout
-    head.P = 1 
+    head.P = 1
 
     galPrintHeader(fout1, head)
 
-
-
     index = 0
-
 
     for index, item in enumerate(galcomps.N):
 
-
-            galPrintComp(fout1, index+1, index, galcomps)
-
-
-
+        galPrintComp(fout1, index + 1, index, galcomps)
 
     galsky.skip = 1
- 
-    galPrintSky(fout1, index+1, galsky)
 
+    galPrintSky(fout1, index + 1, galsky)
 
     fout1.close()
-
 
     print("calling GALFIT again to create final model")
 
     rungal = "galfit  {}".format("psfmodel.txt")
-    errgal = sp.run([rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE,
-                universal_newlines=True)
+    errgal = sp.run(
+        [rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE, universal_newlines=True
+    )
 
     print("Done. PSF model file: ", psfout)
 
-
-    print("Check the image, model and residual: ",outname)
-
+    print("Check the image, model and residual: ", outname)
 
 
 #############################################################################
@@ -178,4 +185,3 @@ def makePSF(galfitFile: str, image: str, regfile: str, center: bool, psfout: str
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-

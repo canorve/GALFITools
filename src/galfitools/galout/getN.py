@@ -10,18 +10,30 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy
 from astropy.io import fits
-from galfitools.galin.galfit import (GalComps, Galfit, GalHead, GetRadAng,
-                                     SelectGal, conver2Sersic, numComps)
+from galfitools.galin.galfit import (
+    GalComps,
+    Galfit,
+    GalHead,
+    GetRadAng,
+    SelectGal,
+    conver2Sersic,
+    numComps,
+)
 from galfitools.galout.getRads import GetMe, GetReff
 from scipy.optimize import bisect
 from scipy.special import gamma, gammainc, gammaincinv
 
 
-def getN(galfitFile: str, dis: int, frac: float, angle: float, 
-            num_comp: int, plot: bool, const = 0) -> float:
-    '''gets the effective radius from a set of Sersics'''
-
-
+def getN(
+    galfitFile: str,
+    dis: int,
+    frac: float,
+    angle: float,
+    num_comp: int,
+    plot: bool,
+    const=0,
+) -> float:
+    """gets the effective radius from a set of Sersics"""
 
     eff = 0.5
 
@@ -30,105 +42,90 @@ def getN(galfitFile: str, dis: int, frac: float, angle: float,
     head = galfit.ReadHead()
     galcomps = galfit.ReadComps()
 
-
-
-
-
     galcomps = SelectGal(galcomps, dis, num_comp)
 
-    #taking the last component position angle for the whole galaxy
+    # taking the last component position angle for the whole galaxy
 
-    maskgal = (galcomps.Active == True) 
+    maskgal = galcomps.Active == True
     if angle:
         theta = angle
     else:
-        theta = galcomps.PosAng[maskgal][-1]  
+        theta = galcomps.PosAng[maskgal][-1]
 
-    #theta = 18.2534 
+    # theta = 18.2534
 
+    # convert all exp, gaussian and de vaucouleurs to Sersic format
+    comps = conver2Sersic(galcomps)
 
-    #convert all exp, gaussian and de vaucouleurs to Sersic format
-    comps = conver2Sersic(galcomps) 
-
-
-    N = numComps(comps,'all')
-    #print('number of model components: ',N)
+    N = numComps(comps, "all")
+    # print('number of model components: ',N)
 
     if N == 0:
-        print('not enough number of components to compute Re')
-        print('exiting..')
+        print("not enough number of components to compute Re")
+        print("exiting..")
         sys.exit(1)
 
-    line = 'Using a theta value of : {:.2f} degrees \n'.format(theta)
-    #print(line)
-
-
+    line = "Using a theta value of : {:.2f} degrees \n".format(theta)
+    # print(line)
 
     EffRad, totmag = GetReff().GetReSer(head, comps, eff, theta)
 
-    line = 'Total Magnitude of the galaxy: {:.2f} \n'.format(totmag)
-    #print(line)
+    line = "Total Magnitude of the galaxy: {:.2f} \n".format(totmag)
+    # print(line)
 
-
-    line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(eff*100,EffRad)
-    #print(line)
-
-
+    line = "The radius at {:.0f}% of light is {:.2f} pixels \n".format(
+        eff * 100, EffRad
+    )
+    # print(line)
 
     EffRadfrac, totmag = GetReff().GetReSer(head, comps, frac, theta)
 
+    line = "The radius at {:.0f}% of light is {:.2f} pixels \n".format(
+        frac * 100, EffRadfrac
+    )
+    # print(line)
 
-    line = 'The radius at {:.0f}% of light is {:.2f} pixels \n'.format(frac*100, EffRadfrac)
-    #print(line)
+    comps2 = copy.deepcopy(comps)
+    meanme = GetMe().MeanMe(totmag, EffRad * head.scale)
+    # me = GetMe().Me(head, comps2, 0, theta) #substituing effective radius per 0 gives m0
+    me = GetMe().Me(
+        head, comps2, EffRad * head.scale, theta
+    )  # substituing effective radius per 0 gives m0
 
+    line = 'Mean Surface Brightness at effective radius: {:.2f} mag/" \n'.format(meanme)
+    # print(line)
 
-
-    comps2 =  copy.deepcopy(comps)
-    meanme = GetMe().MeanMe(totmag, EffRad*head.scale)
-    #me = GetMe().Me(head, comps2, 0, theta) #substituing effective radius per 0 gives m0
-    me = GetMe().Me(head, comps2, EffRad*head.scale, theta) #substituing effective radius per 0 gives m0
-
-
-
-
-    line = 'Mean Surface Brightness at effective radius: {:.2f} mag/\" \n'.format(meanme)
-    #print(line)
-
-
-    line = 'Surface brightness at effective radius {:.2f} mag/\" \n'.format(me)
-    #print(line)
+    line = 'Surface brightness at effective radius {:.2f} mag/" \n'.format(me)
+    # print(line)
 
     sersic = GetN().MeMeanMe(me, meanme)
 
-    line = 'Sersic index with the method of Mean Surface Brightness at effective radius: {:.2f}  \n'.format(sersic)
-    #print(line)
-
+    line = "Sersic index with the method of Mean Surface Brightness at effective radius: {:.2f}  \n".format(
+        sersic
+    )
+    # print(line)
 
     sersic2 = GetN().ReRfrac(EffRad, EffRadfrac, frac)
 
-    line = 'Sersic index with the method of fraction of light at {:.2f}: {:.2f}  \n'.format(frac,sersic2)
-    #print(line)
+    line = "Sersic index with the method of fraction of light at {:.2f}: {:.2f}  \n".format(
+        frac, sersic2
+    )
+    # print(line)
 
+    # sersic3 = GetN().MeM0(me, m0)
 
-    #sersic3 = GetN().MeM0(me, m0)
+    # line = 'Sersic index with the method of me - mo is {:.2f}  \n'.format(sersic3)
+    # print(line)
 
-    #line = 'Sersic index with the method of me - mo is {:.2f}  \n'.format(sersic3)
-    #print(line)
+    # computing the Sersic indexes for different radius
 
-
-
-
-    #computing the Sersic indexes for different radius
-
-    Fa = np.arange(0.1, .5, .05)
-    Fb = np.arange(.55,1,.05)
-    F = np.concatenate((Fa,Fb))
+    Fa = np.arange(0.1, 0.5, 0.05)
+    Fb = np.arange(0.55, 1, 0.05)
+    F = np.concatenate((Fa, Fb))
 
     R = GetReff().GetRfracSer(head, comps, F, theta)
 
-
-    ns = GetN().GalNs(EffRad, R, F) 
-
+    ns = GetN().GalNs(EffRad, R, F)
 
     if plot:
 
@@ -139,50 +136,37 @@ def getN(galfitFile: str, dis: int, frac: float, angle: float,
         plt.ylabel("Sersic index")
         plt.savefig("Serind.png")
 
+    # print("Sersic index computed at different fraction of light radius: ")
 
-    #print("Sersic index computed at different fraction of light radius: ")
-
-
-    #for idx, item in enumerate(F):
+    # for idx, item in enumerate(F):
     #    line = 'Fraction of light: {:.2f} ; Sersic index: {:.2f} '.format(F[idx],ns[idx])
     #    print(line)
 
-    line = '\nSersic index mean: {:.2f}  Standard deviation: {:.2f}  '.format(np.mean(ns),np.std(ns))
-    #print(line)
+    line = "\nSersic index mean: {:.2f}  Standard deviation: {:.2f}  ".format(
+        np.mean(ns), np.std(ns)
+    )
+    # print(line)
 
+    # separate in two functions:
 
-    
-    #separate in two functions:
-
-    #return Effrad, totmag, meanme, me, N, theta 
-    return sersic, np.mean(ns), np.std(ns), totmag, N, theta 
+    # return Effrad, totmag, meanme, me, N, theta
+    return sersic, np.mean(ns), np.std(ns), totmag, N, theta
 
 
 class GetN:
-    '''Class to compute the Sersic index from photometric parameters'''
-
-
+    """Class to compute the Sersic index from photometric parameters"""
 
     def GalNs(self, EffRad, EffRadfrac, F):
 
-
-
         sers = np.array([])
 
-        for idx, f in  enumerate(F):
-
+        for idx, f in enumerate(F):
 
             n = self.ReRfrac(EffRad, EffRadfrac[idx], f)
 
             sers = np.append(sers, n)
 
-
-
-        return sers 
-
-
-
-
+        return sers
 
     def MeMeanMe(self, me: float, meanme: float) -> float:
 
@@ -191,10 +175,7 @@ class GetN:
 
         Sersic = self.solveSer(a, b, me, meanme)
 
-
         return Sersic
-
-
 
     def solveSer(self, a: float, b: float, me: float, meanme: float) -> float:
         "return the sersic index. It uses Bisection"
@@ -205,31 +186,25 @@ class GetN:
             print("unable to solve equation in the given range. Setting n to 99")
             N = 99
 
-        return N 
-
+        return N
 
     def funMeMeanMe(self, n: float, me: float, meanme: float) -> float:
-        
 
-        k = gammaincinv(2*n, 0.5)
+        k = gammaincinv(2 * n, 0.5)
 
         fn = self.Fn(n)
 
-        result = me - meanme  - 2.5*np.log10(fn)
+        result = me - meanme - 2.5 * np.log10(fn)
 
+        return result
 
-        return result 
-     
     def Fn(self, n: float) -> float:
 
-        k = gammaincinv(2*n, 0.5)
+        k = gammaincinv(2 * n, 0.5)
 
-
-        fn = ((n*np.exp(k))/(k**(2*n)))*gamma(2*n)
-
+        fn = ((n * np.exp(k)) / (k ** (2 * n))) * gamma(2 * n)
 
         return fn
-
 
     def ReRfrac(self, Re: float, Rfrac: float, frac: float) -> float:
 
@@ -238,12 +213,11 @@ class GetN:
 
         Sersic = self.solveSerRe(a, b, Re, Rfrac, frac)
 
-
         return Sersic
 
-
-
-    def solveSerRe(self, a: float, b: float, Re: float, Rfrac: float, frac: float) -> float:
+    def solveSerRe(
+        self, a: float, b: float, Re: float, Rfrac: float, frac: float
+    ) -> float:
         "return the sersic index. It uses Bisection"
 
         try:
@@ -252,44 +226,30 @@ class GetN:
             print("unable to solve equation in the given range. Setting n to 99")
             N = 99
 
-
-
-        return N 
-
+        return N
 
     def funReRfrac(self, n: float, Re: float, Rfrac: float, frac: float) -> float:
-        
 
-        k = gammaincinv(2*n, 0.5)
+        k = gammaincinv(2 * n, 0.5)
 
+        x = k * (Rfrac / Re) ** (1 / n)
 
-        x = k*(Rfrac/Re)**(1/n)
-        
+        result = frac * gamma(2 * n) - gamma(2 * n) * gammainc(2 * n, x)
 
-        result = frac*gamma(2*n) - gamma(2*n)*gammainc(2*n, x) 
-
-
-        return result 
-     
-
+        return result
 
     def MeM0(self, me: float, m0: float) -> float:
-        '''Uses me and m0 to compute n. It is not very realiable 
-        and takes longer than the other two methods'''
+        """Uses me and m0 to compute n. It is not very realiable 
+        and takes longer than the other two methods"""
         a = 0
         b = 45
 
-
         K = self.solveKm0(a, b, me, m0)
-
 
         a = 0.2
         b = 40
 
-
-
         Sersic = self.solveSerK(a, b, K)
-
 
         return Sersic
 
@@ -302,16 +262,15 @@ class GetN:
             print("solution not found for the given range")
             K = 0
 
-        return K 
-
+        return K
 
     def funMeM0(self, K: float, me: float, m0: float) -> float:
 
-        result = me - m0 - 2.5*K/np.log(10)
+        result = me - m0 - 2.5 * K / np.log(10)
 
-        return result 
+        return result
 
-    def solveSerK(self, a: float, b: float, k: float) -> float: 
+    def solveSerK(self, a: float, b: float, k: float) -> float:
 
         try:
             sersic = bisect(self.funK, a, b, args=(k))
@@ -322,15 +281,10 @@ class GetN:
         return sersic
 
     def funK(self, n: float, k: float) -> float:
-       
 
-        result = gammaincinv(2*n, 0.5) - k
+        result = gammaincinv(2 * n, 0.5) - k
 
-
-
-        return result 
-
-
+        return result
 
 
 #############################################################################
@@ -344,8 +298,5 @@ class GetN:
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-if __name__ == '__main__':
-  main()
-
-
-
+if __name__ == "__main__":
+    main()
