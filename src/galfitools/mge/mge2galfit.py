@@ -483,7 +483,7 @@ def mge2gal(
 
             FWHM = 2.35482 * SigPix
 
-            outlinea = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f} \n".format(
+            outlinea = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f} ".format(
                 mgemag, SigPix, FWHM)
             outlineb = "q: {:.2f} angle: {:.2f} \n".format(
                  qobs, anglegass)
@@ -523,7 +523,7 @@ def mge2gal(
 
             Re = (K ** (0.5)) * h
 
-            outlinea = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f} \n".format(
+            outlinea = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f} ".format(
                 mgemag, SigPix, FWHM
             )
             outlineb = "Re: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(
