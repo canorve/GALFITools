@@ -19,7 +19,6 @@ from galfitools.galout.getRads import (
 )
 from galfitools.galout.PhotDs9 import photDs9
 from galfitools.galout.showcube import displayCube
-from galfitools.mge.mge2galfit import GetInfoEllip
 from galfitools.shell.prt import printWelcome
 
 
@@ -28,7 +27,8 @@ def mainPhotDs9():
     printWelcome()
 
     parser = argparse.ArgumentParser(
-        description="computes photometry from a Ds9 region file: Box, Ellipses and Polygons "
+        description="computes photometry from a Ds9 region "
+        + "file: Box, Ellipses and Polygons "
     )
 
     parser.add_argument(
@@ -51,7 +51,8 @@ def mainPhotDs9():
         "--sky",
         default=0,
         type=float,
-        help="Sky background value to be removed from image before photometry. Default = 0",
+        help="Sky background value to be removed from image "
+        + "before photometry. Default = 0",
     )
 
     args = parser.parse_args()
@@ -90,13 +91,12 @@ def mainGetBreak() -> None:
         "-d", "--dis", type=int, help="Maximum distance among components", default=10
     )
 
-    # parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
-
     parser.add_argument(
         "-n",
         "--numcomp",
         type=int,
-        help="Number of component where it'll obtain center of all components, default = 1 ",
+        help="Number of component where it'll obtain center of "
+        + "all components, default = 1 ",
         default=1,
     )
 
@@ -104,14 +104,16 @@ def mainGetBreak() -> None:
         "-pa",
         "--angle",
         type=float,
-        help="Position angle of the major axis of the galaxy. Default= it will take the angle of the last components",
+        help="Position angle of the major axis of the galaxy. Default ="
+        + " it will take the angle of the last components",
     )
 
     parser.add_argument(
         "-ni",
         "--numinitial",
         type=int,
-        help="Number of component where it'll obtain the initial parameter to search break radius or to generated random initial radius. ",
+        help="Number of component where it'll obtain the initial parameter "
+        + "to search break radius or to generated random initial radius. ",
         default=2,
     )
 
@@ -126,7 +128,9 @@ def mainGetBreak() -> None:
         "-r",
         "--random",
         type=int,
-        help="Number of random radius as initial parameters to search for the minimum. It will generated random radius from 0 to effective radius of the component indicated by parameter -ni ",
+        help="Number of random radius as initial parameters to search for the "
+        + "minimum. It will generated random radius from 0 to effective radius"
+        + " of the component indicated by parameter -ni ",
     )
 
     parser.add_argument(
@@ -203,7 +207,8 @@ def mainGetBreak2():
         "-n",
         "--numcomp",
         type=int,
-        help="Number of component where it'll obtain center of all components, default = 1 ",
+        help="Number of component where it'll obtain center of all components,"
+        + " default = 1 ",
         default=1,
     )
 
@@ -211,7 +216,8 @@ def mainGetBreak2():
         "-pa",
         "--angle",
         type=float,
-        help="Position angle of the major axis of the galaxy. Default= it will take the angle of the last components",
+        help="Position angle of the major axis of the galaxy. Default = it will"
+        + " take the angle of the last components",
     )
 
     parser.add_argument(
@@ -262,7 +268,8 @@ def mainGetBarSize():
     printWelcome()
 
     parser = argparse.ArgumentParser(
-        description="getBarSize: gets the bar size from Sersic models: Bulge, Bar and disk. It assumes that bar is galfit component 2 "
+        description="getBarSize: gets the bar size from Sersic models: Bulge,"
+        + " Bar and disk. It assumes that bar is galfit component 2 "
     )
 
     # required arguments
@@ -278,7 +285,8 @@ def mainGetBarSize():
         "-n",
         "--numcomp",
         type=int,
-        help="Number of component where it'll obtain center of all components, default = 1 ",
+        help="Number of component where it'll obtain center of all components,"
+        + " default = 1 ",
         default=1,
     )
 
@@ -348,13 +356,13 @@ def mainFWHM() -> None:
     parser.add_argument(
         "-d", "--dis", type=int, help="Maximum distance among components", default=10
     )
-    # parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
 
     parser.add_argument(
         "-n",
         "--numcomp",
         type=int,
-        help="Number of component where it'll obtain center of all components, default = 1 ",
+        help="Number of component where it'll obtain center of all components,"
+        + " default = 1 ",
         default=1,
     )
 
@@ -362,7 +370,8 @@ def mainFWHM() -> None:
         "-pa",
         "--angle",
         type=float,
-        help="Position angle of the major axis of the galaxy. Default= it will take the angle of the last components",
+        help="Position angle of the major axis of the galaxy. Default ="
+        + " it will take the angle of the last components",
     )
 
     args = parser.parse_args()
@@ -415,7 +424,8 @@ def mainKappa() -> None:
         "-n",
         "--numcomp",
         type=int,
-        help="Number of component where it'll obtain center of all components, default = 1 ",
+        help="Number of component where it'll obtain center of all components,"
+        + " default = 1 ",
         default=1,
     )
 
@@ -423,14 +433,16 @@ def mainKappa() -> None:
         "-pa",
         "--angle",
         type=float,
-        help="Position angle of the major axis of the galaxy. Default= it will take the angle of the last components",
+        help="Position angle of the major axis of the galaxy. Default ="
+        + " it will take the angle of the last components",
     )
 
     parser.add_argument(
         "-ni",
         "--numinitial",
         type=int,
-        help="Number of component where it'll obtain the initial parameter to search break radius or to generated random initial radius. ",
+        help="Number of component where it'll obtain the initial parameter"
+        + " to search break radius or to generated random initial radius. ",
         default=2,
     )
 
@@ -445,7 +457,9 @@ def mainKappa() -> None:
         "-r",
         "--random",
         type=int,
-        help="Number of random radius as initial parameters to search for the minimum. It will generated random radius from 0 to effective radius of the component indicated by parameter -ni ",
+        help="Number of random radius as initial parameters to search "
+        + "for the minimum. It will generated random radius from 0 to "
+        + "effective radius of the component indicated by parameter -ni ",
     )
 
     parser.add_argument(
@@ -503,7 +517,8 @@ def mainKappa2():
     printWelcome()
 
     parser = argparse.ArgumentParser(
-        description="getKappa2: gets the Kappa radius (maximum curvature radius) from a set of Sersics "
+        description="getKappa2: gets the Kappa radius (maximum curvature radius)"
+        + " from a set of Sersics "
     )
 
     # required arguments
@@ -518,7 +533,8 @@ def mainKappa2():
         "-n",
         "--numcomp",
         type=int,
-        help="Number of component where it'll obtain center of all components, default = 1 ",
+        help="Number of component where it'll obtain center of all components,"
+        + " default = 1 ",
         default=1,
     )
 
@@ -526,7 +542,8 @@ def mainKappa2():
         "-pa",
         "--angle",
         type=float,
-        help="Position angle of the major axis of the galaxy. Default= it will take the angle of the last components",
+        help="Position angle of the major axis of the galaxy. Default = "
+        + "it will take the angle of the last components",
     )
 
     parser.add_argument(
@@ -595,13 +612,12 @@ def mainGetReComp() -> None:
         default=0.5,
     )
 
-    # parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
-
     parser.add_argument(
         "-n",
         "--numcomp",
         type=int,
-        help="Number of component where it'll obtain center of all components, default = 1 ",
+        help="Number of component where it'll obtain center of all components,"
+        + " default = 1 ",
         default=1,
     )
 
@@ -609,7 +625,9 @@ def mainGetReComp() -> None:
         "-pa",
         "--angle",
         type=float,
-        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components. Angle measured from Y-Axis as same as GALFIT. ",
+        help="Angle of the major axis of the galaxy. Default = it will take the "
+        + " angle of the last components. Angle measured from Y-Axis as"
+        + "same as GALFIT. ",
     )
 
     args = parser.parse_args()
@@ -639,12 +657,14 @@ def mainGetReComp() -> None:
     line = "Total Magnitude of the galaxy: {:.2f} \n".format(totmag)
     print(line)
 
-    line = 'Surface brightness at radius of {:.0f}% of light (\u03BCr): {:.2f} mag/" \n'.format(
+    line = "Surface brightness at radius of "
+    + "{:.0f}% of light (\u03BCr): {:.2f} mag/'' \n".format(
         eff * 100, me
     )
     print(line)
 
-    line = 'Mean Surface Brightness at effective radius (<\u03BC>e): {:.2f} mag/" \n'.format(
+    line = "Mean Surface Brightness at effective radius (<\u03BC>e):"
+    + " {:.2f} mag/'' \n".format(
         meanme
     )
     if eff == 0.5:
@@ -674,13 +694,12 @@ def maingetSlope() -> None:
         "-d", "--dis", type=int, help="Maximum distance among components", default=10
     )
 
-    # parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
-
     parser.add_argument(
         "-n",
         "--numcomp",
         type=int,
-        help="Number of component where it'll obtain center of all components, default = 1 ",
+        help="Number of component where it'll obtain center of "
+        + "all components, default = 1 ",
         default=1,
     )
 
@@ -688,7 +707,8 @@ def maingetSlope() -> None:
         "-a",
         "--angle",
         type=float,
-        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components",
+        help="Angle of the major axis of the galaxy. Default = "
+        + "it will take the angle of the last components",
     )
 
     parser.add_argument(
@@ -755,7 +775,8 @@ def maingetN() -> None:
     # reading arguments parsing
 
     parser = argparse.ArgumentParser(
-        description="getN: computes the Sersic index from surface brightness at effective radius"
+        description="getN: computes the Sersic index from surface brightness"
+        + " at effective radius"
     )
 
     # required arguments
@@ -767,13 +788,12 @@ def maingetN() -> None:
         "-d", "--dis", type=int, help="Maximum distance among components", default=10
     )
 
-    # parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
-
     parser.add_argument(
         "-n",
         "--numcomp",
         type=int,
-        help="Number of component where it'll obtain center of all components, default = 1 ",
+        help="Number of component where it'll obtain center of all components, "
+        + "default = 1 ",
         default=1,
     )
 
@@ -781,7 +801,9 @@ def maingetN() -> None:
         "-pa",
         "--angle",
         type=float,
-        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components. Angle measured from Y-Axis as same as GALFIT. ",
+        help="Angle of the major axis of the galaxy. Default = it will take "
+        + "the angle of the last components. Angle measured from Y-Axis as "
+        + "same as GALFIT. ",
     )
 
     parser.add_argument(
@@ -807,7 +829,7 @@ def maingetN() -> None:
         default=0,
     )
 
-    ## parsing variables
+    # parsing variables
 
     args = parser.parse_args()
 
@@ -835,7 +857,8 @@ def maingetN() -> None:
     line = "Total Magnitude of the galaxy: {:.2f} \n".format(totmag)
     print(line)
 
-    line = "Sersic index with the method of Mean Surface Brightness at effective radius: {:.2f}  \n".format(
+    line = "Sersic index with the method of Mean Surface "
+    + "Brightness at effective radius: {:.2f}  \n".format(
         sersic
     )
     print(line)
@@ -850,13 +873,13 @@ def maingetN() -> None:
 
 
 def mainGetBulgeRad() -> None:
-    """gets the bulge radius or the radius where two models of surface brightness models are equal"""
 
     printWelcome()
     # reading arguments parsing
 
     parser = argparse.ArgumentParser(
-        description="getBulgeRad: gets the bulge radius or the radius where two models of surface brightness models are equal"
+        description="getBulgeRad: gets the bulge radius or the radius where "
+        + "two models of surface brightness models are equal"
     )
 
     # required arguments
@@ -868,19 +891,16 @@ def mainGetBulgeRad() -> None:
         "GalfitFile2", help="Galfit File containing the core surface brightness model"
     )
 
-    # parser.add_argument("gammarad", type=float, help="gamma radius")
-
     parser.add_argument(
         "-d", "--dis", type=int, help="Maximum distance among components", default=10
     )
-
-    # parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
 
     parser.add_argument(
         "-n",
         "--numcomp",
         type=int,
-        help="Number of component where it'll obtain center of all components, default = 1 ",
+        help="Number of component where it'll obtain center of all components,"
+        + " default = 1 ",
         default=1,
     )
 
@@ -888,7 +908,9 @@ def mainGetBulgeRad() -> None:
         "-pa",
         "--angle",
         type=float,
-        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components. Angle measured from Y-Axis as same as GALFIT. ",
+        help="Angle of the major axis of the galaxy. Default = "
+        + "it will take the angle of the last components. Angle "
+        + "measured from Y-Axis as same as GALFIT. ",
     )
 
     parser.add_argument(
@@ -904,8 +926,6 @@ def mainGetBulgeRad() -> None:
         type=float,
         help="provide a range for x-axis: xmin - xmax ",
     )
-
-    ## parsing variables
 
     args = parser.parse_args()
 
@@ -925,7 +945,7 @@ def mainGetBulgeRad() -> None:
         galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx
     )
 
-    galfit = Galfit(galfitFile)
+    galfit = Galfit(galfitFile1)
 
     head = galfit.ReadHead()
 
@@ -938,7 +958,8 @@ def mainGetBulgeRad() -> None:
     line = "Using a theta value of: {:.2f} degrees\n".format(theta)
     print(line)
 
-    line = 'The bulge radius is {:.2f} pixels or {:.2f} "  \n'.format(rbulge)
+    line = 'The bulge radius is {:.2f} pixels or {:.2f} "  \n'.format(
+            rbulge, rbulge_arc)
     print(line)
 
 
@@ -949,7 +970,8 @@ def mainMissingLight() -> None:
     # reading arguments parsing
 
     parser = argparse.ArgumentParser(
-        description="getMissLight: computes the missing light from two surface brightness models"
+        description="getMissLight: computes the missing light from two "
+        + "surface brightness models"
     )
 
     # required arguments
@@ -975,11 +997,12 @@ def mainMissingLight() -> None:
         "-n",
         "--numcomp",
         type=int,
-        help="Number of component where it'll obtain center of all components, default = 1 ",
+        help="Number of component where it'll obtain center of all "
+        + "components, default = 1 ",
         default=1,
     )
 
-    ## parsing variables
+    # parsing variables
 
     args = parser.parse_args()
 
@@ -1018,14 +1041,16 @@ def mainShowCube():
         "-br",
         "--brightness",
         type=float,
-        help="brightness of the image. Only for galaxy and model. Default = 0. Preferible range goes from -1 to 1",
+        help="brightness of the image. Only for galaxy and model. "
+        + "Default = 0. Preferible range goes from -1 to 1",
         default=0,
     )
     parser.add_argument(
         "-co",
         "--contrast",
         type=float,
-        help="contrast of the image. Only for galaxy and model. Default = 1. Preferible range goes from 0 to 1",
+        help="contrast of the image. Only for galaxy and model. Default = 1. "
+        + "Preferible range goes from 0 to 1",
         default=1,
     )
 
@@ -1074,7 +1099,8 @@ def maingetCOW() -> None:
     # reading arguments parsing
 
     parser = argparse.ArgumentParser(
-        description="getCOW: plots the curve-of-growth from the galfit.XX file. Only for Sersic functions"
+        description="getCOW: plots the curve-of-growth from the galfit.XX "
+        + "file. Only for Sersic functions"
     )
 
     # required arguments
@@ -1106,7 +1132,8 @@ def maingetCOW() -> None:
         "-fr",
         "--fracrad",
         type=float,
-        help="fraction of light radius. This is the upper limit of X-Axis. default=.95 ",
+        help="fraction of light radius. This is the upper limit of "
+        + "X-Axis. default=.95 ",
         default=0.95,
     )
 
@@ -1114,7 +1141,8 @@ def maingetCOW() -> None:
         "-n",
         "--numcomp",
         type=int,
-        help="Number of component where it'll obtain center of all components, default = 1 ",
+        help="Number of component where it'll obtain center of all "
+        + "components, default = 1 ",
         default=1,
     )
 
@@ -1122,7 +1150,9 @@ def maingetCOW() -> None:
         "-pa",
         "--angle",
         type=float,
-        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components. Angle measured from Y-Axis as same as GALFIT. ",
+        help="Angle of the major axis of the galaxy. Default = "
+        + "it will take the angle of the last components. Angle "
+        + "measured from Y-Axis as same as GALFIT. ",
     )
 
     parser.add_argument(
@@ -1133,7 +1163,7 @@ def maingetCOW() -> None:
         default=100,
     )
 
-    ## parsing variables
+    # parsing variables
 
     args = parser.parse_args()
 
@@ -1202,7 +1232,8 @@ def maingetPeak():
     printWelcome()
 
     parser = argparse.ArgumentParser(
-        description="Obtains the center, axis ratio and angular position from DS9 region"
+        description="Obtains the center, axis ratio and angular "
+        + "position from DS9 region"
     )
 
     parser.add_argument("Image", help="image fits file")

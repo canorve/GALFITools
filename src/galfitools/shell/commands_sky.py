@@ -89,7 +89,8 @@ def mainSkyDs9():
     printWelcome()
 
     parser = argparse.ArgumentParser(
-        description="SkyDs9: computes sky background from a Ds9 region file: Box, Ellipses and Polygons "
+        description="SkyDs9: computes sky background from a Ds9 region file:"
+        + " Box, Ellipses and Polygons "
     )
 
     parser.add_argument(
@@ -103,7 +104,8 @@ def mainSkyDs9():
         "-ol",
         "--outliers",
         action="store_true",
-        help="Removes the top 80%% and botttom 20%% of the pixel values to compute sky within ring",
+        help="Removes the top 80%% and botttom 20%% of the pixel values to "
+        + "compute sky within ring",
     )
 
     args = parser.parse_args()
@@ -139,14 +141,16 @@ def mainSkyRing():
         "-c",
         "--center",
         action="store_true",
-        help="use the center of the ellipse. Otherwise it will use the (x,y) position with the highest value of the ellipse",
+        help="use the center of the ellipse. Otherwise it will use the (x,y)"
+        + " position with the highest value of the ellipse",
     )
 
     parser.add_argument(
         "-ol",
         "--outliers",
         action="store_true",
-        help="Removes the top 80%% and botttom 20%% of the pixel values to compute sky within ring",
+        help="Removes the top 80%% and botttom 20%% of the pixel values to"
+        + " compute sky within ring",
     )
 
     # arguments with inputs
@@ -168,13 +172,12 @@ def mainSkyRing():
     center = args.center
     outliers = args.outliers
 
-    ##end input
-
     print("Major axis of ellipse is used as initial radius.")
 
     mean, std, median, rad = SkyRing(image, mask, ds9regfile, width, center, outliers)
 
-    line = "Total sky:  mean = {:.2f}; std={:.2f}; median = {:.2f} at radius {:.2f} ".format(
+    line = "Total sky:  mean = "
+    + " {:.2f}; std={:.2f}; median = {:.2f} at radius {:.2f} ".format(
         mean, std, median, rad
     )
     print(line)
