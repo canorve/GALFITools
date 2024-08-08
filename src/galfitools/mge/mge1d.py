@@ -121,7 +121,7 @@ def main():
 
         Re = (K ** (0.5)) * h
 
-        outlinea = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f} \n".format(
+        outlinea = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f} ".format(
                 mgemag, SigPix, FWHM
         )
 
