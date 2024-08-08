@@ -1,13 +1,9 @@
 #! /usr/bin/env python
 
-import argparse
 import os
 import os.path
-import subprocess as sp
-import sys
 
 import numpy as np
-import scipy
 from astropy.io import fits
 from galfitools.galin.MaskDs9 import GetAxis
 
@@ -36,7 +32,7 @@ def makeMask(
             satfileout, sexfile, satscale, satoffset
         )  # crea archivo  Saturacion reg
 
-    ##### segmentation mask
+    # segmentation mask
 
     MakeImage(maskfile, NCol, NRow)
 
@@ -47,16 +43,9 @@ def makeMask(
 def ds9satbox(satfileout, output, satscale, satoffset):
     "Creates a file for ds9 which selects bad saturated regions"
 
-    scaleflag = 1
-    offsetflag = 1
-    regfileflag = 1
-    magflag = 1
-    clasflag = 1
-
-    flagsat = 4  ## flag value when object is saturated (or close to)
-    maxflag = 128  ## max value for flag
+    flagsat = 4  # flag value when object is saturated (or close to)
+    maxflag = 128  # max value for flag
     check = 0
-    regflag = 0  ## flag for saturaded regions
 
     f_out = open(satfileout, "w")
 
@@ -98,7 +87,7 @@ def ds9satbox(satfileout, output, satscale, satoffset):
 
         check = CheckFlag(
             Flg[idx], flagsat, maxflag
-        )  ## check if object has saturated regions
+        )  # check if object has saturated regions
 
         if check:
 
@@ -107,16 +96,18 @@ def ds9satbox(satfileout, output, satscale, satoffset):
             )
             f_out.write(line)
 
-            line2 = 'point({0},{1}) # point=boxcircle font="times 10 bold" text={{ {2} }} \n'.format(
-                X[idx], Y[idx], N[idx]
+            line2a = "point({0},{1}) ".format(X[idx], Y[idx])
+            line2b = '# point=boxcircle font="times 10 bold" text={{ {0} }} \n'.format(
+                    N[idx]
             )
+            line2 = line2a + line2b
             f_out.write(line2)
 
     f_out.close()
 
 
 def MakeMask(maskimage, catfile, scale, offset, regfile):
-    "Create a mask image using ellipses for every Object of catfile. Now includes offset"
+    "Create a mask image using ellipses for every Object of catfile. "
     # k Check
 
     checkflag = 0
@@ -177,9 +168,8 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
         # user in ds9
         regflag = CheckSatReg(xx[idx], yy[idx], regfile, Rkron[idx], theta[idx], e[idx])
 
-        if (checkflag == False) and (regflag == False):
+        if (checkflag is False) and (regflag is False):
 
-            # print ("Creating ellipse mask for object {}  \n".format(n[idx]))
             img = MakeKron(
                 img,
                 n[idx],
@@ -206,7 +196,7 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
 
 
 def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
-    "This subroutine create a Kron ellipse within a box defined by: xmin, xmax, ymin, ymax"
+    "This subroutine create a Kron ellipse within a box defined by: xmin,xmax,ymin,ymax"
 
     # Check
 
@@ -335,29 +325,11 @@ def MakeImage(newfits, sizex, sizey):
 
 
 def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
-    # k Check
 
     # sort the sextractor
     # catalog by magnitude,
     # get sizes for objects
     # and write it in a new file
-
-    # The sextractor catalog must contain the following parameters:
-    #   1 NUMBER                 Running object number
-    #   2 ALPHA_J2000            Right ascension of barycenter (J2000)                      [deg]
-    #   3 DELTA_J2000            Declination of barycenter (J2000)                          [deg]
-    #   4 X_IMAGE                Object position along x                                    [pixel]
-    #   5 Y_IMAGE                Object position along y                                    [pixel]
-    #   6 MAG_APER               Fixed aperture magnitude vector                            [mag]
-    #   7 KRON_RADIUS            Kron apertures in units of A or B
-    #   8 FLUX_RADIUS            Fraction-of-light radii                                    [pixel]
-    #   9 ISOAREA_IMAGE          Isophotal area above Analysis threshold                    [pixel**2]
-    #  10 A_IMAGE                Profile RMS along major axis                               [pixel]
-    #  11 ELLIPTICITY            1 - B_IMAGE/A_IMAGE
-    #  12 THETA_IMAGE            Position angle (CCW/x)                                     [deg]
-    #  13 BACKGROUND             Background at centroid position                            [count]
-    #  14 CLASS_STAR             S/G classifier output
-    #  15 FLAGS                  Extraction flags
 
     print("Sorting and getting sizes for objects \n")
 
@@ -407,7 +379,7 @@ def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
     index = Area.argsort()
     for i in index:
 
-        line = "{} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}\n".format(
+        line1 = "{} {} {} {} {} {} {} {} {} {}\n".format(
             n[i],
             alpha[i],
             delta[i],
@@ -418,6 +390,8 @@ def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
             fluxrad[i],
             ia[i],
             ai[i],
+        )
+        line2 = "{} {} {} {} {} {} {} {} {} {} {} {} {}\n".format(
             e[i],
             theta[i],
             bkgd[i],
@@ -432,6 +406,8 @@ def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
             int(np.round(sysmin[i])),
             int(np.round(sysmax[i])),
         )
+
+        line = line1 + line2
 
         f_out.write(line)
 
@@ -522,18 +498,18 @@ def CheckFlag(val, check, max):
 
 
 def CheckSatReg(x, y, filein, R, theta, ell):
-    "Check if object is inside of saturated region. returns True if at least one pixel is inside"
-    ## saturaded region as indicated by ds9 box region
-    ## returns 1 if object center is in saturaded region
+    '''Check if object is inside of saturated region. returns
+    True if at least one pixel is inside'''
+    # saturaded region as indicated by ds9 box region
+    # returns 1 if object center is in saturaded region
 
     q = 1 - ell
 
     bim = q * R
 
-    theta = theta * np.pi / 180  ## Rads!!!
+    theta = theta * np.pi / 180  # Rads!!!
 
     flag = False
-    fileflag = 1
 
     with open(filein) as f_in:
 
@@ -595,8 +571,3 @@ def CheckSatReg(x, y, filein, R, theta, ell):
                         break
 
     return flag
-
-
-# end of program
-if __name__ == "__main__":
-    mainMakeMask()

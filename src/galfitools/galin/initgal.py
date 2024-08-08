@@ -1,7 +1,6 @@
 #! /usr/bin/python3
 
 
-import argparse
 import glob
 from pathlib import Path
 
@@ -75,7 +74,7 @@ class InitGal:
 
                     if self.numcomp == comp:
 
-                        if (tmp[0] == "3)") and (flagsky3 == False):  # input image
+                        if (tmp[0] == "3)") and (flagsky3 is False):
                             if self.param3:
                                 c3min, c3max = self.param3[0], self.param3[1]
                                 c3 = np.random.default_rng().uniform(c3min, c3max, 1)
@@ -140,7 +139,7 @@ class InitGal:
 
                 else:
 
-                    if (tmp[0] == "3)") and (flagsky3 == False):  # input image
+                    if (tmp[0] == "3)") and (flagsky3 is False):
                         if self.param3:
                             c3min, c3max = self.param3[0], self.param3[1]
                             c3 = np.random.default_rng().uniform(c3min, c3max, 1)
@@ -246,8 +245,6 @@ class InitGal:
 
         # All lines including the blank ones
         lines = (line.rstrip() for line in File)
-        # lines = (line.split('#', 1)[0] for line in lines)  # remove comments
-        # lines = (line.rstrip() for line in lines) # remove lines containing only comments
         lines = (line for line in lines if line)  # Non-blank lines
 
         lines = list(lines)
@@ -256,7 +253,7 @@ class InitGal:
 
 
 #############################################################################
-######################### End of program  ###################################
+#  End of program  ###################################
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
@@ -266,5 +263,3 @@ class InitGal:
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-if __name__ == "__main__":
-    mainInitGal()

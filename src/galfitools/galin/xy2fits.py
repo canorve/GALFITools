@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import argparse
 import os
 import os.path
 import subprocess as sp
@@ -43,7 +42,7 @@ class xy2fits:
             print("{} deleted; a new one is created ".format(newfits))
 
             runcmd = "rm {}".format(newfits)
-            errrm = sp.run(
+            sp.run(
                 [runcmd],
                 shell=True,
                 stdout=sp.PIPE,
@@ -64,7 +63,7 @@ class xy2fits:
         hdu = fits.open(ImageFits)
         Image = hdu[i].data
 
-        ## for some strange reason I have to interchange X and Y
+        # for some strange reason I have to interchange X and Y
         Image[[Y], [X]] = Value
 
         hdu[i].data = Image
@@ -76,7 +75,7 @@ class xy2fits:
 
 
 #############################################################################
-######################### End of program  ###################################
+#  End of program  ###################################
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
@@ -86,5 +85,3 @@ class xy2fits:
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-if __name__ == "__main__":
-    mainxy2fits()

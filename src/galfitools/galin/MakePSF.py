@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
 
 
-import os
-import os.path
 import re
 import subprocess as sp
 import sys
 
-import numpy as np
-from astropy.io import fits
 from galfitools.galin.galfit import (
     Galfit,
     galfitLastFit,
@@ -17,7 +13,6 @@ from galfitools.galin.galfit import (
     galPrintSky,
 )
 from galfitools.galin.getStar import getStar
-from galfitools.galin.MaskDs9 import GetAxis, checkCompHDU
 from galfitools.mge.mge2galfit import Ds9ell2Kronellv2, GetInfoEllip, mge2gal
 
 
@@ -41,24 +36,9 @@ def makePSF(
 
     inputimage = head.inputimage
 
-    imageout = head.outimage
-    magzpt = head.mgzpt
-    maskfile = head.maskimage
-
     sky = galsky.sky
 
-    scale = head.scale
-    psfile = head.psfimage
-
     sigfile = head.sigimage
-
-    convbox = head.convx
-    convboxy = head.convy
-
-    xlo = head.xmin
-    ylo = head.ymin
-    xhi = head.xmax
-    yhi = head.ymax
 
     imsize = head.xmax - head.xmin + 1
 
@@ -175,7 +155,7 @@ def makePSF(
 
 
 #############################################################################
-######################### End of program  ###################################
+#  End of program  ###################################
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|

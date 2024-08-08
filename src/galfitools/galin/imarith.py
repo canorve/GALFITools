@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
-
 import os
 import sys
 
-import numpy as np
 from astropy.io import fits
 
 

@@ -1,16 +1,11 @@
 #!/usr/bin/env python3
 
-import argparse
 import os
 import os.path
-import stat
 import subprocess as sp
 import sys
 
-import matplotlib.pyplot as plt
 import numpy as np
-import scipy
-import scipy.special
 from astropy.io import fits
 from galfitools.galin.MaskDs9 import GetAxis
 
@@ -77,7 +72,7 @@ def MakeImage(newfits, sizex, sizey):
         print("{} deleted; a new one is created \n".format(newfits))
 
         runcmd = "rm {}".format(newfits)
-        errrm = sp.run(
+        sp.run(
             [runcmd],
             shell=True,
             stdout=sp.PIPE,
@@ -93,7 +88,7 @@ def MakeImage(newfits, sizex, sizey):
 
 
 #############################################################################
-######################### End of program  ###################################
+#  End of program  ###################################
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
@@ -103,5 +98,3 @@ def MakeImage(newfits, sizex, sizey):
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-if __name__ == "__main__":
-    mainMaskSky()

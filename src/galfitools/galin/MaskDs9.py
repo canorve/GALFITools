@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import argparse
 import os.path
 import sys
 
@@ -122,7 +121,7 @@ def maskDs9(
 
             flagpoly = True
 
-        if flag == True:
+        if flag is True:
 
             x3 = p[4]
             x4 = x3[:-2]
@@ -136,7 +135,7 @@ def maskDs9(
 
             flag = False
 
-        if flagpoly == True:
+        if flagpoly is True:
 
             Pol.append(pol)
             tupVerts.append(verts)
@@ -406,7 +405,8 @@ def MakeKron(
     skymean=None,
     skystd=None,
 ):
-    "This subroutine create a Kron ellipse within a box defined by: xmin, xmax, ymin, ymax"
+    '''This subroutine create a Kron ellipse within a box defined by:
+    xmin, xmax, ymin, ymax'''
 
     # Check
 
@@ -498,7 +498,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 
 
 #############################################################################
-######################### End of program  ###################################
+#  End of program  ###################################
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
@@ -508,5 +508,3 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-if __name__ == "__main__":
-    mainMaskDs9()
