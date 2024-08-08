@@ -1,19 +1,9 @@
 #! /usr/bin/env python
 
-import argparse
-import copy
-import os
-import subprocess as sp
 import sys
 
-import numpy as np
-import scipy
-from astropy.io import fits
 from galfitools.galin.galfit import (
-    GalComps,
     Galfit,
-    GalHead,
-    GetRadAng,
     SelectGal,
     conver2Sersic,
     numComps,
@@ -24,11 +14,11 @@ from galfitools.galout.getRads import getBreak2, getKappa2
 def getBarSize(
     galfitFile: str, dis: int, num_comp: int, plot: bool, ranx: list, out: str
 ) -> float:
-    """gets the Kappa radius (maximum curvature) from a set of Sersics using another method"""
+    """gets the Kappa radius (maximum curvature) from a set of
+    Sersics using another method"""
 
     galfit = Galfit(galfitFile)
 
-    head = galfit.ReadHead()
     galcomps = galfit.ReadComps()
 
     # convert all exp, gaussian and de vaucouleurs to Sersic format
@@ -36,7 +26,7 @@ def getBarSize(
 
     comps = SelectGal(comps, dis, num_comp)
 
-    maskgal = comps.Active == True
+    maskgal = comps.Active == 1
 
     theta = comps.PosAng[maskgal][
         1
@@ -54,7 +44,7 @@ def getBarSize(
         sys.exit(1)
 
     #########################
-    ### computing the slope
+    # computing the slope
     #########################
     if ranx:
         (xmin, xmax) = ranx[0], ranx[1]
@@ -82,7 +72,9 @@ def getBarSize(
 
     line = "# Region file format: DS9 version 4.1 \n"
     fout.write(line)
-    line = 'global color=red dashlist=8 3 width=2 font="helvetica 10 normal roman" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1\n'
+    line = 'global color=red dashlist=8 3 width=2 '
+    + 'font="helvetica 10 normal roman" select=1 highlite=1 dash=0 '
+    + 'fixed=0 edit=1 move=1 delete=1 include=1 source=1\n'
     fout.write(line)
     line = "physical\n"
     fout.write(line)

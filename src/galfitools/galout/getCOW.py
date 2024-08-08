@@ -1,15 +1,9 @@
 #! /usr/bin/env python
 
-import argparse
-import copy
-import os
-import subprocess as sp
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy
-from astropy.io import fits
 from galfitools.galin.galfit import (
     GalComps,
     Galfit,
@@ -19,7 +13,8 @@ from galfitools.galin.galfit import (
     conver2Sersic,
     numComps,
 )
-from galfitools.galout.getRads import GetMe, GetReff
+
+from galfitools.galout.getRads import GetReff
 from scipy.optimize import bisect
 from scipy.special import gamma, gammainc, gammaincinv
 
@@ -45,7 +40,7 @@ def getCOW(
     galcomps = SelectGal(galcomps, dis, num_comp)
 
     # taking the last component position angle for the whole galaxy
-    maskgal = galcomps.Active == True
+    maskgal = galcomps.Active == 1
     if angle:
         theta = angle
     else:
@@ -62,7 +57,7 @@ def getCOW(
         print("exiting..")
         sys.exit(1)
 
-    line = "Using a theta value of : {:.2f} degrees \n".format(theta)
+    # line = "Using a theta value of : {:.2f} degrees \n".format(theta)
     # print(line)
 
     EffRadfrac, totmag = GetReff().GetReSer(
@@ -136,7 +131,7 @@ def readGalfitF2(galfitF2, dis, angle, num_comp):
     galcomps2 = SelectGal(galcomps2, dis, num_comp)
 
     # taking the last component position angle for the whole galaxy
-    maskgal = galcomps2.Active == True
+    maskgal = galcomps2.Active == 1
     if angle:
         theta2 = angle
     else:
@@ -153,13 +148,12 @@ def readGalfitF2(galfitF2, dis, angle, num_comp):
         print("exiting..")
         sys.exit(1)
 
-    line = "Using a theta value of : {:.2f} degrees \n".format(theta2)
+    # line = "Using a theta value of : {:.2f} degrees \n".format(theta2)
     # print(line)
 
     return head2, comps2, theta2
 
 
-### GetCOW
 class GetCOW:
     """class to obtain the Curve-of-Growth at a given radius """
 
@@ -173,7 +167,7 @@ class GetCOW:
 
             cowfluxs = np.append(cowfluxs, cowflux)
 
-        maskgal = comps.Active == True
+        maskgal = comps.Active == 1
 
         comps.Flux = 10 ** ((head.mgzpt - comps.Mag) / 2.5)
 
@@ -189,13 +183,13 @@ class GetCOW:
         self, galhead: GalHead, comps: GalComps, theta: float, rad: float
     ) -> float:
 
-        maskgal = comps.Active == True
+        maskgal = comps.Active == 1
 
         comps.Flux = 10 ** ((galhead.mgzpt - comps.Mag) / 2.5)
 
-        totFlux = comps.Flux[maskgal].sum()
+        # totFlux = comps.Flux[maskgal].sum()
 
-        totmag = -2.5 * np.log10(totFlux) + galhead.mgzpt
+        # totmag = -2.5 * np.log10(totFlux) + galhead.mgzpt
 
         # rad refers to the radius where flux will be computed
         # comps.Rad refers to the effective radius of every component
@@ -280,7 +274,7 @@ class GetN:
 
             N = bisect(self.funMeMeanMe, a, b, args=(me, meanme))
 
-        except:
+        except Exception:
             print("solution not found for the given range")
             N = 0
 
@@ -288,7 +282,7 @@ class GetN:
 
     def funMeMeanMe(self, n: float, me: float, meanme: float) -> float:
 
-        k = gammaincinv(2 * n, 0.5)
+        # k = gammaincinv(2 * n, 0.5)
 
         fn = self.Fn(n)
 
@@ -321,7 +315,7 @@ class GetN:
         try:
             N = bisect(self.funReRfrac, a, b, args=(Re, Rfrac, frac))
 
-        except:
+        except Exception:
             print("solution not found for the given range")
             N = 0
 
@@ -338,7 +332,7 @@ class GetN:
         return result
 
     def MeM0(self, me: float, m0: float) -> float:
-        """Uses me and m0 to compute n. It is not very realiable 
+        """Uses me and m0 to compute n. It is not very realiable
         and takes longer than the other two methods"""
         a = 0
         b = 45
@@ -358,7 +352,7 @@ class GetN:
         try:
             K = bisect(self.funMeM0, a, b, args=(me, m0))
 
-        except:
+        except Exception:
             print("solution not found for the given range")
             K = 0
 
@@ -375,7 +369,7 @@ class GetN:
         try:
             sersic = bisect(self.funK, a, b, args=(k))
 
-        except:
+        except Exception:
             print("solution not found for the given range")
             sersic = 0
 
@@ -389,7 +383,7 @@ class GetN:
 
 
 #############################################################################
-######################### End of program  ###################################
+#   End of program  ###################################
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
@@ -399,5 +393,3 @@ class GetN:
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-if __name__ == "__main__":
-    main()
