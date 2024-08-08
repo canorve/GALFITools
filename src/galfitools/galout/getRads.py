@@ -1,15 +1,10 @@
 #! /usr/bin/env python
 
-import argparse
-import copy
-import os
-import subprocess as sp
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
-from astropy.io import fits
 from galfitools.galin.galfit import (
     GalComps,
     Galfit,
@@ -20,7 +15,7 @@ from galfitools.galin.galfit import (
     numComps,
 )
 from scipy.interpolate import UnivariateSpline
-from scipy.optimize import bisect, fmin, newton
+from scipy.optimize import bisect, newton
 from scipy.special import gamma, gammainc, gammaincinv
 
 
@@ -42,7 +37,7 @@ def getBreak(
 
     galfit = Galfit(galfitFile)
 
-    head = galfit.ReadHead()
+    # head = galfit.ReadHead()
     galcomps = galfit.ReadComps()
 
     # convert all exp, gaussian and de vaucouleurs to Sersic format
@@ -64,7 +59,7 @@ def getBreak(
 
     # taking the last component position angle for the whole galaxy
 
-    maskgal = comps.Active == True
+    maskgal = comps.Active == 1
 
     if angle:
         theta = angle
@@ -79,7 +74,7 @@ def getBreak(
         sys.exit(1)
 
     #########################
-    ### computing the slope
+    #  computing the slope
     #########################
 
     if plot:
@@ -107,9 +102,6 @@ def getBreak(
 
         rbreak = GetBreak().FindBreak(comps, theta, inicomp)
 
-        line = "The break radius  is {:.2f} pixels \n".format(rbreak)
-        # print(line)
-
     else:
 
         if random:
@@ -120,7 +112,6 @@ def getBreak(
         else:
 
             radius = comps.Rad[maskgal]
-            # print('The initial search radius are the effective radius of the components')
 
         rbreak = MulFindBreak(comps, theta, radius)
 
@@ -129,7 +120,7 @@ def getBreak(
 
 def MulFindBreak(comps, theta, radius):
 
-    maskgal = comps.Active == True
+    maskgal = comps.Active == 1
 
     radsbreak = GetBreak().MulFindBreak(comps, theta, radius)
 
@@ -151,7 +142,7 @@ def MulFindBreak(comps, theta, radius):
 
         betas = np.append(betas, beta)
 
-    radmask = radsbreak < radius[-1]  # hope it works
+    # radmask = radsbreak < radius[-1]  # hope it works
 
     idx = np.where(betas == min(betas))
 
@@ -172,7 +163,7 @@ class GetBreak:
     def GalBreak(self, R: list, comps: GalComps, theta: float) -> float:
         "plots the curvature of the function"
 
-        maskgal = comps.Active == True  # using active components only
+        maskgal = comps.Active == 1  # using active components only
 
         kappa = np.array([])
 
@@ -211,7 +202,7 @@ class GetBreak:
     def FindBreak(self, comps: GalComps, theta: float, initial_comp: int) -> float:
         "return the break radii of a set of Sersic functions"
 
-        maskgal = comps.Active == True  # using active components only
+        maskgal = comps.Active == 1  # using active components only
 
         init = comps.Rad[maskgal][
             initial_comp
@@ -237,7 +228,7 @@ class GetBreak:
 
         brads = np.array([])
 
-        maskgal = comps.Active == True  # using active components only
+        maskgal = comps.Active == 1  # using active components only
 
         for idx, item in enumerate(radius):
 
@@ -272,7 +263,7 @@ class GetBreak:
     def FindSlope(self, comps: GalComps, theta: float, slope: float) -> float:
         "return the Re of a set of Sersic functions. It uses Bisection"
 
-        maskgal = comps.Active == True  # using active components only
+        maskgal = comps.Active == 1  # using active components only
 
         a = 0.1
         b = comps.Rad[maskgal][-1] * 10  # hope it doesn't crash
@@ -293,7 +284,7 @@ class GetBreak:
                 ),
             )
 
-        except:
+        except Exception:
             print("unable to solve equation in the given range. Setting n to 99")
             Radslp = 0
 
@@ -389,7 +380,7 @@ def getBreak2(
 
     galfit = Galfit(galfitFile)
 
-    head = galfit.ReadHead()
+    # head = galfit.ReadHead()
     galcomps = galfit.ReadComps()
 
     # convert all exp, gaussian and de vaucouleurs to Sersic format
@@ -409,7 +400,7 @@ def getBreak2(
 
     comps = SelectGal(comps, dis, num_comp)
 
-    maskgal = comps.Active == True
+    maskgal = comps.Active == 1
     if angle:
         theta = angle
     else:
@@ -424,7 +415,7 @@ def getBreak2(
         sys.exit(1)
 
     #########################
-    ### computing the slope
+    #  computing the slope
     #########################
     if ranx:
         (xmin, xmax) = ranx[0], ranx[1]
@@ -451,7 +442,7 @@ def getBreak2(
     ###
     yspl = UnivariateSpline(lrad, slp, s=0, k=4)
 
-    yspl2d = yspl.derivative(n=2)
+    # yspl2d = yspl.derivative(n=2)
     yspl1d = yspl.derivative(n=1)
 
     if plot:
@@ -476,11 +467,12 @@ def getBreak2(
 def getKappa2(
     galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool, ranx: list
 ) -> float:
-    """gets the kappa radius (maximum curvature) from a set of Sersics using another method"""
+    """gets the kappa radius (maximum curvature) from a set of
+    Sersics using another method"""
 
     galfit = Galfit(galfitFile)
 
-    head = galfit.ReadHead()
+    # head = galfit.ReadHead()
     galcomps = galfit.ReadComps()
 
     # convert all exp, gaussian and de vaucouleurs to Sersic format
@@ -500,7 +492,7 @@ def getKappa2(
 
     comps = SelectGal(comps, dis, num_comp)
 
-    maskgal = comps.Active == True
+    maskgal = comps.Active == 1
     if angle:
         theta = angle
     else:
@@ -515,7 +507,7 @@ def getKappa2(
         sys.exit(1)
 
     #########################
-    ### computing the slope
+    #  computing the slope
     #########################
     if ranx:
         (xmin, xmax) = ranx[0], ranx[1]
@@ -532,7 +524,7 @@ def getKappa2(
     yspl = UnivariateSpline(lrad, slp, s=0, k=4)
 
     yspl1d = yspl.derivative(n=1)  # this is the second derivative of the Sersics
-    yspl2d = yspl.derivative(n=2)  # this is the Third derivative of the Sersics
+    # yspl2d = yspl.derivative(n=2)  # this is the Third derivative of the Sersics
 
     kap1d = np.abs(yspl1d(lrad)) / (1 + slp ** 2) ** (3 / 2)
 
@@ -568,7 +560,7 @@ def getFWHM(galfitFile: str, dis: int, angle: float, num_comp: int):
 
     galfit = Galfit(galfitFile)
 
-    head = galfit.ReadHead()
+    # head = galfit.ReadHead()
     galcomps = galfit.ReadComps()
 
     # convert all exp, gaussian and de vaucouleurs to Sersic format
@@ -590,7 +582,7 @@ def getFWHM(galfitFile: str, dis: int, angle: float, num_comp: int):
 
     # taking the last component position angle for the whole galaxy
 
-    maskgal = comps.Active == True
+    maskgal = comps.Active == 1
 
     if angle:
         theta = angle
@@ -605,7 +597,7 @@ def getFWHM(galfitFile: str, dis: int, angle: float, num_comp: int):
         sys.exit(1)
 
     #########################
-    ### computing the slope
+    #  computing the slope
     #########################
 
     fwhm = GetFWHM().FindFWHM(comps, theta)
@@ -626,7 +618,7 @@ class GetFWHM:
 
     def GalFWHM(self, R: list, comps: GalComps, theta: float) -> float:
 
-        maskgal = comps.Active == True  # using active components only
+        maskgal = comps.Active == 1  # using active components only
 
         gam = np.array([])
 
@@ -664,7 +656,7 @@ class GetFWHM:
     def FindFWHM(self, comps: GalComps, theta: float) -> float:
         "return the fwhm of a set of Sersic functions. It uses Bisection"
 
-        maskgal = comps.Active == True  # using active components only
+        maskgal = comps.Active == 1  # using active components only
 
         # find the surface brightness at S(R=0)
         X = self.var_X(0, comps.Rad[maskgal], comps.Exp[maskgal])
@@ -689,7 +681,7 @@ class GetFWHM:
                 ),
             )
 
-        except:
+        except Exception:
             print("solution not found in given range")
             Radslp = 0
 
@@ -764,7 +756,7 @@ def getKappa(
 
     galfit = Galfit(galfitFile)
 
-    head = galfit.ReadHead()
+    # head = galfit.ReadHead()
     galcomps = galfit.ReadComps()
 
     # convert all exp, gaussian and de vaucouleurs to Sersic format
@@ -786,7 +778,7 @@ def getKappa(
 
     # taking the last component position angle for the whole galaxy
 
-    maskgal = comps.Active == True
+    maskgal = comps.Active == 1
     if angle:
         theta = angle
     else:
@@ -803,7 +795,7 @@ def getKappa(
     print(line)
 
     #########################
-    ### computing the slope
+    #  computing the slope
     #########################
 
     if plot:
@@ -829,7 +821,7 @@ def getKappa(
 
         rkappa = GetKappa().FindKappa(comps, theta, inicomp)
 
-        line = "The Kappa radius  is {:.2f} pixels \n".format(rbreak)
+        # line = "The Kappa radius  is {:.2f} pixels \n".format(rbreak)
         # print(line)
 
     else:
@@ -842,7 +834,6 @@ def getKappa(
         else:
 
             radius = comps.Rad[maskgal]
-            # print('The initial search radius are the effective radius of the components')
 
         rkappa = MultiFindKappa(comps, theta, radius)
 
@@ -851,7 +842,7 @@ def getKappa(
 
 def MultiFindKappa(comps, theta, radius):
 
-    maskgal = comps.Active == True
+    maskgal = comps.Active == 1
 
     radskappa = GetKappa().MulFindKappa(comps, theta, radius)
 
@@ -873,7 +864,7 @@ def MultiFindKappa(comps, theta, radius):
 
         kappas = np.append(kappas, kappa)
 
-    radmask = radskappa < radius[-1]  # hope it works
+    # radmask = radskappa < radius[-1]  # hope it works
 
     idx = np.where(kappas == min(kappas))
 
@@ -894,7 +885,7 @@ class GetKappa:
     def GalKappa(self, R: list, comps: GalComps, theta: float) -> float:
         "plots the curvature of the function"
 
-        maskgal = comps.Active == True  # using active components only
+        maskgal = comps.Active == 1  # using active components only
 
         kappa = np.array([])
 
@@ -945,7 +936,7 @@ class GetKappa:
     def FindKappa(self, comps: GalComps, theta: float, initial_comp: int) -> float:
         "return the break radius of a set of Sersic functions"
 
-        maskgal = comps.Active == True  # using active components only
+        maskgal = comps.Active == 1  # using active components only
 
         init = comps.Rad[maskgal][
             initial_comp
@@ -981,7 +972,7 @@ class GetKappa:
 
         krads = np.array([])
 
-        maskgal = comps.Active == True  # using only active components
+        maskgal = comps.Active == 1  # using only active components
 
         for idx, item in enumerate(radius):
 
@@ -1010,7 +1001,7 @@ class GetKappa:
     def FindSlope(self, comps: GalComps, theta: float, slope: float) -> float:
         "return the Re of a set of Sersic functions. It uses Bisection"
 
-        maskgal = comps.Active == True  # using active components only
+        maskgal = comps.Active == 1  # using active components only
 
         a = 0.1
         b = comps.Rad[maskgal][-1] * 10  # hope it doesn't crash
@@ -1031,7 +1022,7 @@ class GetKappa:
                 ),
             )
 
-        except:
+        except Exception:
             print("solution not found in given range")
             Radslp = 0
 
@@ -1144,7 +1135,7 @@ def getReComp(
 
     # taking the last component position angle for the whole galaxy
 
-    maskgal = galcomps.Active == True
+    maskgal = galcomps.Active == 1
     if angle:
         theta = angle
     else:
@@ -1195,7 +1186,7 @@ class GetMe:
 
         comps.Ie = comps.Flux / denom
 
-        maskgal = comps.Active == True
+        maskgal = comps.Active == 1
         Itotr = self.Itotser(
             EffRad,
             comps.Ie[maskgal],
@@ -1232,7 +1223,7 @@ class GetMe:
         return Ir
 
 
-### Sersic components
+# Sersic components
 class GetReff:
     """class to obtain the effective radius for the whole galaxy"""
 
@@ -1252,7 +1243,7 @@ class GetReff:
         self, galhead: GalHead, comps: GalComps, eff: float, theta: float
     ) -> float:
 
-        maskgal = comps.Active == True
+        maskgal = comps.Active == 1
 
         comps.Flux = 10 ** ((galhead.mgzpt - comps.Mag) / 2.5)
 
@@ -1298,7 +1289,7 @@ class GetReff:
                 self.funReSer, a, b, args=(flux, rad, n, q, pa, totFlux, eff, theta)
             )
 
-        except:
+        except Exception:
             print("solution not found in given range")
             Re = 0
 
@@ -1366,7 +1357,6 @@ def getSlope(
 
     galfit = Galfit(galfitFile)
 
-    head = galfit.ReadHead()
     galcomps = galfit.ReadComps()
 
     # convert all exp, gaussian and de vaucouleurs to Sersic format
@@ -1388,7 +1378,7 @@ def getSlope(
 
     # taking the last component position angle for the whole galaxy
 
-    maskgal = comps.Active == True
+    maskgal = comps.Active == 1
 
     if angle:
         theta = angle
@@ -1403,7 +1393,7 @@ def getSlope(
         sys.exit(1)
 
     #########################
-    ### computing the slope
+    # computing the slope
     #########################
 
     if plot:
@@ -1443,7 +1433,7 @@ class GetSlope:
 
     def GalSlope(self, R: list, comps: GalComps, theta: float) -> float:
 
-        maskgal = comps.Active == True  # using active components only
+        maskgal = comps.Active == 1  # using active components only
 
         gam = np.array([])
 
@@ -1481,7 +1471,7 @@ class GetSlope:
     def FindSlope(self, comps: GalComps, theta: float, slope: float) -> float:
         "return the Re of a set of Sersic functions. It uses Bisection"
 
-        maskgal = comps.Active == True  # using active components only
+        maskgal = comps.Active == 1  # using active components only
 
         a = 0.1
         b = comps.Rad[maskgal][-1] * 10  # hope it doesn't crash
@@ -1502,7 +1492,7 @@ class GetSlope:
                 ),
             )
 
-        except:
+        except Exception:
             print("solution not found in given range")
             Radslp = 0
 
@@ -1560,14 +1550,14 @@ class GetSlope:
 
 
 def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
-    """gets the bulge radius or the radius where two models of surface brightness models are equal"""
+    """gets the bulge radius or the radius where two models of
+    surface brightness models are equal"""
 
     galfit1 = Galfit(galfitFile1)
     head1 = galfit1.ReadHead()
     galcomps1 = galfit1.ReadComps()
 
     galfit2 = Galfit(galfitFile2)
-    head2 = galfit2.ReadHead()
     galcomps2 = galfit2.ReadComps()
 
     galcomps1 = SelectGal(galcomps1, dis, num_comp)
@@ -1576,8 +1566,7 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
 
     # taking the last component position angle for the whole galaxy
 
-    maskgal1 = galcomps1.Active == True
-    maskgal2 = galcomps2.Active == True
+    maskgal2 = galcomps2.Active == 1
 
     if angle:
         theta = angle
@@ -1633,7 +1622,7 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
     # computing bulge radius
     try:
         rbulge = newton(getDiffx, 0, args=(head1, comps1, comps2, theta))
-    except:
+    except Exception:
         print("solution not found for initial parameter")
         rbulge = 0
 
@@ -1698,7 +1687,7 @@ class GetIr:
 
         comps.Ie = comps.Flux / denom
 
-        maskgal = comps.Active == True
+        maskgal = comps.Active == 1
 
         Itotr = self.Itotser(
             R,
