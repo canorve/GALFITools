@@ -1171,15 +1171,7 @@ def GetInfoEllip(regfile):
         ry = v4
         angle = v5
 
-        if rx >= ry:
-            axratio = ry / rx
-            eps = 1 - axratio
-            theta = angle + 90
-        else:
-            axratio = rx / ry
-            eps = 1 - axratio
-            theta = angle
-
+    
         # avoids ds9 regions with Area = 0
         if rx < 1:
             rx = 1

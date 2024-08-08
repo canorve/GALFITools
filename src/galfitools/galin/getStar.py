@@ -2,7 +2,6 @@
 
 
 import os.path
-import subprocess as sp
 import sys
 
 import numpy as np
@@ -22,7 +21,7 @@ def getStar(
 ) -> None:
 
     ##########################################
-    ######Internal flags #####################
+    #  Internal flags
     even = False
     ##########################################
     ##########################################
@@ -162,7 +161,7 @@ def GetInfoEllip(regfile):
             flag = True
             found = True
 
-        if flag == True:
+        if flag is True:
             x3 = p[4]
             x4 = x3[:-2]
 
@@ -184,17 +183,14 @@ def GetInfoEllip(regfile):
         ry = v4
         angle = v5
 
-        if rx >= ry:
-            axratio = ry / rx
-            eps = 1 - axratio
-            theta = angle + 90
-        else:
-            axratio = rx / ry
-            eps = 1 - axratio
-            theta = angle
+        # avoids ds9 regions with Area = 0
+        if rx < 1:
+            rx = 1
+        if ry < 1:
+            ry = 1
 
         return obj, xpos, ypos, rx, ry, angle
-        # return eps, theta, xpos, ypos
+
     else:
         print("ellipse region was not found in file. Exiting.. ")
         sys.exit()
@@ -295,7 +291,7 @@ def GetPmax(image, mask, xmin, xmax, ymin, ymax):
 
 
 #############################################################################
-######################### End of program  ###################################
+#  End of program  ###################################
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
@@ -305,6 +301,3 @@ def GetPmax(image, mask, xmin, xmax, ymin, ymax):
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-
-if __name__ == "__main__":
-    mainGetStar()
