@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 
 
-import argparse
 import os.path
-import subprocess as sp
 import sys
 
 import numpy as np
 from astropy.io import fits
-from galfitools.galin.MaskDs9 import GetAxis, checkCompHDU
+from galfitools.galin.MaskDs9 import GetAxis
 
 
 def getPeak(image: str, regfile: str, center: bool, maskfile: str) -> None:
@@ -23,8 +21,6 @@ def getPeak(image: str, regfile: str, center: bool, maskfile: str) -> None:
         assert os.path.isfile(maskfile), errmsg
         hdu = fits.open(maskfile)
         mask = hdu[0].data
-        maskb = np.array(mask, dtype=bool)
-        maskbt = maskb.T
         hdu.close()
 
     else:
@@ -93,7 +89,7 @@ def GetInfoEllip(regfile):
             flag = True
             found = True
 
-        if flag == True:
+        if flag is True:
             x3 = p[4]
             x4 = x3[:-2]
 
@@ -115,17 +111,7 @@ def GetInfoEllip(regfile):
         ry = v4
         angle = v5
 
-        if rx >= ry:
-            axratio = ry / rx
-            eps = 1 - axratio
-            theta = angle + 90
-        else:
-            axratio = rx / ry
-            eps = 1 - axratio
-            theta = angle
-
         return obj, xpos, ypos, rx, ry, angle
-        # return eps, theta, xpos, ypos
     else:
         print("ellipse region was not found in file. Exiting.. ")
         sys.exit()
@@ -226,7 +212,7 @@ def GetPmax(image, mask, xmin, xmax, ymin, ymax):
 
 
 #############################################################################
-######################### End of program  ###################################
+#  End of program  ###################################
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
@@ -236,6 +222,3 @@ def GetPmax(image, mask, xmin, xmax, ymin, ymax):
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-
-if __name__ == "__main__":
-    mainGetStar()

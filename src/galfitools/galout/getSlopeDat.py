@@ -2,21 +2,16 @@
 
 import argparse
 import copy
-import os
-import subprocess as sp
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy
-from astropy.io import fits
 from scipy.optimize import bisect
-from scipy.special import gamma, gammainc, gammaincinv
+from scipy.special import gamma, gammaincinv
 
 
 # console scripts
 def main() -> None:
-    """gets the effective radius from a set of Sersics"""
 
     # reading argument parsing
 
@@ -36,17 +31,17 @@ def main() -> None:
         "-er",
         "--effrad",
         type=float,
-        help="percentage of light to compute for radius. default=.5 for effective radius ",
+        help="percentage of light to compute for radius. default=.5 "
+        + "for effective radius ",
         default=0.5,
     )
-
-    # parser.add_argument("-ser","--sersic", action="store_true", help="uses sersic function for galfit file")
 
     parser.add_argument(
         "-n",
         "--numcomp",
         type=int,
-        help="Number of component where it'll obtain center of all components, default = 1 ",
+        help="Number of component where it'll obtain center of all "
+        + "components, default = 1 ",
         default=1,
     )
 
@@ -54,7 +49,8 @@ def main() -> None:
         "-a",
         "--angle",
         type=float,
-        help="Angle of the major axis of the galaxy. Default= it will take the angle of the last components",
+        help="Angle of the major axis of the galaxy. Default= it will take "
+        + "the angle of the last components",
     )
 
     parser.add_argument(
@@ -77,7 +73,7 @@ def main() -> None:
 
     num_comp = args.numcomp
 
-    head = ReadHead(galfitFile)
+    # head = ReadHead(galfitFile)
 
     galcomps = ReadComps(galfitFile)
 
@@ -100,7 +96,7 @@ def main() -> None:
 
     # taking the last component position angle for the whole galaxy
 
-    maskgal = comps.Active == True
+    maskgal = comps.Active == 1
     if args.angle:
         theta = args.angle
     else:
@@ -118,7 +114,7 @@ def main() -> None:
     print(line)
 
     #########################
-    ### computing the slope
+    # computing the slope
     #########################
 
     R = np.arange(0.1, 100, 0.1)
@@ -132,7 +128,6 @@ def main() -> None:
 
     # saving data
 
-    stuff = [["nameservers", "panel"], ["nameservers", "panel"]]
     with open("out.txt", "w") as o:
         for idx, item in enumerate(R):
             print("{} {}".format(R[idx], gam[idx]), file=o)
@@ -177,9 +172,6 @@ def ReadHead(File: str) -> GalHead:
 
     galhead = GalHead()  # class for header
 
-    maskimage = ""
-    #    skylevel=0
-
     GalfitFile = open(inputf, "r")
 
     # All lines including the blank ones
@@ -197,9 +189,9 @@ def ReadHead(File: str) -> GalHead:
         # ================================================================================
         # IMAGE and GALFIT CONTROL PARAMETERS
         # A) tempfits/A2399-3-2.fits      # Input data image (FITS file)
-        # B) A2399-215615.96-m073822.7-337-out.fits      # Output data image block
-        # C) tempfits/none-3-2.fits      # Sigma image name (made from data if blank or "none")
-        # D) psfs/PSF-1309-721.fits          # Input PSF image and (optional) diffusion kernel
+        # B) A2399-215615.96-m073822.7-337-out.fits # Output data image block
+        # C) tempfits/none-3-2.fits      # Sigma image name
+        # D) psfs/PSF-1309-721.fits # Input PSF image and (optional) diffusion kernel
         # E) 1                   # PSF fine sampling factor relative to data
         # F) mask-337            # Bad pixel mask (FITS image or ASCII coord list)
         # G) constraints         # File with parameter constraints (ASCII file)
@@ -282,7 +274,7 @@ def ReadHead(File: str) -> GalHead:
     return galhead
 
 
-### class for Galfit components
+# class for Galfit components
 class GalComps:
     """stores the components of galfit file"""
 
@@ -322,7 +314,7 @@ def numComps(galcomps: GalComps, name: str) -> int:
     """obtains the number of components"""
 
     if name == "all":
-        nummask = (galcomps.Active == True) & (
+        nummask = (galcomps.Active == 1) & (
             (galcomps.NameComp == "sersic")
             | (galcomps.NameComp == "expdisk")
             | (galcomps.NameComp == "gaussian")
@@ -330,7 +322,7 @@ def numComps(galcomps: GalComps, name: str) -> int:
         )
 
     else:
-        nummask = (galcomps.Active == True) & (galcomps.NameComp == name)
+        nummask = (galcomps.Active == 1) & (galcomps.NameComp == name)
 
     N = galcomps.Active[nummask].size
 
@@ -487,8 +479,6 @@ def ReadSky(File: str) -> GalSky:
     lines = list(lines)
     index = 0
 
-    N = 0
-
     while index < len(lines):
 
         line = lines[index]
@@ -507,7 +497,7 @@ def ReadSky(File: str) -> GalSky:
 
         if (tmp[0] == "0)") and (tmp[1] == NameComp):
 
-            namec = tmp[1]
+            # namec = tmp[1]
 
             while tmp[0] != "Z)":
 
@@ -527,16 +517,16 @@ def ReadSky(File: str) -> GalSky:
                 if tmp[0] == "Z)":
                     skip = int(tmp[1])
 
-            galsky.NameComp = np.append(galcomps.NameComp, NameComp)
+            galsky.NameComp = np.append(galsky.NameComp, NameComp)
 
             galsky.sky = np.append(galsky.sky, sky)
             galsky.dskyx = np.append(galsky.dskyx, dskyx)
             galsky.dskyy = np.append(galsky.dskyy, dskyy)
-            galskyskip = np.append(galsky.skip, skip)
+            galsky.skip = np.append(galsky.skip, skip)
 
-            galsky.skyfree = np.append(galsky.skyfree, skyfree)
-            galsky.dskyxfree = np.append(galsky.dskyxfree, dskyxfree)
-            galsky.dskyyfree = np.append(galsky.dskyyfree, dskyyfree)
+            galsky.skyfree = np.append(galsky.skyfree, freesky)
+            galsky.dskyxfree = np.append(galsky.dskyxfree, freedskyx)
+            galsky.dskyyfree = np.append(galsky.dskyyfree, freedskyy)
 
         index += 1
 
@@ -611,14 +601,15 @@ class GetSlope:
     """class to obtain the effective radius for the whole galaxy"""
 
     def FullSlopeSer(
-        self, R: float, Re: list, n: list, q: list, pa: list, theta: float
+        self, comps: GalComps, R: float, Re: list, n: list, q: list,
+        pa: list, theta: float
     ) -> float:
 
         SlptotR = self.SlopeSer(R, Re, n, q, pa, theta)
 
         return SlptotR.sum()
 
-        maskgal = comps.Active == True  # using active components only
+        maskgal = comps.Active == 1  # using active components only
 
         gam = np.array([])
 
@@ -656,7 +647,7 @@ class GetSlope:
     def FindSlope(self, comps: GalComps, theta: float, slope: float) -> float:
         "return the Re of a set of Sersic functions. It uses Bisection"
 
-        maskgal = comps.Active == True  # using active components only
+        maskgal = comps.Active == 1  # using active components only
 
         a = 0.1
         b = comps.Rad[maskgal][-1] * 10  # hope it doesn't crash
@@ -676,7 +667,7 @@ class GetSlope:
                     slope,
                 ),
             )
-        except:
+        except Exception:
             print("solution not found in given range")
             Radslp = 0
 
@@ -729,7 +720,7 @@ class GetSlope:
 
 
 def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
-    """Given an ellipse and an angle it returns the radius in angle direction. 
+    """Given an ellipse and an angle it returns the radius in angle direction.
     Theta are the values for the galaxy and the others for every component"""
 
     # changing measured angle from y-axis to x-axis
@@ -751,7 +742,7 @@ def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
 
 
 #############################################################################
-######################### End of program  ###################################
+#   End of program  ###################################
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
@@ -761,5 +752,6 @@ def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
+# end of program
 if __name__ == "__main__":
     main()

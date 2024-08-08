@@ -1,25 +1,14 @@
 #! /usr/bin/env python
 
-import argparse
-import copy
-import os
-import subprocess as sp
 import sys
 
-import matplotlib.pyplot as plt
 import numpy as np
-import scipy
-from astropy.io import fits
 from galfitools.galin.galfit import (
-    GalComps,
     Galfit,
-    GalHead,
-    GetRadAng,
     SelectGal,
     conver2Sersic,
     numComps,
 )
-from scipy.optimize import bisect
 from scipy.special import gamma, gammainc, gammaincinv
 
 
@@ -41,8 +30,8 @@ def getMissLight(galfitFile1, galfitFile2, dis, num_comp, rad):
 
     # taking the last component position angle for the whole galaxy
 
-    maskgal1 = galcomps1.Active == True
-    maskgal2 = galcomps2.Active == True
+    # maskgal1 = galcomps1.Active == 1
+    # maskgal2 = galcomps2.Active == 1
 
     # convert all exp, gaussian and de vaucouleurs to Sersic format
     comps1 = conver2Sersic(galcomps1)
@@ -82,7 +71,7 @@ class GetMag:
 
         comps.Ie = comps.Flux / denom
 
-        maskgal = comps.Active == True
+        maskgal = comps.Active == 1
 
         Ftotr = self.Ftotser(
             gamRad,
@@ -145,7 +134,7 @@ def getMiss(head, mag1, mag2):
 
 
 #############################################################################
-######################### End of program  ###################################
+#  End of program  ###################################
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
@@ -155,5 +144,3 @@ def getMiss(head, mag1, mag2):
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-if __name__ == "__main__":
-    main()

@@ -1,20 +1,12 @@
 #! /usr/bin/env python
 
-import argparse
 import copy
-import os
-import subprocess as sp
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy
-from astropy.io import fits
 from galfitools.galin.galfit import (
-    GalComps,
     Galfit,
-    GalHead,
-    GetRadAng,
     SelectGal,
     conver2Sersic,
     numComps,
@@ -46,7 +38,7 @@ def getN(
 
     # taking the last component position angle for the whole galaxy
 
-    maskgal = galcomps.Active == True
+    maskgal = galcomps.Active == 1
     if angle:
         theta = angle
     else:
@@ -65,52 +57,42 @@ def getN(
         print("exiting..")
         sys.exit(1)
 
-    line = "Using a theta value of : {:.2f} degrees \n".format(theta)
+    # line = "Using a theta value of : {:.2f} degrees \n".format(theta)
     # print(line)
 
     EffRad, totmag = GetReff().GetReSer(head, comps, eff, theta)
 
-    line = "Total Magnitude of the galaxy: {:.2f} \n".format(totmag)
+    # line = "Total Magnitude of the galaxy: {:.2f} \n".format(totmag)
     # print(line)
 
-    line = "The radius at {:.0f}% of light is {:.2f} pixels \n".format(
-        eff * 100, EffRad
-    )
+    # line = "The radius at {:.0f}% of light is {:.2f} pixels \n".format(
+    #    eff * 100, EffRad
+    # )
     # print(line)
 
     EffRadfrac, totmag = GetReff().GetReSer(head, comps, frac, theta)
 
-    line = "The radius at {:.0f}% of light is {:.2f} pixels \n".format(
-        frac * 100, EffRadfrac
-    )
+    # line = "The radius at {:.0f}% of light is {:.2f} pixels \n".format(
+    #     frac * 100, EffRadfrac
+    # )
     # print(line)
 
     comps2 = copy.deepcopy(comps)
     meanme = GetMe().MeanMe(totmag, EffRad * head.scale)
-    # me = GetMe().Me(head, comps2, 0, theta) #substituing effective radius per 0 gives m0
     me = GetMe().Me(
         head, comps2, EffRad * head.scale, theta
     )  # substituing effective radius per 0 gives m0
 
-    line = 'Mean Surface Brightness at effective radius: {:.2f} mag/" \n'.format(meanme)
-    # print(line)
-
-    line = 'Surface brightness at effective radius {:.2f} mag/" \n'.format(me)
+    # line = 'Surface brightness at effective radius {:.2f} mag/" \n'.format(me)
     # print(line)
 
     sersic = GetN().MeMeanMe(me, meanme)
 
-    line = "Sersic index with the method of Mean Surface Brightness at effective radius: {:.2f}  \n".format(
-        sersic
-    )
+    # line = "Sersic index with the method of Mean Surface Brightness at "
+    # + "effective radius: {:.2f}  \n".format(sersic)
     # print(line)
 
-    sersic2 = GetN().ReRfrac(EffRad, EffRadfrac, frac)
-
-    line = "Sersic index with the method of fraction of light at {:.2f}: {:.2f}  \n".format(
-        frac, sersic2
-    )
-    # print(line)
+    # sersic2 = GetN().ReRfrac(EffRad, EffRadfrac, frac)
 
     # sersic3 = GetN().MeM0(me, m0)
 
@@ -139,12 +121,12 @@ def getN(
     # print("Sersic index computed at different fraction of light radius: ")
 
     # for idx, item in enumerate(F):
-    #    line = 'Fraction of light: {:.2f} ; Sersic index: {:.2f} '.format(F[idx],ns[idx])
-    #    print(line)
+    # line = 'Fraction of light: {:.2f} ; Sersic index: {:.2f} '.format(F[idx],ns[idx])
+    # print(line)
 
-    line = "\nSersic index mean: {:.2f}  Standard deviation: {:.2f}  ".format(
-        np.mean(ns), np.std(ns)
-    )
+    # line = "\nSersic index mean: {:.2f}  Standard deviation: {:.2f}  ".format(
+    #    np.mean(ns), np.std(ns)
+    # )
     # print(line)
 
     # separate in two functions:
@@ -182,7 +164,7 @@ class GetN:
 
         try:
             N = bisect(self.funMeMeanMe, a, b, args=(me, meanme))
-        except:
+        except Exception:
             print("unable to solve equation in the given range. Setting n to 99")
             N = 99
 
@@ -190,7 +172,7 @@ class GetN:
 
     def funMeMeanMe(self, n: float, me: float, meanme: float) -> float:
 
-        k = gammaincinv(2 * n, 0.5)
+        # k = gammaincinv(2 * n, 0.5)
 
         fn = self.Fn(n)
 
@@ -222,7 +204,7 @@ class GetN:
 
         try:
             N = bisect(self.funReRfrac, a, b, args=(Re, Rfrac, frac))
-        except:
+        except Exception:
             print("unable to solve equation in the given range. Setting n to 99")
             N = 99
 
@@ -239,7 +221,7 @@ class GetN:
         return result
 
     def MeM0(self, me: float, m0: float) -> float:
-        """Uses me and m0 to compute n. It is not very realiable 
+        """Uses me and m0 to compute n. It is not very realiable
         and takes longer than the other two methods"""
         a = 0
         b = 45
@@ -258,7 +240,7 @@ class GetN:
 
         try:
             K = bisect(self.funMeM0, a, b, args=(me, m0))
-        except:
+        except Exception:
             print("solution not found for the given range")
             K = 0
 
@@ -274,9 +256,8 @@ class GetN:
 
         try:
             sersic = bisect(self.funK, a, b, args=(k))
-        except:
+        except Exception:
             print("unable to solve equation in the given range. Setting n to 99")
-            N = 99
 
         return sersic
 
@@ -288,7 +269,7 @@ class GetN:
 
 
 #############################################################################
-######################### End of program  ###################################
+#  End of program  ###################################
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
@@ -298,5 +279,3 @@ class GetN:
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-if __name__ == "__main__":
-    main()
