@@ -53,7 +53,7 @@ def Comp2Ellip(galhead, galcomps, N, lw=1):
 
     # color value
     values = range(N)
-    jet = cm = plt.get_cmap("jet")
+    jet =  plt.get_cmap("jet")
     cNorm = colors.Normalize(vmin=0, vmax=values[-1])
     scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 
