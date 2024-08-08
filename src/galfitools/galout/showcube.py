@@ -1,15 +1,11 @@
 #! /usr/bin/env python3
 
-
-import argparse
-
 import matplotlib.pyplot as plt
 import numpy as np
 from astropy import units as U
 from astropy.io import fits
 from matplotlib import colors
 from matplotlib.patches import Ellipse
-from scipy import stats
 
 
 def displayCube(
@@ -25,7 +21,7 @@ def displayCube(
 
     ######################
     # shows the image cube#
-    ######################{
+    ######################
 
     ell = []
 
@@ -58,11 +54,11 @@ def Comp2Ellip(galhead, galcomps, N, lw=1):
     values = range(N)
     jet = cm = plt.get_cmap("jet")
     cNorm = colors.Normalize(vmin=0, vmax=values[-1])
-    scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
+    scalarMap = cm.ScalarMappable(norm=cNorm, cmap=jet)
 
     for idx, item in enumerate(galcomps.N):
 
-        if galcomps.Active[idx] == True:
+        if galcomps.Active[idx] is True:
             # correcting coordinates
             xc = galcomps.PosX[idx] - galhead.xmin + 1
             yc = galcomps.PosY[idx] - galhead.ymin + 1
@@ -102,7 +98,7 @@ class ShowCube:
         plate=1,
     ):
         """
-        This routine shows the GALFIT output cube image: galaxy, model and residual    
+        This routine shows the GALFIT output cube image: galaxy, model and residual
         """
 
         hdu = fits.open(cubeimg)
@@ -122,10 +118,10 @@ class ShowCube:
         restop = round(0.9 * restot)
         resbot = round(0.1 * restot)
 
-        modtot = len(flatmodimg)
+        # modtot = len(flatmodimg)
 
-        modtop = round(0.9 * modtot)
-        modbot = round(0.1 * modtot)
+        # modtop = round(0.9 * modtot)
+        # modbot = round(0.1 * modtot)
 
         modimgpatch = flatmodimg  # [modbot:modtop]
         resimgpatch = flatresimg[resbot:restop]
@@ -156,7 +152,7 @@ class ShowCube:
 
         fig, (ax1, ax2, ax3) = plt.subplots(figsize=(14, 5), nrows=1, ncols=3)
 
-        im = ax1.imshow(
+        ax1.imshow(
             newdata,
             origin="lower",
             interpolation="nearest",
@@ -210,8 +206,3 @@ class ShowCube:
 
         fig.subplots_adjust(left=0.04, right=0.98, bottom=0.02, top=0.98)
         plt.savefig(namepng, dpi=dpival)
-
-
-# end of program
-if __name__ == "__main__":
-    mainShowCube()
