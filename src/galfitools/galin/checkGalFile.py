@@ -1,27 +1,15 @@
 #! /usr/bin/env python
 
-import argparse
-import copy
 import os
-import subprocess as sp
-import sys
 
 import numpy as np
-import scipy
-from astropy.io import fits
 from galfitools.galin.galfit import (
-    GalComps,
     Galfit,
-    GalHead,
-    GetRadAng,
     SelectGal,
-    conver2Sersic,
-    numComps,
     numParFree,
     numParSkyFree,
 )
 from galfitools.galin.MaskDs9 import GetAxis
-from scipy.special import gamma, gammainc, gammaincinv
 
 
 class HeadInfo:
@@ -179,18 +167,3 @@ def copy2info(head, head2):
     head2.P = head.P
 
     return head2
-
-
-#############################################################################
-######################### End of program  ###################################
-#     ______________________________________________________________________
-#    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
-#   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
-#   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/|
-#   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
-#   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/|
-#   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
-#   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
-##############################################################################
-if __name__ == "__main__":
-    main()

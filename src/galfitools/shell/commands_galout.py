@@ -657,16 +657,18 @@ def mainGetReComp() -> None:
     line = "Total Magnitude of the galaxy: {:.2f} \n".format(totmag)
     print(line)
 
-    line = "Surface brightness at radius of "
-    + "{:.0f}% of light (\u03BCr): {:.2f} mag/'' \n".format(
+    line1 = "Surface brightness at radius of "
+    line2 = "{:.0f}% of light (\u03BCr): {:.2f} mag/'' \n".format(
         eff * 100, me
     )
+    line = line1 + line2
     print(line)
 
     line = "Mean Surface Brightness at effective radius (<\u03BC>e):"
-    + " {:.2f} mag/'' \n".format(
+    line2 = " {:.2f} mag/'' \n".format(
         meanme
     )
+    line = line1 + line2
     if eff == 0.5:
         print(line)
 
