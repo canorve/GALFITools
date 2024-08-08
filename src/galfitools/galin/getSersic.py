@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
 
-
-import os.path
-import subprocess as sp
-import sys
-
 import numpy as np
-from astropy.io import fits
-from galfitools.galin.galfit import GalComps, GalHead
+from galfitools.galin.galfit import GalComps
 from galfitools.galout.getPeak import getPeak
 from galfitools.galout.PhotDs9 import photDs9
 from galfitools.mge.mge2galfit import GetInfoEllip
@@ -74,11 +68,13 @@ def getSersic(
     if bulgetot:
         if not (noprint):
             print(
-                "The initial parameters for the Sersic component based on the DS9 ellipse region are: "
+                "The initial parameters for the Sersic component based on "
+                + "the DS9 ellipse region are: "
             )
             print("")
             print(
-                "WARNING: these are initial parameters. True values will be computed by GALFIT"
+                "WARNING: these are initial parameters. True values will be "
+                + "computed by GALFIT"
             )
             print("")
 
@@ -238,11 +234,13 @@ def getSersic(
 
         if not (noprint):
             print(
-                "The initial parameters for the Sersic component based on the DS9 ellipse region are: "
+                "The initial parameters for the Sersic component based on "
+                + "the DS9 ellipse region are: "
             )
             print("")
             print(
-                "WARNING: these are initial parameters. True values will be computed by GALFIT"
+                "WARNING: these are initial parameters. True values will be"
+                + " computed by GALFIT"
             )
             print("")
 
