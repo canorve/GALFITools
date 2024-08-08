@@ -1,11 +1,8 @@
 import argparse
-import subprocess as sp
-import sys
 from collections import Counter
 
 import numpy as np
 from galfitools.galin.checkGalFile import checkFile
-from galfitools.galin.galfit import GalComps, Galfit, GalHead, galfitLastFit
 from galfitools.galin.getBoxSizeDs9 import getBoxSizeDs9
 from galfitools.galin.getSersic import getSersic
 from galfitools.galin.getStar import getStar
@@ -16,7 +13,6 @@ from galfitools.galin.MakePSF import makePSF
 from galfitools.galin.MaskDs9 import maskDs9
 from galfitools.galin.MaskSky import skyRem
 from galfitools.galin.xy2fits import xy2fits
-from galfitools.mge.mge2galfit import PrintHeader, PrintSersic, PrintSky, mge2gal
 from galfitools.shell.prt import printWelcome
 
 
@@ -242,7 +238,8 @@ def mainMaskDs9():
     printWelcome()
 
     parser = argparse.ArgumentParser(
-        description="creates (or modify) a mask image for GALFIT using Ds9 regions such as Boxes, Ellipses and Polygons "
+        description="creates (or modify) a mask image for GALFIT"
+        + "using Ds9 regions such as Boxes, Ellipses and Polygons "
     )
 
     parser.add_argument("MaskFile", help="the Mask image file to modify or create")
@@ -315,7 +312,8 @@ def mainMaskSky():
     printWelcome()
 
     parser = argparse.ArgumentParser(
-        description="creates a mask image for GALFIT using original image and sky mean and sigma"
+        description="creates a mask image for GALFIT using "
+                    + "original image and sky mean and sigma"
     )
 
     parser.add_argument("ImageFile", help="original data image ")
@@ -331,7 +329,8 @@ def mainMaskSky():
         "--numbersig",
         default=1,
         type=float,
-        help="number of times that the sigma of the sky will be multiplied to remove the sky background",
+        help="number of times that the sigma of the sky will "
+        + "be multiplied to remove the sky background",
     )
 
     parser.add_argument(
@@ -409,7 +408,8 @@ def maincheckFile() -> None:
     # reading arguments parsing
 
     parser = argparse.ArgumentParser(
-        description="checkFile: check that the parameters and file names inside the GALFIT input file are correct"
+        description="checkFile: check that the parameters and file "
+        + "names inside the GALFIT input file are correct"
     )
 
     # required arguments
@@ -423,7 +423,7 @@ def maincheckFile() -> None:
         default=10,
     )
 
-    ## parsing variables
+    # parsing variables
 
     args = parser.parse_args()
 
@@ -567,14 +567,16 @@ def maingetSersic():
         "--sky",
         default=0,
         type=float,
-        help="Sky background value to be removed from image before photometry. Default = 0",
+        help="Sky background value to be removed from image "
+        + "before photometry. Default = 0",
     )
 
     parser.add_argument(
         "-bt",
         "--bulgetot",
         type=float,
-        help="Bulge to total ratio. If set it will print two sersics: one for the bulge and the other for the disk",
+        help="Bulge to total ratio. If set it will print two sersics: "
+        + "one for the bulge and the other for the disk",
     )
 
     parser.add_argument(
@@ -593,7 +595,8 @@ def maingetSersic():
         "-b",
         "--bards9",
         type=str,
-        help="DS9 ellipse region file that containts the bar region. bulgetot flag must be activated",
+        help="DS9 ellipse region file that containts the bar region. "
+        + " bulgetot flag must be activated",
     )
 
     args = parser.parse_args()
@@ -608,7 +611,7 @@ def maingetSersic():
     noprint = args.noprint
     bards9 = args.bards9
 
-    galcomps = getSersic(
+    getSersic(
         image, regfile, center, maskfile, zeropoint, sky, noprint, bulgetot, bards9
     )
 
@@ -633,7 +636,10 @@ def main_imarith() -> None:
         "-i",
         "--image2",
         type=str,
-        help="second input image to make arithmetic operations with ImageFile. Image2 must be of the same size of ImageFile. If this second image is provided it will make operations indicated by arithmetic flag ignoring its constant input",
+        help="second input image to make arithmetic operations with "
+        + "ImageFile. Image2 must be of the same size of ImageFile. "
+        + "If this second image is provided it will make operations "
+        + "indicated by arithmetic flag ignoring its constant input",
     )
 
     parser.add_argument("-a", "--add", type=float, help="add constant to image pixels")
@@ -645,7 +651,7 @@ def main_imarith() -> None:
         "-s", "--sub", type=float, help="substract constant to all pixels"
     )
 
-    ## parsing variables
+    # parsing variables
 
     args = parser.parse_args()
 
