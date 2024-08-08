@@ -1,16 +1,10 @@
 #!/usr/bin/env python3
 
-import argparse
 import os
 import os.path
-import stat
 import subprocess as sp
-import sys
 
-import matplotlib.pyplot as plt
 import numpy as np
-import scipy
-import scipy.special
 from astropy.io import fits
 from galfitools.galin.MaskDs9 import GetAxis
 
@@ -30,10 +24,6 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y, sky) -> None:
     fit = 1
     Z = 0
 
-    xpos = X
-    ypos = Y
-    anglegass = 35.8
-
     #    scale = 0.0455  # arcsec/pixel
 
     ###################################################
@@ -43,8 +33,6 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y, sky) -> None:
     #    imgname = "ngc4342.fits"
     root_ext = os.path.splitext(imgname)
     TNAM = root_ext[0]
-
-    exptime = GetExpTime(imgname)
 
     ##################
     #################
@@ -68,7 +56,7 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y, sky) -> None:
     T2 = outname + "-sky.fits"
     T3 = "{}".format(rmsname)
 
-    if flagpos == False:
+    if flagpos is False:
         xlo = 1
         ylo = 1
 
@@ -120,16 +108,16 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y, sky) -> None:
 def ds9satbox(satfileout, output, satscale, satoffset):
     "Creates a file for ds9 which selects bad saturated regions"
 
-    scaleflag = 1
-    offsetflag = 1
-    regfileflag = 1
-    magflag = 1
-    clasflag = 1
+    # scaleflag = 1
+    # offsetflag = 1
+    # regfileflag = 1
+    # magflag = 1
+    # clasflag = 1
 
-    flagsat = 4  ## flag value when object is saturated (or close to)
-    maxflag = 128  ## max value for flag
+    flagsat = 4  # flag value when object is saturated (or close to)
+    # maxflag = 128  # max value for flag
     check = 0
-    regflag = 0  ## flag for saturaded regions
+    # regflag = 0  # flag for saturaded regions
 
     f_out = open(satfileout, "w")
 
@@ -169,7 +157,7 @@ def ds9satbox(satfileout, output, satscale, satoffset):
         if Rkrony == 0:
             Rkrony = 1
 
-        check = CheckFlag(Flg[idx], flagsat)  ## check if object has saturated regions
+        check = CheckFlag(Flg[idx], flagsat)  # check if object has saturated regions
 
         if check:
 
@@ -178,21 +166,24 @@ def ds9satbox(satfileout, output, satscale, satoffset):
             )
             f_out.write(line)
 
-            line2 = 'point({0},{1}) # point=boxcircle font="times 10 bold" text={{ {2} }} \n'.format(
-                X[idx], Y[idx], N[idx]
+            line2a = 'point({0},{1}) # point=boxcircle '.format(
+                X[idx], Y[idx])
+
+            line2b = 'font="times 10 bold" text={{ {0} }} \n'.format(
+                 N[idx]
             )
+            line2 = line2a + line2b
             f_out.write(line2)
 
     f_out.close()
 
 
 def MakeMask(maskimage, catfile, scale, offset, regfile):
-    "Create a mask image using ellipses for every Object of catfile. Now includes offset"
-    # k Check
+    '''Create a mask image using ellipses for every Object
+    of catfile. Now includes offset'''
 
     checkflag = 0
     flagsat = 4  # flag value when object is saturated (or close to)
-    maxflag = 128  # max value for flag
 
     regflag = 0  # flag for saturaded regions
 
@@ -244,7 +235,7 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
         # user in ds9
         regflag = CheckSatReg(xx[idx], yy[idx], regfile, Rkron[idx], theta[idx], e[idx])
 
-        if (checkflag == False) and (regflag == False):
+        if (checkflag is False) and (regflag is False):
 
             print("Creating ellipse mask for object {}  \n".format(n[idx]))
             img = MakeKron(
@@ -261,7 +252,7 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
                 sysmax[idx],
             )
 
-        elif checkflag == True or regflag == True:
+        elif checkflag is True or regflag is True:
 
             print(
                 "Skipping object {}, one or more pixels are saturated \n".format(n[idx])
@@ -275,7 +266,8 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
 
 
 def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
-    "This subroutine create a Kron ellipse within a box defined by: xmin, xmax, ymin, ymax"
+    '''This subroutine create a Kron ellipse within a box defined
+    by: xmin, xmax, ymin, ymax'''
 
     # Check
 
@@ -410,23 +402,6 @@ def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
     # get sizes for objects
     # and write it in a new file
 
-    # The sextractor catalog must contain the following parameters:
-    #   1 NUMBER                 Running object number
-    #   2 ALPHA_J2000            Right ascension of barycenter (J2000)                      [deg]
-    #   3 DELTA_J2000            Declination of barycenter (J2000)                          [deg]
-    #   4 X_IMAGE                Object position along x                                    [pixel]
-    #   5 Y_IMAGE                Object position along y                                    [pixel]
-    #   6 MAG_APER               Fixed aperture magnitude vector                            [mag]
-    #   7 KRON_RADIUS            Kron apertures in units of A or B
-    #   8 FLUX_RADIUS            Fraction-of-light radii                                    [pixel]
-    #   9 ISOAREA_IMAGE          Isophotal area above Analysis threshold                    [pixel**2]
-    #  10 A_IMAGE                Profile RMS along major axis                               [pixel]
-    #  11 ELLIPTICITY            1 - B_IMAGE/A_IMAGE
-    #  12 THETA_IMAGE            Position angle (CCW/x)                                     [deg]
-    #  13 BACKGROUND             Background at centroid position                            [count]
-    #  14 CLASS_STAR             S/G classifier output
-    #  15 FLAGS                  Extraction flags
-
     print("Sorting and getting sizes for objects \n")
 
     (
@@ -470,14 +445,12 @@ def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
 
     (sxsmin, sxsmax, sysmin, sysmax) = GetSize(xx, yy, Rwsky, theta, e, NCol, NRow)
 
-    #    print(sxmin.size, sxmax.size, symin, symax)
-
     f_out = open(SexArSort, "w")
 
     index = Area.argsort()
     for i in index:
 
-        line = "{} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}\n".format(
+        line1 = "{} {} {} {} {} {} {} {} {} {} {} {} ".format(
             n[i],
             alpha[i],
             delta[i],
@@ -490,6 +463,9 @@ def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
             ai[i],
             e[i],
             theta[i],
+        )
+
+        line2 = "{} {} {} {} {} {} {} {} {} {} {}\n".format(
             bkgd[i],
             idx[i],
             flg[i],
@@ -502,6 +478,8 @@ def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
             np.int(np.round(sysmin[i])),
             np.int(np.round(sysmax[i])),
         )
+
+        line = line1 + line2
 
         f_out.write(line)
 
@@ -583,19 +561,19 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 
 
 def CheckSatReg(x, y, filein, R, theta, ell):
-    "Check if object is inside of saturated region. returns True if at least one pixel is inside"
-    ## check if object is inside of
-    ## saturaded region as indicated by ds9 box region
-    ## returns 1 if object center is in saturaded region
+    '''Check if object is inside of saturated region. returns
+    True if at least one pixel is inside'''
+    #  check if object is inside of
+    #  saturaded region as indicated by ds9 box region
+    #  returns 1 if object center is in saturaded region
 
     q = 1 - ell
 
     bim = q * R
 
-    theta = theta * np.pi / 180  ## Rads!!!
+    theta = theta * np.pi / 180  # Rads!!!
 
     flag = False
-    fileflag = 1
 
     with open(filein) as f_in:
 
@@ -657,14 +635,11 @@ def CheckSatReg(x, y, filein, R, theta, ell):
 
     return flag
 
-
-#################333333333333333333333333333333333
 ####################################################
 ####################################################
 #####################################################
 
-
-### GALFIT functions
+# GALFIT functions
 
 
 def PrintHeader(
@@ -685,7 +660,7 @@ def PrintHeader(
     J,
     platedx,
     platedy,
-    O,
+    Op,
     P,
     S,
 ):
@@ -695,82 +670,84 @@ def PrintHeader(
     # print to filehandle
     # the header for GALFIT
 
-    lineZ = "==================================================================================================\n"
+    lineZ = "=========================================="
+    + "========================================================\n"
     lineX = "# IMAGE PARAMETERS \n"
-    lineA = "A) {}                                   # Input Data image (FITS file)                            \n".format(
+    lineA = "A) {}       # Input Data image (FITS file) \n".format(
         A
     )
-    lineB = "B) {}                                   # Output data image block                                 \n".format(
+    lineB = "B) {}   # Output data image block  \n".format(
         B
     )
-    lineC = 'C) {}                                   # Sigma image name (made from data if blank or "none")  \n'.format(
+    lineC = 'C) {}   # Sigma image name (made from data if blank or "none")  \n'.format(
         C
     )
-    lineD = "D) {}                                   # Input PSF image and (optional) diffusion kernel         \n".format(
+    lineD = "D) {}   # Input PSF image and (optional) diffusion kernel\n".format(
         D
     )
-    lineE = "E) {}                                   # PSF fine sampling factor relative to data               \n".format(
+    lineE = "E) {}   # PSF fine sampling factor relative to data  \n".format(
         E
     )
-    lineF = "F) {}                                   # Bad pixel mask (FITS image or ASCII coord list)         \n".format(
+    lineF = "F) {}     # Bad pixel mask (FITS image or ASCII coord list) \n".format(
         F
     )
-    lineG = "G) {}                                   # File with parameter constraints (ASCII file)            \n".format(
+    lineG = "G) {}     # File with parameter constraints (ASCII file)  \n".format(
         G
     )
-    lineH = "H) {} {} {} {}                          # Image region to fit (xmin xmax ymin ymax)               \n".format(
+    lineH = "H) {} {} {} {}    # Image region to fit (xmin xmax ymin ymax)\n".format(
         xlo, xhi, ylo, yhi
     )
-    lineI = "I) {} {}                                # Size of the convolution box (x y)                       \n".format(
+    lineI = "I) {} {}    # Size of the convolution box (x y)  \n".format(
         convx, convy
     )
-    lineJ = "J) {}                                   # Magnitude photometric zeropoint                         \n".format(
+    lineJ = "J) {}       # Magnitude photometric zeropoint  \n".format(
         J
     )
-    lineK = "K) {} {}                                # Plate scale (dx dy). \[arcsec per pixel\]               \n".format(
+    lineK = "K) {} {}    # Plate scale (dx dy). [arcsec per pixel] \n".format(
         platedx, platedy
     )
-    lineO = "O) {}                                   # Display type (regular, curses, both)                    \n".format(
-        O
+    lineO = "O) {}    # Display type (regular, curses, both)   \n".format(
+        Op
     )
-    lineP = "P) {}                                   # Choose 0=optimize, 1=model, 2=imgblock, 3=subcomps      \n".format(
+    lineP = "P) {}    # Choose 0=optimize, 1=model, 2=imgblock, 3=subcomps\n".format(
         P
     )
-    lineS = "S) {}                                   # Modify/create objects interactively?                    \n".format(
+    lineS = "S) {}    # Modify/create objects interactively?  \n".format(
         S
     )
     lineY = " \n"
 
-    line0 = "# INITIAL FITTING PARAMETERS                                                     \n"
+    line0 = "# INITIAL FITTING PARAMETERS          \n"
     line1 = "# \n"
-    line2 = "#   For object type, allowed functions are:                                      \n"
-    line3 = "#       nuker, sersic, expdisk, devauc, king, psf, gaussian, moffat,             \n"
-    line4 = "#       ferrer, powsersic, sky, and isophote.                                    \n"
+    line2 = "#   For object type, allowed functions are:\n"
+    line3 = "#    nuker, sersic, expdisk, devauc, king, psf, gaussian, moffat,\n"
+    line4 = "#    ferrer, powsersic, sky, and isophote.   \n"
     line5 = "# \n"
-    line6 = "#  Hidden parameters will only appear when they're specified:                    \n"
-    line7 = "#      C0 (diskyness/boxyness),                                                  \n"
-    line8 = "#      Fn (n=integer, Azimuthal Fourier Modes),                                  \n"
-    line9 = "#      R0-R10 (PA rotation, for creating spiral structures).                     \n"
+    line6 = "#  Hidden parameters will only appear when they're specified:\n"
+    line7 = "#  C0 (diskyness/boxyness),   \n"
+    line8 = "#  Fn (n=integer, Azimuthal Fourier Modes),  \n"
+    line9 = "#  R0-R10 (PA rotation, for creating spiral structures).  \n"
     line10 = "# \n"
 
-    line11 = "# column 1:  Parameter number                                                               \n"
-    line12 = "# column 2:                                                                                 \n"
-    line13 = "#          -- Parameter 0:    the allowed functions are: sersic, nuker, expdisk             \n"
-    line14 = "#                             edgedisk, devauc, king, moffat, gaussian, ferrer, psf, sky    \n"
-    line15 = "#          -- Parameter 1-10: value of the initial parameters                               \n"
-    line16 = "#          -- Parameter C0:   For diskiness/boxiness                                        \n"
-    line17 = "#                             <0 = disky                                                    \n"
-    line18 = "#                             >0 = boxy                                                     \n"
-    line19 = "#          -- Parameter Z:    Outputting image options, the options are:                    \n"
-    line20 = "#                             0 = normal, i.e. subtract final model from the data to create \n"
-    line21 = "#                             the residual image                                            \n"
-    line22 = "#                             1 = Leave in the model -- do not subtract from the data       \n"
-    line23 = "#                                                                                           \n"
-    line24 = "# column 3: allow parameter to vary (yes = 1, no = 0)                                       \n"
-    line25 = "# column 4: comment                                                                         \n"
+    line11 = "# column 1:  Parameter number\n"
+    line12 = "# column 2:     \n"
+    line13 = "#  -- Parameter 0: the allowed functions are: sersic, nuker, expdisk\n"
+    line14 = "#        edgedisk, devauc, king, moffat, gaussian, ferrer, psf, sky \n"
+    line15 = "#        -- Parameter 1-10: value of the initial parameters \n"
+    line16 = "#        -- Parameter C0:   For diskiness/boxiness \n"
+    line17 = "#              <0 = disky   \n"
+    line18 = "#              >0 = boxy    \n"
+    line19 = "#       -- Parameter Z: Outputting image options, the options are:\n"
+    line20 = "#  0 = normal, i.e. subtract final model from the data to create \n"
+    line21 = "#            the residual image  \n"
+    line22 = "#            1 = Leave in the model -- do not subtract from the data\n"
+    line23 = "#            \n"
+    line24 = "# column 3: allow parameter to vary (yes = 1, no = 0)\n"
+    line25 = "# column 4: comment  \n"
     line26 = " \n"
 
-    line27 = "==================================================================================================\n"
+    line27 = "========================================="
+    + "=========================================================\n"
 
     hdl.write(lineZ)
     hdl.write(lineX)
@@ -828,20 +805,21 @@ def PrintSky(hdl, ncomp, sky, Z, fit):
 
     # k Check
 
-    line00 = "# Object number: {}                                                             \n".format(
+    line00 = "# Object number: {}   \n".format(
         ncomp
     )
-    line01 = " 0)      sky            #    Object type                                        \n"
-    line02 = " 1) {}         {}       # sky background        [ADU counts]                    \n".format(
+    line01 = " 0)      sky       #    Object type  \n"
+    line02 = " 1) {}     {}  # sky background  \n".format(
         sky, fit
     )
-    line03 = " 2) 0.000      0        # dsky/dx (sky gradient in x)                           \n"
-    line04 = " 3) 0.000      0        # dsky/dy (sky gradient in y)                           \n"
-    line05 = " Z) {}                  # Skip this model in output image?  (yes=1, no=0)       \n".format(
+    line03 = " 2) 0.000      0    # dsky/dx (sky gradient in x) \n"
+    line04 = " 3) 0.000      0     # dsky/dy (sky gradient in y)\n"
+    line05 = " Z) {}        # Skip this model in output image?  \n".format(
         Z
     )
     line06 = "\n"
-    line07 = "================================================================================\n"
+    line07 = "================================="
+    + "===============================================\n"
 
     hdl.write(line00)
     hdl.write(line01)
@@ -865,29 +843,29 @@ def PrintSersic(
     # a sersic function given
     # by the parameters
 
-    line00 = "# Object number: {}                                                             \n".format(
+    line00 = "# Object number: {}  \n".format(
         ncomp
     )
-    line01 = " 0)     sersic               #  Object type                                     \n"
-    line02 = " 1) {:.2f}  {:.2f}  {}  {}            #  position x, y     [pixel]                       \n".format(
+    line01 = " 0)     sersic      #  Object type    \n"
+    line02 = " 1) {:.2f}  {:.2f}  {}  {}  #  position x, y   \n".format(
         xpos, ypos, fit, fit
     )
-    line03 = " 3) {:.2f}       {}              #  total magnitude                                 \n".format(
+    line03 = " 3) {:.2f}   {}  #  total magnitude     \n".format(
         magser, fit
     )
-    line04 = " 4) {:.2f}       {}              #  R_e         [Pixels]                            \n".format(
+    line04 = " 4) {:.2f}  {}   #  R_e  [Pixels]\n".format(
         reser, fit
     )
-    line05 = " 5) {}       {}              #  Sersic exponent (deVauc=4, expdisk=1)           \n".format(
+    line05 = " 5) {}  {}    #  Sersic exponent (deVauc=4, expdisk=1)\n".format(
         nser, fit
     )
-    line06 = " 9) {:.2f}       {}              #  axis ratio (b/a)                                \n".format(
+    line06 = " 9) {:.2f}  {}  #  axis ratio (b/a)  \n".format(
         axratser, fit
     )
-    line07 = "10) {:.2f}       {}              #  position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
+    line07 = "10) {:.2f}   {}  #  position angle (PA)  \n".format(
         angleser, fit
     )
-    line08 = " Z) {}                       #  Skip this model in output image?  (yes=1, no=0) \n".format(
+    line08 = " Z) {}       #  Skip this model in output image? \n".format(
         Z
     )
     line09 = "\n"
@@ -913,26 +891,26 @@ def PrintGauss(hdl, ncomp, xpos, ypos, magass, fwhm, axratgass, anglegass, Z, fi
     # a sersic function given
     # by the parameters
 
-    line00 = "# Object number: {}                                                             \n".format(
+    line00 = "# Object number: {}  \n".format(
         ncomp
     )
-    line01 = " 0)     gaussian               #  Object type                                     \n"
-    line02 = " 1) {:.2f}  {:.2f}  {}  {}            #  position x, y     [pixel]                       \n".format(
+    line01 = " 0)     gaussian     #  Object type  \n"
+    line02 = " 1) {:.2f}  {:.2f}  {}  {} #  position x, y \n".format(
         xpos, ypos, fit, fit
     )
-    line03 = " 3) {:.2f}       {}              #  total magnitude                                 \n".format(
+    line03 = " 3) {:.2f}   {}  #  total magnitude  \n".format(
         magass, fit
     )
-    line04 = " 4) {:.2f}       {}              #  FWHM         [Pixels]                            \n".format(
+    line04 = " 4) {:.2f}   {}  #  FWHM  [Pixels]  \n".format(
         fwhm, fit
     )
-    line05 = " 9) {:.2f}       {}              #  axis ratio (b/a)                                \n".format(
+    line05 = " 9) {:.2f}   {}  #  axis ratio (b/a)  \n".format(
         axratgass, fit
     )
-    line06 = "10) {:.2f}       {}              #  position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
+    line06 = "10) {:.2f}   {}   #  position angle (PA)  \n".format(
         anglegass, fit
     )
-    line07 = " Z) {}                       #  Skip this model in output image?  (yes=1, no=0) \n".format(
+    line07 = " Z) {}    #  Skip this model in output image? \n".format(
         Z
     )
     line08 = "\n"
@@ -959,24 +937,24 @@ def PrintExp(hdl, ncomp, xpos, ypos, magexp, rsexp, axratexp, angleexp, Z, fit):
     # a exponential function given
     # by the parameters
 
-    line00 = "# Object number: $ncomp                                                        \n"
-    line01 = " 0)     expdisk              # Object type                                     \n"
-    line02 = " 1) {:.2f}  {:.2f}  {}  {}           # position x, y     [pixel]                       \n".format(
+    line00 = "# Object number: $ncomp    \n"
+    line01 = " 0)     expdisk     # Object type       \n"
+    line02 = " 1) {:.2f}  {:.2f}  {}  {}  # position x, y  [pixel] \n".format(
         xpos, ypos, fit, fit
     )
-    line03 = " 3) {:.2f}        {}             # total magnitude                                 \n".format(
+    line03 = " 3) {:.2f}   {}   # total magnitude \n".format(
         magexp, fit
     )
-    line04 = " 4) {:.2f}        {}             #      Rs  [Pixels]                               \n".format(
+    line04 = " 4) {:.2f}   {} # Rs  [Pixels]  \n".format(
         rsexp, fit
     )
-    line05 = " 9) {:.2f}        {}             # axis ratio (b/a)                                \n".format(
+    line05 = " 9) {:.2f}   {} # axis ratio (b/a) \n".format(
         axratexp, fit
     )
-    line06 = "10) {:.2f}        {}             # position angle (PA)  [Degrees: Up=0, Left=90]   \n".format(
+    line06 = "10) {:.2f}   {}  # position angle (PA)  \n".format(
         angleexp, fit
     )
-    line07 = " Z) {}                       # Skip this model in output image?  (yes=1, no=0) \n".format(
+    line07 = " Z) {} # Skip this model in output image? \n".format(
         Z
     )
     line08 = "\n"
@@ -1001,7 +979,7 @@ def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
     if os.path.isfile(Imageout):
         print("{} deleted; a new one is created \n".format(Imageout))
         runcmd = "rm {}".format(Imageout)
-        errrm = sp.run(
+        sp.run(
             [runcmd],
             shell=True,
             stdout=sp.PIPE,
@@ -1050,7 +1028,7 @@ def CheckFlag(val, check):
 
 
 #############################################################################
-######################### End of program  ###################################
+#    End of program  ###################################
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
@@ -1060,5 +1038,3 @@ def CheckFlag(val, check):
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-if __name__ == "__main__":
-    mainGalfitSky()

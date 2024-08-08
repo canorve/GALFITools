@@ -1,16 +1,6 @@
 #!/usr/bin/env python3
 
-import argparse
-import os
-import os.path
-import stat
-import subprocess as sp
-import sys
-
-import matplotlib.pyplot as plt
 import numpy as np
-import scipy
-import scipy.special
 from astropy.io import fits
 
 # introducir sky box y sky ring
@@ -36,7 +26,7 @@ def sky(imgname, maskimage, filereg) -> None:
 
     maskdat = np.array(maskdat, dtype=bool)
 
-    mask = maskdat == False
+    mask = maskdat == 0
 
     img = imgdat[mask]
 
@@ -130,7 +120,7 @@ def GetRegionDs9(filein):
 
 
 #############################################################################
-######################### End of program  ###################################
+#    End of program  ###################################
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
@@ -140,5 +130,3 @@ def GetRegionDs9(filein):
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-if __name__ == "__main__":
-    main()

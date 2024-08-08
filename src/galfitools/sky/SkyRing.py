@@ -21,7 +21,7 @@ def SkyRing(image, mask, ds9regfile, width, center, outliers):
     if mask:
         assert os.path.exists(mask), "mask file does not exists"
 
-    ##end input
+    # end input
     obj, xpos, ypos, rx, ry, angle = GetInfoEllip(ds9regfile)
     xx, yy, Rkron, theta, eps = Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle)
     q = 1 - eps
@@ -229,11 +229,16 @@ class SkyCal:
             skystd = np.append(skystd, std)
             radius = np.append(radius, Rings[idx] + self.width / 2)
 
-            print(
-                "Ring = {}; rad = {:.2f}; sky mean = {:.2f}; sky std = {:.2f}; median: {:.2f} ".format(
-                    idx + 1, Rings[idx] + self.width / 2, mean, std, median
+            linea = "Ring = {}; rad = {:.2f}; sky mean = {:.2f}; ".format(
+                    idx + 1, Rings[idx] + self.width / 2, mean)
+
+            lineb = "sky std = {:.2f}; median: {:.2f} ".format(
+                    std, median
                 )
-            )
+
+            line = linea + lineb
+
+            print(line)
 
             # calcular gradiente
             if count >= self.NumRings:
@@ -510,6 +515,6 @@ class SkyCal:
 
         return (xmin, xmax, ymin, ymax)
 
-    ##### End of sky class ##################
+    #    End of sky class ##################
     #########################################
     #########################################

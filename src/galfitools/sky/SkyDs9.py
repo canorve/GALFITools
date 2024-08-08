@@ -96,7 +96,7 @@ def SkyDs9(ImageFile, RegFile, maskfile, outliers=False):
 
             flagpoly = True
 
-        if flag == True:
+        if flag is True:
 
             x3 = p[4]
             x4 = x3[:-2]
@@ -110,7 +110,7 @@ def SkyDs9(ImageFile, RegFile, maskfile, outliers=False):
 
             flag = False
 
-        if flagpoly == True:
+        if flagpoly is True:
 
             Pol.append(pol)
             tupVerts.append(verts)
@@ -124,8 +124,6 @@ def SkyDs9(ImageFile, RegFile, maskfile, outliers=False):
     angle = np.array(v5)
 
     Pol = np.array(Pol)
-
-    totFlux = 0
 
     Flats = np.array([])
 
@@ -171,7 +169,7 @@ def SkyDs9(ImageFile, RegFile, maskfile, outliers=False):
 
         if Pol[idx] == "polygon":
 
-            polflat = SkyPolygon(Image, tupVerts[idx], ncol, nrow)
+            SkyPolygon(Image, tupVerts[idx], ncol, nrow)
 
             Flats = np.append(Flats, boxflat)
 
@@ -332,7 +330,8 @@ def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
 
 
 def SkyKron(imagemat, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
-    "This subroutine obtain flux from a Kron ellipse within a box defined by: xmin, xmax, ymin, ymax"
+    ''' This subroutine obtain flux from a Kron ellipse within
+    a box defined by: xmin, xmax, ymin, ymax'''
 
     xmin = int(xmin)
     xmax = int(xmax)
@@ -422,13 +421,13 @@ def GetExpTime(Image):
         hdu = fits.open(Image)
         exptime = hdu[0].header["EXPTIME"]
         hdu.close()
-    except:
+    except Exception:
         exptime = 1
     return float(exptime)
 
 
 #############################################################################
-######################### End of program  ###################################
+#    End of program  ###################################
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
@@ -438,5 +437,3 @@ def GetExpTime(Image):
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-if __name__ == "__main__":
-    main()
