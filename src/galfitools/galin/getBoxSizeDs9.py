@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 
-import argparse
 import os.path
 import sys
 
 import numpy as np
-from astropy.io import fits
-from astropy.io.fits import CompImageHDU
-from matplotlib.path import Path
 
 
 def getBoxSizeDs9(RegFile: str) -> int:
@@ -46,7 +42,7 @@ def getBoxSizeDs9(RegFile: str) -> int:
             x2 = x1[4:]
             flag = True
 
-        if flag == True:
+        if flag is True:
 
             x3 = p[4]
             x4 = x3[:-2]
@@ -60,12 +56,10 @@ def getBoxSizeDs9(RegFile: str) -> int:
 
             flag = False
 
-    obj = np.array(v0)
     xpos = np.array(v1)
     ypos = np.array(v2)
     rx = np.array(v3)
     ry = np.array(v4)
-    angle = np.array(v5)
 
     # converting for galfit header:
 
@@ -86,7 +80,6 @@ def getBoxSizeDs9(RegFile: str) -> int:
 
 
 #############################################################################
-######################### End of program  ###################################
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
@@ -96,5 +89,3 @@ def getBoxSizeDs9(RegFile: str) -> int:
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
 #   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
 ##############################################################################
-if __name__ == "__main__":
-    mainMaskDs9()
