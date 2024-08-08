@@ -1,9 +1,5 @@
 #! /usr/bin/env python3
 
-import argparse
-import sys
-
-import matplotlib.pyplot as plt
 import numpy as np
 from astropy.io import fits
 from galfitools.galin.MaskDs9 import GetAxis
@@ -43,8 +39,3 @@ def makeSim(image, GAIN, skymean, skystd, newimage) -> None:
     hdu.writeto(newimage, overwrite=True)
 
     hdu.close()
-
-
-# end of program
-if __name__ == "__main__":
-    main()

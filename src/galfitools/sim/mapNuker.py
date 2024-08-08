@@ -1,14 +1,7 @@
 #!/usr/bin/env python
 
-from os import path
-
 import matplotlib.pyplot as plt
-import mgefit
 import numpy as np
-from astropy.io import fits
-from mgefit.mge_fit_1d import mge_fit_1d
-from scipy.interpolate import UnivariateSpline
-from scipy.special import gammaincinv
 
 
 def main():
@@ -166,7 +159,7 @@ def cartesian(arrays, out=None):
 
 
 #############################################################################
-######################### End of program  ###################################
+#   End of program  ###################################
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
