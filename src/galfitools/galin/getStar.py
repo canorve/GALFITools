@@ -231,36 +231,36 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     # getting size
 
     xmin = x - np.sqrt(
-        (R ** 2) * (np.cos(theta)) ** 2 + (bim ** 2) * (np.sin(theta)) ** 2
+        (R**2) * (np.cos(theta)) ** 2 + (bim**2) * (np.sin(theta)) ** 2
     )
 
     xmax = x + np.sqrt(
-        (R ** 2) * (np.cos(theta)) ** 2 + (bim ** 2) * (np.sin(theta)) ** 2
+        (R**2) * (np.cos(theta)) ** 2 + (bim**2) * (np.sin(theta)) ** 2
     )
 
     ymin = y - np.sqrt(
-        (R ** 2) * (np.sin(theta)) ** 2 + (bim ** 2) * (np.cos(theta)) ** 2
+        (R**2) * (np.sin(theta)) ** 2 + (bim**2) * (np.cos(theta)) ** 2
     )
 
     ymax = y + np.sqrt(
-        (R ** 2) * (np.sin(theta)) ** 2 + (bim ** 2) * (np.cos(theta)) ** 2
+        (R**2) * (np.sin(theta)) ** 2 + (bim**2) * (np.cos(theta)) ** 2
     )
 
     mask = xmin < 1
     if mask.any():
-        xmin[mask] = 1
+        xmin = 1
 
     mask = xmax > ncol
     if mask.any():
-        xmax[mask] = ncol
+        xmax = ncol
 
     mask = ymin < 1
     if mask.any():
-        ymin[mask] = 1
+        ymin = 1
 
     mask = ymax > nrow
     if mask.any():
-        ymax[mask] = nrow
+        ymax = nrow
 
     return (xmin, xmax, ymin, ymax)
 
