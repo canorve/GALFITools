@@ -110,7 +110,7 @@ def main():
         # C0 = TotCounts/(2*np.pi*qobs*SigPix**2)
         C0 = TotCounts / (np.sqrt(2 * np.pi) * SigPix)
 
-        Ftot = 2 * np.pi * qobs * SigPix ** 2 * C0
+        Ftot = 2 * np.pi * qobs * SigPix**2 * C0
 
         mgemag = magzpt + 2.5 * np.log10(exptime) - 2.5 * np.log10(Ftot)
         # mgemag = magzpt  + 2.5*np.log10(exptime)  - 2.5*np.log10(TotCounts)
@@ -122,12 +122,10 @@ def main():
         Re = (K ** (0.5)) * h
 
         outlinea = "Mag: {:.2f}  Sig: {:.2f}  FWHM: {:.2f} ".format(
-                mgemag, SigPix, FWHM
+            mgemag, SigPix, FWHM
         )
 
-        outlineb = "Re: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(
-                Re, qobs, anglegass
-        )
+        outlineb = "Re: {:.2f}  q: {:.2f} angle: {:.2f} \n".format(Re, qobs, anglegass)
 
         outline = outlinea + outlineb
         print(outline)
@@ -213,51 +211,31 @@ def PrintHeader(
     # print to filehandle
     # the header for GALFIT
 
-    lineZ = "========================================"
-    + "==========================================================\n"
+    lineZa = "========================================"
+    lineZb = "==========================================================\n"
+    lineZ = lineZa + lineZb
+
     lineX = "# IMAGE PARAMETERS \n"
-    lineA = "A) {}      # Input Data image (FITS file)   \n".format(
-        A
-    )
-    lineB = "B) {}      # Output data image block \n".format(
-        B
-    )
+    lineA = "A) {}      # Input Data image (FITS file)   \n".format(A)
+    lineB = "B) {}      # Output data image block \n".format(B)
     lineC = 'C) {}   # Sigma image name (made from data if blank or "none") \n'.format(
         C
     )
-    lineD = "D) {}      # Input PSF image and (optional) diffusion kernel \n".format(
-        D
-    )
-    lineE = "E) {}      # PSF fine sampling factor relative to data     \n".format(
-        E
-    )
-    lineF = "F) {}     # Bad pixel mask (FITS image or ASCII coord list)  \n".format(
-        F
-    )
-    lineG = "G) {}     # File with parameter constraints (ASCII file)     \n".format(
-        G
-    )
+    lineD = "D) {}      # Input PSF image and (optional) diffusion kernel \n".format(D)
+    lineE = "E) {}      # PSF fine sampling factor relative to data     \n".format(E)
+    lineF = "F) {}     # Bad pixel mask (FITS image or ASCII coord list)  \n".format(F)
+    lineG = "G) {}     # File with parameter constraints (ASCII file)     \n".format(G)
     lineH = "H) {} {} {} {}   # Image region to fit (xmin xmax ymin ymax) \n".format(
         xlo, xhi, ylo, yhi
     )
-    lineI = "I) {} {}     # Size of the convolution box (x y)   \n".format(
-        convx, convy
-    )
-    lineJ = "J) {}        # Magnitude photometric zeropoint     \n".format(
-        J
-    )
+    lineI = "I) {} {}     # Size of the convolution box (x y)   \n".format(convx, convy)
+    lineJ = "J) {}        # Magnitude photometric zeropoint     \n".format(J)
     lineK = "K) {} {}     # Plate scale (dx dy). [arcsec per pixel] \n".format(
         platedx, platedy
     )
-    lineO = "O) {}        # Display type (regular, curses, both)   \n".format(
-        Olin
-    )
-    lineP = "P) {}  # Choose 0=optimize, 1=model, 2=imgblock, 3=subcomps \n".format(
-        P
-    )
-    lineS = "S) {}  # Modify/create objects interactively? \n".format(
-        S
-    )
+    lineO = "O) {}        # Display type (regular, curses, both)   \n".format(Olin)
+    lineP = "P) {}  # Choose 0=optimize, 1=model, 2=imgblock, 3=subcomps \n".format(P)
+    lineS = "S) {}  # Modify/create objects interactively? \n".format(S)
     lineY = " \n"
 
     line0 = "# INITIAL FITTING PARAMETERS      \n"
@@ -289,8 +267,10 @@ def PrintHeader(
     line25 = "# column 4: comment     \n"
     line26 = " \n"
 
-    line27 = "=========================================="
-    + "========================================================\n"
+    line27a = "=========================================="
+    line27b = "========================================================\n"
+
+    line27 = line27a + line27b
 
     hdl.write(lineZ)
     hdl.write(lineX)
@@ -348,21 +328,18 @@ def PrintSky(hdl, ncomp, sky, Z, fit):
 
     # k Check
 
-    line00 = "# Object number: {}   \n".format(
-        ncomp
-    )
+    line00 = "# Object number: {}   \n".format(ncomp)
     line01 = " 0)      sky       #    Object type \n"
-    line02 = " 1) {}         {}  # sky background [ADU counts]  \n".format(
-        sky, fit
-    )
+    line02 = " 1) {}         {}  # sky background [ADU counts]  \n".format(sky, fit)
     line03 = " 2) 0.000      0  # dsky/dx (sky gradient in x)\n"
     line04 = " 3) 0.000      0  # dsky/dy (sky gradient in y)\n"
-    line05 = " Z) {}    # Skip this model in output image?    \n".format(
-        Z
-    )
+    line05 = " Z) {}    # Skip this model in output image?    \n".format(Z)
     line06 = "\n"
-    line07 = "============================================"
-    + "====================================\n"
+
+    line07a = "============================================"
+    line07b = "====================================\n"
+
+    line07 = line07a + line07b
 
     hdl.write(line00)
     hdl.write(line01)
@@ -386,34 +363,22 @@ def PrintSersic(
     # a sersic function given
     # by the parameters
 
-    line00 = "# Object number: {}       \n".format(
-        ncomp
-    )
+    line00 = "# Object number: {}       \n".format(ncomp)
     line01 = " 0)     sersic     #  Object type   \n"
     line02 = " 1) {:.2f}  {:.2f}  {}  {}   #  position x, y     [pixel]\n".format(
         xpos, ypos, fit, fit
     )
-    line03 = " 3) {:.2f}       {} #  total magnitude \n".format(
-        magser, fit
-    )
-    line04 = " 4) {:.2f}  {} #  R_e  [Pixels]\n".format(
-        reser, fit
-    )
+    line03 = " 3) {:.2f}       {} #  total magnitude \n".format(magser, fit)
+    line04 = " 4) {:.2f}  {} #  R_e  [Pixels]\n".format(reser, fit)
     line05 = " 5) {} {} #  Sersic exponent (deVauc=4, expdisk=1) \n".format(
         nser, serfit
     )
     line06 = " 6)  0.0000       0   #  ----------------\n"
     line07 = " 7)  0.0000       0   #  ----------------\n"
     line08 = " 8)  0.0000       0   #  ----------------\n"
-    line09 = " 9) {:.2f}       {}   #  axis ratio (b/a)\n".format(
-        axratser, fit
-    )
-    line10 = "10) {:.2f}  {} #  position angle (PA)  \n".format(
-        angleser, fit
-    )
-    lineZ = " Z) {}   #  Skip this model in output image?  (yes=1, no=0) \n".format(
-        Z
-    )
+    line09 = " 9) {:.2f}       {}   #  axis ratio (b/a)\n".format(axratser, fit)
+    line10 = "10) {:.2f}  {} #  position angle (PA)  \n".format(angleser, fit)
+    lineZ = " Z) {}   #  Skip this model in output image?  (yes=1, no=0) \n".format(Z)
     line11 = "\n"
 
     hdl.write(line00)

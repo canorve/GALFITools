@@ -613,7 +613,7 @@ def numComps(galcomps: GalComps, name: str) -> int:
 
 def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
     """changes Flag to true for those components who belongs
-        to the same galaxy of n_comp"""
+    to the same galaxy of n_comp"""
 
     galcomps.Active.fill(False)
 
@@ -749,7 +749,7 @@ class GetReff:
 
 
 def conver2Sersic(galcomps: GalComps) -> GalComps:
-    """ function to convert exponential, gaussian params to Sersic params"""
+    """function to convert exponential, gaussian params to Sersic params"""
 
     comps = copy.deepcopy(galcomps)
 
@@ -766,7 +766,7 @@ def conver2Sersic(galcomps: GalComps) -> GalComps:
         comps.Exp[maskgas] = 0.5
         comps.Rad[maskgas] = comps.Rad[maskgas] / 2.354  # converting to sigma
         comps.Rad[maskgas] = (
-            SQ2 * (K_GAUSS ** 0.5) * comps.Rad[maskgas]
+            SQ2 * (K_GAUSS**0.5) * comps.Rad[maskgas]
         )  # converting to Re
 
     # for de vaucouleurs
@@ -792,7 +792,7 @@ def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
 
     # bim = q * R
 
-    ecc = np.sqrt(1 - q ** 2)
+    ecc = np.sqrt(1 - q**2)
 
     alpha = theta - newpa  # this is the direction
 
@@ -848,45 +848,26 @@ def galPrintHeader(hdl, galhead: GalHead) -> bool:
     # print to filehandle
     # the header for GALFIT
 
-    lineZ = "================================================="
-    + "=================================================\n"
+    lineZa = "================================================="
+    lineZb = "=================================================\n"
+    lineZ = lineZa + lineZb
     lineX = "# IMAGE PARAMETERS \n"
-    lineA = "A) {}    # Input Data image (FITS file)            \n".format(
-        A
-    )
-    lineB = "B) {}    # Output data image block               \n".format(
-        B
-    )
-    lineC = 'C) {}    # Sigma image name   \n'.format(
-        C
-    )
-    lineD = "D) {}    # Input PSF image and (optional) diffusion kernel \n".format(
-        D
-    )
-    lineE = "E) {}    # PSF fine sampling factor relative to data    \n".format(
-        E
-    )
-    lineF = "F) {}    # Bad pixel mask (FITS image or ASCII coord list) \n".format(
-        F
-    )
-    lineG = "G) {}    # File with parameter constraints (ASCII file)     \n".format(
-        G
-    )
+    lineA = "A) {}    # Input Data image (FITS file)            \n".format(A)
+    lineB = "B) {}    # Output data image block               \n".format(B)
+    lineC = "C) {}    # Sigma image name   \n".format(C)
+    lineD = "D) {}    # Input PSF image and (optional) diffusion kernel \n".format(D)
+    lineE = "E) {}    # PSF fine sampling factor relative to data    \n".format(E)
+    lineF = "F) {}    # Bad pixel mask (FITS image or ASCII coord list) \n".format(F)
+    lineG = "G) {}    # File with parameter constraints (ASCII file)     \n".format(G)
     lineH = "H) {} {} {} {}   # Image region to fit (xmin xmax ymin ymax)  \n".format(
         xlo, xhi, ylo, yhi
     )
-    lineI = "I) {} {}  # Size of the convolution box (x y)      \n".format(
-        convx, convy
-    )
-    lineJ = "J) {}     # Magnitude photometric zeropoint          \n".format(
-        J
-    )
+    lineI = "I) {} {}  # Size of the convolution box (x y)      \n".format(convx, convy)
+    lineJ = "J) {}     # Magnitude photometric zeropoint          \n".format(J)
     lineK = "K) {} {}  # Plate scale (dx dy). [arcsec per pixel]\n".format(
         platedx, platedy
     )
-    lineO = "O) {}     # Display type (regular, curses, both) \n".format(
-        varO
-    )
+    lineO = "O) {}     # Display type (regular, curses, both) \n".format(varO)
     lineP = "P) {}     # Choose 0=optimize, 1=model, 2=imgblock, 3=subcomps \n".format(
         P
     )
@@ -922,8 +903,9 @@ def galPrintHeader(hdl, galhead: GalHead) -> bool:
     line25 = "# column 4: comment     \n"
     line26 = " \n"
 
-    line27 = "==================================================="
-    + "===============================================\n"
+    line27a = "==================================================="
+    line27b = "===============================================\n"
+    line27 = line27a + line27b
 
     hdl.write(lineZ)
     hdl.write(lineX)
@@ -1054,8 +1036,9 @@ def galPrintSky(hdl: str, ncomp: int, galsky: GalSky) -> bool:
         galsky.skip
     )
     line06 = "\n"
-    line07 = "================================================"
-    + "================================\n"
+    line07a = "================================================"
+    line07b = "================================\n"
+    line07 = line07a + line07b
 
     hdl.write(line00)
     hdl.write(line01)

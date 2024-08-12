@@ -281,7 +281,6 @@ def GetPmax(image, mask, xmin, xmax, ymin, ymax):
         invmask = invmask * 1
 
         chuckimg = chuckimg * invmask
-
     maxy, maxx = np.where(chuckimg == np.max(chuckimg))
 
     xpos = maxx[0] + xmin - 1
