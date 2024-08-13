@@ -98,7 +98,7 @@ def ds9satbox(satfileout, output, satscale, satoffset):
 
             line2a = "point({0},{1}) ".format(X[idx], Y[idx])
             line2b = '# point=boxcircle font="times 10 bold" text={{ {0} }} \n'.format(
-                    N[idx]
+                N[idx]
             )
             line2 = line2a + line2b
             f_out.write(line2)
@@ -107,7 +107,7 @@ def ds9satbox(satfileout, output, satscale, satoffset):
 
 
 def MakeMask(maskimage, catfile, scale, offset, regfile):
-    "Create a mask image using ellipses for every Object of catfile. "
+    "Create a mask image using ellipses for every Object of catfile."
     # k Check
 
     checkflag = 0
@@ -229,7 +229,7 @@ def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     yell = y + R * np.cos(angle) * np.sin(theta) + bim * np.sin(angle) * np.cos(theta)
 
     dell = np.sqrt((xell - x) ** 2 + (yell - y) ** 2)
-    dist = np.sqrt(dx ** 2 + dy ** 2)
+    dist = np.sqrt(dx**2 + dy**2)
 
     mask = dist < dell
     imagemat[ypos[mask], xpos[mask]] = idn
@@ -379,7 +379,7 @@ def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
     index = Area.argsort()
     for i in index:
 
-        line1 = "{} {} {} {} {} {} {} {} {} {}\n".format(
+        line1 = "{} {} {} {} {} {} {} {} {} {} ".format(
             n[i],
             alpha[i],
             delta[i],
@@ -428,19 +428,19 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     # getting size
 
     xmin = x - np.sqrt(
-        (R ** 2) * (np.cos(theta)) ** 2 + (bim ** 2) * (np.sin(theta)) ** 2
+        (R**2) * (np.cos(theta)) ** 2 + (bim**2) * (np.sin(theta)) ** 2
     )
 
     xmax = x + np.sqrt(
-        (R ** 2) * (np.cos(theta)) ** 2 + (bim ** 2) * (np.sin(theta)) ** 2
+        (R**2) * (np.cos(theta)) ** 2 + (bim**2) * (np.sin(theta)) ** 2
     )
 
     ymin = y - np.sqrt(
-        (R ** 2) * (np.sin(theta)) ** 2 + (bim ** 2) * (np.cos(theta)) ** 2
+        (R**2) * (np.sin(theta)) ** 2 + (bim**2) * (np.cos(theta)) ** 2
     )
 
     ymax = y + np.sqrt(
-        (R ** 2) * (np.sin(theta)) ** 2 + (bim ** 2) * (np.cos(theta)) ** 2
+        (R**2) * (np.sin(theta)) ** 2 + (bim**2) * (np.cos(theta)) ** 2
     )
 
     mask = xmin < 1
@@ -476,7 +476,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 
 
 def CheckFlag(val, check, max):
-    "Check for flag contained in $val, returns 1 if found "
+    "Check for flag contained in $val, returns 1 if found"
 
     flag = False
     mod = 1
@@ -498,8 +498,8 @@ def CheckFlag(val, check, max):
 
 
 def CheckSatReg(x, y, filein, R, theta, ell):
-    '''Check if object is inside of saturated region. returns
-    True if at least one pixel is inside'''
+    """Check if object is inside of saturated region. returns
+    True if at least one pixel is inside"""
     # saturaded region as indicated by ds9 box region
     # returns 1 if object center is in saturaded region
 
