@@ -8,7 +8,11 @@ from scipy.special import gammainc, gammaincinv
 
 
 class GalHead:
-    """store the header of galfit file"""
+    """
+    Data class to store the header info of the galfit file
+
+
+    """
 
     inputimage = "none.fits"
     outimage = "none-out.fits"
@@ -38,9 +42,12 @@ class GalHead:
     tempmask = "tempmask.fits"
 
 
-# class for Galfit components
 class GalComps:
-    """stores the components of galfit file"""
+    """
+    Data class to store the galfit components of the galfit file
+
+
+    """
 
     N = np.array([])
     NameComp = np.array([])  # 0)
@@ -89,7 +96,11 @@ class GalComps:
 
 
 class GalSky:
-    """stores the value of the GALFIT file"""
+    """
+    Data class to store the sky component of the GALFIT file
+
+
+    """
 
     sky = 0
     dskyx = 0
@@ -102,6 +113,12 @@ class GalSky:
 
 
 class DataImg:
+    """
+    Data class to store the galaxy, model and residual images
+    of the output file of GALFIT
+
+
+    """
 
     img = np.array([[1, 1], [1, 1]])
     model = np.array([[1, 1], [1, 1]])
@@ -114,6 +131,7 @@ class DataImg:
     impsf = np.array([[1, 1], [1, 1]])
 
 
+"""
 def readDataImg(ellconf, galhead):
 
     dataimg = DataImg()
@@ -174,9 +192,31 @@ def readDataImg(ellconf, galhead):
         dataimg.mask = None
 
     return dataimg
+"""
 
 
 class Galfit:
+    """
+    Class to read GALFIT parameters file
+
+    Attributes
+    ----------
+    File: str
+         name of the GALFIT file
+
+    Methods
+    -------
+    ReadHead
+        reads the header of the GALFIT file
+
+    ReadComps
+        reads the galfit components of the GALFIT file
+
+    ReadSky
+        reads the galfit sky components of the GALFIT file
+
+    """
+
     def __init__(self, File: str):
         self.File = File
 
@@ -522,8 +562,38 @@ class Galfit:
 
 
 def numParFree(galcomps: GalComps) -> int:
-    """obtains the number of free parameters. This function does NOT
-    count the sky as a free param"""
+    """Obtains the number of free parameters
+
+    Count the number of free parameters of the surface brightness model
+    of the GALFIT file.
+
+    Parameters
+    ----------
+    galcomps : GalComps Data Class defined above
+
+
+    Returns
+    -------
+    pt : int
+        Number of free parameters
+
+
+    See Also
+    --------
+    numParSkyFree: Obtains the number of free parameters of the sky
+                    component
+
+
+    Notes
+    -----
+    It only counts the components with galcomps.Active == True
+    This prevents to count components of other galaxies that
+    were simultanously fitted.
+
+    Sky component is ignored.
+
+
+    """
 
     p1 = 0
     p2 = 0
@@ -570,7 +640,28 @@ def numParFree(galcomps: GalComps) -> int:
 
 
 def numParSkyFree(galsky: GalSky) -> int:
-    """obtains the number of free parameters for sky function"""
+    """Obtains the number of free parameters of the sky component
+
+    Count the number of free parameters of the sky component
+    of the GALFIT file.
+
+    Parameters
+    ----------
+    galsky: GalSky data Class defined above
+
+
+    Returns
+    -------
+    pt : int
+        Number of free parameters
+
+
+    See Also
+    --------
+    numParFree: Obtains the number of free parameters
+
+
+    """
 
     p1 = 0
     p2 = 0
@@ -592,6 +683,7 @@ def numParSkyFree(galsky: GalSky) -> int:
     return int(pt)
 
 
+# lastmod
 def numComps(galcomps: GalComps, name: str) -> int:
     """obtains the number of components"""
 
