@@ -13,7 +13,16 @@ from galfitools.galin.MaskDs9 import GetAxis
 
 
 class HeadInfo:
-    """store the flags of the header of the galfit file"""
+    """Data class to store information of the GALFIT Header
+
+
+    This Data class verifies that the variables in the GALFIT header
+    contain valid values. It uses boolean flags to indicate whether
+    the file exists and whether the sizes of the convolution box or
+    fitting region are appropriate.
+
+
+    """
 
     inputimageflag = False
     outimageflag = False
@@ -47,7 +56,27 @@ class HeadInfo:
 
 
 def checkFile(galfitFile: str, dis: int) -> float:
-    """prints information of the galfit File """
+    """checks that GALFIT file contains valid parameters
+
+
+    Parameters
+    ----------
+    galfitFile : str
+                name of the GALFIT file
+
+    dis : int
+          maximum distance among components
+
+
+    Returns
+    -------
+    headinfo : HeadInfo data class defined above
+    galax : number of components per galaxy model
+    mag : total magnitude
+    freepar : total number of free parameters for the fitting
+
+
+    """
 
     galfit = Galfit(galfitFile)
 
@@ -130,7 +159,7 @@ def checkFile(galfitFile: str, dis: int) -> float:
     for idx, item in enumerate(galcomps.N):
         dx = galcomps.PosX[idx] - galcomps.PosX
         dy = galcomps.PosY[idx] - galcomps.PosY
-        d = np.sqrt(dx ** 2 + dy ** 2)
+        d = np.sqrt(dx**2 + dy**2)
         maskdis = (d <= dmax) & (galax == 0)
         if maskdis.any():
             galax[maskdis] = cont
@@ -146,7 +175,20 @@ def checkFile(galfitFile: str, dis: int) -> float:
 
 
 def copy2info(head, head2):
+    """copy header information
 
+    copy header variables from head to head2
+
+    Parameters
+    ----------
+    head : GalHead data class defined in galfit.py
+    head2 : Galhead data class where the variables will be copied
+
+    Returns
+    -------
+    head2 : GalHead data class
+
+    """
     head2.inputimage = head.inputimage
     head2.outimage = head.outimage
     head2.sigimage = head.sigimage
