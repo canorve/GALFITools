@@ -18,6 +18,54 @@ def getSersic(
     bulgetot: float,
     bards9: str,
 ) -> GalComps:
+    """Obtains the initial parameters for GALFIT
+
+    given an DS9 ellipse region, it prints the initial parameters
+    of the surface brightness model in GALFIT format.
+
+
+    Parameters
+    ----------
+    image : float
+            FITS image of the galaxy
+    regfile : str
+            DS9 ellipse region file
+    center : bool
+            If True, it uses the geometrical center of the
+            DS9 ellipse. Otherwise it will use the peak pixel
+            as a center of the galaxy.
+
+    maskfile : str
+              mask file
+
+    zeropoint : float
+               magnitude zero point
+    sky : float
+          Sky/background value
+    noprint : float
+            if False, avoids to print to STDOUT
+
+    bulgetot : float
+            Estimates the bulge-to-total ratio of the galaxy to
+            determine the initial parameters for the bulge/disk model.
+            If set to None, it computes the initial parameters for
+            a single Sersic model.
+
+    bards9 : str
+            If a DS9 ellipse region is provided (different from
+            the regfile defined above), it will be used to estimate
+            the initial parameters of the bar. In this case, the
+            initial parameters of the bulge, bar, and disk will
+            be printed. The bulgetot parameter must be specified
+            for this to function.
+
+
+    Returns
+    -------
+    galcomps : GalComps data class defined in galfit.py containing
+               the initial parameter
+
+    """
 
     X, Y, AxRat, PA = getPeak(image, regfile, center, maskfile)
 
