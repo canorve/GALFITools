@@ -7,6 +7,28 @@ import numpy as np
 
 
 def getBoxSizeDs9(RegFile: str) -> int:
+    """obtains the corner coordinates of a DS9 region box
+
+    Using the DS9 region box file, this method obtains the X-minimum,
+    X-maximum, Y-minimum, and Y-maximum values for the H) option
+    in the GALFIT header file.
+
+
+    Parameters
+    ----------
+    RegFile : str
+              file containing the DS9 box region
+
+
+    Returns
+    -------
+    xmin : int
+    xmax : int
+    ymin : int
+    ymax : int
+
+
+    """
 
     if not os.path.exists(RegFile):
         print("%s: reg filename does not exist!" % (sys.argv[1]))
@@ -77,15 +99,3 @@ def getBoxSizeDs9(RegFile: str) -> int:
     ymax = round(ymax[0])
 
     return xmin, xmax, ymin, ymax
-
-
-#############################################################################
-#     ______________________________________________________________________
-#    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
-#   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
-#   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/|
-#   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
-#   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/|
-#   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
-#   |_|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|/
-##############################################################################
