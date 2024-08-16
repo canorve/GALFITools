@@ -658,7 +658,7 @@ def numParSkyFree(galsky: GalSky) -> int:
 
     See Also
     --------
-    numParFree: Obtains the number of free parameters
+    numParFree : Obtains the number of free parameters
 
 
     """
@@ -683,9 +683,26 @@ def numParSkyFree(galsky: GalSky) -> int:
     return int(pt)
 
 
-# lastmod
 def numComps(galcomps: GalComps, name: str) -> int:
-    """obtains the number of components"""
+    """gets the number of components for a galaxy.
+
+    Given the number of components of a GALFIT file,
+    it discerns which components belong to the galaxy. This
+    is useful when simultaneous fitting was used.
+
+    Parameters
+    ----------
+    galcomps : GalComps data class defined above
+    name :  str
+            indicates which model components to count:
+            all, sersic, expdisk, gaussian, devauc
+
+    Returns
+    -------
+    N : Number of components of the galaxy
+
+
+    """
 
     if name == "all":
         nummask = (galcomps.Active == 1) & (
@@ -704,8 +721,40 @@ def numComps(galcomps: GalComps, name: str) -> int:
 
 
 def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
-    """changes Flag to true for those components who belongs
-    to the same galaxy of n_comp"""
+    """Selects which components belong to the galaxy.
+
+    From the data class GalComps, it changes the flag Active to
+    True for those components where distance is less than distmax
+    from component n_comp.
+
+    This is useful when there are simultaneous
+    fitting of galaxies in a single GALFIT file.
+
+
+    Parameters
+    ----------
+    galcomps : GalComps data class defined above
+    distmax : float
+              maximum distance among components
+    n_comp : int
+            The center of the galaxy will be determined from this
+            component (n_comp). The distances of the remaining
+            components will be calculated relative to this center.
+
+    Returns
+    -------
+    galcomps : GalComps data class with flag Active = True for
+              those components which belong to the galaxy selected
+              by n_comp.
+
+    Notes
+    ------
+    If a galaxy is made up of three components, it does not matter which
+    of the three you select as a center. As long these belong to the
+    same galaxy.
+
+
+    """
 
     galcomps.Active.fill(False)
 
@@ -738,9 +787,11 @@ def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
     return galcomps
 
 
+"""
+
 # Sersic components
 class GetReff:
-    """class to obtain the effective radius for the whole galaxy"""
+#    class to obtain the effective radius for the whole galaxy
 
     def GetReSer(
         self, galhead: GalHead, comps: GalComps, eff: float, theta: float
@@ -826,7 +877,7 @@ class GetReff:
     def Fser(
         self, R: float, Flux: list, Re: list, n: list, q: list, pa: list, theta: float
     ) -> float:
-        """sersic flux to a determined R"""
+        #sersic flux to a determined R
 
         k = gammaincinv(2 * n, 0.5)
 
@@ -839,9 +890,29 @@ class GetReff:
 
         return Fr
 
+"""
+
 
 def conver2Sersic(galcomps: GalComps) -> GalComps:
-    """function to convert exponential, gaussian params to Sersic params"""
+    """Converts the exponential, gaussian or De Vaucouleurs to Sersic
+
+    Using the format of GALFIT with the GalComps data class,
+    it converts the parameters of the functions exponential,
+    gaussian or De Vaucouleurs to parameters of Sersic function.
+
+
+    Parameters
+    -----------
+    galcomps : GalComps data class defined above
+
+
+    Returns
+    -------
+    galcomps : GalComps data class with the functions converted to Sersic
+              parameters
+
+
+    """
 
     comps = copy.deepcopy(galcomps)
 
@@ -874,8 +945,33 @@ def conver2Sersic(galcomps: GalComps) -> GalComps:
 
 
 def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
-    """Given an ellipse and an angle it returns the radius in angle direction.
-    Theta are the values for the galaxy and the others for every component"""
+    """Obtains the radius along the specified angular direction.
+
+    Given the angular position and axis ratio of the ellipse
+    it gives the radius of the ellipse in the theta direction.
+
+    If theta is in the major axis direction it returns the
+    major axis. On the other hand, if theta is in the direction
+    of the minor axis it returns the minor axis.
+
+
+    Parameters
+    ----------
+    R : float
+        Radius along the major axis
+    q : list
+        Axis ratio of ellipse
+    pa : list
+        Angular position of ellipse measured from Y-axis (same as GALFIT)
+    theta : float
+            angle that defines the direction
+
+    Returns
+    -------
+    aell : float
+            radius along the angle specified by theta
+
+    """
 
     # changing measured angle from y-axis to x-axis
     # and changing to rads:
@@ -896,7 +992,23 @@ def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
 
 
 def galfitLastFit(directory: str) -> str:
+    """determine the last fit completed by GALFIT
 
+    Every time GALFIT produces a successful fit it produces
+    a file called galfit.XX, where the XX represent a number
+    that increases every time where GALFIT
+
+    Parameters
+    ----------
+    directory : str
+                directory containing the galfit files
+
+    Returns
+    -------
+    max_file : str
+                last fitting model file produced by GALFIT
+
+    """
     # Directory containing the files
     # directory = "." #actual directory
 
@@ -912,9 +1024,24 @@ def galfitLastFit(directory: str) -> str:
     return max_file
 
 
-# print galfit files
-def galPrintHeader(hdl, galhead: GalHead) -> bool:
-    "print GALFIT header in a file"
+def galPrintHeader(hdl: str, galhead: GalHead) -> bool:
+    """prints GALFIT header to a file
+
+    Given a file handler, prints the GALFIT header parameters of
+    to a file
+
+
+    Parameters
+    ----------
+    hdl : str
+        file handler where the header information will be print
+    galhead : GalHead data class defined above
+
+    Returns
+    -------
+        bool
+
+    """
 
     A = galhead.inputimage
     B = galhead.outimage
@@ -1051,8 +1178,28 @@ def galPrintHeader(hdl, galhead: GalHead) -> bool:
 
 
 def galPrintComp(hdl: str, ncomp: int, idx: int, galcomps: GalComps) -> bool:
-    "print GALFIT Sersic function to filehandle"
-    # k Check
+    """prints GALFIT component parameters to a file
+
+    Given a file handler, prints the GALFIT component parameters of
+    one model the surface brightness models to a GALFIT file
+
+
+    Parameters
+    ----------
+    hdl : str
+        file handler where the component parameter information will be print
+    ncomp : int
+        prints the number of component in the GALFIT file
+    idx : int
+        index to indicate which component of the galcomps data class will be print
+
+    galcomps : GalComps data class defined above
+
+    Returns
+    -------
+        bool
+
+    """
 
     # print to filehandle
 
@@ -1111,7 +1258,24 @@ def galPrintComp(hdl: str, ncomp: int, idx: int, galcomps: GalComps) -> bool:
 
 
 def galPrintSky(hdl: str, ncomp: int, galsky: GalSky) -> bool:
-    "Print GALFIT sky function to filehandle using  GalSky class"
+    """prints GALFIT sky component parameters to a file
+
+    Given a file handler, prints the GALFIT sky component parameters
+    to a GALFIT file
+
+    Parameters
+    ----------
+    hdl : str
+        file handler where the sky component parameter information will be print
+    ncomp : int
+        prints the number of component in the GALFIT file
+    galsky : GalSky data class defined above
+
+    Returns
+    -------
+        bool
+
+    """
 
     line00 = "# Object number: {}                 \n".format(ncomp)
     line01 = " 0)      sky            #    Object type   \n"
