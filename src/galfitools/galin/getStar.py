@@ -19,6 +19,39 @@ def getStar(
     sigma: str,
     sigout: str,
 ) -> None:
+    """extracts a piece of the image file
+
+    Given a DS9 ellipse region file and a specified size,
+    it extracts a cutout image that includes the region
+    enclosed by the ellipse.
+
+    Parameters
+    ----------
+    image : str
+           name of the image file
+
+    regfile : str
+            DS9 ellipse region file
+    imsize : int
+            size of the new cutout image in pixels
+    center : bool
+            If True, it takes the geometrical center
+            of the DS9 ellipse region. Otherwise, it will
+            take the peak's pixels as the coordinate
+    sky: float
+         value of the background sky
+    imout: str
+        name of the output image file
+    sigma: str
+        name of the sigma image file if exists otherwise None
+    sigout: str
+        name of the output sigma image file
+
+    Returns
+    -------
+    None
+
+    """
 
     ##########################################
     #  Internal flags
@@ -95,15 +128,40 @@ def getStar(
 #####################################################
 
 
-def GetFits(Image, Imageout, sky, xlo, xhi, ylo, yhi):
-    "Get a piece from the image"
-    # k Check
+def GetFits(
+    Image: str, Imageout: str, sky: float, xlo: int, xhi: int, ylo: int, yhi: int
+) -> None:
+    """Get a piece from the image
 
-    # if os.path.isfile(Imageout):
-    #    print("{} deleted; a new one is created \n".format(Imageout))
-    #    runcmd = "rm {}".format(Imageout)
-    #    errrm = sp.run([runcmd], shell=True, stdout=sp.PIPE,
-    #                    stderr=sp.PIPE, universal_newlines=True)
+    Given an image, and X-minimum, X-maximum,
+    Y-minimum, Y-maximum, it extracts a cutout image.
+    the X-Y-minimum, X-Y-maximum determines the
+    coordinates of the extracted neww image.
+
+    Parameters
+    ----------
+    Image : str
+           name of the image file
+    Imageout : str
+        name of the output image file
+
+    sky : float
+         value of the background sky
+    xlo : int
+          Pixel with the minimum X value.
+    xhi : int
+          Pixel with the maximum X value.
+    ylo : int
+          Pixel with the minimum Y value.
+    yhi : int
+          Pixel with the maximum Y value.
+
+
+    Returns
+    -------
+    None
+
+    """
 
     if os.path.isfile(Imageout):
         print("{} deleted; a new one is created \n".format(Imageout))
@@ -132,7 +190,28 @@ def GetFits(Image, Imageout, sky, xlo, xhi, ylo, yhi):
     hdu.close()
 
 
-def GetInfoEllip(regfile):
+def GetInfoEllip(regfile: str):
+    """gets ellipse information from DS9 region files
+
+    Parameters
+    ----------
+    regfile : str
+                DS9 region file
+
+    Returns
+    -------
+    obj : str
+          object name
+    xpos : float, x-center
+    ypos : float, y-center
+    rx : float, major or minor axis
+    ry : float, minor or major axis
+    angle : float, angular position
+
+
+    returns 0, 0, 0, 0, 0, 0 if ellipse region was not found in file
+
+    """
 
     if not os.path.exists(regfile):
         print("%s: reg filename does not exist!" % (regfile))
@@ -198,7 +277,27 @@ def GetInfoEllip(regfile):
     return 0, 0, 0, 0
 
 
-def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
+def Ds9ell2Kronell(xpos: float, ypos: float, rx: float, ry: float, angle: float):
+    """Converts DS9 ellipse parameters to geometrical parameters
+
+    Parameters
+    ----------
+    obj : str
+          object name
+    xpos : float, x-center
+    ypos : float, y-center
+    rx : float, major or minor axis
+    ry : float, minor or major axis
+    angle : float, angular position
+
+    Returns
+    -------
+    xx : float, x center position
+    yy : float, y center positon
+    Rkron : float, major axis
+    theta: float, angular position measured from Y-axis
+    e: float, ellipticity
+    """
 
     if rx >= ry:
 
@@ -220,8 +319,26 @@ def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
 
 
 def GetSize(x, y, R, theta, ell, ncol, nrow):
-    "this subroutine get the maximun"
-    "and minimim pixels for Kron and sky ellipse"
+    """Get the (x,y) coordinates that encompass the ellipse
+
+    Parameters
+    ----------
+    x : float, x-center of ellipse
+    y : float, y-center of ellipse
+    R : float, major axis of ellipse
+    theta : float, angular position of ellipse
+    ell : float, ellipticity
+    ncol : number of columns of the image
+    nrow : number of rows of the image
+
+
+    Returns
+    -------
+    xmin, xmax, ymin, ymax : Minimum and maximum coordinates
+    that encompass the ellipse.
+
+    """
+
     # k Check
     q = 1 - ell
     bim = q * R
@@ -266,7 +383,25 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 
 
 def GetPmax(image, mask, xmin, xmax, ymin, ymax):
+    """gets the peak coordinates
 
+    Given an image, and optionally a mask, it identifies
+    the (x, y) pixels where the maximum value is located.
+
+    Parameters
+    ----------
+    image: 2D-array of the image
+    mask: 2D-array of the mask
+    xmin, xmax, ymin, ymax : int, int, int, int
+                            coordinates of the image section
+                            where the maximum will be obtained
+
+    Returns
+    -------
+    (xpos, ypos) : (x, y) coordinates of the maximum
+
+
+    """
     xmin = int(xmin)
     xmax = int(xmax)
     ymin = int(ymin)
