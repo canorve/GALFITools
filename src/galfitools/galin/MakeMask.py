@@ -11,6 +11,31 @@ from galfitools.galin.MaskDs9 import GetAxis
 def makeMask(
     sexfile: str, image: str, maskfile: str, scale: float, satfileout: str
 ) -> None:
+    """Creates a mask file from a catalog of SExtractor
+
+    It creates a mask file for GALFIT using information from a
+    SExtractor catalog. It includes masking of saturated regions.
+
+    Parameters
+    ----------
+    sexfile : str
+            name of the Sextractor catalog
+
+    image: str,
+            name of the image file
+
+    maskfile: str,
+            name of the mask file
+    scale: float,
+            Scale factor by which the ellipse will be enlarged or diminished.
+    satfileout: str
+            DS9 region file where the saturation regions will be indicated
+
+    Returns
+    -------
+    None
+
+    """
 
     sexarsort = "sexsort.cat"
 
@@ -40,8 +65,24 @@ def makeMask(
     MakeSatBox(maskfile, satfileout, Total + 1, NCol, NRow)  # make sat region
 
 
-def ds9satbox(satfileout, output, satscale, satoffset):
-    "Creates a file for ds9 which selects bad saturated regions"
+def ds9satbox(satfileout, sexcat, satscale, satoffset):
+    """Creates a DS9 file which contains regions with bad
+        saturated regions
+
+    Parameters
+    ----------
+    satfileout : str, DS9 region output file
+    sexcat : str, SExtractor catalog
+    satscale : float,
+             Scale factor by which the saturation region will be
+             enlarged or diminished.
+    satoffset: float,
+            constant to be added to the size of saturated region
+
+    Returns
+    -------
+    None
+    """
 
     flagsat = 4  # flag value when object is saturated (or close to)
     maxflag = 128  # max value for flag
@@ -65,7 +106,7 @@ def ds9satbox(satfileout, output, satscale, satoffset):
         Bkgd,
         Idx,
         Flg,
-    ) = np.genfromtxt(output, delimiter="", unpack=True)
+    ) = np.genfromtxt(sexcat, delimiter="", unpack=True)
 
     line = "image \n"
     f_out.write(line)
@@ -107,8 +148,25 @@ def ds9satbox(satfileout, output, satscale, satoffset):
 
 
 def MakeMask(maskimage, catfile, scale, offset, regfile):
-    "Create a mask image using ellipses for every Object of catfile."
-    # k Check
+    """Creates ellipse masks for every object of the SExtractor catalog
+
+    Parameters
+    ----------
+    maskimage: str
+            name of the mask file. This file should already exists
+    catfile: str,
+            SExtractor catalog
+    scale: float,
+            Scale factor by which the ellipse will be enlarged or diminished.
+    offset: float
+            constant to be added to the ellipse size
+    regfile: str
+            DS9 region file containing the saturated region.
+
+    Returns
+    -------
+    None
+    """
 
     checkflag = 0
     flagsat = 4  # flag value when object is saturated (or close to)
@@ -196,9 +254,28 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
 
 
 def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
-    "This subroutine create a Kron ellipse within a box defined by: xmin,xmax,ymin,ymax"
+    """This creates a ellipse in an image
 
-    # Check
+    This function creates an ellipse and fills the pixels inside it
+    with the value specified by idn. The ellipse is created within
+    a box delimited by xmin, xmax, ymin, and ymax.
+
+    Parameters
+    ----------
+    imagemat : ndarray, the image matrix
+    idn : int the value to fill the ellipse
+    x, y : position of the ellipse's center
+    R : ellipse major axis
+    theta : angular position of the ellipse measured from X-axis
+    ell : ellipticity of the ellipse
+    xmin, xmax, ymin, ymax : int, int, int, int
+            box delimitation of the ellipse
+
+    Returns
+    -------
+    imagemat : the image with the new ellipse
+
+    """
 
     xmin = int(xmin)
     xmax = int(xmax)
@@ -238,8 +315,21 @@ def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
 
 
 def MakeSatBox(maskimage, region, val, ncol, nrow):
-    "Create a mask for saturated regions"
-    "Regions must be in DS9 box regions format"
+    """Creates saturated regions in the mask
+
+    Parameters
+    ----------
+    maskimage : str, name of the mask file
+    region : str, DS9 box region
+    val : int, value to be filled inside the saturated region
+    ncol : int, number of columns of the image
+    nrow : int, number of rows of the image
+
+    Returns
+    -------
+    bool
+
+    """
 
     # k Check
 
@@ -313,7 +403,7 @@ def MakeSatBox(maskimage, region, val, ncol, nrow):
 
 
 def MakeImage(newfits, sizex, sizey):
-    "create a new blank Image"
+    """Creates a new blank Image"""
     # k Check
     if os.path.isfile(newfits):
         print("{} deleted; a new one is created \n".format(newfits))
@@ -325,6 +415,21 @@ def MakeImage(newfits, sizex, sizey):
 
 
 def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
+    """Sorts the SExtractor catalog by area, from largest to smallest.
+
+    Parameters
+    ----------
+    SexCat : str, name of the SExtractor catalog
+    scale : float,
+    SexArSort : new output SExtractor catalog
+    NCol : number of columns of the image
+    NRow : number of rows of the image
+
+
+    Returns
+    -------
+    number of objects
+    """
 
     # sort the sextractor
     # catalog by magnitude,
@@ -417,8 +522,27 @@ def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
 
 
 def GetSize(x, y, R, theta, ell, ncol, nrow):
-    "this subroutine get the maximun"
-    "and minimim pixels for Kron and sky ellipse"
+    """This function retrieves the minimum and
+    maximum pixel coordinates that enclose the ellipse.
+
+    Parameters
+    ----------
+    x, y : int, int, position of the ellipse's center
+    R : float, ellipse major axis
+    theta : float, angular position of the ellipse measured from X-axis
+    ell : float, ellipticity of the ellipse
+    ncol : number of columns of the image
+    nrow : number of rows of the image
+
+
+    Returns
+    -------
+
+    xmin, xmax, ymin, ymax : int, int, int, int
+            box delimitation of the ellipse
+
+
+    """
     # k Check
     q = 1 - ell
     bim = q * R
@@ -475,33 +599,61 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     return (xmin, xmax, ymin, ymax)
 
 
-def CheckFlag(val, check, max):
-    "Check for flag contained in $val, returns 1 if found"
+def CheckFlag(val, check, maxx):
+    """Check if SExtractor flag contains the check flag
+
+    This function is useful to check if
+    a object sextractor flag contains saturated region
+
+    Parameters
+    ----------
+    val: SExtractor flag of the object
+    check: SExtractor flag value to check
+    maxx: maximum value of the flag
+
+    Returns
+    -------
+    bool, returns True if found
+
+
+    """
 
     flag = False
     mod = 1
 
     while mod != 0:
 
-        res = int(val / max)
+        res = int(val / maxx)
 
-        if max == check and res == 1:
+        if maxx == check and res == 1:
 
             flag = True
 
-        mod = val % max
+        mod = val % maxx
 
         val = mod
-        max = max / 2
+        maxx = maxx / 2
 
     return flag
 
 
 def CheckSatReg(x, y, filein, R, theta, ell):
-    """Check if object is inside of saturated region. returns
-    True if at least one pixel is inside"""
-    # saturaded region as indicated by ds9 box region
-    # returns 1 if object center is in saturaded region
+    """Check if object is inside of saturated region.
+
+
+    Parameters
+    ----------
+    (x, y): int, int, center's coordinates in pixels
+    filein : str, file containing the saturated regions
+    R: float, major axis
+    theta: float, angular position of the ellipse
+    ell: float, ellipticity of the object
+
+    Returns
+    -------
+    bool : it returns True if at least one pixel is inside
+
+    """
 
     q = 1 - ell
 
