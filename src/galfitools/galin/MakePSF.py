@@ -26,6 +26,38 @@ def makePSF(
     twist: bool,
     numgauss: int,
 ) -> None:
+    """makes PSF model
+
+    It creates a PSF model image model for GALFIT.
+    It model a star from an image usign the MGE method
+
+    Parameters
+    ----------
+    galfitFile : str
+                GALFIT initial parameters file
+    image : str
+            name of the FITS image
+    regfile: str
+            DS9 ellipse region file containing the star.
+    center: bool
+            If True, the geometrical center of the DS9 ellipse
+            region will be used. Otherwise, the center with the
+            maximum count level of the DS9 ellipse region will be used.
+    psfout: str
+            name of the PSF output file
+    sigma: str
+            If available, the sigma image, otherwise set to None
+    twist: bool
+            If true use the twist option for the MGE method
+    numgauss: int
+            maximum number of gaussians to be used.
+
+
+    Returns
+    -------
+    None
+
+    """
 
     #######################
     # reading options from galfit header

@@ -43,7 +43,7 @@ def getStar(
     imout: str
         name of the output image file
     sigma: str
-        name of the sigma image file if exists otherwise None
+        name of the sigma image file if it exists otherwise None
     sigout: str
         name of the output sigma image file
 
