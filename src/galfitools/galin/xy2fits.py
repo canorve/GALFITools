@@ -12,6 +12,34 @@ from galfitools.galin.MaskDs9 import GetAxis
 
 
 class xy2fits:
+    """
+    converts a ASCII mask file with `x y` format pixels
+    to a FITS image.
+
+    Attributes
+    ----------
+    ImageFile : str
+                the name of the new FITS mask image file
+
+
+    AsciiFile : str
+                the ASCII file containing the pixels
+
+    Value : float
+            the value to be substituted as a count value
+            in the FITS mask image
+
+    Methods
+    -------
+    MakeFits : this is the main method this creates the
+                FITS image from the ASCII file
+    MakeImage : create a new blank Image
+
+    PutPix : assign the count value to the pixels of the new
+            image
+
+    """
+
     def MakeFits(self, ImageFile, AsciiFile, Value):
 
         root_ext = os.path.splitext(AsciiFile)
@@ -69,9 +97,6 @@ class xy2fits:
         hdu[i].data = Image
         hdu.writeto(ImageFits, overwrite=True)
         hdu.close()
-
-
-######################
 
 
 #############################################################################
