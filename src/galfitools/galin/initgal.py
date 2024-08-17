@@ -10,6 +10,50 @@ import numpy as np
 
 
 class InitGal:
+    """Creates GALFIT's input files with different initial parameters
+
+    Creates a bunch of GALFIT files with different initial parameters.
+    It will create a bash file to run galfit on those files.
+
+    Attributes
+    ----------
+    GalfitFile : str, galfit file where the header information
+                will be taken.
+    number : int, the number of files created
+    param3 : float float, Range of values to assign to the 3) model's
+                        parameter, specified in the format [min, max].
+    param4 : float float, Range of values to assign to the 4) model's
+                        parameter, specified in the format [min, max].
+    param5 : float float, Range of values to assign to the 5) model's
+                        parameter, specified in the format [min, max].
+    param6 : float float, Range of values to assign to the 6) model's
+                        parameter, specified in the format [min, max].
+    param7 : float float, Range of values to assign to the 7) model's
+                        parameter, specified in the format [min, max].
+    param8 : float float,  Range of values to assign to the 8) model's
+                        parameter, specified in the format [min, max].
+    param9 : float float, Range of values to assign to the 9) model's
+                        parameter, specified in the format [min, max].
+    param10 : float float, Range of values to assign to the 10) model's
+                        parameter, specified in the format [min, max].
+
+    numcomp : int, the component number where the parameters will be changed
+
+
+    Methods
+    -------
+    MakeParams
+        makes GALFIT files with different initial parameters
+
+    MakeBash
+        makes a bash file to run GALFIT on every file created by
+        MakeParams method
+
+    ReadFile
+        read a file and returns the lines of the file as a list
+
+    """
+
     def __init__(
         self,
         GalfitFile: str,
