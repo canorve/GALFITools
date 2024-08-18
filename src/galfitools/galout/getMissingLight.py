@@ -13,9 +13,42 @@ from scipy.special import gamma, gammainc, gammaincinv
 
 
 def getMissLight(galfitFile1, galfitFile2, dis, num_comp, rad):
-    """gets the missing light from the difference between two GALFIT models"""
+    """gets the missing light from the difference between two GALFIT models
 
-    # reading arguments parsing
+    From two surface brightness models of the same galaxy, this function
+    computes the magnitude of the difference between the two models. The
+    calculation extends from the center to the radius provided by the user
+
+    Parameters
+    ----------
+    galfitFile1 : str
+                Galfit File containing the coreless
+                surface brightness model
+    galfitFile2 : str
+                Galfit File containing the core surface
+                brightness model
+    dis : float
+        Maximum distance among components
+    num_comp : int
+            number of component to select center of galaxy. It will
+            apply for both GALFIT files
+    rad : float
+          upper limit of radius to integrate the missing light in pixels
+
+    Returns
+    -------
+    magmiss : float
+            magnitude of the missing light
+
+    N1 : number of components of model 1
+    N2 : number of components of model 2
+
+    Warnings
+    --------
+    It only works for Sersic functions and their derivations
+    such as de Vaucouleurs, exponential, gaussian.
+
+    """
 
     galfit1 = Galfit(galfitFile1)
     head1 = galfit1.ReadHead()
@@ -54,6 +87,12 @@ def getMissLight(galfitFile1, galfitFile2, dis, num_comp, rad):
 
 
 class GetMag:
+    """Obtains the total flux and magnitude up
+    to a given radius, applicable only for Sersic functions.
+
+
+    """
+
     def GetFlux(self, head, comps, gamRad):
 
         # comps.Rad = comps.Rad*head.scale
@@ -61,7 +100,7 @@ class GetMag:
 
         k = gammaincinv(2 * comps.Exp, 0.5)
 
-        denom1 = (2 * np.pi * comps.Rad ** 2) * (np.exp(k))
+        denom1 = (2 * np.pi * comps.Rad**2) * (np.exp(k))
         denom2 = (comps.Exp) * (k ** (-2 * comps.Exp))
         # axis ratio must be considered if mag total will be used:
         denom3 = (gamma(2 * comps.Exp)) * (comps.AxRat)
@@ -104,7 +143,7 @@ class GetMag:
 
         Fr = (
             Ie
-            * (Re ** 2)
+            * (Re**2)
             * (2 * np.pi * q * n)
             * np.exp(k)
             * (k ** (-2 * n))
@@ -116,6 +155,20 @@ class GetMag:
 
 
 def getMiss(head, mag1, mag2):
+    """obtains the magnitude difference
+
+    Parameters
+    ----------
+    head : GalHead data class defined in galfit.py
+    mag1 : Magnitude 1
+    mag2 : Magnitude 2
+
+    Returns
+    -------
+    magMiss : float
+            magnitude difference
+
+    """
 
     Flux1 = 10 ** ((head.mgzpt - mag1) / 2.5)
     Flux2 = 10 ** ((head.mgzpt - mag2) / 2.5)
