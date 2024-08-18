@@ -7,6 +7,29 @@ import numpy as np
 
 
 def log2csv(num: int, fileout: str):
+    """converts GALFIT fit.log file into a comma separated
+        values file (CSV)
+
+    Parameters
+    ----------
+    num : int
+          number of the fit in fit.log to
+          convert to csv. Default: last GALFIT fit
+
+    fileout : str
+            name of the output file
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    It assumes that fit.log is in the same directory where
+    this function is executed.
+
+
+    """
 
     file = "fit.log"
 
