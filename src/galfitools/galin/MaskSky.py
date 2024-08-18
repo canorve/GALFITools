@@ -9,11 +9,34 @@ import numpy as np
 from astropy.io import fits
 from galfitools.galin.MaskDs9 import GetAxis
 
-#################################################################
-#################################################################
-
 
 def skyRem(imageFile, maskFile, mean, sig, nsig, borValue, bor_flag=False):
+    """Creates a mask image for GALFIT by subtracting the sky background.
+
+    Parameters
+    ----------
+    imageFile : str
+                FITS image where the data will be taken
+    maskFile : str
+               name of the new mask image
+    mean : float
+            mean of the sky  background
+    sig : float
+          standard deviation of sky
+    nsig : float
+          number of sky standard deviations to be removed from image
+    borValue : float
+               value of the border
+    bor_flag : False, optional
+               if True, it will mask the border of the image. This is
+               for those region where the image matrix is larger than the
+               data matrix, e.g.  Hubble images
+
+    Returns
+    -------
+    None
+
+    """
 
     bor_val = 100
 
@@ -66,7 +89,22 @@ def skyRem(imageFile, maskFile, mean, sig, nsig, borValue, bor_flag=False):
 
 
 def MakeImage(newfits, sizex, sizey):
-    "create a new blank Image"
+    """create a new blank FITS Image
+
+    Parameters
+    ----------
+    newfits : str
+              name of the new image
+    sizex : int
+            number of columns of the new image
+    sizey : int
+            number of rows of the new image
+
+    Returns
+    -------
+    bool
+
+    """
 
     if os.path.isfile(newfits):
         print("{} deleted; a new one is created \n".format(newfits))
