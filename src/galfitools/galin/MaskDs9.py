@@ -12,14 +12,53 @@ from matplotlib.path import Path
 def maskDs9(
     MaskFile: str,
     RegFile: str,
-    fill: bool,
+    fill: float,
     image: str,
     bor_flag: bool,
     borValue: int,
     skymean=None,
     skystd=None,
 ) -> None:
+    """Creates masks from DS9 regions
 
+    given DS9 regions such as box, ellipse or polygon it
+    creates those regions as masks in a mask image for GALFIT.
+    If the mask image does not exists, it creates one.
+
+    It also removes unwanted regions in the original image
+    such as saturated regions by providing mean and standard
+    deviation of sky.
+
+    Parameters
+    ----------
+
+    MaskFile : str
+              name of the mask image file
+    RegFile : str
+             name of the file containing the DS9 regions
+    fill : float
+            value to fill withing DS9 regions
+    image : str
+            new of the image file to take the size of the matrix
+            to create a new mask file if it does not exists.
+    bor_flag : False, optional
+               if True, it will mask the border of the image. This is
+               for those region where the image matrix is larger than the
+               data matrix, e.g.  Hubble images
+    borValue : float
+               value of the border
+    skymean : None, optional
+              mean of the sky value to be substituted inside of
+              the DS9 region
+    skystd : None, optional
+             standard deviation of the sky value to be substituted
+             inside of the DS9 region
+
+    Returns
+    -------
+    None
+
+    """
     if not os.path.exists(MaskFile):
 
         print("%s: image filename does not exist!" % (MaskFile))
@@ -232,7 +271,40 @@ def maskDs9(
 def MakeEllip(
     Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow, skymean=None, skystd=None
 ):
-    "Make an ellipse in an image"
+    """Draw an ellipse in an image
+
+    Parameters
+    ----------
+    Image : ndarray
+            the image matrix array
+    fill : float
+            value to be filled inside the DS9 region
+    xpos, ypos : float, float
+                coordinates of the center
+    rx : float
+        major axis or minor axis of the ellipse
+
+    ry : float
+        minor axis or major axis of the ellipse
+
+    angle : float
+            angular position of the ellipse
+
+    ncol, nrow : int, int
+              size of the image
+    skymean : float
+              mean of the sky background
+    skystd : float
+             standard deviation of sky
+
+
+    Returns
+    -------
+
+    Image : ndarray
+            the image with the ellipse
+
+    """
 
     xx, yy, Rkron, theta, e = Ds9ell2Kronell(xpos, ypos, rx, ry, angle)
     (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, e, ncol, nrow)
@@ -258,7 +330,31 @@ def MakeEllip(
 
 
 def MakePolygon(Image, fill, tupVerts, ncol, nrow, skymean=None, skystd=None):
-    "Make a polygon in an image"
+    """Make a polygon in an image
+
+    Parameters
+    ----------
+    Image : ndarray
+           the image matrix array
+    fill : float
+           value to be filled inside the DS9 region
+    tupVerts : tuple
+              vertices of the polygon
+
+    ncol, nrow : int, int
+                size of the image
+    skymean : float
+              mean of the sky background
+    skystd : float
+            standard deviation of sky
+
+
+    Returns
+    -------
+    Image : ndarray
+            the new image with the polygon
+
+    """
 
     x, y = np.meshgrid(
         np.arange(ncol), np.arange(nrow)
@@ -285,7 +381,42 @@ def MakePolygon(Image, fill, tupVerts, ncol, nrow, skymean=None, skystd=None):
 def MakeBox(
     Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow, skymean=None, skystd=None
 ):
-    "Make a box in an image"
+    """Make a box in an image
+
+    Parameters
+    ----------
+
+    Image : ndarray
+           the image matrix array
+    fill : float
+           value to be filled inside the DS9 region
+    xpos, ypos : float, float
+                coordinates of the center
+    rx : float
+        x-longitude of the box
+
+    ry : float
+        y-longitude of the box
+
+    angle : float
+            angular position of the box
+
+    ncol, nrow : int, int
+                size of the image
+    skymean : float
+              mean of the sky background
+    skystd : float
+            standard deviation of sky
+
+
+
+
+    Returns
+    -------
+    Image : ndarray
+            the image with the box region
+
+    """
 
     anglerad = angle * np.pi / 180
     beta = np.pi / 2 - anglerad
@@ -334,8 +465,7 @@ def MakeBox(
 
 
 def GetAxis(Image):
-    # k Check
-    "Get number of rows and columns from the image"
+    """Get number of rows and columns from the image"""
 
     i = 0  # index indicated where the data is located
 
@@ -353,7 +483,13 @@ def GetAxis(Image):
 
 
 def checkCompHDU(file):
-    """ check if fits file is a CompImageHDU"""
+    """check if fits file is a CompImageHDU
+
+    Notes
+    -----
+    function not used anymore
+
+    """
     flag = False
     hdul = fits.open(file)
 
@@ -368,6 +504,26 @@ def checkCompHDU(file):
 
 
 def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
+    """Converts DS9 ellipse parameters to geometrical parameters
+
+    Parameters
+    ----------
+    obj : str
+          object name
+    xpos : float, x-center
+    ypos : float, y-center
+    rx : float, major or minor axis
+    ry : float, minor or major axis
+    angle : float, angular position
+
+    Returns
+    -------
+    xx : float, x center position
+    yy : float, y center positon
+    Rkron : float, major axis
+    theta: float, angular position measured from Y-axis
+    e: float, ellipticity
+    """
 
     if rx >= ry:
 
@@ -405,8 +561,28 @@ def MakeKron(
     skymean=None,
     skystd=None,
 ):
-    '''This subroutine create a Kron ellipse within a box defined by:
-    xmin, xmax, ymin, ymax'''
+    """This creates a ellipse in an image
+
+    This function creates an ellipse and fills the pixels inside it
+    with the value specified by idn. The ellipse is created within
+    a box delimited by xmin, xmax, ymin, and ymax.
+
+    Parameters
+    ----------
+    imagemat : ndarray, the image matrix
+    idn : int the value to fill the ellipse
+    x, y : position of the ellipse's center
+    R : ellipse major axis
+    theta : angular position of the ellipse measured from X-axis
+    ell : ellipticity of the ellipse
+    xmin, xmax, ymin, ymax : int, int, int, int
+            box delimitation of the ellipse
+
+    Returns
+    -------
+    imagemat : the image with the new ellipse
+
+    """
 
     # Check
 
@@ -439,7 +615,7 @@ def MakeKron(
     yell = y + R * np.cos(angle) * np.sin(theta) + bim * np.sin(angle) * np.cos(theta)
 
     dell = np.sqrt((xell - x) ** 2 + (yell - y) ** 2)
-    dist = np.sqrt(dx ** 2 + dy ** 2)
+    dist = np.sqrt(dx**2 + dy**2)
 
     mask = dist <= dell
 
@@ -456,8 +632,26 @@ def MakeKron(
 
 
 def GetSize(x, y, R, theta, ell, ncol, nrow):
-    "this subroutine get the maximun"
-    "and minimim pixels for Kron and sky ellipse"
+    """Get the (x,y) coordinates that encompass the ellipse
+
+    Parameters
+    ----------
+    x : float, x-center of ellipse
+    y : float, y-center of ellipse
+    R : float, major axis of ellipse
+    theta : float, angular position of ellipse
+    ell : float, ellipticity
+    ncol : number of columns of the image
+    nrow : number of rows of the image
+
+
+    Returns
+    -------
+    xmin, xmax, ymin, ymax : Minimum and maximum coordinates
+    that encompass the ellipse.
+
+    """
+
     # k Check
     q = 1 - ell
     bim = q * R
@@ -467,10 +661,10 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     # getting size
 
     constx = np.sqrt(
-        (R ** 2) * (np.cos(theta)) ** 2 + (bim ** 2) * (np.sin(theta)) ** 2
+        (R**2) * (np.cos(theta)) ** 2 + (bim**2) * (np.sin(theta)) ** 2
     )
     consty = np.sqrt(
-        (R ** 2) * (np.sin(theta)) ** 2 + (bim ** 2) * (np.cos(theta)) ** 2
+        (R**2) * (np.sin(theta)) ** 2 + (bim**2) * (np.cos(theta)) ** 2
     )
 
     xmin = x - constx
