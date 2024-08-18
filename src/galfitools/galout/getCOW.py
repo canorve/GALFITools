@@ -30,7 +30,56 @@ def getCOW(
     galfitF2: str,
     maxdiff: bool,
 ) -> float:
-    """plots the curve-of-growth from the galfit.XX file. Only for Sersic functions"""
+    """plots the curve-of-growth
+
+    Makes a plot of the Curver-of-Growth from the galfit.XX file.
+    The curve model is made from the Sersic functions.
+
+    Parameters
+    ----------
+    galfitFile: str
+                name of the GALFIT file
+    dis: int
+        maximum distance among components
+    angle: float
+            angular position of the major axis galaxy.
+            by default (if it is set to None)
+            it will take the last component
+            of the model in the GALFIT file.
+    frac: float
+          fraction of light radius. This is the upper limit of
+          X-Axis.
+    num_comp: int,
+             Number of component where it'll obtain the center (X,Y)
+    plotname: str
+            name of the output plot fileh
+    dpival: int
+            value of the dpi (dots per inch) for the plot
+    galfitF2: str
+            Second GALFIT file to add to the plot (optional).
+    maxdiff: bool
+            plot the maximum difference as a vertical line between
+            model 1 and 2 (galfitF2)
+
+    Returns
+    -------
+
+    totmag : float
+            total magnitude
+    N : int
+        total number of components of the galaxy
+    theta : float
+           Angular position indicating the direction of
+           the galaxy's curve of growth.
+
+    Warnings
+    --------
+    use `dis` parameter with precaution. The equations assume
+    that the components of the same galaxy share the same center.
+    greater values of dis will produce wrong computations of COW
+
+
+    """
 
     galfit = Galfit(galfitFile)
 
@@ -122,6 +171,11 @@ def getCOW(
 
 
 def readGalfitF2(galfitF2, dis, angle, num_comp):
+    """
+    Reads the GALFIT file to obtain header and
+    components information
+
+    """
 
     galfit = Galfit(galfitF2)
 
@@ -141,21 +195,49 @@ def readGalfitF2(galfitF2, dis, angle, num_comp):
     comps2 = conver2Sersic(galcomps2)
 
     N = numComps(comps2, "all")
-    # print('number of model components: ',N)
 
     if N == 0:
         print("not enough number of components to plot COW")
         print("exiting..")
         sys.exit(1)
 
-    # line = "Using a theta value of : {:.2f} degrees \n".format(theta2)
-    # print(line)
-
     return head2, comps2, theta2
 
 
 class GetCOW:
-    """class to obtain the Curve-of-Growth at a given radius """
+    """Obtains the Curve-of-Growth at a given radius
+
+    The main method is GetCOWrad which calls to the other methods
+    This is the one to be used. See the parameters of this method
+    below:
+
+    Parameters
+    ----------
+    head :  GalHead data class defined in galin/galfit.py
+    comps : GalComps data class defined in galin/galfit.py
+    theta : float
+           Angular position indicating the direction of
+           the galaxy's curve of growth.
+    R : array
+        Array indicating the radius at each point where the
+        curve of growth will be computed.
+
+    Methods
+    -------
+    GetCOWrad : given a array of R, obtains the curve of growth
+
+    GetCOWFluxR : selects the components of the galaxy and gets the
+                total flux of the COW at a given R
+
+    funCOWSer : obtains the function of the COW
+
+    COWtotser : obtains the total Sersic flux of all components
+                to a determined R
+
+    COWser : obtains the Sersic flux of one component to a determined R
+
+
+    """
 
     def GetCOWrad(self, head, comps, theta, R):
 
@@ -186,10 +268,6 @@ class GetCOW:
         maskgal = comps.Active == 1
 
         comps.Flux = 10 ** ((galhead.mgzpt - comps.Mag) / 2.5)
-
-        # totFlux = comps.Flux[maskgal].sum()
-
-        # totmag = -2.5 * np.log10(totFlux) + galhead.mgzpt
 
         # rad refers to the radius where flux will be computed
         # comps.Rad refers to the effective radius of every component
@@ -238,152 +316,8 @@ class GetCOW:
         return Fr
 
 
-############################
-############################
-#
-
-
-class GetN:
-    """Class to compute the Sersic index from photometric parameters"""
-
-    def GalNs(self, EffRad, EffRadfrac, F):
-
-        sers = np.array([])
-
-        for idx, f in enumerate(F):
-
-            n = self.ReRfrac(EffRad, EffRadfrac[idx], f)
-
-            sers = np.append(sers, n)
-
-        return sers
-
-    def MeMeanMe(self, me: float, meanme: float) -> float:
-
-        a = 0.1
-        b = 12
-
-        Sersic = self.solveSer(a, b, me, meanme)
-
-        return Sersic
-
-    def solveSer(self, a: float, b: float, me: float, meanme: float) -> float:
-        "return the sersic index. It uses Bisection"
-
-        try:
-
-            N = bisect(self.funMeMeanMe, a, b, args=(me, meanme))
-
-        except Exception:
-            print("solution not found for the given range")
-            N = 0
-
-        return N
-
-    def funMeMeanMe(self, n: float, me: float, meanme: float) -> float:
-
-        # k = gammaincinv(2 * n, 0.5)
-
-        fn = self.Fn(n)
-
-        result = me - meanme - 2.5 * np.log10(fn)
-
-        return result
-
-    def Fn(self, n: float) -> float:
-
-        k = gammaincinv(2 * n, 0.5)
-
-        fn = ((n * np.exp(k)) / (k ** (2 * n))) * gamma(2 * n)
-
-        return fn
-
-    def ReRfrac(self, Re: float, Rfrac: float, frac: float) -> float:
-
-        a = 0.1
-        b = 12
-
-        Sersic = self.solveSerRe(a, b, Re, Rfrac, frac)
-
-        return Sersic
-
-    def solveSerRe(
-        self, a: float, b: float, Re: float, Rfrac: float, frac: float
-    ) -> float:
-        "return the sersic index. It uses Bisection"
-
-        try:
-            N = bisect(self.funReRfrac, a, b, args=(Re, Rfrac, frac))
-
-        except Exception:
-            print("solution not found for the given range")
-            N = 0
-
-        return N
-
-    def funReRfrac(self, n: float, Re: float, Rfrac: float, frac: float) -> float:
-
-        k = gammaincinv(2 * n, 0.5)
-
-        x = k * (Rfrac / Re) ** (1 / n)
-
-        result = frac * gamma(2 * n) - gamma(2 * n) * gammainc(2 * n, x)
-
-        return result
-
-    def MeM0(self, me: float, m0: float) -> float:
-        """Uses me and m0 to compute n. It is not very realiable
-        and takes longer than the other two methods"""
-        a = 0
-        b = 45
-
-        K = self.solveKm0(a, b, me, m0)
-
-        a = 0.2
-        b = 40
-
-        Sersic = self.solveSerK(a, b, K)
-
-        return Sersic
-
-    def solveKm0(self, a: float, b: float, me: float, m0: float) -> float:
-        "return the sersic index. It uses Bisection"
-
-        try:
-            K = bisect(self.funMeM0, a, b, args=(me, m0))
-
-        except Exception:
-            print("solution not found for the given range")
-            K = 0
-
-        return K
-
-    def funMeM0(self, K: float, me: float, m0: float) -> float:
-
-        result = me - m0 - 2.5 * K / np.log(10)
-
-        return result
-
-    def solveSerK(self, a: float, b: float, k: float) -> float:
-
-        try:
-            sersic = bisect(self.funK, a, b, args=(k))
-
-        except Exception:
-            print("solution not found for the given range")
-            sersic = 0
-
-        return sersic
-
-    def funK(self, n: float, k: float) -> float:
-
-        result = gammaincinv(2 * n, 0.5) - k
-
-        return result
-
-
 #############################################################################
-#   End of program  ###################################
+#   End of program
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
