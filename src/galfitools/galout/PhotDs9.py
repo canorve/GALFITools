@@ -10,7 +10,32 @@ from matplotlib.path import Path
 
 
 def photDs9(ImageFile, RegFile, maskfile, zeropoint, sky):
+    """computes the magnitude inside a DS9 region file
 
+    Computes the magnitude inside the region defined by ellipse,
+    box or polygon in DS9 region format.
+
+    Parameters
+    ----------
+    ImageFile : str
+                name of the image file
+    RegFile : str
+            name of the DS9 region file
+    maskfile : str
+               name of the mask image
+    zeropoint : float
+                magnitude zero point
+    sky : float
+         sky background in counts
+
+    Returns
+    -------
+    mag : float
+          magnitude measured from region
+    exptime : float
+            exposition time from image
+
+    """
     if not os.path.exists(ImageFile):
 
         print("image filename does not exist!")
@@ -183,7 +208,7 @@ def photDs9(ImageFile, RegFile, maskfile, zeropoint, sky):
 
 
 def FluxEllip(Image, xpos, ypos, rx, ry, angle, ncol, nrow):
-    "obtain flux from  an ellipse region in an image"
+    """Gets the flux from an DS9 region ellipse in an image"""
 
     xx, yy, Rkron, theta, e = Ds9ell2Kronell(xpos, ypos, rx, ry, angle)
     (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, e, ncol, nrow)
@@ -193,7 +218,7 @@ def FluxEllip(Image, xpos, ypos, rx, ry, angle, ncol, nrow):
 
 
 def FluxPolygon(Image, tupVerts, ncol, nrow):
-    "obtainn flux from a polygon region in an image"
+    """Gets the flux from a DS9 region polygon in an image"""
 
     x, y = np.meshgrid(
         np.arange(ncol), np.arange(nrow)
@@ -211,7 +236,7 @@ def FluxPolygon(Image, tupVerts, ncol, nrow):
 
 
 def FluxBox(Image, xpos, ypos, rx, ry, angle, ncol, nrow):
-    "obtain the flux from a box region in an image"
+    """Gets the flux from a DS9 region box in an image"""
 
     anglerad = angle * np.pi / 180
     beta = np.pi / 2 - anglerad
@@ -253,7 +278,7 @@ def FluxBox(Image, xpos, ypos, rx, ry, angle, ncol, nrow):
 
 
 def MakeBoxBack(Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow):
-    "Make a box in an image"
+    """Make a box in an image. Deprecated"""
 
     xlo = xpos - rx / 2 - 1
     xhi = xpos + rx / 2 + 1
@@ -300,6 +325,9 @@ def MakeBoxBack(Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow):
 
 
 def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
+    """Converts the DS9 ellipse parameters to
+    ellipse parameters
+    """
 
     if rx >= ry:
 
@@ -321,8 +349,8 @@ def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
 
 
 def FluxKron(imagemat, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
-    '''This subroutine obtain flux from a Kron ellipse within a
-     box defined by: xmin, xmax, ymin, ymax'''
+    """This subroutine obtain the flux from a Kron ellipse delimited
+    by box defined by: xmin, xmax, ymin, ymax"""
 
     xmin = int(xmin)
     xmax = int(xmax)
@@ -353,7 +381,7 @@ def FluxKron(imagemat, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     yell = y + R * np.cos(angle) * np.sin(theta) + bim * np.sin(angle) * np.cos(theta)
 
     dell = np.sqrt((xell - x) ** 2 + (yell - y) ** 2)
-    dist = np.sqrt(dx ** 2 + dy ** 2)
+    dist = np.sqrt(dx**2 + dy**2)
 
     mask = dist <= dell
     flux = imagemat[ypos[mask], xpos[mask]].sum()
@@ -362,8 +390,11 @@ def FluxKron(imagemat, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
 
 
 def GetSize(x, y, R, theta, ell, ncol, nrow):
-    "this subroutine get the maximun"
-    "and minimim pixels for Kron and sky ellipse"
+    """Gets the maximun
+    and minimim pixels that encloses the ellipse
+
+    """
+
     # k Check
     q = 1 - ell
     bim = q * R
@@ -373,10 +404,10 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     # getting size
 
     constx = np.sqrt(
-        (R ** 2) * (np.cos(theta)) ** 2 + (bim ** 2) * (np.sin(theta)) ** 2
+        (R**2) * (np.cos(theta)) ** 2 + (bim**2) * (np.sin(theta)) ** 2
     )
     consty = np.sqrt(
-        (R ** 2) * (np.sin(theta)) ** 2 + (bim ** 2) * (np.cos(theta)) ** 2
+        (R**2) * (np.sin(theta)) ** 2 + (bim**2) * (np.cos(theta)) ** 2
     )
 
     xmin = x - constx
@@ -404,8 +435,8 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 
 
 def GetExpTime(Image):
-    # k Check
-    "Get exposition time from the image"
+    """Get exposition time
+    from the image header"""
 
     try:
         hdu = fits.open(Image)
@@ -417,7 +448,7 @@ def GetExpTime(Image):
 
 
 #############################################################################
-#   End of program  ###################################
+#   End of program
 #     ______________________________________________________________________
 #    /___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/___/_/|
 #   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|__/|
