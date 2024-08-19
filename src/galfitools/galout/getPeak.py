@@ -10,7 +10,34 @@ from galfitools.galin.MaskDs9 import GetAxis
 
 
 def getPeak(image: str, regfile: str, center: bool, maskfile: str) -> None:
-    """return the coordinates of the peak given an DS9 region file"""
+    """Returns the coordinates of the pixel with the
+        highest value of counts from a DS9 ellipse region file
+
+
+    Parameters
+    ----------
+    image : str
+            name of the image FITS file
+    regfile : str
+            name of the DS9 region file that containts the ellipse
+    center : bool
+            if True it uses the geometrical center of the ellipse instead
+            of the peak
+    maskfile : str
+              name of the mask FITS file
+
+    Returns
+    -------
+    float, float
+                X,Y coordinates of the pixel with the highest count value
+    axratio : float
+             axis ratio of the DS9 ellipse region file
+
+    theta : float
+
+
+
+    """
 
     # root_ext = os.path.splitext(image)
     # timg= root_ext[0]
@@ -61,6 +88,7 @@ def getPeak(image: str, regfile: str, center: bool, maskfile: str) -> None:
 
 
 def GetInfoEllip(regfile):
+    """extracts ellipse parameters from DS9 region file"""
 
     if not os.path.exists(regfile):
         print("%s: reg filename does not exist!" % (regfile))
@@ -120,6 +148,9 @@ def GetInfoEllip(regfile):
 
 
 def Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle):
+    """converts DS9 ellipse paramters to
+    geometrical parameters
+    """
 
     if rx >= ry:
 
@@ -141,8 +172,10 @@ def Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle):
 
 
 def GetSize(x, y, R, theta, ell, ncol, nrow):
-    "this subroutine get the maximun"
-    "and minimim pixels for Kron and sky ellipse"
+    """Gets the maximun
+    and minimim pixels that encloses the ellipse
+
+    """
     # k Check
     q = 1 - ell
     bim = q * R
@@ -152,19 +185,19 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     # getting size
 
     xmin = x - np.sqrt(
-        (R ** 2) * (np.cos(theta)) ** 2 + (bim ** 2) * (np.sin(theta)) ** 2
+        (R**2) * (np.cos(theta)) ** 2 + (bim**2) * (np.sin(theta)) ** 2
     )
 
     xmax = x + np.sqrt(
-        (R ** 2) * (np.cos(theta)) ** 2 + (bim ** 2) * (np.sin(theta)) ** 2
+        (R**2) * (np.cos(theta)) ** 2 + (bim**2) * (np.sin(theta)) ** 2
     )
 
     ymin = y - np.sqrt(
-        (R ** 2) * (np.sin(theta)) ** 2 + (bim ** 2) * (np.cos(theta)) ** 2
+        (R**2) * (np.sin(theta)) ** 2 + (bim**2) * (np.cos(theta)) ** 2
     )
 
     ymax = y + np.sqrt(
-        (R ** 2) * (np.sin(theta)) ** 2 + (bim ** 2) * (np.cos(theta)) ** 2
+        (R**2) * (np.sin(theta)) ** 2 + (bim**2) * (np.cos(theta)) ** 2
     )
 
     mask = xmin < 1
@@ -187,6 +220,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 
 
 def GetPmax(image, mask, xmin, xmax, ymin, ymax):
+    """get the pixel coordinates with the highest value"""
 
     xmin = int(xmin)
     xmax = int(xmax)
