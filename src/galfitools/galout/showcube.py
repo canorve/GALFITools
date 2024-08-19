@@ -19,6 +19,33 @@ def displayCube(
     scale: float,
     noplot: bool,
 ) -> None:
+    """makes an image of the GALFIT cube image output
+
+    Parameters
+    ----------
+    cubeimage: str
+                name of the GALFIT FITS cube image
+    namecube: str
+              name of the output png image
+    dpival: int
+            dots per inch value
+    brightness: float
+                brightness
+    contrast: float
+            contrast
+    cmap: str
+            name of the matplotlib color map
+    scale: float
+            plate scale of the image
+
+    noplot: bool
+            if True avoids plotting and write the output image
+
+    Returns
+    -------
+    None
+
+    """
 
     ######################
     # shows the image cube#
@@ -47,13 +74,13 @@ def displayCube(
 
 
 def Comp2Ellip(galhead, galcomps, N, lw=1):
-    """ converts galfit component parameter into an Ellipse object"""
+    """converts galfit component parameter into an Ellipse object"""
 
     ellipses = []
 
     # color value
     values = range(N)
-    jet =  plt.get_cmap("jet")
+    jet = plt.get_cmap("jet")
     cNorm = colors.Normalize(vmin=0, vmax=values[-1])
     scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 
@@ -99,7 +126,8 @@ class ShowCube:
         plate=1,
     ):
         """
-        This routine shows the GALFIT output cube image: galaxy, model and residual
+        makes an image of the GALFIT output cube image: galaxy, model and residual
+
         """
 
         hdu = fits.open(cubeimg)
