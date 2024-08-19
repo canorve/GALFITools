@@ -18,14 +18,94 @@ from scipy.special import gamma, gammainc, gammaincinv
 
 def getN(
     galfitFile: str,
-    dis: int,
+    dis: float,
     frac: float,
     angle: float,
     num_comp: int,
     plot: bool,
     const=0,
 ) -> float:
-    """gets the effective radius from a set of Sersics"""
+    """gets the Sersic index
+
+    Assuming the galaxy is physically composed of a single
+    Sersic profile, this function computes the Sersic index
+    using two methods: (1) by comparing the mean surface brightness
+    at the effective radius to the surface brightness at the
+    effective radius, and (2) by using two light fraction
+    radii (effective radius and any other radius). Both methods
+    employ bisection.
+
+    Although it may seem contradictory to derive the Sersic index
+    from a fit involving multiple Sersic components, this approach
+    is useful when the galaxy is modeled using MGE (Multi-Gaussian
+    Expansion) and the Sersic index needs to be estimated.
+
+
+
+    Parameters
+    ----------
+    galfitFile : str
+                name of the GALFIT file
+    dis : float
+         maximum distance among components
+    frac: float,
+            fraction of light.
+    angle: float,
+        Angle of the major axis of the galaxy. If None, it uses
+        the angle of the last component
+    num_comp: int,
+            number of component where the center will be take the center
+    plot: bool,
+         If True, makes a plot of Sersic index vs. fraction of light radius
+         used for computation.
+    const : float, optional
+         Substract constant from plot (for visualization purposes only)
+
+
+    Returns
+    -------
+
+    sersic : float
+    float
+        Sersic index mean of the fraction of light radius
+    float
+        Sersic index standard deviation mean of the fraction of
+        light radius method
+    totmag : float
+            total magnitude
+    N : int
+        total number of components
+    theta : Angular position indicating the direction along
+            which the effective radius and surface brightness
+            at the effective radius are computed.
+
+
+    Warnings
+    --------
+
+    The computation of the Sersic index assumes
+    that all Sersic functions share the same center.
+    Therefore, use the `dis` tolerance variable with
+    caution. If the distance between components
+    is significant, the result will be less accurate.
+
+    Notes
+    -----
+    The fraction light method, gets the Sersic index using
+    two fraction of light radius, for example it uses the
+    Re and R90 (50% of light radius and 90% of light radius)
+    Hence this method uses different fraction of light radius
+    and Re, and it returns the mean and standard deviation of
+    all the estimations of the Sersic index.
+
+    The fraction light method calculates the Sersic index
+    using two light fraction radii, such as the effective
+    radius (Re) and another radius enclosing some fraction
+    of the light. This method uses various light fraction
+    radii and Re, and returns the mean and standard
+    deviation of all Sersic index estimates.
+
+    """
 
     eff = 0.5
 
@@ -44,38 +124,20 @@ def getN(
     else:
         theta = galcomps.PosAng[maskgal][-1]
 
-    # theta = 18.2534
-
     # convert all exp, gaussian and de vaucouleurs to Sersic format
     comps = conver2Sersic(galcomps)
 
     N = numComps(comps, "all")
-    # print('number of model components: ',N)
 
     if N == 0:
         print("not enough number of components to compute Re")
         print("exiting..")
         sys.exit(1)
 
-    # line = "Using a theta value of : {:.2f} degrees \n".format(theta)
-    # print(line)
-
     EffRad, totmag = GetReff().GetReSer(head, comps, eff, theta)
 
-    # line = "Total Magnitude of the galaxy: {:.2f} \n".format(totmag)
-    # print(line)
-
-    # line = "The radius at {:.0f}% of light is {:.2f} pixels \n".format(
-    #    eff * 100, EffRad
-    # )
-    # print(line)
-
+    # at the moment, this is ignored
     EffRadfrac, totmag = GetReff().GetReSer(head, comps, frac, theta)
-
-    # line = "The radius at {:.0f}% of light is {:.2f} pixels \n".format(
-    #     frac * 100, EffRadfrac
-    # )
-    # print(line)
 
     comps2 = copy.deepcopy(comps)
     meanme = GetMe().MeanMe(totmag, EffRad * head.scale)
@@ -83,28 +145,13 @@ def getN(
         head, comps2, EffRad * head.scale, theta
     )  # substituing effective radius per 0 gives m0
 
-    # line = 'Surface brightness at effective radius {:.2f} mag/" \n'.format(me)
-    # print(line)
-
     sersic = GetN().MeMeanMe(me, meanme)
-
-    # line = "Sersic index with the method of Mean Surface Brightness at "
-    # + "effective radius: {:.2f}  \n".format(sersic)
-    # print(line)
-
-    # sersic2 = GetN().ReRfrac(EffRad, EffRadfrac, frac)
-
-    # sersic3 = GetN().MeM0(me, m0)
-
-    # line = 'Sersic index with the method of me - mo is {:.2f}  \n'.format(sersic3)
-    # print(line)
-
-    # computing the Sersic indexes for different radius
 
     Fa = np.arange(0.1, 0.5, 0.05)
     Fb = np.arange(0.55, 1, 0.05)
-    F = np.concatenate((Fa, Fb))
+    F = np.concatenate((Fa, Fb))  # list containing the fraction of light
 
+    # computes the radius of those fraction of light F
     R = GetReff().GetRfracSer(head, comps, F, theta)
 
     ns = GetN().GalNs(EffRad, R, F)
@@ -118,27 +165,26 @@ def getN(
         plt.ylabel("Sersic index")
         plt.savefig("Serind.png")
 
-    # print("Sersic index computed at different fraction of light radius: ")
-
-    # for idx, item in enumerate(F):
-    # line = 'Fraction of light: {:.2f} ; Sersic index: {:.2f} '.format(F[idx],ns[idx])
-    # print(line)
-
-    # line = "\nSersic index mean: {:.2f}  Standard deviation: {:.2f}  ".format(
-    #    np.mean(ns), np.std(ns)
-    # )
-    # print(line)
-
-    # separate in two functions:
-
-    # return Effrad, totmag, meanme, me, N, theta
     return sersic, np.mean(ns), np.std(ns), totmag, N, theta
 
 
 class GetN:
-    """Class to compute the Sersic index from photometric parameters"""
+    """Computes the Sersic index from photometric parameters
 
-    def GalNs(self, EffRad, EffRadfrac, F):
+
+
+    Methods
+    -------
+    GalNs : computes the Sersic index from effective radius and
+            other fraction of light radius.
+
+    MeMeanMe : computes the Sersic index from surface brightness
+                at Re and mean surface brightness at Re.
+
+
+    """
+
+    def GalNs(self, EffRad: float, EffRadfrac: list, F: list):
 
         sers = np.array([])
 
