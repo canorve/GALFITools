@@ -958,7 +958,6 @@ class GetFWHM:
 ############################
 ############################
 ############################
-# lastmod
 
 
 def getKappa(
@@ -972,10 +971,71 @@ def getKappa(
     plot: bool,
     ranx: list,
 ) -> float:
-    """gets the Kappa radius from a set of Sersics"""
+    """Obtains the Kappa radius from a set of Sersic functions.
 
-    # head = ReadHead(galfitFile)
-    # galcomps = ReadComps(galfitFile)
+    Given a model composed of multiple Sersic functions,
+    it returns the radius corresponding to the maximum
+    curvature.
+
+    Parameters
+    ----------
+    galfitFile: str
+            name of the GALFIT file
+    dis: float
+        maximum distance among components
+    inicomp: int
+            Number of component where it'll obtain the initial parameter
+            to search kappa radius or to generated random initial radius
+
+    quick: bool
+           If True, it chooses inicomp as a initial parameter
+
+    random: int
+
+          Number of random radii to use as initial parameters for the
+          global maximum search. Random radii will be generated within
+          the range from 0 to the effective radius of the component
+          specified by the inicomp parameter.
+
+    num_comp: int
+            Number of component from which the center of all
+            components will be determined.
+
+    angle: float
+           Position angle of the major axis of the galaxy. If None
+           it will take the angle of the last components
+
+    plot: bool
+          if True, it will makes plot of the second derivative
+
+    ranx: list
+           provide a range for the plot x-axis: xmin - xmax. For plotting,
+           and searching. If None, the range is [.1,100]
+
+    Returns
+    -------
+    rkappa : float
+            kappa radius in pixels
+    N : int
+        total number of components
+    theta : float
+           Angular position indicating the direction along
+           which break radius is computed. In degrees
+
+
+    See Also
+    --------
+    getKappa2 : a more efficient way to compute Kappa radius
+
+
+    Notes
+    -----
+    The maximum of the curvature involves to find
+    the global maximum among many local maximums. Hence the
+    choose of the initial parameters is fundamental.
+
+
+    """
 
     galfit = Galfit(galfitFile)
 
@@ -1044,15 +1104,11 @@ def getKappa(
 
         rkappa = GetKappa().FindKappa(comps, theta, inicomp)
 
-        # line = "The Kappa radius  is {:.2f} pixels \n".format(rbreak)
-        # print(line)
-
     else:
 
         if random:
 
             radius = np.random.random(random) * comps.Rad[maskgal][inicomp]
-            # print('The initial search radius are: ',radius)
 
         else:
 
@@ -1064,6 +1120,10 @@ def getKappa(
 
 
 def MultiFindKappa(comps, theta, radius):
+    """Given a list of radii, it finds the kappa radius by
+    evaluating each radius in the list as an initial parameter.
+
+    """
 
     maskgal = comps.Active == 1
 
@@ -1095,18 +1155,36 @@ def MultiFindKappa(comps, theta, radius):
 
 
 class GetKappa:
-    """class to obtain the Kappa radius for the whole galaxy"""
+    """Class to obtain the kappa radius from a set of Sersic functions.
+       Class called by getKappa function.
+
+
+    Methods
+    -------
+    GalKappa : Evaluates the kappa function
+
+    FindKappa : Return the kappa radii of a set of Sersic functions
+
+    MulFindKappa: Returns the kappa radius by evaluating it at various
+                  initial parameters derived from a list of effective
+                  radii.
+    funGalKappaSer : evaluates the kappa function at a given radius
+
+    BetaSer : kappa function to a determined R
+
+
+    """
 
     def FullSlopeSer(
         self, R: float, Re: list, n: list, q: list, pa: list, theta: float
     ) -> float:
+        # not used here
 
         SlptotR = self.SlopeSer(R, Re, n, q, pa, theta)
 
         return SlptotR.sum()
 
     def GalKappa(self, R: list, comps: GalComps, theta: float) -> float:
-        "plots the curvature of the function"
 
         maskgal = comps.Active == 1  # using active components only
 
@@ -1223,6 +1301,7 @@ class GetKappa:
 
     def FindSlope(self, comps: GalComps, theta: float, slope: float) -> float:
         "return the Re of a set of Sersic functions. It uses Bisection"
+        # not used here
 
         maskgal = comps.Active == 1  # using active components only
 
@@ -1337,6 +1416,7 @@ class GetKappa:
 ############################
 ############################
 ############################
+# lastmod
 
 
 def getReComp(
