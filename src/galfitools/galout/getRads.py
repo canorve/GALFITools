@@ -1416,18 +1416,61 @@ class GetKappa:
 ############################
 ############################
 ############################
-# lastmod
 
 
 def getReComp(
     galfitFile: str, dis: int, eff: float, angle: float, num_comp: int
 ) -> float:
-    """gets the effective radius from a set of Sersics"""
+    """Obtains the effective radius from a set of Sersic functions.
+
+    Given a model composed of multiple Sersic functions,
+    it returns the effective radius or any other radius
+    that represents a percent of total light.
+
+    Parameters
+    ----------
+    galfitFile: str
+            name of the GALFIT file
+    dis: float
+        maximum distance among components
+    eff: float
+         fraction of total light. The function will find
+         the radius at this value. eff must be between 0 and 1
+    angle: float
+           Position angle of the major axis of the galaxy. If None
+           it will take the angle of the last components
+    num_comp: int
+            Number of component from which the center of all
+            components will be determined.
+
+    Returns
+    -------
+
+    EffRad : float
+            radius found at `eff` of total light in pixels
+    totmag : float
+             total magnitude
+    meanme : float
+             mean of surface brightness at effective radius
+             in mag/arcsec**2
+    me : float
+             surface brightness at EffRad  in mag/arcsec**2
+    N : int
+        total number of components
+    theta : float
+           Angular position indicating the direction along
+           which break radius is computed. In degrees
+
+
+    Notes
+    -----
+    The function call a class to find EffRad using the
+    Bisection method.
+
+
+    """
 
     assert (eff > 0) and (eff <= 1), "effrad must be a value between 0 and 1"
-
-    # head = ReadHead(galfitFile)
-    # galcomps = ReadComps(galfitFile)
 
     galfit = Galfit(galfitFile)
 
@@ -1464,6 +1507,7 @@ def getReComp(
     return EffRad, totmag, meanme, me, N, theta
 
 
+# lastmod
 class GetMe:
     """Class to obtain the surface brightness at effective radius"""
 
