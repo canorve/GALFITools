@@ -1584,10 +1584,38 @@ class GetMe:
         return Ir
 
 
-# lastmod
-# Sersic components
 class GetReff:
-    """class to obtain the effective radius for the whole galaxy"""
+    """Class to obtain the effective radius of the composed
+        surface brightness model
+
+    class is called by GetReComp function. Main method is
+    GetReSer.
+
+
+    Attributes
+    ----------
+    Attributes of the main method GetReser.
+    galhead: GalHead data class defined in galin/galfit.py
+             data class that stores header information of
+             Galfit file.
+    comps: GalComps data class defined in galin/galfit.py
+            data class that stores the components parameters
+            of galfit file.
+    eff: float
+         fraction of total light. The method will find
+         the radius at this value. eff must be between 0 and 1
+    theta : float
+           Angular position indicating the direction along
+           which break radius is computed. In degrees
+
+
+    Methods
+    -------
+    GetReSer : computes the effective radius from the
+                composed Sersic model using the bisection method
+
+
+    """
 
     def GetRfracSer(self, head, comps, F, theta):
 
@@ -1701,6 +1729,7 @@ class GetReff:
 ############################
 ############################
 ############################
+# lastmod
 
 
 def getSlope(
