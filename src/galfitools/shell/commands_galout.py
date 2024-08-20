@@ -121,7 +121,7 @@ def mainGetBreak() -> None:
         "-q",
         "--quick",
         action="store_true",
-        help="evaluate in position only (given by -ni parameter",
+        help="evaluate in position only (given by -ni parameter)",
     )
 
     parser.add_argument(
@@ -658,16 +658,12 @@ def mainGetReComp() -> None:
     print(line)
 
     line1 = "Surface brightness at radius of "
-    line2 = "{:.0f}% of light (\u03BCr): {:.2f} mag/'' \n".format(
-        eff * 100, me
-    )
+    line2 = "{:.0f}% of light (\u03BCr): {:.2f} mag/'' \n".format(eff * 100, me)
     line = line1 + line2
     print(line)
 
     line = "Mean Surface Brightness at effective radius (<\u03BC>e):"
-    line2 = " {:.2f} mag/'' \n".format(
-        meanme
-    )
+    line2 = " {:.2f} mag/'' \n".format(meanme)
     line = line1 + line2
     if eff == 0.5:
         print(line)
@@ -860,9 +856,7 @@ def maingetN() -> None:
     print(line)
 
     line = "Sersic index with the method of Mean Surface "
-    + "Brightness at effective radius: {:.2f}  \n".format(
-        sersic
-    )
+    +"Brightness at effective radius: {:.2f}  \n".format(sersic)
     print(line)
 
     line = "Sersic index with the method of fraction of light (at different radius)  \n"
@@ -961,7 +955,8 @@ def mainGetBulgeRad() -> None:
     print(line)
 
     line = 'The bulge radius is {:.2f} pixels or {:.2f} "  \n'.format(
-            rbulge, rbulge_arc)
+        rbulge, rbulge_arc
+    )
     print(line)
 
 

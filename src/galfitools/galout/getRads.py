@@ -21,7 +21,7 @@ from scipy.special import gamma, gammainc, gammaincinv
 
 def getBreak(
     galfitFile: str,
-    dis: int,
+    dis: float,
     inicomp: int,
     quick: bool,
     random: int,
@@ -30,14 +30,75 @@ def getBreak(
     plot: bool,
     ranx: list,
 ) -> float:
-    """gets the break radius from a set of Sersics"""
+    """Obtains the break radius from a set of Sersic functions.
 
-    # head = ReadHead(galfitFile)
-    # galcomps = ReadComps(galfitFile)
+
+    Given a model composed of multiple Sersic functions,
+    it returns the radius corresponding to the maximum
+    of the second derivative.
+
+    Parameters
+    ----------
+    galfitFile: str
+            name of the GALFIT file
+    dis: float
+        maximum distance among components
+    inicomp: int
+            Number of component where it'll obtain the initial parameter
+            to search break radius or to generated random initial radius
+
+    quick: bool
+           If True, it chooses inicomp as a initial parameter
+
+    random: int
+
+          Number of random radii to use as initial parameters for the
+          global maximum search. Random radii will be generated within
+          the range from 0 to the effective radius of the component
+          specified by the inicomp parameter.
+
+    num_comp: int
+            Number of component from which the center of all
+            components will be determined.
+
+    angle: float
+           Position angle of the major axis of the galaxy. If None
+           it will take the angle of the last components
+
+    plot: bool
+          if True, it will makes plot of the second derivative
+
+    ranx: list
+           provide a range for the plot x-axis: xmin - xmax. For plotting,
+           and searching. If None, the range is [.1,100]
+
+    Returns
+    -------
+    rbreak : float
+            break radius in pixels
+    N : int
+        total number of components
+    theta : float
+           Angular position indicating the direction along
+           which break radius is computed. In degrees
+
+
+    See Also
+    --------
+    getBreak2 : a more efficient way to compute Break radius
+
+
+    Notes
+    -----
+    The maximum of the second derivative involves to find
+    the global maximum among many local maximums. Hence the
+    choose of the initial parameters is fundamental.
+
+
+    """
 
     galfit = Galfit(galfitFile)
 
-    # head = galfit.ReadHead()
     galcomps = galfit.ReadComps()
 
     # convert all exp, gaussian and de vaucouleurs to Sersic format
@@ -47,7 +108,7 @@ def getBreak(
 
     k = gammaincinv(2 * comps.Exp, 0.5)
 
-    denom1 = (2 * np.pi * comps.Rad ** 2) * (np.exp(k))
+    denom1 = (2 * np.pi * comps.Rad**2) * (np.exp(k))
     denom2 = (comps.Exp) * (k ** (-2 * comps.Exp))
     denom3 = (gamma(2 * comps.Exp)) * (comps.AxRat)
 
@@ -107,7 +168,6 @@ def getBreak(
         if random:
 
             radius = np.random.random(random) * comps.Rad[maskgal][inicomp]
-            # print('The initial search radius are: ',radius)
 
         else:
 
@@ -118,15 +178,17 @@ def getBreak(
     return rbreak, N, theta
 
 
-def MulFindBreak(comps, theta, radius):
+def MulFindBreak(comps: GalComps, theta: float, radius: list):
+    """Given a list of radii, it finds the break radius by
+    evaluating each radius in the list as an initial parameter.
+
+    """
 
     maskgal = comps.Active == 1
 
     radsbreak = GetBreak().MulFindBreak(comps, theta, radius)
 
     betas = np.array([])
-
-    # print('finding global minimum')
 
     for r in radsbreak:
 
@@ -142,26 +204,42 @@ def MulFindBreak(comps, theta, radius):
 
         betas = np.append(betas, beta)
 
-    # radmask = radsbreak < radius[-1]  # hope it works
-
+    # in this version, to find the maximum is to find min(betas)
     idx = np.where(betas == min(betas))
 
     return radsbreak[idx][0]
 
 
 class GetBreak:
-    """class to obtain the break radius for the whole galaxy"""
+    """Class to obtain the break radius from a set of Sersic functions.
+       Class called by getBreak function.
+
+
+    Methods
+    -------
+    GalBreak : Evaluates the Break function
+
+    FindBreak : Return the break radii of a set of Sersic functions
+
+    MulFindBreak : Returns the break radius by evaluating it at various
+                  initial parameters derived from a list of effective
+                  radii.
+    funGalBreakSer : evaluates the break function at a given radius
+
+    BreakSer : Break function to a determined R
+
+    """
 
     def FullSlopeSer(
         self, R: float, Re: list, n: list, q: list, pa: list, theta: float
     ) -> float:
+        # not used here
 
         SlptotR = self.SlopeSer(R, Re, n, q, pa, theta)
 
         return SlptotR.sum()
 
     def GalBreak(self, R: list, comps: GalComps, theta: float) -> float:
-        "plots the curvature of the function"
 
         maskgal = comps.Active == 1  # using active components only
 
@@ -194,13 +272,13 @@ class GetBreak:
         theta: float,
         slope: float,
     ) -> float:
+        # not used here
 
         fun = self.SlopeSer(R, Ie, Re, n, q, pa, theta) - slope
 
         return fun
 
     def FindBreak(self, comps: GalComps, theta: float, initial_comp: int) -> float:
-        "return the break radii of a set of Sersic functions"
 
         maskgal = comps.Active == 1  # using active components only
 
@@ -224,7 +302,6 @@ class GetBreak:
         return breakrad[0]
 
     def MulFindBreak(self, comps: GalComps, theta: float, radius: list) -> float:
-        "return the break radius evaluated at different effective radius"
 
         brads = np.array([])
 
@@ -262,6 +339,7 @@ class GetBreak:
 
     def FindSlope(self, comps: GalComps, theta: float, slope: float) -> float:
         "return the Re of a set of Sersic functions. It uses Bisection"
+        # not used here
 
         maskgal = comps.Active == 1  # using active components only
 
@@ -285,7 +363,7 @@ class GetBreak:
             )
 
         except Exception:
-            print("unable to solve equation in the given range. Setting n to 99")
+            print("unable to solve equation in the given range. Setting Radslp to 0")
             Radslp = 0
 
         return Radslp
@@ -310,7 +388,7 @@ class GetBreak:
 
         k = gammaincinv(2 * n, 0.5)
 
-        varxpr2 = (k / n) * ((R / Re) ** (1 / n - 2)) * (1 / Re ** 2) * (1 / n - 1)
+        varxpr2 = (k / n) * ((R / Re) ** (1 / n - 2)) * (1 / Re**2) * (1 / n - 1)
 
         return varxpr2
 
@@ -330,14 +408,13 @@ class GetBreak:
         self, R: float, Ie: list, Re: list, n: list, X: list, Xprim: list, Xprim2: list
     ):
 
-        Sprim2 = Ie * np.exp(-X) * Xprim ** 2 - Ie * np.exp(-X) * Xprim2
+        Sprim2 = Ie * np.exp(-X) * Xprim**2 - Ie * np.exp(-X) * Xprim2
 
         return Sprim2.sum()
 
     def BreakSer(
         self, R: float, Ie: list, Re: list, n: list, q: list, pa: list, theta: float
     ) -> float:
-        """Break from sersic function to a determined R"""
 
         Rcor = GetRadAng(R, q, pa, theta)
 
@@ -350,8 +427,8 @@ class GetBreak:
         Sprim2 = self.var_Sprim2(Rcor, Ie, Re, n, X, Xprim, Xprim2)
 
         Break = (Sprim / S) * (R / np.log10(np.e)) + (
-            (Sprim2 * S - Sprim ** 2) / S ** 2
-        ) * (R ** 2 / np.log10(np.e))
+            (Sprim2 * S - Sprim**2) / S**2
+        ) * (R**2 / np.log10(np.e))
 
         return Break
 
@@ -374,9 +451,60 @@ class GetBreak:
 
 
 def getBreak2(
-    galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool, ranx: list
+    galfitFile: str, dis: float, angle: float, num_comp: int, plot: bool, ranx: list
 ) -> float:
-    """gets the break radius from a set of Sersics using another method"""
+    """Obtains the break radius from a set of Sersic functions.
+        This is an alternative method to getBreak
+
+
+    Given a model composed of multiple Sersic functions,
+    it returns the radius corresponding to the maximum
+    of the second derivative. This method is more efficient
+    to find the global maximum than getBreak
+
+    Parameters
+    ----------
+    galfitFile: str
+            name of the GALFIT file
+    dis: float
+        maximum distance among components
+    num_comp: int
+            Number of component from which the center of all
+            components will be determined.
+    angle: float
+           Position angle of the major axis of the galaxy. If None
+           it will take the angle of the last components
+    plot: bool
+          if True, it will makes plot of the second derivative
+    ranx: list
+           provide a range for the plot x-axis: xmin - xmax. For plotting,
+           and searching. If None, the range is [.1,100]
+
+
+    Returns
+    -------
+    rbreak : float
+            break radius in pixels
+    N : int
+        total number of components
+    theta : float
+           Angular position indicating the direction along
+           which break radius is computed. In degrees
+
+
+    See Also
+    --------
+    getBreak : an alternative to find Break radius
+
+
+    Notes
+    -----
+    The maximum of the second derivative involves to find
+    the global maximum among many local maximums. Hence the
+    choose of the appropiate range with the `ranx` variable
+
+
+    """
 
     galfit = Galfit(galfitFile)
 
@@ -390,7 +518,7 @@ def getBreak2(
 
     k = gammaincinv(2 * comps.Exp, 0.5)
 
-    denom1 = (2 * np.pi * comps.Rad ** 2) * (np.exp(k))
+    denom1 = (2 * np.pi * comps.Rad**2) * (np.exp(k))
     denom2 = (comps.Exp) * (k ** (-2 * comps.Exp))
     denom3 = (gamma(2 * comps.Exp)) * (comps.AxRat)
 
@@ -459,7 +587,7 @@ def getBreak2(
 
     brad = lrad[idx]
 
-    rbreak = 10 ** brad
+    rbreak = 10**brad
 
     return rbreak, N, theta
 
@@ -467,8 +595,58 @@ def getBreak2(
 def getKappa2(
     galfitFile: str, dis: int, angle: float, num_comp: int, plot: bool, ranx: list
 ) -> float:
-    """gets the kappa radius (maximum curvature) from a set of
-    Sersics using another method"""
+    """Obtains the kappa radius from a set of Sersic functions.
+        This is an alternative method to getKappa function.
+
+
+    Given a model composed of multiple Sersic functions,
+    it returns the radius corresponding to the maximum
+    curvature. This method is more efficient
+    to find the global maximum than getKappa
+
+    Parameters
+    ----------
+    galfitFile: str
+            name of the GALFIT file
+    dis: float
+        maximum distance among components
+    num_comp: int
+            Number of component from which the center of all
+            components will be determined.
+    angle: float
+           Position angle of the major axis of the galaxy. If None
+           it will take the angle of the last components
+    plot: bool
+          if True, it will makes plot of the second derivative
+    ranx: list
+           provide a range for the plot x-axis: xmin - xmax. For plotting,
+           and searching. If None, the range is [.1,100]
+
+
+    Returns
+    -------
+    rbreak : float
+            break radius in pixels
+    N : int
+        total number of components
+    theta : float
+           Angular position indicating the direction along
+           which break radius is computed. In degrees
+
+
+    See Also
+    --------
+    getKappa: an alternative to find Kappa radius
+
+
+    Notes
+    -----
+    The maximum of the curvature involves to find
+    the global maximum among many local maximums. Hence the
+    choose of the appropiate range with the `ranx` variable
+
+
+    """
 
     galfit = Galfit(galfitFile)
 
@@ -482,7 +660,7 @@ def getKappa2(
 
     k = gammaincinv(2 * comps.Exp, 0.5)
 
-    denom1 = (2 * np.pi * comps.Rad ** 2) * (np.exp(k))
+    denom1 = (2 * np.pi * comps.Rad**2) * (np.exp(k))
     denom2 = (comps.Exp) * (k ** (-2 * comps.Exp))
     denom3 = (gamma(2 * comps.Exp)) * (comps.AxRat)
 
@@ -526,7 +704,7 @@ def getKappa2(
     yspl1d = yspl.derivative(n=1)  # this is the second derivative of the Sersics
     # yspl2d = yspl.derivative(n=2)  # this is the Third derivative of the Sersics
 
-    kap1d = np.abs(yspl1d(lrad)) / (1 + slp ** 2) ** (3 / 2)
+    kap1d = np.abs(yspl1d(lrad)) / (1 + slp**2) ** (3 / 2)
 
     if plot:
         plt.close()
@@ -542,7 +720,7 @@ def getKappa2(
 
     krad = lrad[idx]
 
-    rkappa = 10 ** krad
+    rkappa = 10**krad
 
     return rkappa, N, theta
 
@@ -553,10 +731,37 @@ def getKappa2(
 
 
 def getFWHM(galfitFile: str, dis: int, angle: float, num_comp: int):
-    """gets the FWHM from a set of Sersics"""
+    """Obtains  gets the FWHM from a set of Sersics functions.
 
-    # head = ReadHead(galfitFile)
-    # galcomps = ReadComps(galfitFile)
+    Given a model composed of multiple Sersic functions,
+    it returns the radius with Full Width Half Maximum (FWHM)
+
+    Parameters
+    ----------
+    galfitFile: str
+            name of the GALFIT file
+    dis: float
+        maximum distance among components
+    angle: float
+           Position angle of the major axis of the galaxy. If None
+           it will take the angle of the last components
+    num_comp: int
+            Number of component from which the center of all
+            components will be determined.
+
+    Returns
+    -------
+
+    fwhm : float
+           FWHM radius in pixels
+    N : int
+        total number of components
+    theta : float
+           Angular position indicating the direction along
+           which break radius is computed. In degrees
+
+
+    """
 
     galfit = Galfit(galfitFile)
 
@@ -570,7 +775,7 @@ def getFWHM(galfitFile: str, dis: int, angle: float, num_comp: int):
 
     k = gammaincinv(2 * comps.Exp, 0.5)
 
-    denom1 = (2 * np.pi * comps.Rad ** 2) * (np.exp(k))
+    denom1 = (2 * np.pi * comps.Rad**2) * (np.exp(k))
     denom2 = (comps.Exp) * (k ** (-2 * comps.Exp))
     denom3 = (gamma(2 * comps.Exp)) * (comps.AxRat)
 
@@ -606,7 +811,25 @@ def getFWHM(galfitFile: str, dis: int, angle: float, num_comp: int):
 
 
 class GetFWHM:
-    """class to obtain the FWHM for the whole galaxy"""
+    """Class to obtain the FWHM for the whole model
+       Class called by getFWHM function.
+
+
+    Methods
+    -------
+    FindFWHM : return the fwhm of a set of Sersic functions.
+                It uses Bisection
+
+    FullFWHMSer : Surface brightness I(R) from sersic function evaluated at R
+
+    GalFWHM : Evaluates the surface britghtness from a list of R
+
+    funGalFWHMSer : Evaluates Surface brightness at R
+
+    FWHMSer :  Surface brightness I(R) from sersic function evaluated at R
+
+
+    """
 
     def FullFWHMSer(
         self, R: float, Re: list, n: list, q: list, pa: list, theta: float
@@ -654,7 +877,6 @@ class GetFWHM:
         return fun
 
     def FindFWHM(self, comps: GalComps, theta: float) -> float:
-        "return the fwhm of a set of Sersic functions. It uses Bisection"
 
         maskgal = comps.Active == 1  # using active components only
 
@@ -736,6 +958,7 @@ class GetFWHM:
 ############################
 ############################
 ############################
+# lastmod
 
 
 def getKappa(
@@ -766,7 +989,7 @@ def getKappa(
 
     k = gammaincinv(2 * comps.Exp, 0.5)
 
-    denom1 = (2 * np.pi * comps.Rad ** 2) * (np.exp(k))
+    denom1 = (2 * np.pi * comps.Rad**2) * (np.exp(k))
     denom2 = (comps.Exp) * (k ** (-2 * comps.Exp))
     denom3 = (gamma(2 * comps.Exp)) * (comps.AxRat)
 
@@ -911,7 +1134,7 @@ class GetKappa:
                 theta,
             )
 
-            kap = np.abs(beta) / (1 + gam ** 2) ** (3 / 2)
+            kap = np.abs(beta) / (1 + gam**2) ** (3 / 2)
 
             kappa = np.append(kappa, kap)
 
@@ -963,7 +1186,7 @@ class GetKappa:
 
         gam = self.SlopeSer(R, Ie, Re, n, q, pa, theta)
 
-        kappa = np.abs(beta) / (1 + gam ** 2) ** (3 / 2)
+        kappa = np.abs(beta) / (1 + gam**2) ** (3 / 2)
 
         return -kappa
 
@@ -1048,7 +1271,7 @@ class GetKappa:
 
         k = gammaincinv(2 * n, 0.5)
 
-        varxpr2 = (k / n) * ((R / Re) ** (1 / n - 2)) * (1 / Re ** 2) * (1 / n - 1)
+        varxpr2 = (k / n) * ((R / Re) ** (1 / n - 2)) * (1 / Re**2) * (1 / n - 1)
 
         return varxpr2
 
@@ -1068,7 +1291,7 @@ class GetKappa:
         self, R: float, Ie: list, Re: list, n: list, X: list, Xprim: list, Xprim2: list
     ):
 
-        Sprim2 = Ie * np.exp(-X) * Xprim ** 2 - Ie * np.exp(-X) * Xprim2
+        Sprim2 = Ie * np.exp(-X) * Xprim**2 - Ie * np.exp(-X) * Xprim2
 
         return Sprim2.sum()
 
@@ -1088,8 +1311,8 @@ class GetKappa:
         Sprim2 = self.var_Sprim2(Rcor, Ie, Re, n, X, Xprim, Xprim2)
 
         Beta = (Sprim / S) * (R / np.log10(np.e)) + (
-            (Sprim2 * S - Sprim ** 2) / S ** 2
-        ) * (R ** 2 / np.log10(np.e))
+            (Sprim2 * S - Sprim**2) / S**2
+        ) * (R**2 / np.log10(np.e))
 
         return Beta
 
@@ -1166,7 +1389,7 @@ class GetMe:
 
     def MeanMe(self, magtot: float, effrad: float) -> float:
 
-        meanme = magtot + 2.5 * np.log10(2 * np.pi * effrad ** 2)
+        meanme = magtot + 2.5 * np.log10(2 * np.pi * effrad**2)
 
         return meanme
 
@@ -1177,7 +1400,7 @@ class GetMe:
 
         k = gammaincinv(2 * comps.Exp, 0.5)
 
-        denom1 = (2 * np.pi * comps.Rad ** 2) * (np.exp(k))
+        denom1 = (2 * np.pi * comps.Rad**2) * (np.exp(k))
         denom2 = (comps.Exp) * (k ** (-2 * comps.Exp))
         # denom3 = (gamma(2*comps.Exp))*(comps.AxRat)
         denom3 = gamma(2 * comps.Exp)
@@ -1366,7 +1589,7 @@ def getSlope(
 
     k = gammaincinv(2 * comps.Exp, 0.5)
 
-    denom1 = (2 * np.pi * comps.Rad ** 2) * (np.exp(k))
+    denom1 = (2 * np.pi * comps.Rad**2) * (np.exp(k))
     denom2 = (comps.Exp) * (k ** (-2 * comps.Exp))
     denom3 = (gamma(2 * comps.Exp)) * (comps.AxRat)
 
@@ -1678,7 +1901,7 @@ class GetIr:
 
         k = gammaincinv(2 * comps.Exp, 0.5)
 
-        denom1 = (2 * np.pi * comps.Rad ** 2) * (np.exp(k))
+        denom1 = (2 * np.pi * comps.Rad**2) * (np.exp(k))
         denom2 = (comps.Exp) * (k ** (-2 * comps.Exp))
         # denom3 = (gamma(2*comps.Exp))*(comps.AxRat)
         denom3 = gamma(2 * comps.Exp)

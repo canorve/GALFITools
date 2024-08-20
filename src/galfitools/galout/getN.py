@@ -77,7 +77,7 @@ def getN(
         total number of components
     theta : Angular position indicating the direction along
             which the effective radius and surface brightness
-            at the effective radius are computed.
+            at the effective radius are computed. In degrees
 
 
     Warnings
