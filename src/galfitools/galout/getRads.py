@@ -1507,9 +1507,24 @@ def getReComp(
     return EffRad, totmag, meanme, me, N, theta
 
 
-# lastmod
 class GetMe:
-    """Class to obtain the surface brightness at effective radius"""
+    """Class to obtain the surface brightness at effective radius
+       and the mean surface brightness at effective radius
+
+
+    Methods
+    -------
+    MeanMe : Mean Surface brightness I(R) at effective radius
+
+    Me : Surface brightness I(R) at R
+
+    Itotser : Evaluates the Sersic surface brightness flux
+             from a list of R
+
+    Iser : Sersic surface brightness flux at R
+
+
+    """
 
     def MeanMe(self, magtot: float, effrad: float) -> float:
 
@@ -1559,7 +1574,6 @@ class GetMe:
     def Iser(
         self, R: float, Ie: list, Re: list, n: list, q: list, pa: list, theta: float
     ) -> float:
-        """sersic flux to a determined R"""
 
         k = gammaincinv(2 * n, 0.5)
 
@@ -1570,6 +1584,7 @@ class GetMe:
         return Ir
 
 
+# lastmod
 # Sersic components
 class GetReff:
     """class to obtain the effective radius for the whole galaxy"""
