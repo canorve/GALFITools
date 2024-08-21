@@ -628,6 +628,15 @@ def mge2gal(
 
 
 def ReadMgePsf(psfile):
+    """Reads the file created by mge2gal
+    returns the normalized psf.
+
+    Notes
+    -----
+    Not used in GALFITools and will be removed
+    in the future
+
+    """
 
     counts, mag, sigpix, fwhm, qobs, angle = np.genfromtxt(
         psfile, skip_header=1, delimiter="", unpack=True
@@ -642,6 +651,15 @@ def ReadMgePsf(psfile):
 
 
 def Sextractor(filimage, X, Y):
+    """
+    Runs Sextractor and recover photometry from
+    the object indicated by coordinates X, Y
+
+    Notes
+    -----
+    Not used in the library and will be removed in the future
+
+    """
 
     sexfile = "default.sex"
     CatSex = "sim.cat"
@@ -752,10 +770,25 @@ def PrintHeader(
     P,
     S,
 ):
-    "print GALFIT header in a file"
+    """Print the GALFIT header parameters to a file specified
+    by the filehandle.
 
+
+    Parameters
+    ----------
+
+    hdl : str
+        filehandler
+
+    The rest of Parameters A, B, C, D, ..., S
+    follows the logic order of the GALFIT file
+
+    Returns
+    -------
+    bool
+
+    """
     # k Check
-    # print to filehandle
     # the header for GALFIT
 
     lineZa = "============================================="
@@ -870,7 +903,31 @@ def PrintHeader(
 
 
 def PrintSky(hdl, ncomp, sky, Z, fit):
-    "Print GALFIT sky function to filehandle"
+    """Print the GALFIT sky function parameters to a
+    file specified by the filehandle.
+
+
+    Parameters
+    ----------
+
+    hdl : str
+        filehandler
+
+    ncomp : int
+        number of component
+    sky : float
+         value of sky background
+    Z : int
+        skip object. Z GALFIT component parameter
+    fit : int
+        leave parameter free/fixed during fit
+
+
+    Returns
+    -------
+    bool
+
+    """
 
     # k Check
 
@@ -900,12 +957,43 @@ def PrintSky(hdl, ncomp, sky, Z, fit):
 def PrintSersic(
     hdl, ncomp, xpos, ypos, magser, reser, nser, axratser, angleser, Z, fit, serfit
 ):
-    "print GALFIT Sersic function to filehandle"
-    # k Check
+    """Print the GALFIT Sersic function parameters to a
+    file specified by the filehandle.
 
-    # print to filehandle
-    # a sersic function given
-    # by the parameters
+
+    Parameters
+    ----------
+
+    hdl : str
+        filehandler
+
+    ncomp : int
+        number of component
+
+    xpos, ypos : int, int
+                pixel position of the component's center
+
+    magser : float
+            magnitud of Sersic component
+    reser : float
+            effective radius in pixels
+    nser : float
+            Sersic index
+    axratser : axis ratio of Sersic component
+
+    angleser : angular position of component measured from Y-axis
+               in degrees
+    Z : int
+        skip object. Z GALFIT component parameter
+    fit : int
+        leave parameter free/fixed during fit
+
+
+    Returns
+    -------
+    bool
+
+    """
 
     line00 = "# Object number: {}     \n".format(ncomp)
     line01 = " 0)     sersic      #  Object type \n"
@@ -943,11 +1031,40 @@ def PrintSersic(
 
 
 def PrintGauss(hdl, ncomp, xpos, ypos, magass, fwhm, axratgass, anglegass, Z, fit):
-    "print GALFIT GAUSS function to filehandle"
+    """Print the GALFIT Gauss function parameters to a
+    file specified by the filehandle.
 
-    # print to filehandle
-    # a sersic function given
-    # by the parameters
+
+    Parameters
+    ----------
+
+    hdl : str
+        filehandler
+
+    ncomp : int
+        number of component
+
+    xpos, ypos : int, int
+                pixel position of the component's center
+    magass : float
+            magnitud of Gaussian component
+    fwhm : float
+            Full Width Half Maximum in pixels
+    axratgass : axis ratio of Gauss component
+
+    anglegass : angular position of component measured from Y-axis
+               in degrees
+    Z : int
+        skip object. Z GALFIT component parameter
+    fit : int
+        leave parameter free/fixed during fit
+
+
+    Returns
+    -------
+    bool
+
+    """
 
     line00 = "# Object number: {}       \n".format(ncomp)
     line01 = " 0)     gaussian   #  Object type \n"
@@ -977,13 +1094,39 @@ def PrintGauss(hdl, ncomp, xpos, ypos, magass, fwhm, axratgass, anglegass, Z, fi
 
 
 def PrintExp(hdl, ncomp, xpos, ypos, magexp, rsexp, axratexp, angleexp, Z, fit):
-    "print GALFIT exponential function to filehandle"
+    """Print the GALFIT exponential function parameters to a
+    file specified by the filehandle.
 
-    # k Check
 
-    # print to filehandle
-    # a exponential function given
-    # by the parameters
+    print GALFIT exponential function to filehandle
+    Parameters
+    ----------
+
+    hdl : str
+        filehandler
+
+    ncomp : int
+        number of component
+
+    xpos, ypos : int, int
+                pixel position of the component's center
+    magexp : float
+            magnitud of exponential component
+    rsexp : float
+            scale radius of exponential component
+    axratexp : axis ratio of exponential component
+    angleexp : angular position of component measured from Y-axis
+               in degrees
+    Z : int
+        skip object. Z GALFIT component parameter
+    fit : int
+        leave parameter free/fixed during fit
+
+    Returns
+    -------
+    bool
+
+    """
 
     line00 = "# Object number: $ncomp      \n"
     line01 = " 0)     expdisk        # Object type \n"
@@ -1013,7 +1156,10 @@ def PrintExp(hdl, ncomp, xpos, ypos, magexp, rsexp, axratexp, angleexp, Z, fit):
 
 
 def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
-    "Get a piece from the image"
+    """Get a cutout of the image
+    # repeated
+
+    """
     # k Check
 
     if os.path.isfile(Imageout):
@@ -1035,8 +1181,10 @@ def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
 
 
 def GetExpTime(Image):
-    # k Check
-    "Get exposition time from the image"
+    """Get exposition time from the FITS image header
+    # repeated
+
+    """
 
     try:
         hdu = fits.open(Image)
@@ -1048,11 +1196,24 @@ def GetExpTime(Image):
 
 
 def makeConstraints(consfile: str, numcomp: int) -> True:
-    "creates a contraints file with the number of components"
+    """Creates a contraints file for GALFIT with the number of components
+
+    Parameters
+    ----------
+    consfile : str
+               the new constraints file
+    numcomp : int
+             the number of components to constraint
+
+    Returns
+    -------
+    bool
+
+    """
 
     fout = open(consfile, "w")
 
-    line00 = "#Component/    parameter   constraint	Comment           \n"
+    line00 = "# Component/    parameter   constraint	Comment           \n"
     line01 = "# operation	(see below)   range         \n"
 
     linempty = "                  \n"
@@ -1078,7 +1239,15 @@ def makeConstraints(consfile: str, numcomp: int) -> True:
 
 
 def CheckFlag(val, check):
-    "Check for flag contained in val, returns True if found"
+    """Check if flag is contained in val,
+    returns True if found.
+
+    This is useful for Sextractor Flags
+
+
+    # repeated
+
+    """
 
     flag = False
     mod = 1
@@ -1101,6 +1270,11 @@ def CheckFlag(val, check):
 
 
 def GetInfoEllip(regfile):
+    """Extracts parameters' information
+    from DS9 ellipse region.
+
+    # repeated
+    """
 
     if not os.path.exists(regfile):
         print("%s: reg filename does not exist!" % (regfile))
@@ -1170,6 +1344,12 @@ def GetInfoEllip(regfile):
 
 
 def Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle):
+    """converts DS9 ellipse parameters to geometrical
+    parameters
+
+    # repeated
+
+    """
 
     if rx >= ry:
 
@@ -1191,8 +1371,12 @@ def Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle):
 
 
 def GetSize(x, y, R, theta, ell, ncol, nrow):
-    "this subroutine get the maximun"
-    "and minimim pixels for Kron and sky ellipse"
+    """Gets the maximum and minimum pixels
+    positions for an ellipse
+
+    # repeated
+
+    """
     # k Check
     q = 1 - ell
     bim = q * R
@@ -1237,6 +1421,11 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 
 
 def GetPmax(image, mask, xmin, xmax, ymin, ymax):
+    """Obtains the pixel position with the highest value within
+    the indicated region.
+
+    # repeated
+    """
 
     xmin = int(xmin)
     xmax = int(xmax)
