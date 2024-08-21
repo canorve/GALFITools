@@ -55,8 +55,12 @@ region input, need that the Ds9 region to be saved in image
 (or physical) coordinates. Ds9 regions saved in the World
 Coordinate System (WCS) coordinates will not work.
 
-
-
+Components refer to individual surface brightness 
+models, each following a specific order within 
+the GALFIT file. A galaxy can be composed of a 
+single component or multiple components. For instance,
+a barred galaxy can be model by 3 components: bulge, bar
+and disk. 
 
 **GALFIT INPUT**
 ------------------
@@ -160,7 +164,8 @@ prepare the necessary files for GALFIT input
 
 
 
-**maskDs9**  creates (or modify) a mask image for GALFIT using Ds9 regions such as Boxes, Ellipses and Polygons
+**maskDs9**  creates (or modify) a mask image for GALFIT using DS9 regions 
+such as Boxes, Ellipses and Polygons
 
 ::
 
@@ -329,13 +334,12 @@ prepare the necessary files for GALFIT input
                           activated
 
 
-**MakePSF**
+**MakePSF** Makes a PSF model of a star using Multi Gaussian Expansion
 
 ::
 
   usage: makePSF [-h] [-c] [-o OUT] [-sig SIGMA] [-t] [-ng NUMGAUSS] image GalfitFile Ds9regFile
 
-  Makes a PSF model of a star using Multi Gaussian Expansion
 
   positional arguments:
     image                 the image file where it contains the star to be modelled
