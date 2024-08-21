@@ -6,7 +6,30 @@ from galfitools.galin.MaskDs9 import GetAxis
 
 
 def makeSim(image, GAIN, skymean, skystd, newimage) -> None:
+    """Simulates a observed galaxy from a GALFIT model
 
+    Makes a simple artificial galaxy model. It adds Poisson
+    noise and sky noise to the GALFIT model.
+
+
+    Parameters
+    ----------
+    image : str
+            name of the FITS image that contains the galaxy model
+    GAIN : float
+           CCD's gain e-/ADU
+    skymean : float
+            value of the mean of sky background
+    skystd : float
+            value of standard deviation of sky background
+    newimage : str
+             name of the new simulated image
+
+    Returns
+    -------
+    None
+
+    """
     sizex, sizey = GetAxis(image)
 
     hdu = fits.open(image)
@@ -30,7 +53,7 @@ def makeSim(image, GAIN, skymean, skystd, newimage) -> None:
 
     hdusky.writeto("skynoise.fits", overwrite=True)
 
-    # sumar las dos partes:
+    # adds the two images:
 
     imgsim = pimg + sky
 
