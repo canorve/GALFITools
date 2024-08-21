@@ -69,8 +69,10 @@ def getBreak(
           if True, it will makes plot of the second derivative
 
     ranx: list
-           provide a range for the plot x-axis: xmin - xmax. For plotting,
-           and searching. If None, the range is [.1,100]
+           Specify the range for the plot’s x-axis: xmin to xmax
+           for plotting and searching. If set to None, the default
+           range is [0.1, 100].
+
 
     Returns
     -------
@@ -464,21 +466,22 @@ def getBreak2(
 
     Parameters
     ----------
-    galfitFile: str
+    galfitFile : str
             name of the GALFIT file
-    dis: float
+    dis : float
         maximum distance among components
-    num_comp: int
+    num_comp : int
             Number of component from which the center of all
             components will be determined.
-    angle: float
+    angle : float
            Position angle of the major axis of the galaxy. If None
            it will take the angle of the last components
-    plot: bool
+    plot : bool
           if True, it will makes plot of the second derivative
-    ranx: list
-           provide a range for the plot x-axis: xmin - xmax. For plotting,
-           and searching. If None, the range is [.1,100]
+    ranx : list
+           Specify the range for the plot’s x-axis: xmin to xmax
+           for plotting and searching. If set to None, the default
+           range is [0.1, 100].
 
 
     Returns
@@ -619,8 +622,9 @@ def getKappa2(
     plot: bool
           if True, it will makes plot of the second derivative
     ranx: list
-           provide a range for the plot x-axis: xmin - xmax. For plotting,
-           and searching. If None, the range is [.1,100]
+           Specify the range for the plot’s x-axis: xmin to xmax
+           for plotting and searching. If set to None, the default
+           range is [0.1, 100].
 
 
     Returns
@@ -1009,8 +1013,10 @@ def getKappa(
           if True, it will makes plot of the second derivative
 
     ranx: list
-           provide a range for the plot x-axis: xmin - xmax. For plotting,
-           and searching. If None, the range is [.1,100]
+           Specify the range for the plot’s x-axis: xmin to xmax
+           for plotting and searching. If set to None, the default
+           range is [0.1, 100].
+
 
     Returns
     -------
@@ -1726,12 +1732,6 @@ class GetReff:
         return Fr
 
 
-############################
-############################
-############################
-# lastmod
-
-
 def getSlope(
     galfitFile: str,
     dis: int,
@@ -1741,10 +1741,49 @@ def getSlope(
     plot: bool,
     ranx: list,
 ) -> float:
-    """gets the slope radius from a set of Sersics"""
+    """Obtains the slope radius from a set of Sersic functions.
 
-    # head = ReadHead(galfitFile)
-    # galcomps = ReadComps(galfitFile)
+    Given a model composed of multiple Sersic functions,
+    this function returns the radius corresponding to the
+    derivative value specified by the slope variable. It calls
+    to class GetSlope to computed using the bisection method
+
+
+    Parameters
+    ----------
+    galfitFile: str
+            name of the GALFIT file
+    dis: float
+        maximum distance among components
+    slope : float
+        Value of the slope at which the radius will be determined.
+    angle: float
+           Position angle of the major axis of the galaxy. If None
+           it will take the angle of the last components
+    num_comp: int
+            Number of component from which the center of all
+            components will be determined.
+    plot: bool
+          if True, it will makes plot of the second derivative
+
+    ranx: list
+           Specify the range for the plot’s x-axis: xmin to xmax
+           for plotting and searching. If set to None, the default
+           range is [0.1, 100].
+
+    Returns
+    -------
+    rgam: float
+          the slope radius in pixels
+    N : int
+        total number of components
+    theta : float
+           Angular position indicating the direction along
+           which break radius is computed. In degrees
+
+
+
+    """
 
     galfit = Galfit(galfitFile)
 
@@ -1812,7 +1851,21 @@ def getSlope(
 
 
 class GetSlope:
-    """class to obtain the effective radius for the whole galaxy"""
+    """Class to obtain the slope radius from a set of Sersic functions.
+
+    This class is called by GetSlope Function to compute
+    the radius at the given slope value.
+    The main method is FindSlope.
+
+    Methods
+    -------
+    GalSlope: Evaluates the first derivative at the specified radius (R).
+
+    FindSlope: Return the slope radius of a set of Sersic functions.
+               It uses bisection to find the radius at the specified slope
+
+
+    """
 
     def FullSlopeSer(
         self, R: float, Re: list, n: list, q: list, pa: list, theta: float
@@ -1935,14 +1988,55 @@ class GetSlope:
         return Slp
 
 
-############################
-############################
-############################
-
-
 def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
-    """gets the bulge radius or the radius where two models of
-    surface brightness models are equal"""
+    """Determines the radius at which the surface brightness of
+    two models are equal.
+
+
+    Given two surface brightness models, this function identifies
+    the radius where their surface brightness values are equal. This
+    is useful for determining the radius where the surface brightness
+    of the bulge and disk are equal, or for finding the radius between
+    the core and coreless regions in elliptical galaxies.
+
+
+    Parameters
+    ----------
+    galfitFile1 : str
+            name of the GALFIT file with model 1
+    galfitFile2 : str
+            name of the GALFIT file with model 2
+
+    dis: float
+        maximum distance among components
+    num_comp: int
+            Number of component from which the center of all
+            components will be determined.
+    angle: float
+           Position angle of the major axis of the galaxy. If None
+           it will take the angle of the last components
+    plot: bool
+          if True, it will makes plot of the second derivative
+    ranx: list
+           Specify the range for the plot’s x-axis: xmin to xmax
+           for plotting and searching. If set to None, the default
+           range is [0.1, 100].
+
+    Returns
+    -------
+    rbulge: float
+            radius where the I1 and I2 are equal in pixels
+    N1 : int
+        total number of components for model 1
+    N2 : int
+        total number of components for model 2
+
+    theta : float
+           Angular position indicating the direction along
+           which this radius is computed. In degrees
+
+
+    """
 
     galfit1 = Galfit(galfitFile1)
     head1 = galfit1.ReadHead()
@@ -1963,8 +2057,6 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
         theta = angle
     else:
         theta = galcomps2.PosAng[maskgal2][-1]
-
-    # theta = 18.2534
 
     # convert all exp, gaussian and de vaucouleurs to Sersic format
     comps1 = conver2Sersic(galcomps1)
@@ -2020,6 +2112,7 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
     return rbulge, N1, N2, theta
 
 
+# lastmod
 def getDiff(head1, comps1, comps2, R, theta):
 
     Idiff = np.array([])
