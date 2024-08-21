@@ -19,7 +19,60 @@ from scipy import stats
 
 
 def sbProf(args):
-    """creates a surface brightness profile"""
+    """Creates a surface brightness profile
+
+    Parameters
+    ----------
+    args : argument parser data class
+           from library argparser
+
+    The parameters of the args class are
+    explained below:
+
+    args.Image : str
+                the FITS image
+    args.Ds9Region : str
+                    DS9 ellipse region file, which
+                    must enclose the galaxy to be fitted.
+    args.mgzpt : float
+                magnitude zeropoint
+    args.mask : str
+                name of the mask image
+    args.axrat : float
+                axis ratio
+    args.angle : float
+                position angle
+    args.sky : float
+                value of the sky background
+    args.plate : float
+                plate scale of the image
+    args.output : str
+                name of the output plot
+    args.center: bool
+                If True, it uses the center of the DS9 ellipse.
+                otherwise will use the pixel position of the
+                peak
+    args.ranx : list
+                range of the x-axis in the plot.
+    args.rany : list
+                range of the y-axis in the plot.
+    args.logx : bool
+                if True  x axis is logarithmic
+    args.pix : bool
+                If true top axis indicates pixels
+    args.grid : bool
+                if True enables grid in plot
+
+    args.rad : float
+            if it is different than None it plots and vertical
+            line at the indicated value
+
+    args.rad2 : float
+            A second vertical line. If it is different than
+            None it plots and vertical line at the indicated value
+
+
+    """
 
     image = args.Image
     ds9reg = args.Ds9Region
@@ -61,10 +114,6 @@ def sbProf(args):
     conf.rad2 = rad2
 
     dataimg = readDataImg(conf)
-
-    # hdu = fits.open(image)
-    # img = hdu[0].data
-    # img=img.astype(float)
 
     conf.exptime = GetExpTime(image)
 
@@ -133,6 +182,12 @@ def sbProf(args):
 
 
 class DataImg:
+    """Data class to save the galaxy image
+    and mask image
+
+
+
+    """
 
     img = np.empty([2, 2])
 
@@ -140,6 +195,12 @@ class DataImg:
 
 
 def readDataImg(conf):
+    """reads the galaxy image and
+    mask image
+
+    # repeated
+
+    """
 
     dataimg = DataImg()
 
@@ -172,28 +233,24 @@ def readDataImg(conf):
 
 
 def SectPhot(conf, dataimg, n_sectors=19, minlevel=0):
-    """ calls to function sectors_photometry for galaxy and model """
+    """Calls to function sectors_photometry
+    for galaxy and model
+
+    """
 
     maskb = dataimg.mask
 
     eps = 1 - conf.qarg
 
-    # if ellconf.dplot:
     plt.clf()
     print("")
 
     ############
     # I have to switch x and y values because they are different axes for
     # numpy:
-    # if ellconf.flagmodel == False:
     yctemp = conf.xc
     xctemp = conf.yc
-    # else:
-    #    yctemp = ellconf.inxc
-    #    xctemp = ellconf.inyc
 
-    # and angle is different as well:
-    # angsec = 90 - conf.parg
     angsec = conf.parg
 
     ###################################################
@@ -232,6 +289,7 @@ def SectPhot(conf, dataimg, n_sectors=19, minlevel=0):
 
 
 def EllipSectors(conf, sectgalax, n_sectors=19, minlevel=0):
+    """Creates the plot from data obtained by sectors_photometry"""
 
     # galaxy
     xradq, ysbq, ysberrq = sect2xy(sectgalax, conf, n_sectors)
@@ -245,6 +303,9 @@ def EllipSectors(conf, sectgalax, n_sectors=19, minlevel=0):
 
 
 def sect2xy(sect, conf, n_sectors):
+    """converts the sectors data to
+    surface brightness data for plotting
+    """
 
     #######################################
     #######################################
@@ -258,7 +319,7 @@ def sect2xy(sect, conf, n_sectors):
 
     ab = conf.qarg
 
-    aellab = mgerad * np.sqrt((np.sin(mgeanrad) ** 2) / ab ** 2 + np.cos(mgeanrad) ** 2)
+    aellab = mgerad * np.sqrt((np.sin(mgeanrad) ** 2) / ab**2 + np.cos(mgeanrad) ** 2)
 
     aellarc = aellab * conf.scale
 
@@ -266,7 +327,7 @@ def sect2xy(sect, conf, n_sectors):
     mgesb = (
         conf.mgzpt
         - 2.5 * np.log10(mgecount / conf.exptime)
-        + 2.5 * np.log10(conf.scale ** 2)
+        + 2.5 * np.log10(conf.scale**2)
         + 0.1
     )  # - ellconf.Aext
 
@@ -283,9 +344,12 @@ def sect2xy(sect, conf, n_sectors):
 
 
 def FindSB(xarcq, ymgeq, numsectors):
+    """obtains the surface brightness
+    from the divided sectors by angle
+
     # the xarcq array must be ordered
     # use mag instead of counts
-
+    """
     xradq = []
     ysbq = []
     ysberrq = []
@@ -333,7 +397,7 @@ def FindSB(xarcq, ymgeq, numsectors):
 
 
 def PlotSB(xradq, ysbq, ysberrq, conf, scale):
-    """  Produces final best-fitting plot  """
+    """Produces final best-fitting plot"""
 
     # subplot for arc sec axis
     plt.close("all")
@@ -529,8 +593,10 @@ def PlotSB(xradq, ysbq, ysberrq, conf, scale):
     return xran, yran, axret
 
 
-# class for parameters
 class Config:
+    """Data class for configuration parameters
+    of SbProf
+    """
 
     logx = False
     image = "none.fits"
@@ -580,7 +646,11 @@ class Config:
 
 def GetExpTime(Image):
     # k Check
-    "Get exposition time from the image"
+    """Get exposition time from the image
+
+    # repeated
+
+    """
 
     try:
         hdu = fits.open(Image)
