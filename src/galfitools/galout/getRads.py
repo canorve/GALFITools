@@ -2112,9 +2112,11 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
     return rbulge, N1, N2, theta
 
 
-# lastmod
 def getDiff(head1, comps1, comps2, R, theta):
+    """Calculates the surface brightness difference
+    between two models at various radii I1 - I2.
 
+    """
     Idiff = np.array([])
 
     for r in R:
@@ -2129,6 +2131,10 @@ def getDiff(head1, comps1, comps2, R, theta):
 
 
 def getIs(head1, comps1, comps2, R, theta):
+    """Calculates the surface brightness of two
+    models at various radii.
+
+    """
 
     I1 = np.array([])
     I2 = np.array([])
@@ -2145,6 +2151,10 @@ def getIs(head1, comps1, comps2, R, theta):
 
 
 def getDiffx(r, head1, comps1, comps2, theta):
+    """Calculates the surface brightness difference
+    between two models at a specified radii I1 - I2.
+
+    """
 
     Ir1 = GetIr().Ir(head1, comps1, r, theta)
     Ir2 = GetIr().Ir(head1, comps2, r, theta)
@@ -2155,6 +2165,25 @@ def getDiffx(r, head1, comps1, comps2, theta):
 
 
 class GetIr:
+    """class called by getDiff, getDiffx, getIs
+    to obtain the surface brightness from  a set
+    of Sersic functions at different radii
+
+    the main method is Ir
+
+    Methods
+    -------
+    Ir : obtains the surface brightness at R
+
+    Itotser : method called by Ir to obtain the
+              total surface brightness of the
+              set components at R
+    Iser : method called by Itotser to obtain
+            the surface brightnness
+           per component at R
+
+    """
+
     def Ir(self, head, comps, R, theta):
 
         # comps.Rad = comps.Rad*head.scale
@@ -2182,8 +2211,6 @@ class GetIr:
             comps.PosAng[maskgal],
             theta,
         )
-
-        # me = -2.5*np.log10(Itotr)
 
         return Itotr
 
