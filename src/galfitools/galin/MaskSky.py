@@ -104,6 +104,7 @@ def MakeImage(newfits, sizex, sizey):
     -------
     bool
 
+    # repeated
     """
 
     if os.path.isfile(newfits):
