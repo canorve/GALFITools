@@ -23,6 +23,10 @@ from galfitools.shell.prt import printWelcome
 
 
 def mainPhotDs9():
+    """
+    Calls the photDs9 function based on argument parsing.
+    This function serves as an example of an API for photDs9.
+    """
 
     printWelcome()
 
@@ -74,6 +78,10 @@ def mainPhotDs9():
 
 # console scripts
 def mainGetBreak() -> None:
+    """
+    Calls the getBreak function based on argument parsing.
+    This function serves as an example of an API for getBreak.
+    """
 
     printWelcome()
     # reading argument parsing
@@ -187,7 +195,10 @@ def mainGetBreak() -> None:
 
 
 def mainGetBreak2():
-    """gets the break radius from a set of Sersics"""
+    """
+    Calls the getBreak2 function based on argument parsing.
+    This function serves as an example of an API for getBreak2.
+    """
 
     printWelcome()
 
@@ -263,7 +274,10 @@ def mainGetBreak2():
 
 
 def mainGetBarSize():
-    """gets the bar size from a model of Bulge, Bar, disk"""
+    """
+    Calls the getBarSize function based on argument parsing.
+    This function serves as an example of an API for getBarSize.
+    """
 
     printWelcome()
 
@@ -341,6 +355,10 @@ def mainGetBarSize():
 
 
 def mainFWHM() -> None:
+    """
+    Calls the getFWHM function based on argument parsing.
+    This function serves as an example of an API for getFWHM.
+    """
 
     printWelcome()
 
@@ -402,6 +420,10 @@ def mainFWHM() -> None:
 
 # console scripts
 def mainKappa() -> None:
+    """
+    Calls the getKappa function based on argument parsing.
+    This function serves as an example of an API for getKappa.
+    """
 
     printWelcome()
 
@@ -512,7 +534,10 @@ def mainKappa() -> None:
 
 
 def mainKappa2():
-    """gets the Kappa radius from a set of Sersics"""
+    """
+    Calls the getKappa2 function based on argument parsing.
+    This function serves as an example of an API for getKappa2.
+    """
 
     printWelcome()
 
@@ -589,6 +614,10 @@ def mainKappa2():
 
 
 def mainGetReComp() -> None:
+    """
+    Calls the getReComp function based on argument parsing.
+    This function serves as an example of an API for getReComp.
+    """
 
     printWelcome()
     # reading arguments parsing
@@ -675,6 +704,10 @@ def mainGetReComp() -> None:
 
 
 def maingetSlope() -> None:
+    """
+    Calls the getSlope function based on argument parsing.
+    This function serves as an example of an API for getSlope.
+    """
 
     printWelcome()
     # reading argument parsing
@@ -768,6 +801,10 @@ def maingetSlope() -> None:
 # check modify
 # console scripts
 def maingetN() -> None:
+    """
+    Calls the getN function based on argument parsing.
+    This function serves as an example of an API for getN.
+    """
 
     printWelcome()
     # reading arguments parsing
@@ -869,6 +906,10 @@ def maingetN() -> None:
 
 
 def mainGetBulgeRad() -> None:
+    """
+    Calls the getBulgeRad function based on argument parsing.
+    This function serves as an example of an API for getBulgeRad.
+    """
 
     printWelcome()
     # reading arguments parsing
@@ -961,7 +1002,10 @@ def mainGetBulgeRad() -> None:
 
 
 def mainMissingLight() -> None:
-    """gets the missing light from a two models"""
+    """
+    Calls the getMissLight function based on argument parsing.
+    This function serves as an example of an API for getMissLight.
+    """
 
     printWelcome()
     # reading arguments parsing
@@ -1022,6 +1066,10 @@ def mainMissingLight() -> None:
 
 
 def mainShowCube():
+    """
+    Calls the displayCube function based on argument parsing.
+    This function serves as an example of an API for displayCube.
+    """
 
     printWelcome()
     parser = argparse.ArgumentParser(
@@ -1091,6 +1139,10 @@ def mainShowCube():
 
 
 def maingetCOW() -> None:
+    """
+    Calls the getStar function based on argument parsing.
+    This function serves as an example of an API for getStar.
+    """
 
     printWelcome()
     # reading arguments parsing
@@ -1196,6 +1248,10 @@ def maingetCOW() -> None:
 
 
 def mainFitlog2CSV():
+    """
+    Calls the getStar function based on argument parsing.
+    This function serves as an example of an API for getStar.
+    """
 
     printWelcome()
 
@@ -1225,6 +1281,10 @@ def mainFitlog2CSV():
 
 
 def maingetPeak():
+    """
+    Calls the getStar function based on argument parsing.
+    This function serves as an example of an API for getStar.
+    """
 
     printWelcome()
 

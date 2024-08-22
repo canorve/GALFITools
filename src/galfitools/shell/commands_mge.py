@@ -7,7 +7,10 @@ from galfitools.shell.prt import printWelcome
 
 # check modify: remove initgauss
 def mainMGE():
-
+    """
+    Calls the mge2gal function based on argument parsing.
+    This function serves as an example of an API.
+    """
     printWelcome()
     parser = argparse.ArgumentParser(
         description="fits mge of Cappellari and formats to GALFIT"
@@ -117,6 +120,10 @@ def mainMGE():
 
 
 def mainSbProf():
+    """
+    Calls the sbProf function based on argument parsing.
+    This function serves as an example of an API.
+    """
 
     printWelcome()
     parser = argparse.ArgumentParser(
