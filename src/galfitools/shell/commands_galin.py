@@ -17,6 +17,10 @@ from galfitools.shell.prt import printWelcome
 
 
 def mainGetStar():
+    """
+    Calls the getStar function based on argument parsing.
+    This function serves as an example of an API for getStar.
+    """
 
     printWelcome()
 
@@ -75,6 +79,10 @@ def mainGetStar():
 
 
 def mainInitGal():
+    """
+    Calls the InitGal function based on argument parsing.
+    This function serves as an example of an API for InitGal.
+    """
 
     printWelcome()
 
@@ -191,6 +199,10 @@ def mainInitGal():
 
 
 def mainMakeMask():
+    """
+    Calls the makeMask function based on argument parsing.
+    This function serves as an example of an API for makeMask.
+    """
 
     printWelcome()
 
@@ -234,6 +246,10 @@ def mainMakeMask():
 
 
 def mainMaskDs9():
+    """
+    Calls the maskDs9 function based on argument parsing.
+    This function serves as an example of an API for maskDs9.
+    """
 
     printWelcome()
 
@@ -308,12 +324,16 @@ def mainMaskDs9():
 
 
 def mainMaskSky():
+    """
+    Calls the skyRem function based on argument parsing.
+    This function serves as an example of an API for skyRem.
+    """
 
     printWelcome()
 
     parser = argparse.ArgumentParser(
         description="creates a mask image for GALFIT using "
-                    + "original image and sky mean and sigma"
+        + "original image and sky mean and sigma"
     )
 
     parser.add_argument("ImageFile", help="original data image ")
@@ -373,6 +393,10 @@ def mainMaskSky():
 
 
 def mainxy2fits():
+    """
+    Calls the xy2fits function based on argument parsing.
+    This function serves as an example of an API for xy2fits.
+    """
 
     printWelcome()
 
@@ -403,6 +427,10 @@ def mainxy2fits():
 
 # console scripts
 def maincheckFile() -> None:
+    """
+    Calls the checkFile function based on argument parsing.
+    This function serves as an example of an API for checkFile.
+    """
 
     printWelcome()
     # reading arguments parsing
@@ -523,6 +551,10 @@ def maincheckFile() -> None:
 
 
 def mainGetBoxSizeDs9():
+    """
+    Calls the getBoxSizeDs9 function based on argument parsing.
+    This function serves as an example of an API for getBoxSizeDs9.
+    """
 
     printWelcome()
 
@@ -544,6 +576,10 @@ def mainGetBoxSizeDs9():
 
 
 def maingetSersic():
+    """
+    Calls the getSersic function based on argument parsing.
+    This function serves as an example of an API for getSersic.
+    """
 
     printWelcome()
 
@@ -617,6 +653,10 @@ def maingetSersic():
 
 
 def main_imarith() -> None:
+    """
+    Calls the imarith function based on argument parsing.
+    This function serves as an example of an API for imarith.
+    """
 
     printWelcome()
     # reading arguments parsing
@@ -670,6 +710,10 @@ def main_imarith() -> None:
 
 
 def mainMakePSF():
+    """
+    Calls the makePSF function based on argument parsing.
+    This function serves as an example of an API for makePSF.
+    """
 
     printWelcome()
 
