@@ -8,6 +8,9 @@ from astropy.io import fits
 
 
 def sky(imgname, maskimage, filereg) -> None:
+    """computes sky from a DS9 region box file
+    # deprecated
+    """
 
     xlo, xhi, ylo, yhi = GetRegionDs9(filereg)
     ################################################
@@ -65,11 +68,11 @@ def sky(imgname, maskimage, filereg) -> None:
 
 
 def rms(array):
-    return np.sqrt(np.mean(array ** 2))
+    return np.sqrt(np.mean(array**2))
 
 
 def GetRegionDs9(filein):
-    "Get the size (xmin,xmax,ymin,ymax) from ds9 region file "
+    "Get the size (xmin,xmax,ymin,ymax) from ds9 region file"
 
     xhi = 0
     xlo = 0
