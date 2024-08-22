@@ -8,12 +8,40 @@ import numpy as np
 from astropy.io import fits
 from galfitools.galin.MaskDs9 import GetAxis
 
-# computes sky using GALFIT
+
 # change it and use skyRem instead
 
 
 def galfitSky(imgname, maskfile, mgzpt, scale, X, Y, sky) -> None:
+    """Computes the sky using GALFIT
 
+    It uses the FITS image and a mask to compute the
+    to make an initial parameter file to compute sky background
+    by GALFIT
+
+    Parameters
+    ----------
+    imgname : str
+            name of the FITS image
+
+    maskfile : str
+            name of the mask image
+    mgzpt: float
+            magnitud zeropoint
+    scale : float
+            plate scale
+    X, Y : float, float x,y position of center
+    sky : float
+        initial parameter of sky
+
+    Notes
+    -----
+    The function returns a GALFIT initial parameter file
+    named sky.txt. The user must run GALFIT with this file
+    to obtain the sky background
+
+
+    """
     flagpos = False
 
     (NCol, NRow) = GetAxis(imgname)
@@ -100,13 +128,11 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y, sky) -> None:
     print("To compute sky run: galfit sky.txt")
 
 
-####################################
-#####################################
-######################################
-
-
 def ds9satbox(satfileout, output, satscale, satoffset):
-    "Creates a file for ds9 which selects bad saturated regions"
+    """Creates a file for ds9 which selects bad saturated regions
+    # not used
+    # repeated
+    """
 
     # scaleflag = 1
     # offsetflag = 1
@@ -177,7 +203,11 @@ def ds9satbox(satfileout, output, satscale, satoffset):
 
 def MakeMask(maskimage, catfile, scale, offset, regfile):
     """Create a mask image using ellipses for every Object
-    of catfile. Now includes offset"""
+    of catfile. Now includes offset
+
+    # not used
+    # repeated
+    """
 
     checkflag = 0
     flagsat = 4  # flag value when object is saturated (or close to)
@@ -264,7 +294,12 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
 
 def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     """This subroutine create a Kron ellipse within a box defined
-    by: xmin, xmax, ymin, ymax"""
+    by: xmin, xmax, ymin, ymax
+
+    # used in function not used
+    # repeated
+
+    """
 
     # Check
 
@@ -306,8 +341,13 @@ def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
 
 
 def MakeSatBox(maskimage, region, val, ncol, nrow):
-    "Create a mask for saturated regions"
-    "Regions must be in DS9 box regions format"
+    """Create a mask for saturated regions
+    Regions must be in DS9 box regions format
+
+    # not used
+    # repeated
+
+    """
 
     # k Check
 
@@ -380,7 +420,11 @@ def MakeSatBox(maskimage, region, val, ncol, nrow):
 
 
 def MakeImage(newfits, sizex, sizey):
-    "create a new blank Image"
+    """Create a new blank Image
+    # not used
+    # repeated
+
+    """
     # k Check
     if os.path.isfile(newfits):
         print("{} deleted; a new one is created \n".format(newfits))
@@ -392,6 +436,11 @@ def MakeImage(newfits, sizex, sizey):
 
 
 def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
+    """Sorts SExtractor catalog by area
+    # not used
+    # repeated
+
+    """
     # k Check
 
     # sort the sextractor
@@ -486,8 +535,12 @@ def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
 
 
 def GetSize(x, y, R, theta, ell, ncol, nrow):
-    "this subroutine get the maximun"
-    "and minimim pixels for Kron and sky ellipse"
+    """gets the maximun
+    and minimim pixels for Kron and sky ellipse
+
+    # used in function not used  here
+    # repeated
+    """
     # k Check
     q = 1 - ell
     bim = q * R
@@ -532,34 +585,14 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     return (xmin, xmax, ymin, ymax)
 
 
-# def CheckFlag(val,check,max):
-#  "Check for flag contained in $val, returns 1 if found "
-
-# flag = False
-# mod = 1
-
-# while (mod != 0):
-
-
-#   res = int(val/max)
-
-# 3  if (max == check and res == 1 ):
-
-#       flag=True
-
-
-#  mod = val % max
-
-# val = mod
-# max = max/2
-
-
-#   return flag
-
-
 def CheckSatReg(x, y, filein, R, theta, ell):
     """Check if object is inside of saturated region. returns
-    True if at least one pixel is inside"""
+    True if at least one pixel is inside
+
+    # used in function not used here
+    # repeated
+
+    """
     #  check if object is inside of
     #  saturaded region as indicated by ds9 box region
     #  returns 1 if object center is in saturaded region
@@ -662,7 +695,11 @@ def PrintHeader(
     P,
     S,
 ):
-    "print GALFIT header in a file"
+    """prints GALFIT header in a file
+
+    # repeated
+
+    """
 
     # k Check
     # print to filehandle
@@ -779,7 +816,10 @@ def PrintHeader(
 
 
 def PrintSky(hdl, ncomp, sky, Z, fit):
-    "Print GALFIT sky function to filehandle"
+    """Print GALFIT sky function to filehandle
+
+    # repeated
+    """
 
     # k Check
 
@@ -809,7 +849,12 @@ def PrintSky(hdl, ncomp, sky, Z, fit):
 def PrintSersic(
     hdl, ncomp, xpos, ypos, magser, reser, nser, axratser, angleser, Z, fit
 ):
-    "print GALFIT Sersic function to filehandle"
+    """print GALFIT Sersic function to filehandle
+
+    # not used
+    # repeated
+
+    """
     # k Check
 
     # print to filehandle
@@ -846,7 +891,12 @@ def PrintSersic(
 
 
 def PrintGauss(hdl, ncomp, xpos, ypos, magass, fwhm, axratgass, anglegass, Z, fit):
-    "print GALFIT GAUSS function to filehandle"
+    """print GALFIT GAUSS function to filehandle
+
+    # not used
+    # repeated
+
+    """
 
     # print to filehandle
     # a sersic function given
@@ -878,7 +928,12 @@ def PrintGauss(hdl, ncomp, xpos, ypos, magass, fwhm, axratgass, anglegass, Z, fi
 
 
 def PrintExp(hdl, ncomp, xpos, ypos, magexp, rsexp, axratexp, angleexp, Z, fit):
-    "print GALFIT exponential function to filehandle"
+    """print GALFIT exponential function to filehandle
+
+    # repeated
+    # not used
+
+    """
 
     # k Check
 
@@ -912,7 +967,12 @@ def PrintExp(hdl, ncomp, xpos, ypos, magexp, rsexp, axratexp, angleexp, Z, fit):
 
 
 def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
-    "Get a piece from the image"
+    """Get a piece from the FITS image
+
+    # repeated
+    # not used
+
+    """
     # k Check
 
     if os.path.isfile(Imageout):
@@ -934,8 +994,13 @@ def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
 
 
 def GetExpTime(Image):
-    # k Check
-    "Get exposition time from the image"
+    """Get exposition time from the image header
+
+    # repeated
+    # not used
+
+
+    """
 
     hdu = fits.open(Image)
     exptime = hdu[0].header["EXPTIME"]
@@ -944,7 +1009,12 @@ def GetExpTime(Image):
 
 
 def CheckFlag(val, check):
-    "Check for flag contained in val, returns True if found"
+    """Check for flag contained in val, returns True if found
+
+    # repeated
+    # used in function not used here
+
+    """
 
     flag = False
     mod = 1
