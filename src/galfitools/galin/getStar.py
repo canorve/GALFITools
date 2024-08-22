@@ -161,6 +161,8 @@ def GetFits(
     -------
     None
 
+    # repeated
+
     """
 
     if os.path.isfile(Imageout):
@@ -210,6 +212,8 @@ def GetInfoEllip(regfile: str):
 
 
     returns 0, 0, 0, 0, 0, 0 if ellipse region was not found in file
+
+    # repeated
 
     """
 
@@ -297,6 +301,8 @@ def Ds9ell2Kronell(xpos: float, ypos: float, rx: float, ry: float, angle: float)
     Rkron : float, major axis
     theta: float, angular position measured from Y-axis
     e: float, ellipticity
+
+    # repeated
     """
 
     if rx >= ry:
@@ -336,6 +342,8 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     -------
     xmin, xmax, ymin, ymax : Minimum and maximum coordinates
     that encompass the ellipse.
+
+    # repeated
 
     """
 
@@ -400,6 +408,7 @@ def GetPmax(image, mask, xmin, xmax, ymin, ymax):
     -------
     (xpos, ypos) : (x, y) coordinates of the maximum
 
+    # repeated
 
     """
     xmin = int(xmin)
