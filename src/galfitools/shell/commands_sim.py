@@ -5,6 +5,10 @@ from galfitools.sim.MakeSim import makeSim
 
 
 def mainMakeSim():
+    """
+    Calls the makeSim function based on argument parsing.
+    This function serves as an example of an API.
+    """
 
     printWelcome()
 

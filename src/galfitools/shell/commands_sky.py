@@ -8,6 +8,10 @@ from galfitools.sky.SkyRing import SkyRing
 
 
 def mainGalfitSky():
+    """
+    Calls the galfitSky function based on argument parsing.
+    This function serves as an example of an API.
+    """
 
     printWelcome()
     parser = argparse.ArgumentParser(description="computes the sky using GALFIT")
@@ -59,6 +63,10 @@ def mainGalfitSky():
 
 
 def mainSky():
+    """
+    Calls the sky function based on argument parsing.
+    This function serves as an example of an API.
+    """
 
     printWelcome()
 
@@ -85,6 +93,10 @@ def mainSky():
 
 
 def mainSkyDs9():
+    """
+    Calls the SkyDs9 unction based on argument parsing.
+    This function serves as an example of an API.
+    """
 
     printWelcome()
 
@@ -122,7 +134,10 @@ def mainSkyDs9():
 
 
 def mainSkyRing():
-    """Computes the sky using rings """
+    """
+    Calls the SkyRing function based on argument parsing.
+    This function serves as an example of an API.
+    """
 
     printWelcome()
 
@@ -177,7 +192,7 @@ def mainSkyRing():
     mean, std, median, rad = SkyRing(image, mask, ds9regfile, width, center, outliers)
 
     line = "Total sky:  mean = "
-    + " {:.2f}; std={:.2f}; median = {:.2f} at radius {:.2f} ".format(
+    +" {:.2f}; std={:.2f}; median = {:.2f} at radius {:.2f} ".format(
         mean, std, median, rad
     )
     print(line)
