@@ -14,7 +14,50 @@ from galfitools.mge.mge2galfit import (
 
 
 def SkyRing(image, mask, ds9regfile, width, center, outliers):
-    """Computes the sky using gradient over rings """
+    """Computes the sky background using concentric rings
+
+    Computes the sky background of an object by identifying
+    the gradient when it becomes positive for the second time
+    along concentric rings around the object. For each ring,
+    the sky mean is estimated and stored in a list where the
+    gradient is calculated.
+
+
+    Parameters
+    ----------
+    image : str
+            name of the image file
+    mask : str
+            name of the mask file
+    ds9regfile : str
+                DS9 region of the ellipse, which should not
+                cover the entire galaxy. The major axis is used
+                as the initial ring.
+    width : int
+            value of the width of the rings in pixels
+    center : bool
+            if True, it takes the center at the geometrical middle
+            point of the ellipse. Otherwise, it take the pixel position
+            of the peak's value
+    outliers : bool
+                if True removes the top 80% and bottom 20% of pixels values
+
+
+    Returns
+    -------
+
+    mean : float
+           the sky mean
+    std  : float
+           the standard deviation of sky
+    median : float
+            the median of sky
+    rad  : float
+            the major axis of the ellipse where the sky
+            was estimated
+
+
+    """
 
     assert os.path.exists(image), "image file does not exists"
 
@@ -64,7 +107,44 @@ def SkyRing(image, mask, ds9regfile, width, center, outliers):
 
 
 class SkyCal:
-    "computes sky background "
+    """Computes the sky background  through concentric
+    rings around the objects
+
+    Parameters
+    ----------
+    ImageFile : data image matrix
+    MaskImg : data mask matrix
+    xx, yy : object's center position
+    thetadeg : angular position
+    q : axis ratio
+    Rinit : initial radius
+    width : width of the rings
+    namering : name of the output image to draw ring
+    ringmask : name of the output ring mask
+    outliers : if True removes the top 80% and bottom 20% of the
+            pixels values
+
+
+    Attributes
+    ----------
+    many of the parameters are stored as attributes,
+    except the following two:
+
+    e : ellipticity
+
+    NumRings : number of rings per loop
+
+
+    Methods
+    -------
+    the main method is GetEllipSky
+    GetEllipSky : rings
+    GetRingMask : Obtains the ring selected by index idx
+    CorSize     : Correct size for image border
+    GetXYRBorder : gets the coordinates of the border
+    GetSize : Computes the minimum and maximum pixel
+                positions that encompass the ellipse.
+    """
 
     def GetEllipSky(
         self,
@@ -165,7 +245,7 @@ class SkyCal:
             aring = Rings[ridx] + self.width
 
             # incresing number of points per rad
-            points = 2 * np.pi * np.sqrt(0.5 * (aring ** 2 + bring ** 2))  # Aprox.
+            points = 2 * np.pi * np.sqrt(0.5 * (aring**2 + bring**2))  # Aprox.
             points = 2 * points  # doubling the number of points
             points = int(round(points))
 
@@ -230,11 +310,10 @@ class SkyCal:
             radius = np.append(radius, Rings[idx] + self.width / 2)
 
             linea = "Ring = {}; rad = {:.2f}; sky mean = {:.2f}; ".format(
-                    idx + 1, Rings[idx] + self.width / 2, mean)
+                idx + 1, Rings[idx] + self.width / 2, mean
+            )
 
-            lineb = "sky std = {:.2f}; median: {:.2f} ".format(
-                    std, median
-                )
+            lineb = "sky std = {:.2f}; median: {:.2f} ".format(std, median)
 
             line = linea + lineb
 
@@ -288,7 +367,7 @@ class SkyCal:
         return finmean[0], finstd[0], finmedian[0], finRad[0]
 
     def GetRingMask(self, masksky, idx):
-        """ obtains the ring selected by index idx"""
+        """Obtains the ring selected by index idx"""
 
         ring = idx + 1
 
@@ -346,8 +425,8 @@ class SkyCal:
 
         theta = self.thetadeg * (np.pi / 180)  # rads!!
 
-        thetax = np.sqrt((np.cos(theta)) ** 2 + (q ** 2) * (np.sin(theta)) ** 2)
-        thetay = np.sqrt((q ** 2) * (np.cos(theta)) ** 2 + (np.sin(theta)) ** 2)
+        thetax = np.sqrt((np.cos(theta)) ** 2 + (q**2) * (np.sin(theta)) ** 2)
+        thetay = np.sqrt((q**2) * (np.cos(theta)) ** 2 + (np.sin(theta)) ** 2)
 
         if self.thetadeg < 0:
             self.thetadeg = 360 - self.thetadeg
@@ -404,19 +483,19 @@ class SkyCal:
         # getting size
 
         xmin = self.xx - np.sqrt(
-            (R ** 2) * (np.cos(theta)) ** 2 + (bim ** 2) * (np.sin(theta)) ** 2
+            (R**2) * (np.cos(theta)) ** 2 + (bim**2) * (np.sin(theta)) ** 2
         )
 
         xmax = self.xx + np.sqrt(
-            (R ** 2) * (np.cos(theta)) ** 2 + (bim ** 2) * (np.sin(theta)) ** 2
+            (R**2) * (np.cos(theta)) ** 2 + (bim**2) * (np.sin(theta)) ** 2
         )
 
         ymin = self.yy - np.sqrt(
-            (R ** 2) * (np.sin(theta)) ** 2 + (bim ** 2) * (np.cos(theta)) ** 2
+            (R**2) * (np.sin(theta)) ** 2 + (bim**2) * (np.cos(theta)) ** 2
         )
 
         ymax = self.yy + np.sqrt(
-            (R ** 2) * (np.sin(theta)) ** 2 + (bim ** 2) * (np.cos(theta)) ** 2
+            (R**2) * (np.sin(theta)) ** 2 + (bim**2) * (np.cos(theta)) ** 2
         )
 
         mask = xmin < 1
@@ -464,19 +543,19 @@ class SkyCal:
 
         # getting size
         xmin = x - np.sqrt(
-            (R ** 2) * (np.cos(theta)) ** 2 + (bim ** 2) * (np.sin(theta)) ** 2
+            (R**2) * (np.cos(theta)) ** 2 + (bim**2) * (np.sin(theta)) ** 2
         )
 
         xmax = x + np.sqrt(
-            (R ** 2) * (np.cos(theta)) ** 2 + (bim ** 2) * (np.sin(theta)) ** 2
+            (R**2) * (np.cos(theta)) ** 2 + (bim**2) * (np.sin(theta)) ** 2
         )
 
         ymin = y - np.sqrt(
-            (R ** 2) * (np.sin(theta)) ** 2 + (bim ** 2) * (np.cos(theta)) ** 2
+            (R**2) * (np.sin(theta)) ** 2 + (bim**2) * (np.cos(theta)) ** 2
         )
 
         ymax = y + np.sqrt(
-            (R ** 2) * (np.sin(theta)) ** 2 + (bim ** 2) * (np.cos(theta)) ** 2
+            (R**2) * (np.sin(theta)) ** 2 + (bim**2) * (np.cos(theta)) ** 2
         )
 
         mask = xmin < 1
