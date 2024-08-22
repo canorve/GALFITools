@@ -82,6 +82,9 @@ def ds9satbox(satfileout, sexcat, satscale, satoffset):
     Returns
     -------
     None
+
+
+    # repeated
     """
 
     flagsat = 4  # flag value when object is saturated (or close to)
@@ -166,6 +169,8 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
     Returns
     -------
     None
+
+    # repeated
     """
 
     checkflag = 0
@@ -275,6 +280,8 @@ def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     -------
     imagemat : the image with the new ellipse
 
+    # repeated
+
     """
 
     xmin = int(xmin)
@@ -328,7 +335,7 @@ def MakeSatBox(maskimage, region, val, ncol, nrow):
     Returns
     -------
     bool
-
+    # repeated
     """
 
     # k Check
@@ -404,6 +411,7 @@ def MakeSatBox(maskimage, region, val, ncol, nrow):
 
 def MakeImage(newfits, sizex, sizey):
     """Creates a new blank Image"""
+    # repeated
     # k Check
     if os.path.isfile(newfits):
         print("{} deleted; a new one is created \n".format(newfits))
@@ -429,6 +437,8 @@ def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
     Returns
     -------
     number of objects
+
+    # repeated
     """
 
     # sort the sextractor
@@ -541,6 +551,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     xmin, xmax, ymin, ymax : int, int, int, int
             box delimitation of the ellipse
 
+    # repeated
 
     """
     # k Check
@@ -615,6 +626,7 @@ def CheckFlag(val, check, maxx):
     -------
     bool, returns True if found
 
+    # repeated
 
     """
 
@@ -652,6 +664,9 @@ def CheckSatReg(x, y, filein, R, theta, ell):
     Returns
     -------
     bool : it returns True if at least one pixel is inside
+
+
+    # repeated
 
     """
 
