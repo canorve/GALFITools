@@ -701,6 +701,7 @@ def numComps(galcomps: GalComps, name: str) -> int:
     -------
     N : Number of components of the galaxy
 
+    # repeated
 
     """
 
@@ -753,6 +754,7 @@ def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
     of the three you select as a center. As long these belong to the
     same galaxy.
 
+    # repeated
 
     """
 
@@ -911,7 +913,7 @@ def conver2Sersic(galcomps: GalComps) -> GalComps:
     galcomps : GalComps data class with the functions converted to Sersic
               parameters
 
-
+    # repeated
     """
 
     comps = copy.deepcopy(galcomps)
@@ -971,6 +973,7 @@ def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
     aell : float
             radius along the angle specified by theta
 
+    # repeated
     """
 
     # changing measured angle from y-axis to x-axis
