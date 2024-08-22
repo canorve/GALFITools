@@ -523,6 +523,9 @@ def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
     Rkron : float, major axis
     theta: float, angular position measured from Y-axis
     e: float, ellipticity
+
+    # repeated
+
     """
 
     if rx >= ry:
@@ -581,6 +584,8 @@ def MakeKron(
     Returns
     -------
     imagemat : the image with the new ellipse
+
+    # repeated
 
     """
 
@@ -650,6 +655,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     xmin, xmax, ymin, ymax : Minimum and maximum coordinates
     that encompass the ellipse.
 
+    # repeated
     """
 
     # k Check
