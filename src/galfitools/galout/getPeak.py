@@ -89,7 +89,7 @@ def getPeak(image: str, regfile: str, center: bool, maskfile: str) -> None:
 
 def GetInfoEllip(regfile):
     """extracts ellipse parameters from DS9 region file"""
-
+    # repeated
     if not os.path.exists(regfile):
         print("%s: reg filename does not exist!" % (regfile))
         sys.exit()
@@ -150,6 +150,7 @@ def GetInfoEllip(regfile):
 def Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle):
     """converts DS9 ellipse paramters to
     geometrical parameters
+    # repeated
     """
 
     if rx >= ry:
@@ -174,7 +175,7 @@ def Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle):
 def GetSize(x, y, R, theta, ell, ncol, nrow):
     """Gets the maximun
     and minimim pixels that encloses the ellipse
-
+    # repeated
     """
     # k Check
     q = 1 - ell
@@ -220,7 +221,10 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 
 
 def GetPmax(image, mask, xmin, xmax, ymin, ymax):
-    """get the pixel coordinates with the highest value"""
+    """get the pixel coordinates with the highest value
+
+    # repeated
+    """
 
     xmin = int(xmin)
     xmax = int(xmax)
