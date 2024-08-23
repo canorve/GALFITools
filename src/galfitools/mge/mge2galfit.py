@@ -1097,8 +1097,8 @@ def PrintExp(hdl, ncomp, xpos, ypos, magexp, rsexp, axratexp, angleexp, Z, fit):
     """Print the GALFIT exponential function parameters to a
     file specified by the filehandle.
 
-
     print GALFIT exponential function to filehandle
+
     Parameters
     ----------
 

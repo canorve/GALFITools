@@ -5,7 +5,7 @@ import numpy as np
 from mgefit.mge_fit_1d import mge_fit_1d
 from scipy.special import gammaincinv
 
-
+# remove from galfitools?
 # check modify
 def main():
 
