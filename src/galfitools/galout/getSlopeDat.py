@@ -9,7 +9,7 @@ import numpy as np
 from scipy.optimize import bisect
 from scipy.special import gamma, gammaincinv
 
-
+# remover de galfitools?
 # console scripts
 def main() -> None:
 
@@ -84,7 +84,7 @@ def main() -> None:
 
     k = gammaincinv(2 * comps.Exp, 0.5)
 
-    denom1 = (2 * np.pi * comps.Rad ** 2) * (np.exp(k))
+    denom1 = (2 * np.pi * comps.Rad**2) * (np.exp(k))
     denom2 = (comps.Exp) * (k ** (-2 * comps.Exp))
     denom3 = (gamma(2 * comps.Exp)) * (comps.AxRat)
 
@@ -537,7 +537,7 @@ def ReadSky(File: str) -> GalSky:
 
 def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
     """changes Flag to true for those components who belongs
-        to the same galaxy of n_comp"""
+    to the same galaxy of n_comp"""
 
     galcomps.Active.fill(False)
 
@@ -565,7 +565,7 @@ def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
 
 
 def conver2Sersic(galcomps: GalComps) -> GalComps:
-    """ function to convert exponential, gaussian params to Sersic params"""
+    """function to convert exponential, gaussian params to Sersic params"""
 
     comps = copy.deepcopy(galcomps)
 
@@ -582,7 +582,7 @@ def conver2Sersic(galcomps: GalComps) -> GalComps:
         comps.Exp[maskgas] = 0.5
         comps.Rad[maskgas] = comps.Rad[maskgas] / 2.354  # converting to sigma
         comps.Rad[maskgas] = (
-            SQ2 * (K_GAUSS ** 0.5) * comps.Rad[maskgas]
+            SQ2 * (K_GAUSS**0.5) * comps.Rad[maskgas]
         )  # converting to Re
 
     # for de vaucouleurs
@@ -601,8 +601,14 @@ class GetSlope:
     """class to obtain the effective radius for the whole galaxy"""
 
     def FullSlopeSer(
-        self, comps: GalComps, R: float, Re: list, n: list, q: list,
-        pa: list, theta: float
+        self,
+        comps: GalComps,
+        R: float,
+        Re: list,
+        n: list,
+        q: list,
+        pa: list,
+        theta: float,
     ) -> float:
 
         SlptotR = self.SlopeSer(R, Re, n, q, pa, theta)
@@ -730,7 +736,7 @@ def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
 
     # bim = q * R
 
-    ecc = np.sqrt(1 - q ** 2)
+    ecc = np.sqrt(1 - q**2)
 
     alpha = theta - newpa  # this is the direction
 

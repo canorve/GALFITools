@@ -278,7 +278,10 @@ def FluxBox(Image, xpos, ypos, rx, ry, angle, ncol, nrow):
 
 
 def MakeBoxBack(Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow):
-    """Make a box in an image. Deprecated"""
+    """Make a box in an image. Deprecated
+    # repeated
+    # not used
+    """
 
     xlo = xpos - rx / 2 - 1
     xhi = xpos + rx / 2 + 1
@@ -327,6 +330,7 @@ def MakeBoxBack(Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow):
 def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
     """Converts the DS9 ellipse parameters to
     ellipse parameters
+    # repeated
     """
 
     if rx >= ry:
@@ -350,7 +354,8 @@ def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
 
 def FluxKron(imagemat, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     """This subroutine obtain the flux from a Kron ellipse delimited
-    by box defined by: xmin, xmax, ymin, ymax"""
+    by box defined by: xmin, xmax, ymin, ymax
+    """
 
     xmin = int(xmin)
     xmax = int(xmax)
@@ -392,7 +397,7 @@ def FluxKron(imagemat, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
 def GetSize(x, y, R, theta, ell, ncol, nrow):
     """Gets the maximun
     and minimim pixels that encloses the ellipse
-
+    # repeated
     """
 
     # k Check
@@ -436,7 +441,10 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
 
 def GetExpTime(Image):
     """Get exposition time
-    from the image header"""
+    from the image header
+    # repeated
+
+    """
 
     try:
         hdu = fits.open(Image)

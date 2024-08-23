@@ -3,7 +3,7 @@ import numpy as np
 from scipy.interpolate import UnivariateSpline
 
 # check modify
-
+# remover de galfitools?
 # rad,me=np.genfromtxt("Blackout.txt",unpack=True)
 rad, me = np.genfromtxt("Blueout.txt", unpack=True)
 # rad,me=np.genfromtxt("Redout.txt",unpack=True)
@@ -54,7 +54,7 @@ plt.clf()
 dev1 = yspl1d(xran)
 dev2 = yspl2d(xran)
 
-kappa = np.abs(dev2) / (1 + dev1 ** 2) ** (3 / 2)
+kappa = np.abs(dev2) / (1 + dev1**2) ** (3 / 2)
 
 plt.plot(xran, kappa)
 plt.xlabel("Radius")
