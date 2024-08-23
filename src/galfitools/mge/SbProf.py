@@ -186,7 +186,6 @@ class DataImg:
     and mask image
 
 
-
     """
 
     img = np.empty([2, 2])
