@@ -241,7 +241,7 @@ def SectPhot(conf, dataimg, n_sectors=19, minlevel=0):
 
     eps = 1 - conf.qarg
 
-    plt.clf()
+    # plt.clf()
     print("")
 
     ############
