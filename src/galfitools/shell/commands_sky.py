@@ -2,7 +2,8 @@ import argparse
 
 from galfitools.shell.prt import printWelcome
 from galfitools.sky.GalfitSky import galfitSky
-from galfitools.sky.Sky import sky
+
+# from galfitools.sky.Sky import sky
 from galfitools.sky.SkyDs9 import SkyDs9
 from galfitools.sky.SkyRing import SkyRing
 
@@ -62,11 +63,13 @@ def mainGalfitSky():
     galfitSky(imgname, maskfile, mgzpt, scale, X, Y, initsky)
 
 
+"""
+# Deprecated
 def mainSky():
-    """
+    ''' 
     Calls the sky function based on argument parsing.
     This function serves as an example of an API.
-    """
+    ''' 
 
     printWelcome()
 
@@ -90,6 +93,7 @@ def mainSky():
 
     print("mean sky: {:.3f} ".format(mean))
     print("std sky: {:.3f} ".format(sig))
+"""
 
 
 def mainSkyDs9():
