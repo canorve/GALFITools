@@ -787,6 +787,7 @@ def PrintHeader(
     -------
     bool
 
+    # repeated
     """
     # k Check
     # the header for GALFIT
@@ -927,6 +928,7 @@ def PrintSky(hdl, ncomp, sky, Z, fit):
     -------
     bool
 
+    # repeated
     """
 
     # k Check
@@ -993,6 +995,7 @@ def PrintSersic(
     -------
     bool
 
+    # repeated
     """
 
     line00 = "# Object number: {}     \n".format(ncomp)
@@ -1064,6 +1067,8 @@ def PrintGauss(hdl, ncomp, xpos, ypos, magass, fwhm, axratgass, anglegass, Z, fi
     -------
     bool
 
+
+    # repeated
     """
 
     line00 = "# Object number: {}       \n".format(ncomp)
@@ -1126,6 +1131,7 @@ def PrintExp(hdl, ncomp, xpos, ypos, magexp, rsexp, axratexp, angleexp, Z, fit):
     -------
     bool
 
+    # repeated
     """
 
     line00 = "# Object number: $ncomp      \n"
