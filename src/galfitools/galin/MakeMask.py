@@ -6,6 +6,7 @@ import os.path
 import numpy as np
 from astropy.io import fits
 from galfitools.galin.MaskDs9 import GetAxis
+from galfitools.galin.common import ds9satbox
 
 
 def makeMask(
@@ -65,6 +66,7 @@ def makeMask(
     MakeSatBox(maskfile, satfileout, Total + 1, NCol, NRow)  # make sat region
 
 
+'''
 def ds9satbox(satfileout, sexcat, satscale, satoffset):
     """Creates a DS9 file which contains regions with bad
         saturated regions
@@ -148,6 +150,7 @@ def ds9satbox(satfileout, sexcat, satscale, satoffset):
             f_out.write(line2)
 
     f_out.close()
+'''
 
 
 def MakeMask(maskimage, catfile, scale, offset, regfile):

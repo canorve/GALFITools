@@ -128,6 +128,7 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y, sky) -> None:
     print("To compute sky run: galfit sky.txt")
 
 
+'''
 def ds9satbox(satfileout, output, satscale, satoffset):
     """Creates a file for ds9 which selects bad saturated regions
     # not used
@@ -665,7 +666,7 @@ def CheckSatReg(x, y, filein, R, theta, ell):
 
     return flag
 
-
+'''
 ####################################################
 ####################################################
 #####################################################
@@ -846,6 +847,7 @@ def PrintSky(hdl, ncomp, sky, Z, fit):
     return True
 
 
+'''
 def PrintSersic(
     hdl, ncomp, xpos, ypos, magser, reser, nser, axratser, angleser, Z, fit
 ):
@@ -1035,6 +1037,8 @@ def CheckFlag(val, check):
 
     return flag
 
+
+'''
 
 #############################################################################
 #    End of program  ###################################
