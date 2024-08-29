@@ -2,15 +2,7 @@
 
 
 import numpy as np
-from galfitools.galin.galfit import (
-    GalComps,
-    Galfit,
-    GalHead,
-    GetRadAng,
-    SelectGal,
-    conver2Sersic,
-    numComps,
-)
+from galfitools.galin.galfit import GalComps
 
 
 def ds9satbox(satfileout, sexcat, satscale, satoffset):
