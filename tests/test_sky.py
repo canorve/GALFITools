@@ -7,7 +7,7 @@ import subprocess as sp
 
 from galfitools.sky.GalfitSky import galfitSky
 
-from galfitools.sky.Sky import sky
+# from galfitools.sky.Sky import sky # deprecated
 
 from galfitools.sky.SkyDs9 import SkyDs9
 from galfitools.sky.SkyRing import SkyRing
