@@ -277,6 +277,7 @@ def FluxBox(Image, xpos, ypos, rx, ry, angle, ncol, nrow):
     return flux
 
 
+'''
 def MakeBoxBack(Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow):
     """Make a box in an image. Deprecated
     # repeated
@@ -325,6 +326,7 @@ def MakeBoxBack(Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow):
     # Image[ylo - 1: yhi + 1, xlo - 1: xhi + 1] = fill
 
     return Image
+'''
 
 
 def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):

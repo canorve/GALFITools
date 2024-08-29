@@ -1009,11 +1009,11 @@ def GetFits(
     # new fits
 
     i = 0  # index indicated where the data is located
-    if checkCompHDU(Image):
-        i = 1
-        newhdu = fits.CompImageHDU()
-    else:
-        newhdu = fits.PrimaryHDU()
+    # if checkCompHDU(Image):
+    #    i = 1
+    #    newhdu = fits.CompImageHDU()
+    # else:
+    newhdu = fits.PrimaryHDU()
 
     hdu = fits.open(Image)
     dat = hdu[i].data[ylo - 1 : yhi, xlo - 1 : xhi]

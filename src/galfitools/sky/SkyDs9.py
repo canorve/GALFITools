@@ -287,6 +287,7 @@ def SkyBox(Image, xpos, ypos, rx, ry, angle, ncol, nrow):
     return flatimg
 
 
+'''
 def MakeBoxBack(Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow):
     """Make a box in an image
 
@@ -335,6 +336,8 @@ def MakeBoxBack(Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow):
     # Image[ylo - 1: yhi + 1, xlo - 1: xhi + 1] = fill
 
     return Image
+
+'''
 
 
 def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
@@ -454,6 +457,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     return (round(xmin), round(xmax), round(ymin), round(ymax))
 
 
+'''
 def GetExpTime(Image):
     """Get exposition time from the image
 
@@ -469,7 +473,7 @@ def GetExpTime(Image):
     except Exception:
         exptime = 1
     return float(exptime)
-
+'''
 
 #############################################################################
 #    End of program  ###################################

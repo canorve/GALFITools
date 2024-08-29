@@ -6,7 +6,7 @@ import sys
 
 import numpy as np
 from astropy.io import fits
-from galfitools.galin.MaskDs9 import GetAxis, checkCompHDU
+from galfitools.galin.MaskDs9 import GetAxis
 
 
 def getStar(
@@ -66,8 +66,8 @@ def getStar(
 
     i = 0  # index where data is located at hdu
 
-    if checkCompHDU(image):
-        i = 1
+    # if checkCompHDU(image):
+    #    i = 1
 
     hdu = fits.open(image)
     img = hdu[i].data
@@ -170,11 +170,11 @@ def GetFits(
     # new fits
 
     i = 0  # index indicated where the data is located
-    if checkCompHDU(Image):
-        i = 1
-        newhdu = fits.CompImageHDU()
-    else:
-        newhdu = fits.PrimaryHDU()
+    # if checkCompHDU(Image):
+    #    i = 1
+    #    newhdu = fits.CompImageHDU()
+    # else:
+    newhdu = fits.PrimaryHDU()
 
     hdu = fits.open(Image)
     dat = hdu[i].data[ylo - 1 : yhi, xlo - 1 : xhi]

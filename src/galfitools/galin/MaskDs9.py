@@ -5,7 +5,8 @@ import sys
 
 import numpy as np
 from astropy.io import fits
-from astropy.io.fits import CompImageHDU
+
+# from astropy.io.fits import CompImageHDU
 from matplotlib.path import Path
 
 
@@ -469,8 +470,8 @@ def GetAxis(Image):
 
     i = 0  # index indicated where the data is located
 
-    if checkCompHDU(Image):
-        i = 1
+    # if checkCompHDU(Image):
+    #    i = 1
 
     hdu = fits.open(Image)
 
@@ -482,6 +483,7 @@ def GetAxis(Image):
     return ncol, nrow
 
 
+'''
 def checkCompHDU(file):
     """check if fits file is a CompImageHDU
 
@@ -501,6 +503,8 @@ def checkCompHDU(file):
     hdul.close()
 
     return flag
+
+'''
 
 
 def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):

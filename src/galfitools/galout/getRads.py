@@ -232,6 +232,7 @@ class GetBreak:
 
     """
 
+    """
     def FullSlopeSer(
         self, R: float, Re: list, n: list, q: list, pa: list, theta: float
     ) -> float:
@@ -240,6 +241,8 @@ class GetBreak:
         SlptotR = self.SlopeSer(R, Re, n, q, pa, theta)
 
         return SlptotR.sum()
+
+    """
 
     def GalBreak(self, R: list, comps: GalComps, theta: float) -> float:
 
@@ -263,6 +266,7 @@ class GetBreak:
 
         return kappa
 
+    """
     def funGalSlopeSer(
         self,
         R: float,
@@ -279,6 +283,8 @@ class GetBreak:
         fun = self.SlopeSer(R, Ie, Re, n, q, pa, theta) - slope
 
         return fun
+
+    """
 
     def FindBreak(self, comps: GalComps, theta: float, initial_comp: int) -> float:
 
@@ -339,6 +345,7 @@ class GetBreak:
 
         return beta
 
+    """
     def FindSlope(self, comps: GalComps, theta: float, slope: float) -> float:
         "return the Re of a set of Sersic functions. It uses Bisection"
         # not used here
@@ -369,6 +376,8 @@ class GetBreak:
             Radslp = 0
 
         return Radslp
+
+    """
 
     def var_X(self, R: float, Re: list, n: list):
 
@@ -1181,6 +1190,7 @@ class GetKappa:
 
     """
 
+    """
     def FullSlopeSer(
         self, R: float, Re: list, n: list, q: list, pa: list, theta: float
     ) -> float:
@@ -1189,6 +1199,8 @@ class GetKappa:
         SlptotR = self.SlopeSer(R, Re, n, q, pa, theta)
 
         return SlptotR.sum()
+
+    """
 
     def GalKappa(self, R: list, comps: GalComps, theta: float) -> float:
 
@@ -1305,6 +1317,7 @@ class GetKappa:
 
         return krads
 
+    """
     def FindSlope(self, comps: GalComps, theta: float, slope: float) -> float:
         "return the Re of a set of Sersic functions. It uses Bisection"
         # not used here
@@ -1335,6 +1348,8 @@ class GetKappa:
             Radslp = 0
 
         return Radslp
+
+    """
 
     def var_X(self, R: float, Re: list, n: list):
 
