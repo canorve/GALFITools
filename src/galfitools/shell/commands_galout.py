@@ -1270,12 +1270,15 @@ def mainFitlog2CSV():
         help="number of the fit in fit.log to convert to csv. Default: last fit",
     )
 
+    parser.add_argument("-p", "--path", type=str, help="path where fit.log is located")
+
     args = parser.parse_args()
 
     fileout = args.fileout
     num = args.num
+    path = args.path
 
-    log2csv(num, fileout)
+    log2csv(num, fileout, path=path)
 
     print("conversion to CSV file done.")
 

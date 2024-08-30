@@ -6,7 +6,7 @@ import re
 import numpy as np
 
 
-def log2csv(num: int, fileout: str):
+def log2csv(num: int, fileout: str, path=None):
     """converts GALFIT fit.log file into a comma separated
         values file (CSV)
 
@@ -18,6 +18,8 @@ def log2csv(num: int, fileout: str):
 
     fileout : str
             name of the output file
+    path : str
+            name of the path where fit.log file is located
 
     Returns
     -------
@@ -25,16 +27,17 @@ def log2csv(num: int, fileout: str):
 
     Notes
     -----
-    It assumes that fit.log is in the same directory where
+    If path= None, it assumes that fit.log is in the same directory where
     this function is executed.
 
 
     """
 
     file = "fit.log"
+    if path != None:
+        file = path + file
 
     # fileout="fitlog.csv"
-
     fitlogF = open(file, "r")
 
     f_out = open(fileout, "w")
