@@ -23,6 +23,8 @@ from galfitools.galout.fitlog2csv import log2csv
 
 from galfitools.galout.getCOW import getCOW
 
+from galfitools.galout.getPeak import getPeak
+
 
 def test_getBreak():
 
@@ -415,3 +417,36 @@ def test_getCOW():
     tol = 1e-2
     diff = abs(totmag - 11.96)
     assert diff < tol
+
+    return None
+
+
+def test_getPeak():
+
+    path = "tests/"
+
+    image = "A671.gtMakeMask.maskds9.masksky.fits"
+    image = path + image
+
+    regfile = "ds9.getStar.reg"
+    regfile = path + regfile
+    center = False
+    maskfile = None
+
+    X, Y, AxRat, PA = getPeak(image, regfile, center, maskfile)
+
+    tol = 1e-2
+
+    diffx = abs(X - 1444)
+    assert diffx < tol
+
+    diffy = abs(Y - 1061)
+    assert diffy < tol
+
+    diffax = abs(AxRat - 1)
+    assert diffax < tol
+
+    diffPA = abs(PA - (-90.00))
+    assert diffPA < tol
+
+    return None
