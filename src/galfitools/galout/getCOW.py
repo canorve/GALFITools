@@ -137,7 +137,7 @@ def getCOW(
         ymin = cows[idx]
         ymax = cows2[idx]
 
-    plt.plot(R, cows, color="blue", label="model 1", dpi=dpival)
+    plt.plot(R, cows, color="blue", label="model 1")
     plt.xlabel("Rad")
     plt.ylabel("curve of growth")
     plt.grid(True)
@@ -154,7 +154,7 @@ def getCOW(
 
     if galfitF2:
 
-        plt.plot(R, cows2, color="green", label="model 2", dpi=dpival)
+        plt.plot(R, cows2, color="green", label="model 2")
 
         plt.xlabel("Rad")
         plt.ylabel("curve of growth")
@@ -165,7 +165,7 @@ def getCOW(
     plt.hlines(totmag, xmin, xmax, color="black", label="total magnitude")
 
     plt.legend(loc="lower right")
-    plt.savefig(plotname)
+    plt.savefig(plotname, dpi=dpival)
 
     return totmag, N, theta
 
