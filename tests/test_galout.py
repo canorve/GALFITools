@@ -368,9 +368,9 @@ def test_fitlog2csv():
 
     num = None
 
-    log2csv(num, fileout, path=path)
-
     fileout = path + fileout
+
+    log2csv(num, fileout, path=path)
 
     assert os.path.isfile(fileout)
 
