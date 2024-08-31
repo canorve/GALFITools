@@ -21,6 +21,8 @@ from galfitools.galout.PhotDs9 import photDs9
 
 from galfitools.galout.fitlog2csv import log2csv
 
+from galfitools.galout.getCOW import getCOW
+
 
 def test_getBreak():
 
@@ -378,3 +380,38 @@ def test_fitlog2csv():
         os.remove(fileout)
 
     return None
+
+
+def test_getCOW():
+
+    path = "tests/"
+    galfitFile = "galfit.1ser"
+    galfitFile = path + galfitFile
+    dis = 10
+    plotfile = "cow.png"
+    plotfile = path + plotfile
+
+    dpival = 100
+
+    frac = 0.95
+
+    maxdiff = False
+
+    num_comp = 1
+
+    angle = None
+
+    galfitF2 = None
+
+    totmag, N, theta = getCOW(
+        galfitFile, dis, angle, frac, num_comp, plotfile, dpival, galfitF2, maxdiff
+    )
+
+    assert os.path.isfile(plotfile)
+
+    if os.path.isfile(plotfile):
+        os.remove(plotfile)
+
+    tol = 1e-2
+    diff = abs(totmag - 11.96)
+    assert diff < tol
