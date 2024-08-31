@@ -25,6 +25,8 @@ from galfitools.galout.getCOW import getCOW
 
 from galfitools.galout.getPeak import getPeak
 
+from galfitools.galout.getBarSize import getBarSize
+
 
 def test_getBreak():
 
@@ -448,5 +450,37 @@ def test_getPeak():
 
     diffPA = abs(PA - (-90.00))
     assert diffPA < tol
+
+    return None
+
+
+def test_getBarSize():
+
+    path = "tests/"
+
+    galfitFile = "galfit.barsize"
+    galfitFile = path + galfitFile
+
+    dis = 10
+    out = "testbar.reg"
+    out = path + out
+    num_comp = 1
+    plot = False
+    ranx = None
+
+    rbar, N, theta = getBarSize(galfitFile, dis, num_comp, plot, ranx, out)
+
+    tol = 1e-2
+
+    diffbar = abs(rbar - 131)
+    assert diffbar < tol
+
+    difftheta = abs(theta - 57.15)
+    assert difftheta < tol
+
+    assert os.path.isfile(out)
+
+    if os.path.isfile(out):
+        os.remove(out)
 
     return None
