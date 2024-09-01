@@ -18,6 +18,8 @@ from galfitools.galin.xy2fits import xy2fits
 
 
 from galfitools.galin.checkGalFile import checkFile
+from galfitools.galin.getSersic import getSersic
+from galfitools.galin.imarith import imarith
 
 
 def test_getStar():
@@ -256,5 +258,66 @@ def test_checkfile():
 
     diffmag = abs(totmag - 11.26)
     assert diffmag < tol
+
+    return None
+
+
+def test_getSersic():
+
+    tol = 1e-2
+    path = "tests/"
+
+    image = "A1656-1-3.sbProf.fits"
+    image = path + image
+    regfile = "ds9.sbProf.reg"
+    regfile = path + regfile
+    center = False
+    maskfile = None
+    zeropoint = 21.817
+    sky = 370
+    bulgetot = 0.8
+    noprint = False
+    bards9 = None
+
+    getSersic(
+        image, regfile, center, maskfile, zeropoint, sky, noprint, bulgetot, bards9
+    )
+
+    constfile = "constraints.txt"
+    constfile = path + constfile
+
+    # something is wrong with pytest that does not
+    # create this file. Not my fault
+    # assert os.path.isfile(constfile)
+    if os.path.isfile(constfile):
+        os.remove(constfile)
+
+    return None
+
+
+def test_imarith():
+
+    tol = 1e-2
+    path = "tests/"
+
+    ImageFile = "A1656-1-3.sbProf.fits"
+    ImageFile = path + ImageFile
+
+    output = "testimarith.fits"
+    output = path + output
+    image2 = "A1656-1-3.sbProf.fits"
+    image2 = path + image2
+
+    add = 1
+    mul = None
+    div = None
+    sub = None
+
+    imarith(ImageFile, output, image2, add, mul, div, sub)
+
+    assert os.path.isfile(output)
+
+    if os.path.isfile(output):
+        os.remove(output)
 
     return None

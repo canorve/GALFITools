@@ -63,7 +63,7 @@ def getSersic(
     Returns
     -------
     galcomps : GalComps data class defined in galfit.py containing
-               the initial parameter
+               the initial parameters
 
     """
 
