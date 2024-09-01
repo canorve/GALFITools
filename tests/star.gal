@@ -1,0 +1,47 @@
+
+#  Input menu file: galfit.init
+
+#  Chi^2/nu = 1.276,  Chi^2 = 8506361.000,  Ndof = 6666763
+
+================================================================================
+# IMAGE and GALFIT CONTROL PARAMETERS
+A) star.fits         # Input data image (FITS file)
+B) star.out.fits      # Output data image block
+C) psfsig.fits          # Sigma image name (made from data if blank or "none") 
+D) none            # Input PSF image and (optional) diffusion kernel
+E) 1                   # PSF fine sampling factor relative to data 
+F) none # Bad pixel mask (FITS image or ASCII coord list)
+G) constar.txt          # File with parameter constraints (ASCII file) 
+H) 1 50 1 50 # Image region to fit (xmin xmax ymin ymax)
+I) 101    101          # Size of the convolution box (x y)
+J) 21.817             # Magnitude photometric zeropoint 
+K) 0.68  0.68      # Plate scale (dx dy)   [arcsec per pixel]
+O) regular             # Display type (regular, curses, both)
+P) 0                   # Choose: 0=optimize, 1=model, 2=imgblock, 3=subcomps
+
+# INITIAL FITTING PARAMETERS
+#
+#   For component type, the allowed functions are: 
+#       sersic, expdisk, edgedisk, devauc, king, nuker, psf, 
+#       gaussian, moffat, ferrer, and sky. 
+#  
+#   Hidden parameters will only appear when they're specified:
+#       Bn (n=integer, Bending Modes).
+#       C0 (diskyness/boxyness), 
+#       Fn (n=integer, Azimuthal Fourier Modes).
+#       R0-R10 (coordinate rotation, for creating spiral structures).
+#       To, Ti, T0-T10 (truncation function).
+# 
+# ------------------------------------------------------------------------------
+#   par)    par value(s)    fit toggle(s)    # parameter description 
+# ------------------------------------------------------------------------------
+
+# Component number: 4
+ 0) sky                    #  Component type
+ 1) 367 1          #  Sky background at center of fitting region [ADUs]
+ 2) 0.000e+00      0       #  dsky/dx (sky gradient in x)     [ADUs/pix]
+ 3) 0.000e+00      0       #  dsky/dy (sky gradient in y)     [ADUs/pix]
+ Z) 0                      #  Skip this model in output image?  (yes=1, no=0)
+
+================================================================================
+
