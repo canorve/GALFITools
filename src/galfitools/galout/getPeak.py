@@ -148,7 +148,7 @@ def GetInfoEllip(regfile):
 
 
 def Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle):
-    """converts DS9 ellipse paramters to
+    """converts DS9 ellipse parameters to
     geometrical parameters
     # repeated
     """

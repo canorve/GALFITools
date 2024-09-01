@@ -22,6 +22,8 @@ from galfitools.galin.getSersic import getSersic
 from galfitools.galin.imarith import imarith
 from galfitools.galin.getBoxSizeDs9 import getBoxSizeDs9
 
+from galfitools.galin.MakePSF import makePSF
+
 
 def test_getStar():
 
@@ -344,5 +346,85 @@ def test_getBoxSizeDs9():
 
     diffymax = abs(ymax - 1891)
     assert diffymax < tol
+
+    return None
+
+
+def test_makePSF():
+
+    tol = 1e-2
+    path = "tests/"
+
+    image = "A1656-1-3.sbProf.fits"
+    image = path + image
+
+    regfile = "star.reg"
+    regfile = path + regfile
+
+    center = False
+    psfout = "psf.fits"
+
+    sigma = None
+    # sigma = path+sigma
+
+    galfitFile = "star.gal"
+    galfitFile = path + galfitFile
+    twist = False
+
+    numgauss = None
+
+    #######################
+
+    makePSF(galfitFile, image, regfile, center, psfout, sigma, twist, numgauss)
+
+    consfile = "constar.txt"
+    assert os.path.isfile(consfile)
+    if os.path.isfile(consfile):
+        os.remove(consfile)
+
+    psffile = "psf.fits"
+    assert os.path.isfile(psffile)
+    if os.path.isfile(psffile):
+        os.remove(psffile)
+
+    logfile = "fit.log"
+    assert os.path.isfile(logfile)
+    if os.path.isfile(logfile):
+        os.remove(logfile)
+
+    galfile = "galfit.01"
+    assert os.path.isfile(galfile)
+    if os.path.isfile(galfile):
+        os.remove(galfile)
+
+    mgefile = "mgegas.txt"
+    assert os.path.isfile(mgefile)
+    if os.path.isfile(mgefile):
+        os.remove(mgefile)
+
+    msefile = "mseGALFIT.txt"
+    assert os.path.isfile(msefile)
+    if os.path.isfile(msefile):
+        os.remove(msefile)
+
+    starfile = "star.fits"
+    assert os.path.isfile(starfile)
+    if os.path.isfile(starfile):
+        os.remove(starfile)
+
+    staroutfile = "star.out-mge.fits"
+    assert os.path.isfile(staroutfile)
+    if os.path.isfile(staroutfile):
+        os.remove(staroutfile)
+
+    starpfile = "star.png"
+    assert os.path.isfile(starpfile)
+    if os.path.isfile(starpfile):
+        os.remove(starpfile)
+
+    psftfile = "psfmodel.txt"
+    assert os.path.isfile(psftfile)
+    if os.path.isfile(psftfile):
+        os.remove(psftfile)
 
     return None

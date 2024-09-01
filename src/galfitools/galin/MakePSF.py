@@ -117,7 +117,6 @@ def makePSF(
     ellip = eps
     posang = theta
     regmgefile = None
-
     outname = mge2gal(
         galfitFile,
         regmgefile,

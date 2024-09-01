@@ -7,6 +7,7 @@ import sys
 import numpy as np
 from astropy.io import fits
 from galfitools.galin.MaskDs9 import GetAxis
+from galfitools.mge.mge2galfit import Ds9ell2Kronellv2
 
 
 def getStar(
@@ -79,13 +80,13 @@ def getStar(
     (ncol, nrow) = GetAxis(image)
 
     obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
-    xx, yy, Rkron, theta, eps = Ds9ell2Kronell(xpos, ypos, rx, ry, angle)
+    xx, yy, Rkron, theta, eps = Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle)
 
     if center:
         print("center of ds9 ellipse region will be used")
         xpeak, ypeak = round(xpos), round(ypos)
     else:
-        (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, eps, ncol, nrow)
+        (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta + 90, eps, ncol, nrow)
         xpeak, ypeak = GetPmax(img, mask, xmin, xmax, ymin, ymax)
 
     print("object found at ", xpeak + 1, ypeak + 1)
@@ -332,7 +333,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     x : float, x-center of ellipse
     y : float, y-center of ellipse
     R : float, major axis of ellipse
-    theta : float, angular position of ellipse
+    theta : float, angular position of ellipse. measured from X-axis
     ell : float, ellipticity
     ncol : number of columns of the image
     nrow : number of rows of the image
