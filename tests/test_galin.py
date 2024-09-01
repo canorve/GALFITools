@@ -20,6 +20,7 @@ from galfitools.galin.xy2fits import xy2fits
 from galfitools.galin.checkGalFile import checkFile
 from galfitools.galin.getSersic import getSersic
 from galfitools.galin.imarith import imarith
+from galfitools.galin.getBoxSizeDs9 import getBoxSizeDs9
 
 
 def test_getStar():
@@ -316,8 +317,32 @@ def test_imarith():
     imarith(ImageFile, output, image2, add, mul, div, sub)
 
     assert os.path.isfile(output)
-
     if os.path.isfile(output):
         os.remove(output)
+
+    return None
+
+
+def test_getBoxSizeDs9():
+
+    tol = 1e-2
+    path = "tests/"
+
+    RegFile = "box.reg"
+    RegFile = path + RegFile
+
+    xmin, xmax, ymin, ymax = getBoxSizeDs9(RegFile)
+
+    diffxmin = abs(xmin - 166)
+    assert diffxmin < tol
+
+    diffxmax = abs(xmax - 1817)
+    assert diffxmax < tol
+
+    diffymin = abs(ymin - 204)
+    assert diffymin < tol
+
+    diffymax = abs(ymax - 1891)
+    assert diffymax < tol
 
     return None
