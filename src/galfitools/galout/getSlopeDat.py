@@ -312,27 +312,6 @@ class GalComps:
     FreePosAng = np.array([])  # 10) position angle
 
 
-'''
-def numComps(galcomps: GalComps, name: str) -> int:
-    """obtains the number of components"""
-
-    if name == "all":
-        nummask = (galcomps.Active == 1) & (
-            (galcomps.NameComp == "sersic")
-            | (galcomps.NameComp == "expdisk")
-            | (galcomps.NameComp == "gaussian")
-            | (galcomps.NameComp == "devauc")
-        )
-
-    else:
-        nummask = (galcomps.Active == 1) & (galcomps.NameComp == name)
-
-    N = galcomps.Active[nummask].size
-
-    return N
-'''
-
-
 def ReadComps(File: str) -> GalComps:
     """reads all the components in the galfit file"""
     galcomps = GalComps()

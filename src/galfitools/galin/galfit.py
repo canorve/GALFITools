@@ -701,7 +701,6 @@ def numComps(galcomps: GalComps, name: str) -> int:
     -------
     N : Number of components of the galaxy
 
-    # repeated
 
     """
 

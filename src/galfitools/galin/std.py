@@ -762,46 +762,6 @@ def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
     return xx, yy, Rkron, theta, e
 
 
-'''
-def numComps(galcomps: GalComps, name: str) -> int:
-    """gets the number of components for a galaxy.
-
-    Given the number of components of a GALFIT file,
-    it discerns which components belong to the galaxy. This
-    is useful when simultaneous fitting was used.
-
-    Parameters
-    ----------
-    galcomps : GalComps data class defined above
-    name :  str
-            indicates which model components to count:
-            all, sersic, expdisk, gaussian, devauc
-
-    Returns
-    -------
-    N : Number of components of the galaxy
-
-    # repeated
-
-    """
-
-    if name == "all":
-        nummask = (galcomps.Active == 1) & (
-            (galcomps.NameComp == "sersic")
-            | (galcomps.NameComp == "expdisk")
-            | (galcomps.NameComp == "gaussian")
-            | (galcomps.NameComp == "devauc")
-        )
-
-    else:
-        nummask = (galcomps.Active == 1) & (galcomps.NameComp == name)
-
-    N = galcomps.Active[nummask].size
-
-    return N
-'''
-
-
 def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
     """Selects which components belong to the galaxy.
 
