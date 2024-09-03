@@ -762,6 +762,7 @@ def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
     return xx, yy, Rkron, theta, e
 
 
+'''
 def numComps(galcomps: GalComps, name: str) -> int:
     """gets the number of components for a galaxy.
 
@@ -798,6 +799,7 @@ def numComps(galcomps: GalComps, name: str) -> int:
     N = galcomps.Active[nummask].size
 
     return N
+'''
 
 
 def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:

@@ -9,6 +9,8 @@ import numpy as np
 from scipy.optimize import bisect
 from scipy.special import gamma, gammaincinv
 
+from galfitools.galin.galfit import numComps
+
 # remover de galfitools?
 # console scripts
 def main() -> None:
@@ -310,6 +312,7 @@ class GalComps:
     FreePosAng = np.array([])  # 10) position angle
 
 
+'''
 def numComps(galcomps: GalComps, name: str) -> int:
     """obtains the number of components"""
 
@@ -327,6 +330,7 @@ def numComps(galcomps: GalComps, name: str) -> int:
     N = galcomps.Active[nummask].size
 
     return N
+'''
 
 
 def ReadComps(File: str) -> GalComps:
