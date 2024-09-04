@@ -148,7 +148,6 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     xmin, xmax, ymin, ymax : Minimum and maximum coordinates
     that encompass the ellipse.
 
-    # repeated
     """
 
     # k Check
