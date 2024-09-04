@@ -10,6 +10,7 @@ from scipy.optimize import bisect
 from scipy.special import gamma, gammaincinv
 
 from galfitools.galin.galfit import numComps
+from galfitools.galin.galfit import SelectGal
 
 # remover de galfitools?
 # console scripts
@@ -516,35 +517,6 @@ def ReadSky(File: str) -> GalSky:
     GalfitFile.close()
 
     return galsky
-
-
-def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
-    """changes Flag to true for those components who belongs
-    to the same galaxy of n_comp"""
-
-    galcomps.Active.fill(False)
-
-    idx = np.where(galcomps.N == n_comp)
-
-    assert idx[0].size != 0, "component not found"
-
-    n_idx = idx[0].item(0)
-
-    galcomps.Active[n_idx] = True  # main component
-
-    posx = galcomps.PosX[n_idx]
-    posy = galcomps.PosY[n_idx]
-
-    dx = galcomps.PosX - posx
-    dy = galcomps.PosY - posy
-
-    dist = np.sqrt((dx) ** 2 + (dy) ** 2)
-
-    maskdist = dist <= distmax
-
-    galcomps.Active[maskdist] = True
-
-    return galcomps
 
 
 def conver2Sersic(galcomps: GalComps) -> GalComps:
