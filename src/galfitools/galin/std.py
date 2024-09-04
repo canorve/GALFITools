@@ -108,7 +108,6 @@ def MakeImage(newfits, sizex, sizey):
     -------
     bool
 
-    # repeated
     """
 
     if os.path.isfile(newfits):
@@ -128,115 +127,6 @@ def MakeImage(newfits, sizex, sizey):
     hdu.writeto(newfits, overwrite=True)
 
     return True
-
-
-def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
-    """Sorts the SExtractor catalog by area, from largest to smallest.
-
-    Parameters
-    ----------
-    SexCat : str, name of the SExtractor catalog
-    scale : float,
-    SexArSort : new output SExtractor catalog
-    NCol : number of columns of the image
-    NRow : number of rows of the image
-
-
-    Returns
-    -------
-    number of objects
-
-    # repeated
-    """
-
-    # sort the sextractor
-    # catalog by magnitude,
-    # get sizes for objects
-    # and write it in a new file
-
-    print("Sorting and getting sizes for objects \n")
-
-    (
-        n,
-        alpha,
-        delta,
-        xx,
-        yy,
-        mg,
-        kr,
-        fluxrad,
-        ia,
-        ai,
-        e,
-        theta,
-        bkgd,
-        idx,
-        flg,
-    ) = np.genfromtxt(SexCat, delimiter="", unpack=True)
-
-    n = n.astype(int)
-    flg = flg.astype(int)
-
-    #    ai = ai.astype(float)
-    #    kr = kr.astype(float)
-
-    #    scale = scale.astype(float)
-
-    Rkron = scale * ai * kr
-
-    Rwsky = scale * ai * kr + 10 + 20
-
-    #   considering to use only  KronScale instead of SkyScale
-    #    Rwsky = parvar.KronScale * ai * kr + parvar.Offset + parvar.SkyWidth
-
-    Bim = (1 - e) * Rkron
-
-    Area = np.pi * Rkron * Bim * (-1)
-
-    (sxmin, sxmax, symin, symax) = GetSize(xx, yy, Rkron, theta, e, NCol, NRow)
-
-    (sxsmin, sxsmax, sysmin, sysmax) = GetSize(xx, yy, Rwsky, theta, e, NCol, NRow)
-
-    f_out = open(SexArSort, "w")
-
-    index = Area.argsort()
-    for i in index:
-
-        line1 = "{} {} {} {} {} {} {} {} {} {} ".format(
-            n[i],
-            alpha[i],
-            delta[i],
-            xx[i],
-            yy[i],
-            mg[i],
-            kr[i],
-            fluxrad[i],
-            ia[i],
-            ai[i],
-        )
-        line2 = "{} {} {} {} {} {} {} {} {} {} {} {} {}\n".format(
-            e[i],
-            theta[i],
-            bkgd[i],
-            idx[i],
-            flg[i],
-            int(np.round(sxmin[i])),
-            int(np.round(sxmax[i])),
-            int(np.round(symin[i])),
-            int(np.round(symax[i])),
-            int(np.round(sxsmin[i])),
-            int(np.round(sxsmax[i])),
-            int(np.round(sysmin[i])),
-            int(np.round(sysmax[i])),
-        )
-
-        line = line1 + line2
-
-        f_out.write(line)
-
-    f_out.close()
-
-    return len(n)
 
 
 def GetSize(x, y, R, theta, ell, ncol, nrow):

@@ -339,7 +339,6 @@ def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
     -------
     number of objects
 
-    # repeated
     """
 
     # sort the sextractor
