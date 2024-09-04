@@ -10,7 +10,7 @@ import numpy as np
 from astropy.io import fits
 
 from galfitools.galin.galfit import Galfit
-from galfitools.galin.MaskDs9 import GetAxis
+from galfitools.galin.std import GetAxis
 from mgefit.mge_fit_sectors import mge_fit_sectors
 from mgefit.mge_fit_sectors_regularized import mge_fit_sectors_regularized
 from mgefit.mge_fit_sectors_twist import mge_fit_sectors_twist

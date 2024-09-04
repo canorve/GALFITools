@@ -4,6 +4,8 @@
 import numpy as np
 from galfitools.galin.galfit import GalComps
 
+from astropy.io import fits
+
 
 def ds9satbox(satfileout, sexcat, satscale, satoffset):
     """Creates a DS9 file which contains regions with bad
@@ -89,6 +91,7 @@ def ds9satbox(satfileout, sexcat, satscale, satoffset):
     f_out.close()
 
 
+'''
 def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     """This creates a ellipse in an image
 
@@ -150,6 +153,7 @@ def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     imagemat[ypos[mask], xpos[mask]] = idn
 
     return imagemat
+'''
 
 
 def MakeSatBox(maskimage, region, val, ncol, nrow):
@@ -1269,3 +1273,21 @@ def PrintExp(hdl, ncomp, xpos, ypos, magexp, rsexp, axratexp, angleexp, Z, fit):
     hdl.write(line08)
 
     return True
+
+
+def GetAxis(Image):
+    """Get number of rows and columns from the image"""
+
+    i = 0  # index indicated where the data is located
+
+    # if checkCompHDU(Image):
+    #    i = 1
+
+    hdu = fits.open(Image)
+
+    ncol = hdu[i].header["NAXIS1"]
+    nrow = hdu[i].header["NAXIS2"]
+
+    hdu.close()
+
+    return ncol, nrow

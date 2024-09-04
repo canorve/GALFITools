@@ -6,8 +6,9 @@ import sys
 import numpy as np
 from astropy.io import fits
 
-# from astropy.io.fits import CompImageHDU
 from matplotlib.path import Path
+
+from galfitools.galin.std import GetAxis
 
 
 def maskDs9(
@@ -309,7 +310,7 @@ def MakeEllip(
 
     xx, yy, Rkron, theta, e = Ds9ell2Kronell(xpos, ypos, rx, ry, angle)
     (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, e, ncol, nrow)
-    Image = MakeKron(
+    Image = MakeKronv2(
         Image,
         fill,
         xx,
@@ -465,48 +466,6 @@ def MakeBox(
     return Image
 
 
-def GetAxis(Image):
-    """Get number of rows and columns from the image"""
-
-    i = 0  # index indicated where the data is located
-
-    # if checkCompHDU(Image):
-    #    i = 1
-
-    hdu = fits.open(Image)
-
-    ncol = hdu[i].header["NAXIS1"]
-    nrow = hdu[i].header["NAXIS2"]
-
-    hdu.close()
-
-    return ncol, nrow
-
-
-'''
-def checkCompHDU(file):
-    """check if fits file is a CompImageHDU
-
-    Notes
-    -----
-    function not used anymore
-
-    """
-    flag = False
-    hdul = fits.open(file)
-
-    for i, hdu in enumerate(hdul):
-
-        if isinstance(hdu, CompImageHDU):
-            flag = True
-
-    hdul.close()
-
-    return flag
-
-'''
-
-
 def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
     """Converts DS9 ellipse parameters to geometrical parameters
 
@@ -551,7 +510,7 @@ def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
     return xx, yy, Rkron, theta, e
 
 
-def MakeKron(
+def MakeKronv2(
     imagemat,
     idn,
     x,

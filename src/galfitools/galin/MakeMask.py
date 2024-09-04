@@ -5,7 +5,7 @@ import os.path
 
 import numpy as np
 from astropy.io import fits
-from galfitools.galin.MaskDs9 import GetAxis
+from galfitools.galin.std import GetAxis
 from galfitools.galin.std import ds9satbox
 
 
@@ -171,6 +171,98 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
     hdu.close()
 
     return True
+
+
+'''
+def MakeKron(
+    imagemat,
+    idn,
+    x,
+    y,
+    R,
+    theta,
+    ell,
+    xmin,
+    xmax,
+    ymin,
+    ymax,
+    ncol,
+    nrow,
+    skymean=None,
+    skystd=None,
+):
+    """This creates a ellipse in an image
+
+    This function creates an ellipse and fills the pixels inside it
+    with the value specified by idn. The ellipse is created within
+    a box delimited by xmin, xmax, ymin, and ymax.
+
+    Parameters
+    ----------
+    imagemat : ndarray, the image matrix
+    idn : int the value to fill the ellipse
+    x, y : position of the ellipse's center
+    R : ellipse major axis
+    theta : angular position of the ellipse measured from X-axis
+    ell : ellipticity of the ellipse
+    xmin, xmax, ymin, ymax : int, int, int, int
+            box delimitation of the ellipse
+
+    Returns
+    -------
+    imagemat : the image with the new ellipse
+
+    # repeated
+
+    """
+
+    # Check
+
+    xmin = int(xmin)
+    xmax = int(xmax)
+    ymin = int(ymin)
+    ymax = int(ymax)
+
+    q = 1 - ell
+    bim = q * R
+
+    theta = theta * np.pi / 180  # Rads!!!
+
+    ypos, xpos = np.mgrid[ymin - 1 : ymax + 1, xmin - 1 : xmax + 1]
+
+    dx = xpos - x
+    dy = ypos - y
+
+    landa = np.arctan2(dy, dx)
+
+    mask = landa < 0
+    if mask.any():
+        landa[mask] = landa[mask] + 2 * np.pi
+
+    landa = landa - theta
+
+    angle = np.arctan2(np.sin(landa) / bim, np.cos(landa) / R)
+
+    xell = x + R * np.cos(angle) * np.cos(theta) - bim * np.sin(angle) * np.sin(theta)
+    yell = y + R * np.cos(angle) * np.sin(theta) + bim * np.sin(angle) * np.cos(theta)
+
+    dell = np.sqrt((xell - x) ** 2 + (yell - y) ** 2)
+    dist = np.sqrt(dx**2 + dy**2)
+
+    mask = dist <= dell
+
+    if skymean:
+
+        sky = np.random.normal(skymean, skystd, (nrow, ncol))
+        imagemat[ypos[mask], xpos[mask]] = sky[ypos[mask], xpos[mask]]
+
+    else:
+
+        imagemat[ypos[mask], xpos[mask]] = idn
+
+    return imagemat
+
+'''
 
 
 def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):

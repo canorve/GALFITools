@@ -6,7 +6,7 @@ import subprocess as sp
 
 import numpy as np
 from astropy.io import fits
-from galfitools.galin.MaskDs9 import GetAxis
+from galfitools.galin.std import GetAxis
 from galfitools.galin.std import ds9satbox
 
 # change it and use skyRem instead

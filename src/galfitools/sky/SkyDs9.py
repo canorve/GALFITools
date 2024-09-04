@@ -5,7 +5,7 @@ import sys
 
 import numpy as np
 from astropy.io import fits
-from galfitools.galin.MaskDs9 import GetAxis
+from galfitools.galin.std import GetAxis
 from matplotlib.path import Path
 
 

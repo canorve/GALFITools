@@ -6,7 +6,7 @@ import sys
 
 import numpy as np
 from astropy.io import fits
-from galfitools.galin.MaskDs9 import GetAxis
+from galfitools.galin.std import GetAxis
 from galfitools.mge.mge2galfit import Ds9ell2Kronellv2
 
 

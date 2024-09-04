@@ -7,7 +7,7 @@ import sys
 
 import numpy as np
 from astropy.io import fits
-from galfitools.galin.MaskDs9 import GetAxis
+from galfitools.galin.std import GetAxis
 
 
 def skyRem(imageFile, maskFile, mean, sig, nsig, borValue, bor_flag=False):

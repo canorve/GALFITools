@@ -2,7 +2,7 @@
 
 import numpy as np
 from astropy.io import fits
-from galfitools.galin.MaskDs9 import GetAxis
+from galfitools.galin.std import GetAxis
 
 
 def makeSim(image, GAIN, skymean, skystd, newimage) -> None:

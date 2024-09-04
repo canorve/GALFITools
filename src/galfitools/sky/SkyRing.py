@@ -6,11 +6,12 @@ import numpy as np
 from astropy.io import fits
 from galfitools.mge.mge2galfit import (
     Ds9ell2Kronellv2,
-    GetAxis,
     GetInfoEllip,
     GetPmax,
     GetSize,
 )
+
+from galfitools.galin.std import GetAxis
 
 
 def SkyRing(image, mask, ds9regfile, width, center, outliers):

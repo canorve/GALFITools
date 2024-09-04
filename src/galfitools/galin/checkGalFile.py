@@ -9,7 +9,7 @@ from galfitools.galin.galfit import (
     numParFree,
     numParSkyFree,
 )
-from galfitools.galin.MaskDs9 import GetAxis
+from galfitools.galin.std import GetAxis
 
 
 class HeadInfo:
