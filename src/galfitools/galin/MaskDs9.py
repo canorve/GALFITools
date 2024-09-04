@@ -9,6 +9,7 @@ from astropy.io import fits
 from matplotlib.path import Path
 
 from galfitools.galin.std import GetAxis
+from galfitools.galin.std import GetSize
 
 
 def maskDs9(
@@ -599,6 +600,7 @@ def MakeKronv2(
     return imagemat
 
 
+'''
 def GetSize(x, y, R, theta, ell, ncol, nrow):
     """Get the (x,y) coordinates that encompass the ellipse
 
@@ -658,7 +660,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
         ymax = nrow - 1
 
     return (round(xmin), round(xmax), round(ymin), round(ymax))
-
+'''
 
 #############################################################################
 #  End of program  ###################################

@@ -7,6 +7,7 @@ import sys
 import numpy as np
 from astropy.io import fits
 from galfitools.galin.std import GetAxis
+from galfitools.galin.std import GetSize
 from galfitools.mge.mge2galfit import Ds9ell2Kronellv2
 
 
@@ -325,6 +326,7 @@ def Ds9ell2Kronell(xpos: float, ypos: float, rx: float, ry: float, angle: float)
     return xx, yy, Rkron, theta, e
 
 
+'''
 def GetSize(x, y, R, theta, ell, ncol, nrow):
     """Get the (x,y) coordinates that encompass the ellipse
 
@@ -389,6 +391,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
         ymax = nrow
 
     return (xmin, xmax, ymin, ymax)
+'''
 
 
 def GetPmax(image, mask, xmin, xmax, ymin, ymax):

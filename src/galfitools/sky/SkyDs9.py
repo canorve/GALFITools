@@ -6,6 +6,7 @@ import sys
 import numpy as np
 from astropy.io import fits
 from galfitools.galin.std import GetAxis
+from galfitools.galin.std import GetSize
 from matplotlib.path import Path
 
 
@@ -412,6 +413,7 @@ def SkyKron(imagemat, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     return flatimg
 
 
+'''
 def GetSize(x, y, R, theta, ell, ncol, nrow):
     """gets the maximum and minimim pixels positions
         for the ellipse
@@ -457,6 +459,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     return (round(xmin), round(xmax), round(ymin), round(ymax))
 
 
+'''
 '''
 def GetExpTime(Image):
     """Get exposition time from the image

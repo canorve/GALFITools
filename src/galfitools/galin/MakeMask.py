@@ -9,6 +9,8 @@ from galfitools.galin.std import GetAxis
 from galfitools.galin.std import ds9satbox
 from galfitools.galin.std import MakeImage
 
+# from galfitools.galin.std import GetSize
+
 
 def makeMask(
     sexfile: str, image: str, maskfile: str, scale: float, satfileout: str
@@ -385,9 +387,9 @@ def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
 
     Area = np.pi * Rkron * Bim * (-1)
 
-    (sxmin, sxmax, symin, symax) = GetSize(xx, yy, Rkron, theta, e, NCol, NRow)
+    (sxmin, sxmax, symin, symax) = GetSizev1(xx, yy, Rkron, theta, e, NCol, NRow)
 
-    (sxsmin, sxsmax, sysmin, sysmax) = GetSize(xx, yy, Rwsky, theta, e, NCol, NRow)
+    (sxsmin, sxsmax, sysmin, sysmax) = GetSizev1(xx, yy, Rwsky, theta, e, NCol, NRow)
 
     f_out = open(SexArSort, "w")
 
@@ -431,7 +433,7 @@ def CatArSort(SexCat, scale, SexArSort, NCol, NRow):
     return len(n)
 
 
-def GetSize(x, y, R, theta, ell, ncol, nrow):
+def GetSizev1(x, y, R, theta, ell, ncol, nrow):
     """This function retrieves the minimum and
     maximum pixel coordinates that enclose the ellipse.
 

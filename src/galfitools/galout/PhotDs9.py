@@ -6,6 +6,7 @@ import sys
 import numpy as np
 from astropy.io import fits
 from galfitools.galin.std import GetAxis
+from galfitools.galin.std import GetSize
 from matplotlib.path import Path
 
 
@@ -396,6 +397,7 @@ def FluxKron(imagemat, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     return flux
 
 
+'''
 def GetSize(x, y, R, theta, ell, ncol, nrow):
     """Gets the maximun
     and minimim pixels that encloses the ellipse
@@ -439,6 +441,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
         ymax = nrow - 1
 
     return (round(xmin), round(xmax), round(ymin), round(ymax))
+'''
 
 
 def GetExpTime(Image):

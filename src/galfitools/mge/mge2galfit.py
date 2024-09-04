@@ -11,6 +11,7 @@ from astropy.io import fits
 
 from galfitools.galin.galfit import Galfit
 from galfitools.galin.std import GetAxis
+from galfitools.galin.std import GetSize
 from mgefit.mge_fit_sectors import mge_fit_sectors
 from mgefit.mge_fit_sectors_regularized import mge_fit_sectors_regularized
 from mgefit.mge_fit_sectors_twist import mge_fit_sectors_twist
@@ -1376,6 +1377,7 @@ def Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle):
     return xx, yy, Rkron, theta, e
 
 
+'''
 def GetSize(x, y, R, theta, ell, ncol, nrow):
     """Gets the maximum and minimum pixels
     positions for an ellipse
@@ -1424,6 +1426,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
         ymax = nrow
 
     return (xmin, xmax, ymin, ymax)
+'''
 
 
 def GetPmax(image, mask, xmin, xmax, ymin, ymax):

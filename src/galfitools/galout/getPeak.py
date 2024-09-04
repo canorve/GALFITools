@@ -6,7 +6,8 @@ import sys
 
 import numpy as np
 from astropy.io import fits
-from galfitools.galin.MaskDs9 import GetAxis
+from galfitools.galin.std import GetAxis
+from galfitools.galin.std import GetSize
 
 
 def getPeak(image: str, regfile: str, center: bool, maskfile: str) -> None:
@@ -172,6 +173,7 @@ def Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle):
     return xx, yy, Rkron, theta, e
 
 
+'''
 def GetSize(x, y, R, theta, ell, ncol, nrow):
     """Gets the maximun
     and minimim pixels that encloses the ellipse
@@ -218,6 +220,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
         ymax = nrow
 
     return (xmin, xmax, ymin, ymax)
+'''
 
 
 def GetPmax(image, mask, xmin, xmax, ymin, ymax):
