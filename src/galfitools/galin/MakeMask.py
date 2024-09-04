@@ -6,7 +6,6 @@ import os.path
 import numpy as np
 from astropy.io import fits
 from galfitools.galin.std import GetAxis
-from galfitools.galin.std import ds9satbox
 from galfitools.galin.std import MakeImage
 
 
@@ -637,3 +636,87 @@ def CheckSatReg(x, y, filein, R, theta, ell):
                         break
 
     return flag
+
+
+def ds9satbox(satfileout, sexcat, satscale, satoffset):
+    """Creates a DS9 file which contains regions with bad
+        saturated regions
+
+    Parameters
+    ----------
+    satfileout : str, DS9 region output file
+    sexcat : str, SExtractor catalog
+    satscale : float,
+             Scale factor by which the saturation region will be
+             enlarged or diminished.
+    satoffset: float,
+            constant to be added to the size of saturated region
+
+    Returns
+    -------
+    None
+
+
+    """
+
+    flagsat = 4  # flag value when object is saturated (or close to)
+    maxflag = 128  # max value for flag
+    check = 0
+
+    f_out = open(satfileout, "w")
+
+    (
+        N,
+        Alpha,
+        Delta,
+        X,
+        Y,
+        Mg,
+        Kr,
+        Fluxr,
+        Isoa,
+        Ai,
+        E,
+        Theta,
+        Bkgd,
+        Idx,
+        Flg,
+    ) = np.genfromtxt(sexcat, delimiter="", unpack=True)
+
+    line = "image \n"
+    f_out.write(line)
+
+    for idx, item in enumerate(N):
+
+        bi = Ai[idx] * (1 - E[idx])
+
+        Theta[idx] = Theta[idx] * np.pi / 180  # rads!!!
+
+        Rkronx = satscale * 2 * Ai[idx] * Kr[idx] + satoffset
+        Rkrony = satscale * 2 * bi * Kr[idx] + satoffset
+
+        if Rkronx == 0:
+            Rkronx = 1
+
+        if Rkrony == 0:
+            Rkrony = 1
+
+        check = CheckFlag(
+            Flg[idx], flagsat, maxflag
+        )  # check if object has saturated regions
+
+        if check:
+
+            line = "box({0},{1},{2},{3},0) # color=red move=0 \n".format(
+                X[idx], Y[idx], Rkronx, Rkrony
+            )
+            f_out.write(line)
+
+            line2a = "point({0},{1}) ".format(X[idx], Y[idx])
+            line2b = '# point=boxcircle font="times 10 bold" text={{ {0} }} \n'.format(
+                N[idx]
+            )
+            line2 = line2a + line2b
+            f_out.write(line2)
+
+    f_out.close()
