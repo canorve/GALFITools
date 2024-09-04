@@ -7,7 +7,7 @@ import subprocess as sp
 import numpy as np
 from astropy.io import fits
 from galfitools.galin.MaskDs9 import GetAxis
-
+from galfitools.galin.std import ds9satbox
 
 # change it and use skyRem instead
 
@@ -129,79 +129,6 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y, sky) -> None:
 
 
 '''
-def ds9satbox(satfileout, output, satscale, satoffset):
-    """Creates a file for ds9 which selects bad saturated regions
-    # not used
-    # repeated
-    """
-
-    # scaleflag = 1
-    # offsetflag = 1
-    # regfileflag = 1
-    # magflag = 1
-    # clasflag = 1
-
-    flagsat = 4  # flag value when object is saturated (or close to)
-    # maxflag = 128  # max value for flag
-    check = 0
-    # regflag = 0  # flag for saturaded regions
-
-    f_out = open(satfileout, "w")
-
-    (
-        N,
-        Alpha,
-        Delta,
-        X,
-        Y,
-        Mg,
-        Kr,
-        Fluxr,
-        Isoa,
-        Ai,
-        E,
-        Theta,
-        Bkgd,
-        Idx,
-        Flg,
-    ) = np.genfromtxt(output, delimiter="", unpack=True)
-
-    line = "image \n"
-    f_out.write(line)
-
-    for idx, item in enumerate(N):
-
-        bi = Ai[idx] * (1 - E[idx])
-
-        Theta[idx] = Theta[idx] * np.pi / 180  # rads!!!
-
-        Rkronx = satscale * 2 * Ai[idx] * Kr[idx] + satoffset
-        Rkrony = satscale * 2 * bi * Kr[idx] + satoffset
-
-        if Rkronx == 0:
-            Rkronx = 1
-
-        if Rkrony == 0:
-            Rkrony = 1
-
-        check = CheckFlag(Flg[idx], flagsat)  # check if object has saturated regions
-
-        if check:
-
-            line = "box({0},{1},{2},{3},0) # color=red move=0 \n".format(
-                X[idx], Y[idx], Rkronx, Rkrony
-            )
-            f_out.write(line)
-
-            line2a = "point({0},{1}) # point=boxcircle ".format(X[idx], Y[idx])
-
-            line2b = 'font="times 10 bold" text={{ {0} }} \n'.format(N[idx])
-            line2 = line2a + line2b
-            f_out.write(line2)
-
-    f_out.close()
-
-
 def MakeMask(maskimage, catfile, scale, offset, regfile):
     """Create a mask image using ellipses for every Object
     of catfile. Now includes offset

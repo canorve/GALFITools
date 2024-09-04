@@ -24,7 +24,6 @@ def ds9satbox(satfileout, sexcat, satscale, satoffset):
     None
 
 
-    # repeated
     """
 
     flagsat = 4  # flag value when object is saturated (or close to)
