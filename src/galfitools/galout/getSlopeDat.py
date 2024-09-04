@@ -11,6 +11,7 @@ from scipy.special import gamma, gammaincinv
 
 from galfitools.galin.galfit import numComps
 from galfitools.galin.galfit import SelectGal
+from galfitools.galin.galfit import conver2Sersic
 
 # remover de galfitools?
 # console scripts
@@ -517,39 +518,6 @@ def ReadSky(File: str) -> GalSky:
     GalfitFile.close()
 
     return galsky
-
-
-def conver2Sersic(galcomps: GalComps) -> GalComps:
-    """function to convert exponential, gaussian params to Sersic params"""
-
-    comps = copy.deepcopy(galcomps)
-
-    maskdev = comps.NameComp == "devauc"
-    maskexp = comps.NameComp == "expdisk"
-    maskgas = comps.NameComp == "gaussian"
-
-    K_GAUSS = 0.6931471805599455  # constant k for gaussian
-    K_EXP = 1.6783469900166612  # constant k for expdisk
-    SQ2 = np.sqrt(2)
-
-    # for gaussian functions
-    if maskgas.any():
-        comps.Exp[maskgas] = 0.5
-        comps.Rad[maskgas] = comps.Rad[maskgas] / 2.354  # converting to sigma
-        comps.Rad[maskgas] = (
-            SQ2 * (K_GAUSS**0.5) * comps.Rad[maskgas]
-        )  # converting to Re
-
-    # for de vaucouleurs
-    if maskdev.any():
-        comps.Exp[maskdev] = 4
-
-    # for exponential disks
-    if maskexp.any():
-        comps.Exp[maskexp] = 1
-        comps.Rad[maskexp] = K_EXP * comps.Rad[maskexp]  # converting to Re
-
-    return comps
 
 
 class GetSlope:

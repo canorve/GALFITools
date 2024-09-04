@@ -762,57 +762,6 @@ def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
     return xx, yy, Rkron, theta, e
 
 
-def conver2Sersic(galcomps: GalComps) -> GalComps:
-    """Converts the exponential, gaussian or De Vaucouleurs to Sersic
-
-    Using the format of GALFIT with the GalComps data class,
-    it converts the parameters of the functions exponential,
-    gaussian or De Vaucouleurs to parameters of Sersic function.
-
-
-    Parameters
-    -----------
-    galcomps : GalComps data class defined above
-
-
-    Returns
-    -------
-    galcomps : GalComps data class with the functions converted to Sersic
-              parameters
-
-    # repeated
-    """
-
-    comps = copy.deepcopy(galcomps)
-
-    maskdev = comps.NameComp == "devauc"
-    maskexp = comps.NameComp == "expdisk"
-    maskgas = comps.NameComp == "gaussian"
-
-    K_GAUSS = 0.6931471805599455  # constant k for gaussian
-    K_EXP = 1.6783469900166612  # constant k for expdisk
-    SQ2 = np.sqrt(2)
-
-    # for gaussian functions
-    if maskgas.any():
-        comps.Exp[maskgas] = 0.5
-        comps.Rad[maskgas] = comps.Rad[maskgas] / 2.354  # converting to sigma
-        comps.Rad[maskgas] = (
-            SQ2 * (K_GAUSS**0.5) * comps.Rad[maskgas]
-        )  # converting to Re
-
-    # for de vaucouleurs
-    if maskdev.any():
-        comps.Exp[maskdev] = 4
-
-    # for exponential disks
-    if maskexp.any():
-        comps.Exp[maskexp] = 1
-        comps.Rad[maskexp] = K_EXP * comps.Rad[maskexp]  # converting to Re
-
-    return comps
-
-
 def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
     """Obtains the radius along the specified angular direction.
 

@@ -753,7 +753,6 @@ def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
     of the three you select as a center. As long these belong to the
     same galaxy.
 
-    # repeated
 
     """
 
