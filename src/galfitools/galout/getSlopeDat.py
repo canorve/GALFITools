@@ -12,6 +12,7 @@ from scipy.special import gamma, gammaincinv
 from galfitools.galin.galfit import numComps
 from galfitools.galin.galfit import SelectGal
 from galfitools.galin.galfit import conver2Sersic
+from galfitools.galin.galfit import GetRadAng
 
 # remover de galfitools?
 # console scripts
@@ -646,28 +647,6 @@ class GetSlope:
         Slp = (Sprim / S) * R
 
         return Slp
-
-
-def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
-    """Given an ellipse and an angle it returns the radius in angle direction.
-    Theta are the values for the galaxy and the others for every component"""
-
-    # changing measured angle from y-axis to x-axis
-    # and changing to rads:
-    newpa = (pa + 90) * np.pi / 180  # angle of every component
-    theta = (theta + 90) * np.pi / 180  # angle of direction of R
-
-    # bim = q * R
-
-    ecc = np.sqrt(1 - q**2)
-
-    alpha = theta - newpa  # this is the direction
-
-    bell = R * np.sqrt(1 - (ecc * np.cos(alpha)) ** 2)
-
-    aell = bell / q  # rad to evalue for every component
-
-    return aell
 
 
 #############################################################################

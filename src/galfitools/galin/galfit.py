@@ -131,70 +131,6 @@ class DataImg:
     impsf = np.array([[1, 1], [1, 1]])
 
 
-"""
-def readDataImg(ellconf, galhead):
-
-    dataimg = DataImg()
-
-    # reading galaxy and model images from file
-    errmsg = "file {} does not exist".format(galhead.outimage)
-
-    assert os.path.isfile(galhead.outimage), errmsg
-
-    if ellconf.flagmodel is False:
-        # hdu 1 => image   hdu 2 => model
-        hdu = fits.open(galhead.outimage)
-        dataimg.img = (hdu[1].data.copy()).astype(float)
-        dataimg.model = (hdu[2].data.copy()).astype(float)
-        dataimg.imres = (hdu[3].data.copy()).astype(float)
-        hdu.close()
-
-    else:
-        hdu = fits.open(galhead.inputimage)
-
-        i = 0  # index of data
-        if galhead.flagidx:
-            if galhead.flagnum:
-                dataimg.img = (hdu[galhead.imgidx, galhead.num].data).astype(float)
-            else:
-                dataimg.img = (hdu[galhead.imgidx].data).astype(float)
-        else:
-            dataimg.img = (hdu[i].data).astype(float)
-
-        hdu.close()
-
-        hdu = fits.open(ellconf.inputmodel)
-        dataimg.model = (hdu[i].data).astype(float)
-        hdu.close()
-
-        dataimg.imres = dataimg.img - dataimg.model
-
-    # reading mask image from file
-
-    if galhead.tempmask is not None:
-
-        errmsg = "file {} does not exist".format(galhead.tempmask)
-        assert os.path.isfile(galhead.tempmask), errmsg
-
-        i = 0  # index of data
-        if ellconf.flagmodel is False:
-            hdu = fits.open(galhead.tempmask)
-            mask = hdu[i].data
-            dataimg.mask = np.array(mask, dtype=bool)
-            hdu.close()
-        else:
-            hdu = fits.open(galhead.maskimage)
-            mask = hdu[i].data
-            dataimg.mask = np.array(mask, dtype=bool)
-            hdu.close()
-
-    else:
-        dataimg.mask = None
-
-    return dataimg
-"""
-
-
 class Galfit:
     """
     Class to read GALFIT parameters file
@@ -787,112 +723,6 @@ def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
     return galcomps
 
 
-"""
-
-# Sersic components
-class GetReff:
-#    class to obtain the effective radius for the whole galaxy
-
-    def GetReSer(
-        self, galhead: GalHead, comps: GalComps, eff: float, theta: float
-    ) -> float:
-
-        maskgal = comps.Active == 1
-
-        comps.Flux = 10 ** ((galhead.mgzpt - comps.Mag) / 2.5)
-
-        totFlux = comps.Flux[maskgal].sum()
-
-        totmag = -2.5 * np.log10(totFlux) + galhead.mgzpt
-
-        a = 0.1
-        b = comps.Rad[maskgal][-1] * 1000  # hope it doesn't crash
-
-        Reff = self.solveSerRe(
-            a,
-            b,
-            comps.Flux[maskgal],
-            comps.Rad[maskgal],
-            comps.Exp[maskgal],
-            comps.AxRat[maskgal],
-            comps.PosAng[maskgal],
-            totFlux,
-            eff,
-            theta,
-        )
-
-        return Reff, totmag
-
-    def solveSerRe(
-        self,
-        a: float,
-        b: float,
-        flux: list,
-        rad: list,
-        n: list,
-        q: list,
-        pa: list,
-        totFlux: float,
-        eff: float,
-        theta: float,
-    ) -> float:
-        "return the Re of a set of Sersic functions. It uses Bisection"
-
-        try:
-
-            Re = bisect(
-                self.funReSer, a, b, args=(flux, rad, n, q, pa, totFlux, eff, theta)
-            )
-        except Exception:
-            print("solution not found for the given range")
-            Re = 0
-
-        return Re
-
-    def funReSer(
-        self,
-        R: float,
-        flux: list,
-        rad: list,
-        n: list,
-        q: list,
-        pa: list,
-        totFlux: float,
-        eff: float,
-        theta: float,
-    ) -> float:
-
-        fun = self.Ftotser(R, flux, rad, n, q, pa, theta) - totFlux * eff
-
-        return fun
-
-    def Ftotser(
-        self, R: float, flux: list, rad: list, n: list, q: list, pa: list, theta: float
-    ) -> float:
-
-        ftotR = self.Fser(R, flux, rad, n, q, pa, theta)
-
-        return ftotR.sum()
-
-    def Fser(
-        self, R: float, Flux: list, Re: list, n: list, q: list, pa: list, theta: float
-    ) -> float:
-        #sersic flux to a determined R
-
-        k = gammaincinv(2 * n, 0.5)
-
-        Rcor = GetRadAng(R, q, pa, theta)
-
-        X = k * (Rcor / Re) ** (1 / n)
-
-        # it supposed to be multiplied by gamma, but it is not wrong:
-        Fr = Flux * gammainc(2 * n, X)
-
-        return Fr
-
-"""
-
-
 def conver2Sersic(galcomps: GalComps) -> GalComps:
     """Converts the exponential, gaussian or De Vaucouleurs to Sersic
 
@@ -911,7 +741,6 @@ def conver2Sersic(galcomps: GalComps) -> GalComps:
     galcomps : GalComps data class with the functions converted to Sersic
               parameters
 
-    # repeated
     """
 
     comps = copy.deepcopy(galcomps)
@@ -971,7 +800,6 @@ def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
     aell : float
             radius along the angle specified by theta
 
-    # repeated
     """
 
     # changing measured angle from y-axis to x-axis

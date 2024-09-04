@@ -762,54 +762,6 @@ def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
     return xx, yy, Rkron, theta, e
 
 
-def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
-    """Obtains the radius along the specified angular direction.
-
-    Given the angular position and axis ratio of the ellipse
-    it gives the radius of the ellipse in the theta direction.
-
-    If theta is in the major axis direction it returns the
-    major axis. On the other hand, if theta is in the direction
-    of the minor axis it returns the minor axis.
-
-
-    Parameters
-    ----------
-    R : float
-        Radius along the major axis
-    q : list
-        Axis ratio of ellipse
-    pa : list
-        Angular position of ellipse measured from Y-axis (same as GALFIT)
-    theta : float
-            angle that defines the direction
-
-    Returns
-    -------
-    aell : float
-            radius along the angle specified by theta
-
-    # repeated
-    """
-
-    # changing measured angle from y-axis to x-axis
-    # and changing to rads:
-    newpa = (pa + 90) * np.pi / 180  # angle of every component
-    theta = (theta + 90) * np.pi / 180  # angle of direction of R
-
-    # bim = q * R
-
-    ecc = np.sqrt(1 - q**2)
-
-    alpha = theta - newpa  # this is the direction
-
-    bell = R * np.sqrt(1 - (ecc * np.cos(alpha)) ** 2)
-
-    aell = bell / q  # rad to evalue for every component
-
-    return aell
-
-
 def GetFits(
     Image: str, Imageout: str, sky: float, xlo: int, xhi: int, ylo: int, yhi: int
 ) -> None:
