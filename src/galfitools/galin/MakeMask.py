@@ -7,6 +7,7 @@ import numpy as np
 from astropy.io import fits
 from galfitools.galin.std import GetAxis
 from galfitools.galin.std import ds9satbox
+from galfitools.galin.std import MakeImage
 
 
 def makeMask(
@@ -318,19 +319,6 @@ def MakeSatBox(maskimage, region, val, ncol, nrow):
     hdu[i].data = img
     hdu.writeto(maskimage, overwrite=True)
     hdu.close()
-
-    return True
-
-
-def MakeImage(newfits, sizex, sizey):
-    """Creates a new blank Image"""
-    # repeated
-    # k Check
-    if os.path.isfile(newfits):
-        print("{} deleted; a new one is created \n".format(newfits))
-    hdu = fits.PrimaryHDU()
-    hdu.data = np.zeros((sizey, sizex))
-    hdu.writeto(newfits, overwrite=True)
 
     return True
 

@@ -8,6 +8,7 @@ import sys
 import numpy as np
 from astropy.io import fits
 from galfitools.galin.std import GetAxis
+from galfitools.galin.std import MakeImage
 
 
 def skyRem(imageFile, maskFile, mean, sig, nsig, borValue, bor_flag=False):
@@ -86,44 +87,6 @@ def skyRem(imageFile, maskFile, mean, sig, nsig, borValue, bor_flag=False):
 
     hdu.close()
     hdu2.close()
-
-
-def MakeImage(newfits, sizex, sizey):
-    """create a new blank FITS Image
-
-    Parameters
-    ----------
-    newfits : str
-              name of the new image
-    sizex : int
-            number of columns of the new image
-    sizey : int
-            number of rows of the new image
-
-    Returns
-    -------
-    bool
-
-    # repeated
-    """
-
-    if os.path.isfile(newfits):
-        print("{} deleted; a new one is created \n".format(newfits))
-
-        runcmd = "rm {}".format(newfits)
-        sp.run(
-            [runcmd],
-            shell=True,
-            stdout=sp.PIPE,
-            stderr=sp.PIPE,
-            universal_newlines=True,
-        )
-
-    hdu = fits.PrimaryHDU()
-    hdu.data = np.zeros((sizey, sizex), dtype=np.float64)
-    hdu.writeto(newfits, overwrite=True)
-
-    return True
 
 
 #############################################################################

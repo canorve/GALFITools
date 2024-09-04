@@ -5,6 +5,7 @@ import numpy as np
 from galfitools.galin.galfit import GalComps
 
 from astropy.io import fits
+import os.path
 
 
 def ds9satbox(satfileout, sexcat, satscale, satoffset):
@@ -89,19 +90,6 @@ def ds9satbox(satfileout, sexcat, satscale, satoffset):
             f_out.write(line2)
 
     f_out.close()
-
-
-def MakeImage(newfits, sizex, sizey):
-    """Creates a new blank Image"""
-    # repeated
-    # k Check
-    if os.path.isfile(newfits):
-        print("{} deleted; a new one is created \n".format(newfits))
-    hdu = fits.PrimaryHDU()
-    hdu.data = np.zeros((sizey, sizex))
-    hdu.writeto(newfits, overwrite=True)
-
-    return True
 
 
 def MakeImage(newfits, sizex, sizey):
