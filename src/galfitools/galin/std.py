@@ -89,6 +89,7 @@ def ds9satbox(satfileout, sexcat, satscale, satoffset):
     f_out.close()
 
 
+'''
 def MakeMask(maskimage, catfile, scale, offset, regfile):
     """Creates ellipse masks for every object of the SExtractor catalog
 
@@ -195,6 +196,7 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
     hdu.close()
 
     return True
+'''
 
 
 def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
