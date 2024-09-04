@@ -86,7 +86,6 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
     -------
     None
 
-    # repeated
     """
 
     checkflag = 0
