@@ -9,8 +9,6 @@ from galfitools.galin.std import GetAxis
 from galfitools.galin.std import ds9satbox
 from galfitools.galin.std import MakeImage
 
-# from galfitools.galin.std import GetSize
-
 
 def makeMask(
     sexfile: str, image: str, maskfile: str, scale: float, satfileout: str
@@ -453,7 +451,6 @@ def GetSizev1(x, y, R, theta, ell, ncol, nrow):
     xmin, xmax, ymin, ymax : int, int, int, int
             box delimitation of the ellipse
 
-    # repeated
 
     """
     # k Check

@@ -173,56 +173,6 @@ def Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle):
     return xx, yy, Rkron, theta, e
 
 
-'''
-def GetSize(x, y, R, theta, ell, ncol, nrow):
-    """Gets the maximun
-    and minimim pixels that encloses the ellipse
-    # repeated
-    """
-    # k Check
-    q = 1 - ell
-    bim = q * R
-
-    theta = theta * (np.pi / 180)  # rads!!
-
-    # getting size
-
-    xmin = x - np.sqrt(
-        (R**2) * (np.cos(theta)) ** 2 + (bim**2) * (np.sin(theta)) ** 2
-    )
-
-    xmax = x + np.sqrt(
-        (R**2) * (np.cos(theta)) ** 2 + (bim**2) * (np.sin(theta)) ** 2
-    )
-
-    ymin = y - np.sqrt(
-        (R**2) * (np.sin(theta)) ** 2 + (bim**2) * (np.cos(theta)) ** 2
-    )
-
-    ymax = y + np.sqrt(
-        (R**2) * (np.sin(theta)) ** 2 + (bim**2) * (np.cos(theta)) ** 2
-    )
-
-    mask = xmin < 1
-    if mask.any():
-        xmin = 1
-
-    mask = xmax > ncol
-    if mask.any():
-        xmax = ncol
-
-    mask = ymin < 1
-    if mask.any():
-        ymin = 1
-
-    mask = ymax > nrow
-    if mask.any():
-        ymax = nrow
-
-    return (xmin, xmax, ymin, ymax)
-'''
-
-
 def GetPmax(image, mask, xmin, xmax, ymin, ymax):
     """get the pixel coordinates with the highest value
 

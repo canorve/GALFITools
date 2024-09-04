@@ -397,53 +397,6 @@ def FluxKron(imagemat, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     return flux
 
 
-'''
-def GetSize(x, y, R, theta, ell, ncol, nrow):
-    """Gets the maximun
-    and minimim pixels that encloses the ellipse
-    # repeated
-    """
-
-    # k Check
-    q = 1 - ell
-    bim = q * R
-
-    theta = theta * (np.pi / 180)  # rads!!
-
-    # getting size
-
-    constx = np.sqrt(
-        (R**2) * (np.cos(theta)) ** 2 + (bim**2) * (np.sin(theta)) ** 2
-    )
-    consty = np.sqrt(
-        (R**2) * (np.sin(theta)) ** 2 + (bim**2) * (np.cos(theta)) ** 2
-    )
-
-    xmin = x - constx
-    xmax = x + constx
-    ymin = y - consty
-    ymax = y + consty
-
-    mask = xmin < 1
-    if mask.any():
-        xmin = 1
-
-    mask = xmax > ncol
-    if mask.any():
-        xmax = ncol - 1
-
-    mask = ymin < 1
-    if mask.any():
-        ymin = 1
-
-    mask = ymax > nrow
-    if mask.any():
-        ymax = nrow - 1
-
-    return (round(xmin), round(xmax), round(ymin), round(ymax))
-'''
-
-
 def GetExpTime(Image):
     """Get exposition time
     from the image header
