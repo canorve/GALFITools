@@ -249,7 +249,6 @@ def MakeSatBox(maskimage, region, val, ncol, nrow):
     Returns
     -------
     bool
-    # repeated
     """
 
     # k Check
