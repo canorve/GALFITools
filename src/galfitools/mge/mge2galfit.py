@@ -13,6 +13,7 @@ from galfitools.galin.galfit import Galfit
 from galfitools.galin.std import GetAxis
 from galfitools.galin.std import GetSize
 from galfitools.galin.std import Ds9ell2Kronellv2
+from galfitools.galin.std import GetInfoEllip
 from galfitools.galin.MakeMask import CheckFlag
 from mgefit.mge_fit_sectors import mge_fit_sectors
 from mgefit.mge_fit_sectors_regularized import mge_fit_sectors_regularized
@@ -1220,80 +1221,6 @@ def makeConstraints(consfile: str, numcomp: int) -> True:
     fout.close()
 
     return True
-
-
-def GetInfoEllip(regfile):
-    """Extracts parameters' information
-    from DS9 ellipse region.
-
-    # repeated
-    """
-
-    if not os.path.exists(regfile):
-        print("%s: reg filename does not exist!" % (regfile))
-        sys.exit()
-
-    f1 = open(regfile, "r")
-
-    lines = f1.readlines()
-
-    f1.close()
-
-    flag = False
-    found = False
-
-    # reading reg file
-    for line in lines:
-
-        line = line.split("#")
-        line = line[0]
-
-        b1 = line.split("(")
-        p = line.split(",")
-
-        x1 = p[0]
-        if b1[0] == "ellipse":
-
-            x0 = "ellipse"
-            x2 = x1[8:]
-            flag = True
-            found = True
-
-        if flag is True:
-            x3 = p[4]
-            x4 = x3[:-2]
-
-            v0 = x0
-
-            v1 = float(x2)
-            v2 = float(p[1])
-            v3 = float(p[2])
-            v4 = float(p[3])
-            v5 = float(x4)
-
-            flag = False
-
-    if found:
-        obj = v0
-        xpos = v1
-        ypos = v2
-        rx = v3
-        ry = v4
-        angle = v5
-
-        # avoids ds9 regions with Area = 0
-        if rx < 1:
-            rx = 1
-        if ry < 1:
-            ry = 1
-
-        return obj, xpos, ypos, rx, ry, angle
-        # return eps, theta, xpos, ypos
-    else:
-        print("ellipse region was not found in file. Exiting.. ")
-        sys.exit()
-
-    return 0, 0, 0, 0
 
 
 def GetPmax(image, mask, xmin, xmax, ymin, ymax):

@@ -14,7 +14,8 @@ from galfitools.galin.galfit import (
 )
 from galfitools.galin.getStar import getStar
 from galfitools.galin.std import Ds9ell2Kronellv2
-from galfitools.mge.mge2galfit import GetInfoEllip, mge2gal
+from galfitools.galin.std import GetInfoEllip
+from galfitools.mge.mge2galfit import mge2gal
 
 
 def makePSF(

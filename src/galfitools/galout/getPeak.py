@@ -8,6 +8,7 @@ import numpy as np
 from astropy.io import fits
 from galfitools.galin.std import GetAxis
 from galfitools.galin.std import GetSize
+from galfitools.galin.std import GetInfoEllip
 from galfitools.galin.std import Ds9ell2Kronellv2
 
 
@@ -87,66 +88,6 @@ def getPeak(image: str, regfile: str, center: bool, maskfile: str) -> None:
 ####################################################
 ####################################################
 #####################################################
-
-
-def GetInfoEllip(regfile):
-    """extracts ellipse parameters from DS9 region file"""
-    # repeated
-    if not os.path.exists(regfile):
-        print("%s: reg filename does not exist!" % (regfile))
-        sys.exit()
-
-    f1 = open(regfile, "r")
-
-    lines = f1.readlines()
-
-    f1.close()
-
-    flag = False
-    found = False
-
-    # reading reg file
-    for line in lines:
-
-        b1 = line.split("(")
-        p = line.split(",")
-
-        x1 = p[0]
-        if b1[0] == "ellipse":
-
-            x0 = "ellipse"
-            x2 = x1[8:]
-            flag = True
-            found = True
-
-        if flag is True:
-            x3 = p[4]
-            x4 = x3[:-2]
-
-            v0 = x0
-
-            v1 = float(x2)
-            v2 = float(p[1])
-            v3 = float(p[2])
-            v4 = float(p[3])
-            v5 = float(x4)
-
-            flag = False
-
-    if found:
-        obj = v0
-        xpos = v1
-        ypos = v2
-        rx = v3
-        ry = v4
-        angle = v5
-
-        return obj, xpos, ypos, rx, ry, angle
-    else:
-        print("ellipse region was not found in file. Exiting.. ")
-        sys.exit()
-
-    return 0, 0, 0, 0
 
 
 def GetPmax(image, mask, xmin, xmax, ymin, ymax):

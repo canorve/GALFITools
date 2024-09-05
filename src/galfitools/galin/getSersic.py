@@ -4,7 +4,7 @@ import numpy as np
 from galfitools.galin.galfit import GalComps
 from galfitools.galout.getPeak import getPeak
 from galfitools.galout.PhotDs9 import photDs9
-from galfitools.mge.mge2galfit import GetInfoEllip
+from galfitools.galin.std import GetInfoEllip
 
 
 def getSersic(

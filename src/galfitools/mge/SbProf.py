@@ -8,7 +8,8 @@ import numpy as np
 from astropy.io import fits
 from galfitools.galin.std import GetAxis
 from galfitools.galin.std import Ds9ell2Kronellv2
-from galfitools.mge.mge2galfit import GetInfoEllip, GetPmax, GetSize
+from galfitools.galin.std import GetInfoEllip
+from galfitools.mge.mge2galfit import GetPmax, GetSize
 from matplotlib.ticker import (
     AutoLocator,
     AutoMinorLocator,
