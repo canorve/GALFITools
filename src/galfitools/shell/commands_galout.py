@@ -798,8 +798,6 @@ def maingetSlope() -> None:
     print(line)
 
 
-# check modify
-# console scripts
 def maingetN() -> None:
     """
     Calls the getN function based on argument parsing.
@@ -897,7 +895,9 @@ def maingetN() -> None:
     line = line + line2
     print(line)
 
-    line = "Sersic index with the method of fraction of light (at different radius)\n"
+    line = "Sersic index with the method of fraction of light\n"
+    line2 = "(evaluated at different radius)\n"
+    line = line + line2
     print(line)
 
     line = "Sersic index mean: {:.2f}  Standard deviation: {:.2f}  ".format(
@@ -913,7 +913,6 @@ def mainGetBulgeRad() -> None:
     """
 
     printWelcome()
-    # reading arguments parsing
 
     parser = argparse.ArgumentParser(
         description="getBulgeRad: gets the bulge radius or the radius where "
@@ -1311,9 +1310,6 @@ def maingetPeak():
     regfile = args.RegFile
     center = args.center
     maskfile = args.mask
-
-    # zeropoint = args.zeropoint
-    # sky = args.sky
 
     X, Y, AxRat, PA = getPeak(image, regfile, center, maskfile)
 
