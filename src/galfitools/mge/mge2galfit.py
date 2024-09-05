@@ -1164,9 +1164,11 @@ def PrintExp(hdl, ncomp, xpos, ypos, magexp, rsexp, axratexp, angleexp, Z, fit):
     return True
 
 
+'''
 def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
     """Get a cutout of the image
     # repeated
+    # not used
 
     """
     # k Check
@@ -1187,6 +1189,7 @@ def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
     hdu[0].data = dat
     hdu.writeto(Imageout, overwrite=True)
     hdu.close()
+'''
 
 
 def GetExpTime(Image):

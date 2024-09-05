@@ -126,7 +126,6 @@ def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
     theta: float, angular position measured from Y-axis
     e: float, ellipticity
 
-    # repeated
 
     """
 
@@ -149,6 +148,7 @@ def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
     return xx, yy, Rkron, theta, e
 
 
+'''
 def GetFits(
     Image: str, Imageout: str, sky: float, xlo: int, xhi: int, ylo: int, yhi: int
 ) -> None:
@@ -211,6 +211,7 @@ def GetFits(
     newhdu.writeto(Imageout, overwrite=True)
 
     hdu.close()
+'''
 
 
 def GetInfoEllip(regfile: str):
@@ -366,7 +367,6 @@ def Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle):
     theta: float, angular position measured from Y-axis
     e: float, ellipticity
 
-    # repeated
 
     """
 
