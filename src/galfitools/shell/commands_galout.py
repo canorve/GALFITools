@@ -893,10 +893,11 @@ def maingetN() -> None:
     print(line)
 
     line = "Sersic index with the method of Mean Surface "
-    +"Brightness at effective radius: {:.2f}  \n".format(sersic)
+    line2 = "Brightness at effective radius: {:.2f} \n".format(sersic)
+    line = line + line2
     print(line)
 
-    line = "Sersic index with the method of fraction of light (at different radius)  \n"
+    line = "Sersic index with the method of fraction of light (at different radius)\n"
     print(line)
 
     line = "Sersic index mean: {:.2f}  Standard deviation: {:.2f}  ".format(
