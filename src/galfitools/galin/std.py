@@ -105,45 +105,6 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     return (round(xmin), round(xmax), round(ymin), round(ymax))
 
 
-def CheckFlag(val, check, maxx):
-    """Check if SExtractor flag contains the check flag
-
-    This function is useful to check if
-    a object sextractor flag contains saturated region
-
-    Parameters
-    ----------
-    val: SExtractor flag of the object
-    check: SExtractor flag value to check
-    maxx: maximum value of the flag
-
-    Returns
-    -------
-    bool, returns True if found
-
-    # repeated
-
-    """
-
-    flag = False
-    mod = 1
-
-    while mod != 0:
-
-        res = int(val / maxx)
-
-        if maxx == check and res == 1:
-
-            flag = True
-
-        mod = val % maxx
-
-        val = mod
-        maxx = maxx / 2
-
-    return flag
-
-
 def CheckSatReg(x, y, filein, R, theta, ell):
     """Check if object is inside of saturated region.
 

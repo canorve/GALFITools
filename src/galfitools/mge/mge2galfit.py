@@ -12,6 +12,7 @@ from astropy.io import fits
 from galfitools.galin.galfit import Galfit
 from galfitools.galin.std import GetAxis
 from galfitools.galin.std import GetSize
+from galfitools.galin.MakeMask import CheckFlag
 from mgefit.mge_fit_sectors import mge_fit_sectors
 from mgefit.mge_fit_sectors_regularized import mge_fit_sectors_regularized
 from mgefit.mge_fit_sectors_twist import mge_fit_sectors_twist
@@ -1243,37 +1244,6 @@ def makeConstraints(consfile: str, numcomp: int) -> True:
     fout.close()
 
     return True
-
-
-def CheckFlag(val, check):
-    """Check if flag is contained in val,
-    returns True if found.
-
-    This is useful for Sextractor Flags
-
-
-    # repeated
-
-    """
-
-    flag = False
-    mod = 1
-    maxx = 128
-
-    while mod != 0:
-
-        res = int(val / maxx)
-
-        if maxx == check and res == 1:
-
-            flag = True
-
-        mod = val % maxx
-
-        val = mod
-        maxx = maxx / 2
-
-    return flag
 
 
 def GetInfoEllip(regfile):

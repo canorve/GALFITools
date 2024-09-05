@@ -162,8 +162,6 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
                 sysmax[idx],
             )
 
-        # elif(checkflag == True or regflag == True):
-
     print("ignoring objects where one or more pixels are saturated \n")
 
     hdu[i].data = img
@@ -508,7 +506,7 @@ def GetSizev1(x, y, R, theta, ell, ncol, nrow):
     return (xmin, xmax, ymin, ymax)
 
 
-def CheckFlag(val, check, maxx):
+def CheckFlag(val, check, maxx=128):
     """Check if SExtractor flag contains the check flag
 
     This function is useful to check if
@@ -518,7 +516,7 @@ def CheckFlag(val, check, maxx):
     ----------
     val: SExtractor flag of the object
     check: SExtractor flag value to check
-    maxx: maximum value of the flag
+    maxx: maximum value of the flag. Default = 128
 
     Returns
     -------
