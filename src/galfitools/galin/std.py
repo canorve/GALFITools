@@ -336,44 +336,6 @@ def GetExpTime(Image):
     return float(exptime)
 
 
-def readDataImg(conf):
-    """reads the galaxy image and
-    mask image
-
-    # repeated
-
-    """
-
-    dataimg = DataImg()
-
-    # reading galaxy and model images from file
-    errmsg = "file {} does not exist".format(conf.image)
-
-    assert os.path.isfile(conf.image), errmsg
-
-    # hdu 1 => image   hdu 2 => model
-    hdu = fits.open(conf.image)
-    dataimg.img = (hdu[0].data.copy()).astype(float)
-    hdu.close()
-
-    # reading mask image from file
-
-    if conf.mask:
-
-        errmsg = "file {} does not exist".format(conf.mask)
-        assert os.path.isfile(conf.mask), errmsg
-
-        hdu = fits.open(conf.mask)
-        mask = hdu[0].data
-        dataimg.mask = np.array(mask, dtype=bool)
-        hdu.close()
-
-    else:
-        dataimg.mask = np.array([])
-
-    return dataimg
-
-
 def PrintHeader(
     hdl,
     A,

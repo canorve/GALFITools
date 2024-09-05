@@ -201,7 +201,16 @@ def readDataImg(conf):
     """reads the galaxy image and
     mask image
 
-    # repeated
+    Parameters
+    ----------
+    conf :  Data class Config defined below
+
+
+    Returns
+    -------
+    dataimg : Data class DataImg defined above which
+            contains the images.
+
 
     """
 
