@@ -691,7 +691,7 @@ def mainGetReComp() -> None:
     line = line1 + line2
     print(line)
 
-    line = "Mean Surface Brightness at effective radius (<\u03BC>e):"
+    line1 = "Mean Surface Brightness at effective radius (<\u03BC>e):"
     line2 = " {:.2f} mag/'' \n".format(meanme)
     line = line1 + line2
     if eff == 0.5:
