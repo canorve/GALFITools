@@ -793,7 +793,6 @@ def PrintHeader(
     -------
     bool
 
-    # repeated
     """
     # k Check
     # the header for GALFIT
@@ -934,7 +933,6 @@ def PrintSky(hdl, ncomp, sky, Z, fit):
     -------
     bool
 
-    # repeated
     """
 
     # k Check
@@ -1001,7 +999,6 @@ def PrintSersic(
     -------
     bool
 
-    # repeated
     """
 
     line00 = "# Object number: {}     \n".format(ncomp)
@@ -1089,69 +1086,6 @@ def PrintGauss(hdl, ncomp, xpos, ypos, magass, fwhm, axratgass, anglegass, Z, fi
         anglegass, fit
     )
     line07 = " Z) {}    #  Skip this model in output image?  (yes=1, no=0) \n".format(Z)
-    line08 = "\n"
-
-    hdl.write(line00)
-    hdl.write(line01)
-    hdl.write(line02)
-    hdl.write(line03)
-    hdl.write(line04)
-    hdl.write(line05)
-    hdl.write(line06)
-    hdl.write(line07)
-    hdl.write(line08)
-
-    return True
-
-
-def PrintExp(hdl, ncomp, xpos, ypos, magexp, rsexp, axratexp, angleexp, Z, fit):
-    """Print the GALFIT exponential function parameters to a
-    file specified by the filehandle.
-
-    print GALFIT exponential function to filehandle
-
-    Parameters
-    ----------
-
-    hdl : str
-        filehandler
-
-    ncomp : int
-        number of component
-
-    xpos, ypos : int, int
-                pixel position of the component's center
-    magexp : float
-            magnitud of exponential component
-    rsexp : float
-            scale radius of exponential component
-    axratexp : axis ratio of exponential component
-    angleexp : angular position of component measured from Y-axis
-               in degrees
-    Z : int
-        skip object. Z GALFIT component parameter
-    fit : int
-        leave parameter free/fixed during fit
-
-    Returns
-    -------
-    bool
-
-    # repeated
-    """
-
-    line00 = "# Object number: $ncomp      \n"
-    line01 = " 0)     expdisk        # Object type \n"
-    line02 = " 1) {:.2f}  {:.2f}  {}  {}  # position x, y [pixel]\n".format(
-        xpos, ypos, fit, fit
-    )
-    line03 = " 3) {:.2f}    {}   # total magnitude \n".format(magexp, fit)
-    line04 = " 4) {:.2f}    {}   #      Rs  [Pixels]\n".format(rsexp, fit)
-    line05 = " 9) {:.2f}        {}   # axis ratio (b/a) \n".format(axratexp, fit)
-    line06 = "10) {:.2f}  {} # position angle (PA)   \n".format(angleexp, fit)
-    line07 = " Z) {}      # Skip this model in output image?  (yes=1, no=0) \n".format(
-        Z
-    )
     line08 = "\n"
 
     hdl.write(line00)
