@@ -7,6 +7,7 @@ import numpy as np
 from astropy.io import fits
 from galfitools.galin.std import GetAxis
 from galfitools.galin.std import GetSize
+from galfitools.galin.std import GetExpTime
 from galfitools.galin.std import Ds9ell2Kronell
 from matplotlib.path import Path
 
@@ -319,22 +320,6 @@ def FluxKron(imagemat, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     flux = imagemat[ypos[mask], xpos[mask]].sum()
 
     return flux
-
-
-def GetExpTime(Image):
-    """Get exposition time
-    from the image header
-    # repeated
-
-    """
-
-    try:
-        hdu = fits.open(Image)
-        exptime = hdu[0].header["EXPTIME"]
-        hdu.close()
-    except Exception:
-        exptime = 1
-    return float(exptime)
 
 
 #############################################################################

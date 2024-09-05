@@ -15,6 +15,7 @@ from galfitools.galin.std import GetSize
 from galfitools.galin.std import Ds9ell2Kronellv2
 from galfitools.galin.std import GetInfoEllip
 from galfitools.galin.std import GetPmax
+from galfitools.galin.std import GetExpTime
 from galfitools.galin.MakeMask import CheckFlag
 from mgefit.mge_fit_sectors import mge_fit_sectors
 from mgefit.mge_fit_sectors_regularized import mge_fit_sectors_regularized
@@ -1164,21 +1165,6 @@ def PrintExp(hdl, ncomp, xpos, ypos, magexp, rsexp, axratexp, angleexp, Z, fit):
     hdl.write(line08)
 
     return True
-
-
-def GetExpTime(Image):
-    """Get exposition time from the FITS image header
-    # repeated
-
-    """
-
-    try:
-        hdu = fits.open(Image)
-        exptime = hdu[0].header["EXPTIME"]
-        hdu.close()
-    except Exception:
-        exptime = 1
-    return float(exptime)
 
 
 def makeConstraints(consfile: str, numcomp: int) -> True:

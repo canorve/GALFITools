@@ -324,7 +324,6 @@ def Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle):
 def GetExpTime(Image):
     """Get exposition time
     from the image header
-    # repeated
 
     """
 

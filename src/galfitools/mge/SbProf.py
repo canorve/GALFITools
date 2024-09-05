@@ -10,6 +10,7 @@ from galfitools.galin.std import GetAxis
 from galfitools.galin.std import Ds9ell2Kronellv2
 from galfitools.galin.std import GetInfoEllip
 from galfitools.galin.std import GetPmax
+from galfitools.galin.std import GetExpTime
 from galfitools.mge.mge2galfit import GetSize
 from matplotlib.ticker import (
     AutoLocator,
@@ -644,20 +645,3 @@ class Config:
 
     rad = 0
     rad2 = 0
-
-
-def GetExpTime(Image):
-    # k Check
-    """Get exposition time from the image
-
-    # repeated
-
-    """
-
-    try:
-        hdu = fits.open(Image)
-        exptime = hdu[0].header["EXPTIME"]
-        hdu.close()
-    except Exception:
-        exptime = 1
-    return float(exptime)

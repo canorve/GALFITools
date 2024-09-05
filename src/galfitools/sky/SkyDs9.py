@@ -335,24 +335,6 @@ def SkyKron(imagemat, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     return flatimg
 
 
-'''
-def GetExpTime(Image):
-    """Get exposition time from the image
-
-    # repeated
-    # not used
-
-    """
-
-    try:
-        hdu = fits.open(Image)
-        exptime = hdu[0].header["EXPTIME"]
-        hdu.close()
-    except Exception:
-        exptime = 1
-    return float(exptime)
-'''
-
 #############################################################################
 #    End of program  ###################################
 #     ______________________________________________________________________
