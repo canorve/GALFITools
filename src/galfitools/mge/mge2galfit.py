@@ -195,7 +195,7 @@ def mge2gal(
 
     minlevel = 0
 
-    plt.clf()
+    # plt.clf()
 
     (ncol, nrow) = GetAxis(image)
 
@@ -239,7 +239,7 @@ def mge2gal(
     xpeak = ypeak
     ypeak = xtemp
 
-    plt.clf()
+    # plt.clf()
 
     if twist:
         print("twist mode mge fit sectors is used")
@@ -336,7 +336,7 @@ def mge2gal(
 
         plt.savefig(sectorspng)
 
-        plt.clf()
+        # plt.clf()
 
         tolpsf = 0.001
         if np.abs(psf) > tolpsf:
