@@ -562,8 +562,6 @@ def CheckSatReg(x, y, filein, R, theta, ell):
     bool : it returns True if at least one pixel is inside
 
 
-    # repeated
-
     """
 
     q = 1 - ell
