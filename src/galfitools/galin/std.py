@@ -321,56 +321,6 @@ def Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle):
     return xx, yy, Rkron, theta, e
 
 
-def MakeBoxBack(Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow):
-    """Make a box in an image. Deprecated
-    # repeated
-    # not used
-    """
-
-    xlo = xpos - rx / 2 - 1
-    xhi = xpos + rx / 2 + 1
-
-    ylo = ypos - ry / 2 - 1
-    yhi = ypos + ry / 2
-
-    if xlo < 1:
-        xlo = 1
-    if ylo < 1:
-        ylo = 1
-
-    if xhi > ncol:
-        xhi = ncol - 1
-
-    if yhi > nrow:
-        yhi = nrow - 1
-
-    xlo = int(np.round(xlo))
-    xhi = int(np.round(xhi))
-
-    ylo = int(np.round(ylo))
-    yhi = int(np.round(yhi))
-
-    Verts = [(xlo, yhi), (xhi, yhi), (xhi, ylo), (xlo, ylo)]
-
-    x, y = np.meshgrid(
-        np.arange(ncol), np.arange(nrow)
-    )  # make a canvas with coordinates
-    x, y = x.flatten(), y.flatten()
-    points = np.vstack((x, y)).T
-
-    p = Path(Verts)  # make a polygon
-
-    grid = p.contains_points(points)
-
-    mask = grid.reshape(nrow, ncol)  # now you have a mask with points inside a polygon
-
-    Image[mask] = fill
-
-    # Image[ylo - 1: yhi + 1, xlo - 1: xhi + 1] = fill
-
-    return Image
-
-
 def GetExpTime(Image):
     """Get exposition time
     from the image header
