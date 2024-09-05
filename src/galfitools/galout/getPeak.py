@@ -8,6 +8,7 @@ import numpy as np
 from astropy.io import fits
 from galfitools.galin.std import GetAxis
 from galfitools.galin.std import GetSize
+from galfitools.galin.std import Ds9ell2Kronellv2
 
 
 def getPeak(image: str, regfile: str, center: bool, maskfile: str) -> None:
@@ -146,31 +147,6 @@ def GetInfoEllip(regfile):
         sys.exit()
 
     return 0, 0, 0, 0
-
-
-def Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle):
-    """converts DS9 ellipse parameters to
-    geometrical parameters
-    # repeated
-    """
-
-    if rx >= ry:
-
-        q = ry / rx
-        e = 1 - q
-        Rkron = rx
-        theta = angle - 90
-        xx = xpos
-        yy = ypos
-    else:
-        q = rx / ry
-        e = 1 - q
-        Rkron = ry
-        theta = angle  # + 90
-        xx = xpos
-        yy = ypos
-
-    return xx, yy, Rkron, theta, e
 
 
 def GetPmax(image, mask, xmin, xmax, ymin, ymax):

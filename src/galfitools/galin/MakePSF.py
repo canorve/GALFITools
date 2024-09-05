@@ -13,7 +13,8 @@ from galfitools.galin.galfit import (
     galPrintSky,
 )
 from galfitools.galin.getStar import getStar
-from galfitools.mge.mge2galfit import Ds9ell2Kronellv2, GetInfoEllip, mge2gal
+from galfitools.galin.std import Ds9ell2Kronellv2
+from galfitools.mge.mge2galfit import GetInfoEllip, mge2gal
 
 
 def makePSF(

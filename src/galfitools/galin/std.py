@@ -346,9 +346,28 @@ def GetPmax(image, mask, xmin, xmax, ymin, ymax):
 
 
 def Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle):
-    """converts DS9 ellipse paramters to
-    geometrical parameters
+    """Converts DS9 ellipse parameters to geometrical parameters
+
+    Parameters
+    ----------
+    obj : str
+          object name
+    xpos : float, x-center
+    ypos : float, y-center
+    rx : float, major or minor axis
+    ry : float, minor or major axis
+    angle : float, angular position
+
+    Returns
+    -------
+    xx : float, x center position
+    yy : float, y center positon
+    Rkron : float, major axis
+    theta: float, angular position measured from Y-axis
+    e: float, ellipticity
+
     # repeated
+
     """
 
     if rx >= ry:

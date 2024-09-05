@@ -7,6 +7,7 @@ import numpy as np
 from astropy.io import fits
 from galfitools.galin.std import GetAxis
 from galfitools.galin.std import GetSize
+from galfitools.galin.std import Ds9ell2Kronell
 from matplotlib.path import Path
 
 
@@ -276,83 +277,6 @@ def FluxBox(Image, xpos, ypos, rx, ry, angle, ncol, nrow):
     flux = Image[mask].sum()
 
     return flux
-
-
-'''
-def MakeBoxBack(Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow):
-    """Make a box in an image. Deprecated
-    # repeated
-    # not used
-    """
-
-    xlo = xpos - rx / 2 - 1
-    xhi = xpos + rx / 2 + 1
-
-    ylo = ypos - ry / 2 - 1
-    yhi = ypos + ry / 2
-
-    if xlo < 1:
-        xlo = 1
-    if ylo < 1:
-        ylo = 1
-
-    if xhi > ncol:
-        xhi = ncol - 1
-
-    if yhi > nrow:
-        yhi = nrow - 1
-
-    xlo = int(np.round(xlo))
-    xhi = int(np.round(xhi))
-
-    ylo = int(np.round(ylo))
-    yhi = int(np.round(yhi))
-
-    Verts = [(xlo, yhi), (xhi, yhi), (xhi, ylo), (xlo, ylo)]
-
-    x, y = np.meshgrid(
-        np.arange(ncol), np.arange(nrow)
-    )  # make a canvas with coordinates
-    x, y = x.flatten(), y.flatten()
-    points = np.vstack((x, y)).T
-
-    p = Path(Verts)  # make a polygon
-
-    grid = p.contains_points(points)
-
-    mask = grid.reshape(nrow, ncol)  # now you have a mask with points inside a polygon
-
-    Image[mask] = fill
-
-    # Image[ylo - 1: yhi + 1, xlo - 1: xhi + 1] = fill
-
-    return Image
-'''
-
-
-def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
-    """Converts the DS9 ellipse parameters to
-    ellipse parameters
-    # repeated
-    """
-
-    if rx >= ry:
-
-        q = ry / rx
-        e = 1 - q
-        Rkron = rx
-        theta = angle
-        xx = xpos
-        yy = ypos
-    else:
-        q = rx / ry
-        e = 1 - q
-        Rkron = ry
-        theta = angle + 90
-        xx = xpos
-        yy = ypos
-
-    return xx, yy, Rkron, theta, e
 
 
 def FluxKron(imagemat, x, y, R, theta, ell, xmin, xmax, ymin, ymax):

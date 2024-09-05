@@ -8,7 +8,7 @@ import numpy as np
 from astropy.io import fits
 from galfitools.galin.std import GetAxis
 from galfitools.galin.std import GetSize
-from galfitools.mge.mge2galfit import Ds9ell2Kronellv2
+from galfitools.galin.std import Ds9ell2Kronellv2
 
 
 def getStar(
@@ -281,49 +281,6 @@ def GetInfoEllip(regfile: str):
         sys.exit()
 
     return 0, 0, 0, 0
-
-
-def Ds9ell2Kronell(xpos: float, ypos: float, rx: float, ry: float, angle: float):
-    """Converts DS9 ellipse parameters to geometrical parameters
-
-    Parameters
-    ----------
-    obj : str
-          object name
-    xpos : float, x-center
-    ypos : float, y-center
-    rx : float, major or minor axis
-    ry : float, minor or major axis
-    angle : float, angular position
-
-    Returns
-    -------
-    xx : float, x center position
-    yy : float, y center positon
-    Rkron : float, major axis
-    theta: float, angular position measured from Y-axis
-    e: float, ellipticity
-
-    # repeated
-    """
-
-    if rx >= ry:
-
-        q = ry / rx
-        e = 1 - q
-        Rkron = rx
-        theta = angle + 90
-        xx = xpos
-        yy = ypos
-    else:
-        q = rx / ry
-        e = 1 - q
-        Rkron = ry
-        theta = angle  # + 90
-        xx = xpos
-        yy = ypos
-
-    return xx, yy, Rkron, theta, e
 
 
 def GetPmax(image, mask, xmin, xmax, ymin, ymax):
