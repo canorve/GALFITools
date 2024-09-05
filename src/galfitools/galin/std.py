@@ -336,37 +336,6 @@ def GetExpTime(Image):
     return float(exptime)
 
 
-def PrintSky(hdl, ncomp, sky, Z, fit):
-    """Print GALFIT sky function to filehandle
-
-    # repeated
-    """
-
-    # k Check
-
-    line00 = "# Object number: {}   \n".format(ncomp)
-    line01 = " 0)      sky       #    Object type  \n"
-    line02 = " 1) {}     {}  # sky background  \n".format(sky, fit)
-    line03 = " 2) 0.000      0    # dsky/dx (sky gradient in x) \n"
-    line04 = " 3) 0.000      0     # dsky/dy (sky gradient in y)\n"
-    line05 = " Z) {}        # Skip this model in output image?  \n".format(Z)
-    line06 = "\n"
-    line07a = "================================="
-    line07b = "===============================================\n"
-    line07 = line07a + line07b
-
-    hdl.write(line00)
-    hdl.write(line01)
-    hdl.write(line02)
-    hdl.write(line03)
-    hdl.write(line04)
-    hdl.write(line05)
-    hdl.write(line06)
-    hdl.write(line07)
-
-    return True
-
-
 def PrintSersic(
     hdl, ncomp, xpos, ypos, magser, reser, nser, axratser, angleser, Z, fit
 ):
