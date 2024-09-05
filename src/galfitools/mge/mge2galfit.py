@@ -1164,34 +1164,6 @@ def PrintExp(hdl, ncomp, xpos, ypos, magexp, rsexp, axratexp, angleexp, Z, fit):
     return True
 
 
-'''
-def GetFits(Image, Imageout, xlo, xhi, ylo, yhi):
-    """Get a cutout of the image
-    # repeated
-    # not used
-
-    """
-    # k Check
-
-    if os.path.isfile(Imageout):
-        print("{} deleted; a new one is created \n".format(Imageout))
-        runcmd = "rm {}".format(Imageout)
-        sp.run(
-            [runcmd],
-            shell=True,
-            stdout=sp.PIPE,
-            stderr=sp.PIPE,
-            universal_newlines=True,
-        )
-
-    hdu = fits.open(Image)
-    dat = hdu[0].data[ylo - 1 : yhi, xlo - 1 : xhi]
-    hdu[0].data = dat
-    hdu.writeto(Imageout, overwrite=True)
-    hdu.close()
-'''
-
-
 def GetExpTime(Image):
     """Get exposition time from the FITS image header
     # repeated
