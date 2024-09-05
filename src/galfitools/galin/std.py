@@ -169,7 +169,6 @@ def GetInfoEllip(regfile: str):
 
     returns 0, 0, 0, 0, 0, 0 if ellipse region was not found in file
 
-    # repeated
 
     """
 
@@ -255,7 +254,6 @@ def GetPmax(image, mask, xmin, xmax, ymin, ymax):
     -------
     (xpos, ypos) : (x, y) coordinates of the maximum
 
-    # repeated
 
     """
     xmin = int(xmin)

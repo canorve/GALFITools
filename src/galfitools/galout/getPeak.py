@@ -10,6 +10,7 @@ from galfitools.galin.std import GetAxis
 from galfitools.galin.std import GetSize
 from galfitools.galin.std import GetInfoEllip
 from galfitools.galin.std import Ds9ell2Kronellv2
+from galfitools.galin.std import GetPmax
 
 
 def getPeak(image: str, regfile: str, center: bool, maskfile: str) -> None:
@@ -88,36 +89,6 @@ def getPeak(image: str, regfile: str, center: bool, maskfile: str) -> None:
 ####################################################
 ####################################################
 #####################################################
-
-
-def GetPmax(image, mask, xmin, xmax, ymin, ymax):
-    """get the pixel coordinates with the highest value
-
-    # repeated
-    """
-
-    xmin = int(xmin)
-    xmax = int(xmax)
-    ymin = int(ymin)
-    ymax = int(ymax)
-
-    chuckimg = image[ymin - 1 : ymax, xmin - 1 : xmax]
-    if mask.any():
-        chuckmsk = mask[ymin - 1 : ymax, xmin - 1 : xmax]
-
-        invmask = np.logical_not(chuckmsk)
-
-        invmask = invmask * 1
-
-        chuckimg = chuckimg * invmask
-
-    maxy, maxx = np.where(chuckimg == np.max(chuckimg))
-
-    xpos = maxx[0] + xmin - 1
-    ypos = maxy[0] + ymin - 1
-
-    return (xpos, ypos)
-
 
 #############################################################################
 #  End of program  ###################################

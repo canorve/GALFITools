@@ -10,6 +10,7 @@ from galfitools.galin.std import GetAxis
 from galfitools.galin.std import GetSize
 from galfitools.galin.std import GetInfoEllip
 from galfitools.galin.std import Ds9ell2Kronellv2
+from galfitools.galin.std import GetPmax
 
 
 def getStar(
@@ -193,49 +194,6 @@ def GetFits(
     newhdu.writeto(Imageout, overwrite=True)
 
     hdu.close()
-
-
-def GetPmax(image, mask, xmin, xmax, ymin, ymax):
-    """gets the peak coordinates
-
-    Given an image, and optionally a mask, it identifies
-    the (x, y) pixels where the maximum value is located.
-
-    Parameters
-    ----------
-    image: 2D-array of the image
-    mask: 2D-array of the mask
-    xmin, xmax, ymin, ymax : int, int, int, int
-                            coordinates of the image section
-                            where the maximum will be obtained
-
-    Returns
-    -------
-    (xpos, ypos) : (x, y) coordinates of the maximum
-
-    # repeated
-
-    """
-    xmin = int(xmin)
-    xmax = int(xmax)
-    ymin = int(ymin)
-    ymax = int(ymax)
-
-    chuckimg = image[ymin - 1 : ymax, xmin - 1 : xmax]
-    if mask.any():
-        chuckmsk = mask[ymin - 1 : ymax, xmin - 1 : xmax]
-
-        invmask = np.logical_not(chuckmsk)
-
-        invmask = invmask * 1
-
-        chuckimg = chuckimg * invmask
-    maxy, maxx = np.where(chuckimg == np.max(chuckimg))
-
-    xpos = maxx[0] + xmin - 1
-    ypos = maxy[0] + ymin - 1
-
-    return (xpos, ypos)
 
 
 #############################################################################
