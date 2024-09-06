@@ -75,7 +75,7 @@ def getPeak(image: str, regfile: str, center: bool, maskfile: str) -> None:
         print("center of DS9 ellipse region will be used")
         xpeak, ypeak = round(xpos), round(ypos)
     else:
-        (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, eps, ncol, nrow)
+        (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta + 90, eps, ncol, nrow)
 
         xpeak, ypeak = GetPmax(img, mask, xmin, xmax, ymin, ymax)
 

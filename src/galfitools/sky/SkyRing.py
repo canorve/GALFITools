@@ -85,7 +85,7 @@ def SkyRing(image, mask, ds9regfile, width, center, outliers):
         print("center of ds9 ellipse region will be used")
         xpeak, ypeak = xpos, ypos
     else:
-        (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, eps, ncol, nrow)
+        (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta + 90, eps, ncol, nrow)
         xpeak, ypeak = GetPmax(datimg, maskimg, xmin, xmax, ymin, ymax)
 
     mean, std, median, rad = SkyCal().GetEllipSky(

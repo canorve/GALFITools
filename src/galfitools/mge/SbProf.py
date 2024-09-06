@@ -130,7 +130,7 @@ def sbProf(args):
         print("center of ds9 ellipse region will be used")
         xpeak, ypeak = xpos, ypos
     else:
-        (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, eps, ncol, nrow)
+        (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta + 90, eps, ncol, nrow)
         xpeak, ypeak = GetPmax(dataimg.img, dataimg.mask, xmin, xmax, ymin, ymax)
 
     # I have to switch x and y coordinates, don't ask me why

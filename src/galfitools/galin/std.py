@@ -53,7 +53,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     x : float, x-center of ellipse
     y : float, y-center of ellipse
     R : float, major axis of ellipse
-    theta : float, angular position of ellipse
+    theta : float, angular position of ellipse measured from X-axis
     ell : float, ellipticity
     ncol : number of columns of the image
     nrow : number of rows of the image

@@ -217,7 +217,7 @@ def mge2gal(
                 xpeak, ypeak = xpos, ypos
             else:
                 (xmin, xmax, ymin, ymax) = GetSize(
-                    xx, yy, Rkron, theta, eps, ncol, nrow
+                    xx, yy, Rkron, theta + 90, eps, ncol, nrow
                 )
                 xpeak, ypeak = GetPmax(img, mask, xmin, xmax, ymin, ymax)
 
@@ -656,6 +656,7 @@ def ReadMgePsf(psfile):
     return psfs, normpsf
 
 
+'''
 def Sextractor(filimage, X, Y):
     """
     Runs Sextractor and recover photometry from
@@ -749,7 +750,7 @@ def Sextractor(filimage, X, Y):
 
     print("Sextractor done")
     return E, Angle, XPos, YPos, Background
-
+'''
 
 #  GALFIT functions
 
