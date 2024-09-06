@@ -123,7 +123,7 @@ def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
     xx : float, x center position
     yy : float, y center positon
     Rkron : float, major axis
-    theta: float, angular position measured from Y-axis
+    theta: float, angular position measured from X-axis
     e: float, ellipticity
 
 
@@ -314,7 +314,7 @@ def Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle):
         q = rx / ry
         e = 1 - q
         Rkron = ry
-        theta = angle  # + 90
+        theta = angle
         xx = xpos
         yy = ypos
 
