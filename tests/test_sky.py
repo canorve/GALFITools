@@ -38,42 +38,6 @@ def test_galfitSky():
     return None
 
 
-"""
-def test_sky():
-    # deprecated
-
-
-    imgname =   "A1656-1-3.sbProf.fits"
-    maskfile = "mask.sbProf.fits" 
-    filereg = "ds9.sky.reg"
-    path="tests/"
-    imgname = path+imgname
-    maskfile = path+maskfile
-    filereg = path+filereg
- 
-    mean, sig = sky(imgname, maskfile, filereg)
-
-    tol = 1e-2
-
-    result1 =  369.717 
-    result2 = 4.407 
-
-
-
-    diffsky1 = abs(mean -result1)
-
-    assert diffsky1 < tol
-
-    diffsky2 = abs(sig -result2)
-
-    assert diffsky2 < tol
-
-
-
-    return None
-"""
-
-
 def test_SkyDs9():
 
     ImageFile = "A671.gtMakeMask.maskds9.masksky.fits"
