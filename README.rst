@@ -31,6 +31,7 @@
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.8216472.svg 
   :target: https://doi.org/10.5281/zenodo.8216472 
 
+.. |Contributor Covenant| image:: https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg :target: code_of_conduct.md 
 
 ==========
 GALFITools
