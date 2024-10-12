@@ -142,6 +142,36 @@ run the tests:
 
     tox 
 
+-----------------
+
+**Get Started with GALFITools**
+~~~~~~~~~~~~~~~~~
+
+Once installed, you can test galfitools using any of 
+the commands in the console. 
+
+In the example below, getReComp is used with the output GALFIT file 
+galfit.01 to calculate the effective radius for a composite 
+model consisting of three Sersic components:
+
+::
+   
+  ❯ getReComp galfit.01
+  GALFITools: a library for GALFIT
+  Version: 1.14.1
+  webpage: https://github.com/canorve/GALFITools
+
+  number of model components:  3
+  Using a theta value of : 14.13 degrees 
+
+  Total Magnitude of the galaxy: 9.79 
+
+  Surface brightness at radius of 50% of light (μr): 21.15 mag/'' 
+
+  Mean Surface Brightness at effective radius (<μ>e): 20.27 mag/'' 
+
+  The radius at 50% of light is 199.64 pixels or 49.91 " 
+
 
 
 -----------------
@@ -221,8 +251,9 @@ The codebase of GALFITools is governed by the terms of the **MIT** license.
 To acknowledge the utility of GALFITools in your research, 
 we kindly request that you cite it as follows:
 
-Añorve, C. (2024). canorve/GALFITools: GALFITools v1.7.0 (v1.7.0). Zenodo. https://doi.org/10.5281/zenodo.10968602
+Añorve, C. (2024). canorve/GALFITools: GALFITools v1.7.7 (v1.7.7). Zenodo. https://doi.org/10.5281/zenodo.11206403
 
+cite all versions using the DOI: https://doi.org/10.5281/zenodo.8216472
 
 --------------------------
 
