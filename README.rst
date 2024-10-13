@@ -255,6 +255,15 @@ Añorve, C. (2024). canorve/GALFITools: GALFITools v1.7.7 (v1.7.7). Zenodo. http
 
 cite all versions using the DOI: https://doi.org/10.5281/zenodo.8216472
 
+
+-----------------
+
+**Community**
+~~~~~~~~~~~~~~~~~
+
+Check the `CODE OF CONDUCT <CODE_OF_CONDUCT.md>`__
+
+
 --------------------------
 
 **Additional Resources**
