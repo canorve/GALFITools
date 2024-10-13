@@ -235,12 +235,13 @@ functions within your own scripts can be found here:
 `API <docs/api.rst>`__
 
 
---------------
 
-**License**
---------------
+-----------------
 
-The codebase of GALFITools is governed by the terms of the **MIT** license.
+**Community**
+~~~~~~~~~~~~~~~~~
+
+Check the `CODE OF CONDUCT <CODE_OF_CONDUCT.md>`__
 
 
 -----------
@@ -255,13 +256,6 @@ Añorve, C. (2024). canorve/GALFITools: GALFITools v1.7.7 (v1.7.7). Zenodo. http
 
 cite all versions using the DOI: https://doi.org/10.5281/zenodo.8216472
 
-
------------------
-
-**Community**
-~~~~~~~~~~~~~~~~~
-
-Check the `CODE OF CONDUCT <CODE_OF_CONDUCT.md>`__
 
 
 --------------------------
@@ -293,6 +287,15 @@ we encourage you to reach out via email to  canorve [at] gmail [dot] com
 or initiate a discussion by opening an  `issue <https://github.com/canorve/GALFITools/issues>`__.  
 Your input is invaluable in fostering the continual refinement of 
 GALFITools, for the betterment of the *GALFIT* community and beyond.
+
+
+
+--------------
+
+**License**
+--------------
+
+The codebase of GALFITools is governed by the terms of the **MIT** license.
 
 
 
