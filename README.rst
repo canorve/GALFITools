@@ -151,7 +151,7 @@ Once installed, you can test galfitools using any of
 the commands in the console. 
 
 In the example below, getReComp is used with the output GALFIT file 
-galfit.01 to calculate the effective radius for a composite 
+`galfit.01 <img/galfit.01>`__  to calculate the effective radius for a composite 
 model consisting of three Sersic components:
 
 ::
