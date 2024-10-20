@@ -1,0 +1,86 @@
+
+#  Input menu file: pgc31968.gal
+
+#  Chi^2/nu = 1.490,  Chi^2 = 5291487.500,  Ndof = 3552289
+
+================================================================================
+# IMAGE and GALFIT CONTROL PARAMETERS
+A) pgc31968.fits       # Input data image (FITS file)
+B) pgc31968.out.fits      # Output data image block
+C) sigma.fits          # Sigma image name (made from data if blank or "none") 
+D) psf.fits            # Input PSF image and (optional) diffusion kernel
+E) 1                   # PSF fine sampling factor relative to data 
+F) mask.fits           # Bad pixel mask (FITS image or ASCII coord list)
+G) const.txt           # File with parameter constraints (ASCII file) 
+H) 324  2656 602  2475 # Image region to fit (xmin xmax ymin ymax)
+I) 101    101          # Size of the convolution box (x y)
+J) 25.0000             # Magnitude photometric zeropoint 
+K) 0.2500  0.2500      # Plate scale (dx dy)   [arcsec per pixel]
+O) regular             # Display type (regular, curses, both)
+P) 0                   # Choose: 0=optimize, 1=model, 2=imgblock, 3=subcomps
+
+# INITIAL FITTING PARAMETERS
+#
+#   For component type, the allowed functions are: 
+#       sersic, expdisk, edgedisk, devauc, king, nuker, psf, 
+#       gaussian, moffat, ferrer, and sky. 
+#  
+#   Hidden parameters will only appear when they're specified:
+#       Bn (n=integer, Bending Modes).
+#       C0 (diskyness/boxyness), 
+#       Fn (n=integer, Azimuthal Fourier Modes).
+#       R0-R10 (coordinate rotation, for creating spiral structures).
+#       To, Ti, T0-T10 (truncation function).
+# 
+# ------------------------------------------------------------------------------
+#   par)    par value(s)    fit toggle(s)    # parameter description 
+# ------------------------------------------------------------------------------
+
+# Component number: 1
+ 0) sersic                 #  Component type
+ 1) 1504.7794 1505.8723 1 1  #  Position x, y
+ 3) 12.8565     1          #  Integrated magnitude 
+ 4) 11.2698     1          #  R_e (effective radius)   [pix]
+ 5) 3.7376      1          #  Sersic index n (de Vaucouleurs n=4) 
+ 6) 0.0000      0          #     ----- 
+ 7) 0.0000      0          #     ----- 
+ 8) 0.0000      0          #     ----- 
+ 9) 0.9578      1          #  Axis ratio (b/a)  
+10) -18.7561    1          #  Position angle (PA) [deg: Up=0, Left=90]
+ Z) 0                      #  Skip this model in output image?  (yes=1, no=0)
+
+# Component number: 2
+ 0) sersic                 #  Component type
+ 1) 1504.7794 1505.8723 2 2  #  Position x, y
+ 3) 13.0285     1          #  Integrated magnitude 
+ 4) 28.5686     1          #  R_e (effective radius)   [pix]
+ 5) 0.5000      0          #  Sersic index n (de Vaucouleurs n=4) 
+ 6) 0.0000      0          #     ----- 
+ 7) 0.0000      0          #     ----- 
+ 8) 0.0000      0          #     ----- 
+ 9) 0.6845      1          #  Axis ratio (b/a)  
+10) 0.0539      1          #  Position angle (PA) [deg: Up=0, Left=90]
+ Z) 0                      #  Skip this model in output image?  (yes=1, no=0)
+
+# Component number: 3
+ 0) sersic                 #  Component type
+ 1) 1504.7794 1505.8723 2 2  #  Position x, y
+ 3) 9.9141      1          #  Integrated magnitude 
+ 4) 224.8251    1          #  R_e (effective radius)   [pix]
+ 5) 1.0000      0          #  Sersic index n (de Vaucouleurs n=4) 
+ 6) 0.0000      0          #     ----- 
+ 7) 0.0000      0          #     ----- 
+ 8) 0.0000      0          #     ----- 
+ 9) 0.9602      1          #  Axis ratio (b/a)  
+10) 14.1274     1          #  Position angle (PA) [deg: Up=0, Left=90]
+ Z) 0                      #  Skip this model in output image?  (yes=1, no=0)
+
+# Component number: 4
+ 0) sky                    #  Component type
+ 1) -51.7110    1          #  Sky background at center of fitting region [ADUs]
+ 2) 0.000e+00      0       #  dsky/dx (sky gradient in x)     [ADUs/pix]
+ 3) 0.000e+00      0       #  dsky/dy (sky gradient in y)     [ADUs/pix]
+ Z) 0                      #  Skip this model in output image?  (yes=1, no=0)
+
+================================================================================
+
