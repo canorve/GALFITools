@@ -252,7 +252,9 @@ Check the `CODE OF CONDUCT <CODE_OF_CONDUCT.md>`__
 To acknowledge the utility of GALFITools in your research, 
 we kindly request that you cite it as follows:
 
-Añorve, C. (2024). canorve/GALFITools: GALFITools v1.7.7 (v1.7.7). Zenodo. https://doi.org/10.5281/zenodo.11206403
+Añorve, C. (2024). canorve/GALFITools: GALFITools v1.15.0 (v1.15.0). 
+Zenodo. https://doi.org/10.5281/zenodo.13994492
+
 
 cite all versions using the DOI: https://doi.org/10.5281/zenodo.8216472
 
