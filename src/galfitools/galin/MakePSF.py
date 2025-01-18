@@ -148,6 +148,15 @@ def makePSF(
         print("Exiting now")
         sys.exit(1)
 
+    # check if galfit quit
+    if re.search("QUIT", errgal.stdout):
+        print("ERROR: GALFIT has unexpectedly quit.")
+        print(
+            "Probably the cause is trying to constraint a component which doesn't exist "
+        )
+        print("Exiting now")
+        sys.exit(1)
+
     lastfit_file = galfitLastFit(".")
 
     galfit = Galfit(lastfit_file)

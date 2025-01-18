@@ -616,7 +616,8 @@ def mge2gal(
     fout1.close()
     fout2.close()
 
-    makeConstraints(consfile, len(counts))
+    # makeConstraints(consfile, len(counts))
+    makeConstraints(consfile, numgauss)
 
     print(
         "Done. Gaussians are stored in {}, and {} for galfit format ".format(
