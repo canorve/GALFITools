@@ -15,33 +15,41 @@ def imarith(
     div: float,
     sub: float,
 ) -> None:
-    """makes arithmetic operations on the image
+    """
+    Makes arithmetic operations on the image
 
-    Paremeters
+    Parameters
     ----------
-    ImageFile: str, name of the image file
-    output: str, name of the output file
-    image2: str, name of a second image, optional
-    add: float, If a value is provided, it will be added to the image.
-                Otherwise, if image2 is provided, the result will be
-                the sum of image and image2.
+    ImageFile: str
+               name of the image file
+    output: str
+            name of the output file
+    image2: str
+            name of a second image, optional
+    add: float
+         If a value is provided, it will be added to the image.
+         Otherwise, if image2 is provided, the result will be
+         the sum of image and image2.
 
-    mul: float, If a value is provided, it will be multiplied to the image.
-                Otherwise, if image2 is provided, the result will be
-                the multiplication of image and image2.
+    mul: float
+         If a value is provided, it will be multiplied to the image.
+         Otherwise, if image2 is provided, the result will be
+         the multiplication of image and image2.
 
-    div: float, If a value is provided, it will be divided to the image.
-                Otherwise, if image2 is provided, the result will be
-                the division of image and image2.
+    div: float
+         If a value is provided, it will be divided to the image.
+         Otherwise, if image2 is provided, the result will be
+         the division of image and image2.
 
-    sub: float, If a value is provided, it will be substracted to the image.
-                Otherwise, if image2 is provided, the result will be
-                the substraction of image and image2.
+    sub: float
+         If a value is provided, it will be substracted to the image.
+         Otherwise, if image2 is provided, the result will be
+         the substraction of image and image2.
 
 
     Returns
     -------
-        None
+    None
 
     """
     if not os.path.exists(ImageFile):
