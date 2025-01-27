@@ -42,14 +42,14 @@ class InitGal:
 
     Methods
     -------
-    MakeParams
+    MakeParams : self
         makes GALFIT files with different initial parameters
 
-    MakeBash
+    MakeBash : self
         makes a bash file to run GALFIT on every file created by
         MakeParams method
 
-    ReadFile
+    ReadFile : self
         read a file and returns the lines of the file as a list
 
     """

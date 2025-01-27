@@ -142,13 +142,13 @@ class Galfit:
 
     Methods
     -------
-    ReadHead
+    ReadHead : GalHead
         reads the header of the GALFIT file
 
-    ReadComps
+    ReadComps : GalComps
         reads the galfit components of the GALFIT file
 
-    ReadSky
+    ReadSky : GalSky
         reads the galfit sky components of the GALFIT file
 
     """
@@ -157,7 +157,7 @@ class Galfit:
         self.File = File
 
     def ReadHead(self) -> GalHead:
-        """reads header of galfit file"""
+
         inputf = self.File
 
         galhead = GalHead()  # class for header
@@ -275,8 +275,6 @@ class Galfit:
         return galhead
 
     def ReadComps(self) -> GalComps:
-        """reads all the components in the galfit file"""
-
         File = self.File
 
         galcomps = GalComps()
@@ -424,7 +422,6 @@ class Galfit:
         return galcomps
 
     def ReadSky(self) -> GalSky:
-        """reads the sky value of the galfit file"""
 
         File = self.File
 

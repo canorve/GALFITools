@@ -2180,7 +2180,8 @@ def getDiffx(r, head1, comps1, comps2, theta):
 
 
 class GetIr:
-    """class called by getDiff, getDiffx, getIs
+    """
+    Class called by getDiff, getDiffx, getIs
     to obtain the surface brightness from  a set
     of Sersic functions at different radii
 
@@ -2194,8 +2195,9 @@ class GetIr:
               total surface brightness of the
               set components at R
     Iser : method called by Itotser to obtain
-            the surface brightnness
+           the surface brightnness
            per component at R
+
 
     """
 
