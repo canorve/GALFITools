@@ -1,4 +1,7 @@
+.. _api:
 
+API Reference
+=============
 
 .. contents::
    :depth: 3

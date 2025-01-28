@@ -36,7 +36,7 @@ Contents
    Changelog <changelog>
    Module Reference <api/modules>
    How To <howto>
-
+   API Reference <api>
 
 Indices and tables
 ==================
@@ -63,7 +63,9 @@ Indices and tables
 .. _NumPy style: https://numpydoc.readthedocs.io/en/latest/format.html
 .. _classical style: https://www.sphinx-doc.org/en/master/domains.html#info-field-lists
 .. _classical style: https://www.sphinx-doc.org/en/master/domains.html#info-field-lists
+
 `How to use <docs/howto.rst>`__
+
 `API <docs/api.rst>`__
 
 
