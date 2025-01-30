@@ -278,7 +278,7 @@ def mge2gal(
                     ngauss=initgauss,
                     sigmapsf=psf,
                     scale=scale,
-                    plot=1,
+                    plot=False,
                 )
             else:
                 m = mge_fit_sectors_twist(
@@ -289,7 +289,7 @@ def mge2gal(
                     ngauss=initgauss,
                     sigmapsf=psf,
                     scale=scale,
-                    plot=1,
+                    plot=False,
                 )
 
         else:
@@ -302,7 +302,7 @@ def mge2gal(
                     eps,
                     ngauss=initgauss,
                     scale=scale,
-                    plot=1,
+                    plot=False,
                 )
             else:
                 m = mge_fit_sectors_twist(
@@ -312,7 +312,7 @@ def mge2gal(
                     eps,
                     ngauss=initgauss,
                     scale=scale,
-                    plot=1,
+                    plot=False,
                 )
 
         plt.pause(1)  # Allow plot to appear on the screen
@@ -358,7 +358,7 @@ def mge2gal(
                     ngauss=initgauss,
                     sigmapsf=psf,
                     scale=scale,
-                    plot=1,
+                    plot=False,
                     bulge_disk=0,
                     linear=0,
                 )
@@ -371,7 +371,7 @@ def mge2gal(
                     ngauss=initgauss,
                     sigmapsf=psf,
                     scale=scale,
-                    plot=1,
+                    plot=False,
                     bulge_disk=0,
                     linear=0,
                 )
@@ -387,7 +387,7 @@ def mge2gal(
                     eps,
                     ngauss=initgauss,
                     scale=scale,
-                    plot=1,
+                    plot=False,
                     bulge_disk=0,
                     linear=0,
                 )
@@ -399,7 +399,7 @@ def mge2gal(
                     eps,
                     ngauss=initgauss,
                     scale=scale,
-                    plot=1,
+                    plot=False,
                     bulge_disk=0,
                     linear=0,
                 )
