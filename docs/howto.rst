@@ -1,8 +1,10 @@
 
 .. _howto:
 
-How To
-======
+**GALFITools: Usage Guide**
+============================
+
+
 
 .. contents::
    :depth: 3
@@ -23,8 +25,8 @@ How To
 
 -------------------
 
-**GALFITools: Usage Guide**
-============================
+**Introduction**
+-------------------
 
 GALFITools constitutes a collection of specialized 
 routines aimed at facilitating the utilization of 
