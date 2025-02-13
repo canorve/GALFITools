@@ -125,7 +125,7 @@ Here is tutorial for the installation of GALFITools:
 
 
 In conjunction with the installation, a compilation of pertinent 
-shell `commands <docs/howto.rst>`__ will be incorporated. Subsequently, a comprehensive 
+shell `commands <docs/usage.rst>`__ will be incorporated. Subsequently, a comprehensive 
 evaluation of GALFITools' performance can be conducted through 
 automated tests using the following procedure:
 
@@ -176,7 +176,7 @@ model consisting of three Sersic components:
 
 -----------------
 
-**HOW TO USE**
+**USAGE GUIDE**
 ~~~~~~~~~~~~~~~~~
 
 For comprehensive insights into GALFITools' repertoire 
@@ -184,7 +184,7 @@ of routines and their optimal deployment, it is
 recommended to consult the provided documentation on 
 usage, accessible via the following link: 
 
-`How to use <docs/howto.rst>`__
+`Usage guide <docs/usage.rst>`__
 
 This comprehensive resource elaborates on the 
 practical implementation of each individual routine.

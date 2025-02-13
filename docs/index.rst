@@ -35,7 +35,7 @@ Contents
    Authors <authors>
    Changelog <changelog>
    Module Reference <api/modules>
-   How To <howto>
+   Usage guide <usage>
    API Reference <api>
 
 Indices and tables
@@ -44,7 +44,7 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-* :ref:`howto`
+* :ref:`usage`
 * :ref:`api`
 
 .. _toctree: https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html
@@ -64,7 +64,7 @@ Indices and tables
 .. _classical style: https://www.sphinx-doc.org/en/master/domains.html#info-field-lists
 .. _classical style: https://www.sphinx-doc.org/en/master/domains.html#info-field-lists
 
-`How to use <docs/howto.rst>`__
+`Usage guide <docs/usage.rst>`__
 
 `API <docs/api.rst>`__
 
