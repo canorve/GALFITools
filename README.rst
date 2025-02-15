@@ -240,6 +240,13 @@ functions within your own scripts can be found here:
 
 
 -----------------
+**Contribute**
+~~~~~~~~~~~~~~~~~
+
+
+Issue tracker: `https://github.com/canorve/GALFITools/issues/ <https://github.com/canorve/GALFITools/issues>`__ . 
+
+-----------------
 
 **Community**
 ~~~~~~~~~~~~~~~~~
