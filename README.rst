@@ -244,7 +244,9 @@ functions within your own scripts can be found here:
 ~~~~~~~~~~~~~~~~~
 
 
-Issue tracker: `https://github.com/canorve/GALFITools/issues/ <https://github.com/canorve/GALFITools/issues>`__ . 
+Issue tracker: `issue <https://github.com/canorve/GALFITools/issues>`__. 
+
+
 
 -----------------
 
