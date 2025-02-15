@@ -1,5 +1,5 @@
 
-.. _howto:
+.. _usage:
 
 **GALFITools: Usage Guide**
 ============================

@@ -179,6 +179,8 @@ model consisting of three Sersic components:
 **USAGE GUIDE**
 ~~~~~~~~~~~~~~~~~
 
+For full details read the documentation `https://galfitools.readthedocs.io/en/latest/ <https://galfitools.readthedocs.io/en/latest/>`__.
+
 For comprehensive insights into GALFITools' repertoire 
 of routines and their optimal deployment, it is 
 recommended to consult the provided documentation on 
@@ -235,6 +237,15 @@ functions within your own scripts can be found here:
 `API <docs/api.rst>`__
 
 
+
+
+-----------------
+**Contribute**
+~~~~~~~~~~~~~~~~~
+
+
+Issue tracker: `https://github.com/canorve/GALFITools/issues <https://github.com/canorve/GALFITools/issues>`__. 
+source code: `https://github.com/canorve/GALFITools <https://github.com/canorve/GALFITools>`__. 
 
 -----------------
 
