@@ -179,7 +179,6 @@ model consisting of three Sersic components:
 **USAGE GUIDE**
 ~~~~~~~~~~~~~~~~~
 
-For full details read the documentation `https://galfitools.readthedocs.io/en/latest/ <https://galfitools.readthedocs.io/en/latest/>`__.
 
 For comprehensive insights into GALFITools' repertoire 
 of routines and their optimal deployment, it is 
