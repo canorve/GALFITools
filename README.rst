@@ -239,14 +239,6 @@ functions within your own scripts can be found here:
 
 
 
------------------
-**Contribute**
-~~~~~~~~~~~~~~~~~
-
-
-Issue tracker: `issue <https://github.com/canorve/GALFITools/issues>`__. 
-
-
 
 -----------------
 
