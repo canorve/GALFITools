@@ -246,6 +246,7 @@ functions within your own scripts can be found here:
 
 
 Issue tracker: `https://github.com/canorve/GALFITools/issues <https://github.com/canorve/GALFITools/issues>`__. 
+
 source code: `https://github.com/canorve/GALFITools <https://github.com/canorve/GALFITools>`__. 
 
 
