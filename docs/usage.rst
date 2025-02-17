@@ -46,7 +46,6 @@ of each routine, a explanation of their
 respective parameters can be summoned through 
 the deployment of the "-h" option.
 
-
 The instructional material presented herein is 
 structured into five distinct sections, each 
 devoted to a specific facet of GALFIT's application. 

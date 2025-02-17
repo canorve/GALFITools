@@ -2,7 +2,7 @@
 GALFITools
 ==========
 
-A library for **GALFIT**
+A library for **`GALFIT`_**
 
 
 ..  This is the main page of your project's `Sphinx`_ documentation.
@@ -45,6 +45,9 @@ Indices and tables
 * :ref:`search`
 * :ref:`usage`
 * :ref:`api`
+
+
+.. __GALFIT: https://users.obs.carnegiescience.edu/peng/work/galfit/galfit.html
 
 .. _toctree: https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html
 .. _reStructuredText: https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
