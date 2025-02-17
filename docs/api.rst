@@ -1,7 +1,9 @@
 .. _api:
 
-API Reference
-=============
+**API Reference**
+====================
+
+
 
 .. contents::
    :depth: 3
@@ -21,10 +23,12 @@ API Reference
 
 
 
--------------------
+
+
+--------------------------------
 
 **API Integration Guidelines**
----------------------
+-------------------------------
 
 The integration of GALFITools routines 
 within your custom scripts is facilitated through 

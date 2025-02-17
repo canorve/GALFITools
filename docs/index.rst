@@ -2,11 +2,10 @@
 GALFITools
 ==========
 
-This is the documentation of **GALFITools**.
+A library for **GALFIT**
 
-.. note::
 
-    This is the main page of your project's `Sphinx`_ documentation.
+..  This is the main page of your project's `Sphinx`_ documentation.
     It is formatted in `reStructuredText`_. Add additional pages
     by creating rst-files in ``docs`` and adding them to the `toctree`_ below.
     Use then `references`_ in order to link them from this page, e.g.
