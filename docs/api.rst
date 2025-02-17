@@ -24,8 +24,7 @@ API Reference
 -------------------
 
 **API Integration Guidelines**
-================================
-
+---------------------
 
 The integration of GALFITools routines 
 within your custom scripts is facilitated through 
