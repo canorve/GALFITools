@@ -126,22 +126,6 @@ full documentation along usage guide can be found in `https://galfitools.readthe
 
 
 
------------------
-
-**USAGE GUIDE**
-~~~~~~~~~~~~~~~~~
-
-For comprehensive insights into GALFITools' repertoire 
-of routines and their optimal deployment, it is 
-recommended to consult the provided documentation on 
-usage, accessible via the following link: 
-
-`Usage guide <docs/usage.rst>`__
-
-This comprehensive resource elaborates on the 
-practical implementation of each individual routine.
-
-
 
 ------------------------------
 
