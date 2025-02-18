@@ -175,8 +175,6 @@ cite all versions using the DOI: https://doi.org/10.5281/zenodo.8216472
 **ADDITIONAL RESOURCES**
 --------------------------
 
-Check EllipSect to create surface brightness profiles
-from GALFIT output and estimate other photometric parameters:
 
 For further capabilities and valuable extensions 
 pertaining to GALFIT output, such as the generation of 
