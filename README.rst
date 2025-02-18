@@ -126,7 +126,6 @@ full documentation along usage guide can be found in `https://galfitools.readthe
 
 
 
-
 ------------------------------
 
 **CONTRIBUTING AND SUPPORT**
@@ -154,21 +153,6 @@ GALFITools, for the betterment of the *GALFIT* community and beyond.
 The codebase of GALFITools is governed by the terms of the **MIT** license.
 
 
----------------------
-
-**API REFERENCE**
-~~~~~~~~~~~~~~~~~~~~
-
-
-For the customization of these functions 
-to align with your specific scripting requirements, 
-the API documentation serves as an indispensable resource. 
-The detailed instructions for utilizing these 
-functions within your own scripts can be found here: 
-
-`API <docs/api.rst>`__
-
-
 ----------------------
 
 **CITING GALFITOOLS**
@@ -188,7 +172,7 @@ cite all versions using the DOI: https://doi.org/10.5281/zenodo.8216472
 
 --------------------------
 
-**Additional Resources**
+**ADDITIONAL RESOURCES**
 --------------------------
 
 Check EllipSect to create surface brightness profiles
@@ -201,8 +185,6 @@ photometric parameters, we invite you to explore the
 EllipSect tool: 
 
 `EllipSect <https://github.com/canorve/EllipSect>`__
-
-
 
 
 .. _pyscaffold-notes:
