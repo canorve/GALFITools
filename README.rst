@@ -40,7 +40,6 @@ GALFITools
 ==========
 
 
-A library for  `GALFIT`_ 
 
 `GALFIT`_, a well-established two-dimensional image fitting algorithm, 
 as outlined in the work by Peng et al. (2002, AJ, 124, 266), 
@@ -222,6 +221,52 @@ with GALFITools v1.11.0:
 
 
 
+
+
+-----------------
+
+**CONTRIBUTE**
+~~~~~~~~~~~~~~~~~
+
+
+- Issue tracker: `https://github.com/canorve/GALFITools/issues <https://github.com/canorve/GALFITools/issues>`__. 
+
+- Source code: `https://github.com/canorve/GALFITools <https://github.com/canorve/GALFITools>`__. 
+
+
+
+-----------------
+
+**CODE OF CONDUCT**
+~~~~~~~~~~~~~~~~~
+
+Check the `CODE OF CONDUCT <CODE_OF_CONDUCT.md>`__
+
+
+
+
+
+
+--------------
+
+**SUPPORT**
+--------------
+
+Let us know if you have issues, questions or innovative suggestions arise, 
+we encourage you to reach out via email to  canorve [at] gmail [dot] com  
+or initiate a discussion by opening an  `issue <https://github.com/canorve/GALFITools/issues>`__.  
+Your input is invaluable in fostering the continual refinement of 
+GALFITools, for the betterment of the *GALFIT* community and beyond.
+
+
+--------------
+
+**LICENSE**
+--------------
+
+The codebase of GALFITools is governed by the terms of the **MIT** license.
+
+
 ---------------------
 
 **API Reference**
@@ -237,34 +282,12 @@ functions within your own scripts can be found here:
 `API <docs/api.rst>`__
 
 
-
-
------------------
-
-**Contribute**
-~~~~~~~~~~~~~~~~~
-
-
-- Issue tracker: `https://github.com/canorve/GALFITools/issues <https://github.com/canorve/GALFITools/issues>`__. 
-
-- Source code: `https://github.com/canorve/GALFITools <https://github.com/canorve/GALFITools>`__. 
-
-
-
------------------
-
-**Community**
-~~~~~~~~~~~~~~~~~
-
-Check the `CODE OF CONDUCT <CODE_OF_CONDUCT.md>`__
-
-
 -----------
 
 **Cite as**
 -----------
 
-To acknowledge the utility of GALFITools in your research, 
+If you find this code useful in your research, 
 we kindly request that you cite it as follows:
 
 Añorve, C. (2024). canorve/GALFITools: GALFITools v1.15.0 (v1.15.0). 
@@ -272,6 +295,8 @@ Zenodo. https://doi.org/10.5281/zenodo.13994492
 
 
 cite all versions using the DOI: https://doi.org/10.5281/zenodo.8216472
+
+
 
 
 
@@ -290,29 +315,6 @@ photometric parameters, we invite you to explore the
 EllipSect tool: 
 
 `EllipSect <https://github.com/canorve/EllipSect>`__
-
-
-
---------------
-
-**Questions?**
---------------
-
-
-Should any questions or innovative suggestions arise, 
-we encourage you to reach out via email to  canorve [at] gmail [dot] com  
-or initiate a discussion by opening an  `issue <https://github.com/canorve/GALFITools/issues>`__.  
-Your input is invaluable in fostering the continual refinement of 
-GALFITools, for the betterment of the *GALFIT* community and beyond.
-
-
-
---------------
-
-**License**
---------------
-
-The codebase of GALFITools is governed by the terms of the **MIT** license.
 
 
 
