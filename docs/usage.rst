@@ -65,8 +65,42 @@ single component or multiple components. For instance,
 a barred galaxy can be model by 3 components: bulge, bar
 and disk. 
 
+
+
+**VIDEO TUTORIALS**
+------------------
+
+For the videos, please turn on English subtitles.
+
+Here is a tutorial video for galaxy NGC720 using GALFITools:
+
+
+.. image:: https://img.youtube.com/vi/2npeGmC1mCg/maxresdefault.jpg
+    :alt: IMAGE ALT TEXT HERE
+    :target: https://www.youtube.com/watch?v=2npeGmC1mCg
+
+
+
+Here is another for galaxy NGC1198 using GALFITools:
+
+.. image:: https://img.youtube.com/vi/VmJJkKVd37U/maxresdefault.jpg
+    :alt: IMAGE ALT TEXT HERE
+    :target: https://www.youtube.com/watch?v=VmJJkKVd37U
+
+
+Here we model the barred spiral galaxy PGC 34232
+with GALFITools v1.11.0:
+
+.. image:: https://img.youtube.com/vi/wUA-sigVSts/maxresdefault.jpg
+    :alt: IMAGE ALT TEXT HERE
+    :target: https://www.youtube.com/watch?v=wUA-sigVSts
+
+
+
+
 **GALFIT INPUT**
 ------------------
+
 Routines that aid the GALFIT's user to
 prepare the necessary files for GALFIT input 
 
@@ -808,12 +842,4 @@ around the galaxy.
     -c, --center  use the center of the ellipse. Otherwise it will use the (x,y) position with the highest value of the ellipse
 
 
---------------
-
-**Questions?**
---------------
-
-
-Something is not clear for you or do you have further questions?
-write to me at canorve [at] gmail [dot] com 
 

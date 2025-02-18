@@ -35,11 +35,9 @@
    :target: CODE_OF_CONDUCT.md 
 
 
-==========
-GALFITools
-==========
-
-
+============
+GALFITOOLS
+============
 
 `GALFIT`_, a well-established two-dimensional image fitting algorithm, 
 as outlined in the work by Peng et al. (2002, AJ, 124, 266), 
@@ -49,10 +47,6 @@ as an collection of Python routines. These routines
 enhances the input and output parsing associated with GALFIT.
 
 
-
-.. _GALFIT: https://users.obs.carnegiescience.edu/peng/work/galfit/galfit.html
-
-
 GALFITools extends its utility through an array of functionalities, 
 including the facilitation of mask creation, star selection for PSFs, generation 
 of multiple initial parameters, simulate galaxy images, multigaussian 
@@ -60,50 +54,22 @@ expansion (MGE) fitting, as well as computation of sky background
 and other pertinent photometric variables.
 
 
-
-
---------------------------------
-
-**Installation Instructions**
--------------------------------
+.. _GALFIT: https://users.obs.carnegiescience.edu/peng/work/galfit/galfit.html
 
 
 
-The python libraries required are:
+-----------------------------------
 
--  numpy
--  astropy
--  scipy
--  matplotlib
--  mgefit
+**INSTALLATION INSTRUCTIONS**
+-----------------------------------
 
+First of all, install `GALFIT`_ if you haven't done so. Check
+instructions `here <https://users.obs.carnegiescience.edu/peng/work/galfit/galfit.html`__.
+Make sure that GALFIT can run in any path in your *linux/macOS* terminal.
 
+*Optionally*, consider setting up a virtual environment.
 
-Install `GALFIT`_ if you haven't done so. Make sure
-that GALFIT can run in any path in your terminal.
-
-
-*Optionally*, the establishment of a virtual environment can be considered.
-
-
-The latest release of GALFITools can be downloaded 
-and subsequently installed via one of the following methods:
-
-
-::
-
-   cd GALFITools 
-   pip install . 
-
-or
-
-::
-
-   cd GALFITools 
-   python setup.py install
-
-
-Alternatively, you can install it via pip:
+Install GALFITools via pip:
 
 
 ::
@@ -111,8 +77,7 @@ Alternatively, you can install it via pip:
    pip install GALFITools 
 
 
-
-Here is tutorial for the installation of GALFITools:
+Here is video tutorial for the installation of GALFITools:
 
 
 .. image:: https://img.youtube.com/vi/rqZLxR1yRCs/maxresdefault.jpg
@@ -121,35 +86,15 @@ Here is tutorial for the installation of GALFITools:
 
 
 
+--------------------------------
 
+**GET STARTED WITH GALFITOOLS**
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In conjunction with the installation, a compilation of pertinent 
-shell `commands <docs/usage.rst>`__ will be incorporated. Subsequently, a comprehensive 
-evaluation of GALFITools' performance can be conducted through 
-automated tests using the following procedure:
-
-To run the tests locally, install and invoke tox:
-
-::
-   
-   pip install tox
-
-
-run the tests:
-
-::
-
-    tox 
-
------------------
-
-**Get Started with GALFITools**
-~~~~~~~~~~~~~~~~~
-
-Once installed, you can test galfitools using any of 
+Once installed, you can test GALFITools using any of 
 the commands in the console. 
 
-In the example below, getReComp is used with the output GALFIT file 
+In the example below, command *getReComp* is used with the output GALFIT file 
 `galfit.01 <img/galfit.01>`__  to calculate the effective radius for a composite 
 model consisting of three Sersic components:
 
@@ -172,13 +117,19 @@ model consisting of three Sersic components:
   The radius at 50% of light is 199.64 pixels or 49.91 " 
 
 
+-----------------
+
+**DOCUMENTATION**
+~~~~~~~~~~~~~~~~~
+
+full documentation along usage guide can be found in `https://galfitools.readthedocs.io/en/latest/ <https://galfitools.readthedocs.io/en/latest/>`__.
+
+
 
 -----------------
 
 **USAGE GUIDE**
 ~~~~~~~~~~~~~~~~~
-
-For full details read the documentation `https://galfitools.readthedocs.io/en/latest/ <https://galfitools.readthedocs.io/en/latest/>`__.
 
 For comprehensive insights into GALFITools' repertoire 
 of routines and their optimal deployment, it is 
@@ -191,72 +142,24 @@ This comprehensive resource elaborates on the
 practical implementation of each individual routine.
 
 
-**Video Tutorials:**
 
-Turn on English subtitles.
+------------------------------
 
-Here is a tutorial video for galaxy NGC720 using GALFITools:
-
-
-
-.. image:: https://img.youtube.com/vi/2npeGmC1mCg/maxresdefault.jpg
-    :alt: IMAGE ALT TEXT HERE
-    :target: https://www.youtube.com/watch?v=2npeGmC1mCg
-
-
-
-Here is another for galaxy NGC1198 using GALFITools:
-
-.. image:: https://img.youtube.com/vi/VmJJkKVd37U/maxresdefault.jpg
-    :alt: IMAGE ALT TEXT HERE
-    :target: https://www.youtube.com/watch?v=VmJJkKVd37U
-
-
-Here I model the barred spiral galaxy PGC 34232
-with GALFITools v1.11.0:
-
-.. image:: https://img.youtube.com/vi/wUA-sigVSts/maxresdefault.jpg
-    :alt: IMAGE ALT TEXT HERE
-    :target: https://www.youtube.com/watch?v=wUA-sigVSts
-
-
-
-
-
------------------
-
-**CONTRIBUTE**
-~~~~~~~~~~~~~~~~~
-
-
-- Issue tracker: `https://github.com/canorve/GALFITools/issues <https://github.com/canorve/GALFITools/issues>`__. 
-
-- Source code: `https://github.com/canorve/GALFITools <https://github.com/canorve/GALFITools>`__. 
-
-
-
------------------
-
-**CODE OF CONDUCT**
-~~~~~~~~~~~~~~~~~
-
-Check the `CODE OF CONDUCT <CODE_OF_CONDUCT.md>`__
-
-
-
-
-
-
---------------
-
-**SUPPORT**
---------------
+**CONTRIBUTING AND SUPPORT**
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Let us know if you have issues, questions or innovative suggestions arise, 
 we encourage you to reach out via email to  canorve [at] gmail [dot] com  
 or initiate a discussion by opening an  `issue <https://github.com/canorve/GALFITools/issues>`__.  
 Your input is invaluable in fostering the continual refinement of 
 GALFITools, for the betterment of the *GALFIT* community and beyond.
+
+
+- Issue tracker: `https://github.com/canorve/GALFITools/issues <https://github.com/canorve/GALFITools/issues>`__. 
+
+- Source code: `https://github.com/canorve/GALFITools <https://github.com/canorve/GALFITools>`__. 
+
+- `CODE OF CONDUCT <CODE_OF_CONDUCT.md>`__
 
 
 --------------
@@ -269,7 +172,7 @@ The codebase of GALFITools is governed by the terms of the **MIT** license.
 
 ---------------------
 
-**API Reference**
+**API REFERENCE**
 ~~~~~~~~~~~~~~~~~~~~
 
 
@@ -282,10 +185,10 @@ functions within your own scripts can be found here:
 `API <docs/api.rst>`__
 
 
------------
+----------------------
 
-**Cite as**
------------
+**CITING GALFITOOLS**
+-----------------------
 
 If you find this code useful in your research, 
 we kindly request that you cite it as follows:
@@ -295,7 +198,6 @@ Zenodo. https://doi.org/10.5281/zenodo.13994492
 
 
 cite all versions using the DOI: https://doi.org/10.5281/zenodo.8216472
-
 
 
 
