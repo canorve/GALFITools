@@ -89,7 +89,7 @@ Here is video tutorial for the installation of GALFITools:
 --------------------------------
 
 **GET STARTED WITH GALFITOOLS**
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------
 
 Once installed, you can test GALFITools using any of 
 the commands in the console. 
@@ -120,7 +120,7 @@ model consisting of three Sersic components:
 -----------------
 
 **DOCUMENTATION**
-~~~~~~~~~~~~~~~~~
+-----------------------------------
 
 full documentation along usage guide can be found in `https://galfitools.readthedocs.io/en/latest/ <https://galfitools.readthedocs.io/en/latest/>`__.
 
@@ -129,7 +129,7 @@ full documentation along usage guide can be found in `https://galfitools.readthe
 ------------------------------
 
 **CONTRIBUTING AND SUPPORT**
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------
 
 Let us know if you have issues, questions or innovative suggestions arise, 
 we encourage you to reach out via email to  canorve [at] gmail [dot] com  
@@ -189,8 +189,9 @@ EllipSect tool:
 
 
 ====
+
 Note
-====
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This project has been set up using PyScaffold 4.2.1. For details and usage
 information on PyScaffold see https://pyscaffold.org/.

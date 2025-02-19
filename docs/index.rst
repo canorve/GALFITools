@@ -66,8 +66,6 @@ Indices and tables
 .. _classical style: https://www.sphinx-doc.org/en/master/domains.html#info-field-lists
 .. _classical style: https://www.sphinx-doc.org/en/master/domains.html#info-field-lists
 
-`Usage guide <docs/usage.rst>`__
 
-`API <docs/api.rst>`__
 
 
