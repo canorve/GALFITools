@@ -1195,12 +1195,4 @@ Routines that compute the sky background
 
 
 
---------------
-
-**Questions?**
---------------
-
-
-Something is not clear for you or do you have further questions?
-write to me at canorve [at] gmail [dot] com 
 
