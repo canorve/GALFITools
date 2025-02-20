@@ -146,7 +146,7 @@ GALFITools, for the betterment of the *GALFIT* community and beyond.
 
 - `Contributions and help <https://galfitools.readthedocs.io/en/latest/contributing.html>`__. 
 
-- :doc:`contributing <CONTRIBUTING>`__ 
+- `contributing <CONTRIBUTING>`__ 
 
 --------------
 
