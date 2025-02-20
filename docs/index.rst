@@ -30,6 +30,7 @@ Contents
 
    Overview <readme>
    Contributions & Help <contributing>
+   Code of conduct  <../CODE_OF_CONDUCT.md>
    License <license>
    Authors <authors>
    Changelog <changelog>

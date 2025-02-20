@@ -146,6 +146,7 @@ GALFITools, for the betterment of the *GALFIT* community and beyond.
 
 :doc: `Contributing <contributing>`
 See :doc:`contributing` 
+
 - :doc: `Code of conduct <../CODE_OF_CONDUCT.md>`
 
 
