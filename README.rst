@@ -36,7 +36,7 @@
 
 
 ============
-GALFITOOLS
+GALFITools
 ============
 
 `GALFIT`_, a well-established two-dimensional image fitting algorithm, 
@@ -60,7 +60,7 @@ and other pertinent photometric variables.
 
 -----------------------------------
 
-**INSTALLATION INSTRUCTIONS**
+**Installation Instructions**
 -----------------------------------
 
 First of all, install `GALFIT`_ if you haven't done so. Check
@@ -89,7 +89,7 @@ Here is video tutorial for the installation of GALFITools:
 
 ------------------------------------
 
-**GET STARTED WITH GALFITOOLS**
+**Get Started with GALFITools**
 -----------------------------------
 
 Once installed, you can test GALFITools using any of 
@@ -121,7 +121,7 @@ with three Sersic components:
 
 -------------------
 
-**DOCUMENTATION**
+**Documentation**
 -------------------
 
 Full documentation along usage guide can be found in `https://galfitools.readthedocs.io/en/latest/ <https://galfitools.readthedocs.io/en/latest/>`__.
@@ -130,7 +130,7 @@ Full documentation along usage guide can be found in `https://galfitools.readthe
 
 ------------------------------
 
-**CONTRIBUTING AND SUPPORT**
+**Contributing and Support**
 -------------------------------
 
 Let us know if you have issues, questions or innovative suggestions arise, 
@@ -149,7 +149,7 @@ GALFITools, for the betterment of the *GALFIT* community and beyond.
 
 --------------
 
-**LICENSE**
+**License**
 --------------
 
 The codebase of GALFITools is governed by the terms of the **MIT** license.
@@ -157,7 +157,7 @@ The codebase of GALFITools is governed by the terms of the **MIT** license.
 
 ----------------------
 
-**CITING GALFITOOLS**
+**Credit / Citation**
 -----------------------
 
 If you find this code useful in your research, 
@@ -171,10 +171,9 @@ cite all versions using the DOI: https://doi.org/10.5281/zenodo.8216472
 
 
 
-
 --------------------------
 
-**ADDITIONAL RESOURCES**
+**Additonal Resources**
 --------------------------
 
 
@@ -192,7 +191,7 @@ EllipSect tool:
 
 ====
 
-NOTE
+Note
 ~~~~~~
 
 This project has been set up using PyScaffold 4.2.1. For details and usage
