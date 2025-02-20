@@ -68,7 +68,7 @@ and disk.
 
 
 **VIDEO TUTORIALS**
-------------------
+---------------------
 
 For the videos, please turn on English subtitles.
 
