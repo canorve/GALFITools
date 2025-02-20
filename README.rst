@@ -36,7 +36,6 @@
 
 
 ============
-
 GALFITOOLS
 ============
 
@@ -144,6 +143,9 @@ GALFITools, for the betterment of the *GALFIT* community and beyond.
 - Issue tracker: `https://github.com/canorve/GALFITools/issues <https://github.com/canorve/GALFITools/issues>`__. 
 
 - Source code: `https://github.com/canorve/GALFITools <https://github.com/canorve/GALFITools>`__. 
+
+- :doc: `Contributing <contributing>`__
+
 
 - `CODE OF CONDUCT <CODE_OF_CONDUCT.md>`__
 
