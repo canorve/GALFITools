@@ -144,10 +144,10 @@ GALFITools, for the betterment of the *GALFIT* community and beyond.
 
 - Source code: `https://github.com/canorve/GALFITools <https://github.com/canorve/GALFITools>`__. 
 
-- `Contributing <CONTRIBUTING.rst>`__
+- :doc: `Contributing <contributing>`
 
+- :doc: `Code of conduct <../CODE_OF_CONDUCT.md>`
 
-- `CODE OF CONDUCT <CODE_OF_CONDUCT.md>`__
 
 
 --------------

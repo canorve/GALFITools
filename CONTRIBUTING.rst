@@ -78,7 +78,7 @@ that any documentation update is done in the same way was a code contribution.
 
 .. todo:: If your project is hosted on GitHub, you can also mention the following tip:
 
-   .. tip::
+.. tip::
       Please notice that the `GitHub web interface`_ provides a quick way of
       propose changes in ``GALFITools``'s files. While this mechanism can
       be tricky for normal code contributions, it works perfectly fine for
@@ -314,8 +314,8 @@ on PyPI_, the following steps can be used to release a new version for
 .. |the repository service| replace:: GitHub
 .. |contribute button| replace:: "Create pull request"
 
-.. _repository: https://github.com/<USERNAME>/GALFITools
-.. _issue tracker: https://github.com/<USERNAME>/GALFITools/issues
+.. _repository: https://github.com/canorve/GALFITools
+.. _issue tracker: https://github.com/canorve/GALFITools/issues
 .. <-- end -->
 
 
