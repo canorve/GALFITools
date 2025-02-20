@@ -94,13 +94,14 @@ Here is video tutorial for the installation of GALFITools:
 Once installed, you can test GALFITools using any of 
 the commands in the console. 
 
-In the example below, command *getReComp* is used with the output GALFIT file 
-`galfit.01 <img/galfit.01>`__  to calculate the effective radius for a composite 
-model consisting of three Sersic components:
+In the example below, the command *getReComp* is executed in a terminal 
+using the GALFIT output file 
+`galfit.01 <img/galfit.01>`__  to calculate the effective radius of a model 
+with three Sersic components:
 
 ::
    
-  ❯ getReComp galfit.01
+  $ getReComp galfit.01
   GALFITools: a library for GALFIT
   Version: 1.14.1
   webpage: https://github.com/canorve/GALFITools
