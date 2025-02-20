@@ -144,9 +144,9 @@ GALFITools, for the betterment of the *GALFIT* community and beyond.
 
 - Source code: `https://github.com/canorve/GALFITools <https://github.com/canorve/GALFITools>`__. 
 
-- `Contributions and help <https://galfitools.readthedocs.io/en/latest/contributing.html>` 
+- `Contributions and help <https://galfitools.readthedocs.io/en/latest/contributing.html>`__. 
 
-
+- :doc:`contributing <CONTRIBUTING>`__ 
 
 --------------
 
