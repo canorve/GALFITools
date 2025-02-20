@@ -64,8 +64,9 @@ and other pertinent photometric variables.
 -----------------------------------
 
 First of all, install `GALFIT`_ if you haven't done so. Check
-instructions `here <https://users.obs.carnegiescience.edu/peng/work/galfit/galfit.html`__.
+instructions `here <https://users.obs.carnegiescience.edu/peng/work/galfit/galfit.html/>`__.
 Make sure that GALFIT can run in any path in your *linux/macOS* terminal.
+
 
 *Optionally*, consider setting up a virtual environment.
 
