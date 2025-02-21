@@ -1,26 +1,3 @@
-.. todo:: THIS IS SUPPOSED TO BE AN EXAMPLE. MODIFY IT ACCORDING TO YOUR NEEDS!
-
-   The document assumes you are using a source repository service that promotes a
-   contribution model similar to `GitHub's fork and pull request workflow`_.
-   While this is true for the majority of services (like GitHub, GitLab,
-   BitBucket), it might not be the case for private repositories (e.g., when
-   using Gerrit).
-
-   Also notice that the code examples might refer to GitHub URLs or the text
-   might use GitHub specific terminology (e.g., *Pull Request* instead of *Merge
-   Request*).
-
-   Please make sure to check the document having these assumptions in mind
-   and update things accordingly.
-
-.. todo:: Provide the correct links/replacements at the bottom of the document.
-
-.. todo:: You might want to have a look on `PyScaffold's contributor's guide`_,
-
-   especially if your project is open source. The text should be very similar to
-   this template, but there are a few extra contents that you might decide to
-   also include, like mentioning labels of your issue tracker or automated
-   releases.
 
 
 ============
@@ -39,8 +16,8 @@ listed in the excellent `guide created by FreeCodeCamp`_ [#contrib1]_.
 
 Please notice, all users and contributors are expected to be **open,
 considerate, reasonable, and respectful**. When in doubt, `Python Software
-Foundation's Code of Conduct`_ is a good reference in terms of behavior
-guidelines.
+Foundation's Code of Conduct`_  or Covenant Code of Conduct are good references 
+in terms of behavior guidelines.
 
 
 Issue Reports
@@ -70,13 +47,9 @@ by adding missing information and correcting mistakes.
 
 ``GALFITools`` documentation uses Sphinx_ as its main documentation compiler.
 This means that the docs are kept in the same repository as the project code, and
-that any documentation update is done in the same way was a code contribution.
+that any documentation update is done in the same way was a code contribution. 
+The markup language is reStructuredText_.
 
-.. todo:: Don't forget to mention which markup language you are using.
-
-    e.g.,  reStructuredText_ or CommonMark_ with MyST_ extensions.
-
-.. todo:: If your project is hosted on GitHub, you can also mention the following tip:
 
 .. tip::
       Please notice that the `GitHub web interface`_ provides a quick way of
@@ -106,11 +79,12 @@ and use Python's built-in web server for a preview in your web browser
 Code Contributions
 ==================
 
-.. todo:: Please include a reference or explanation about the internals of the project.
 
-   An architecture description, design principles or at least a summary of the
-   main concepts will make it easy for potential contributors to get started
-   quickly.
+The functions in this project are designed to serve two primary purposes: 
+They can be used for argument parsing in the terminal, as demonstrated in the 
+tutorials, and they can also serve as examples for API usage. Please keep this 
+in mind when making code contributions.
+
 
 Submit an issue
 ---------------
@@ -182,7 +156,6 @@ Implement your changes
 
    to record your changes in git_.
 
-   .. todo:: if you are not using pre-commit, please remove the following item:
 
    Please make sure to see the validation messages from |pre-commit|_ and fix
    any eventual issues.
@@ -218,11 +191,10 @@ Submit your contribution
 #. Go to the web page of your fork and click |contribute button|
    to send your changes for review.
 
-   .. todo:: if you are using GitHub, you can uncomment the following paragraph
 
-      Find more detailed information in `creating a PR`_. You might also want to open
-      the PR as a draft first and mark it as ready for review after the feedbacks
-      from the continuous integration (CI) system or any required fixes.
+    Find more detailed information in `creating a PR`_. You might also want to open
+    the PR as a draft first and mark it as ready for review after the feedbacks
+    from the continuous integration (CI) system or any required fixes.
 
 
 Troubleshooting
@@ -278,10 +250,6 @@ Maintainer tasks
 Releases
 --------
 
-.. todo:: This section assumes you are using PyPI to publicly release your package.
-
-   If instead you are using a different/private package index, please update
-   the instructions accordingly.
 
 If you are part of the group of maintainers and have correct user permissions
 on PyPI_, the following steps can be used to release a new version for
