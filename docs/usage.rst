@@ -68,6 +68,8 @@ Before presenting the five sections of the instructional
 material, we will show three video tutorials to demonstrate 
 the full capabilities of GALFITools in action.
 
+---------------------
+
 **Video Tutorials**
 ---------------------
 
@@ -98,9 +100,10 @@ with GALFITools v1.11.0:
 
 
 
+---------------------
 
 **GALFIT Input**
-------------------
+--------------------
 
 Routines that aid the GALFIT's user to
 prepare the necessary files for GALFIT input 
@@ -396,8 +399,11 @@ such as Boxes, Ellipses and Polygons
                           number of gaussians that will be used for galfit.
 
 
+---------------------
+
 **GALFIT Output**
 -------------------
+
 Routines that computes photometric variables from 
 the surface brightness models fitted by GALFIT 
 
@@ -701,6 +707,9 @@ second component in galfit file galfit.XX
     -rx RANX RANX, --ranx RANX RANX
                           x-axis range to search for the Break and Kappa radius: xmin - xmax
 
+
+-----------------
+
 **MGE**
 ---------------
 
@@ -762,8 +771,12 @@ Routines that use the Multi-Gaussian Expansion.
     -r2 RAD2, --rad2 RAD2
                           value for a second vertical line to add into the plot
 
+
+
+-----------------
 **SIM**
 ---------------
+
 Routines that make a simulated galaxy image using GALFIT.
 
 **makeSim** simulates a observed galaxy from a GALFIT model. It 
@@ -780,6 +793,9 @@ adds Poisson and sky noise to the image.
     -std STD, --std STD   the sky standard deviation. default = 1
     -g GAIN, --gain GAIN  the gain value of the image. default = 1
 
+
+
+-------------
 **Sky**
 -------------
 
