@@ -22,9 +22,10 @@
 
 
 
-=======================
+---------------------
+
 **Introduction**
-=======================
+---------------------
 
 GALFITools constitutes a collection of specialized 
 routines aimed at facilitating the utilization of 
