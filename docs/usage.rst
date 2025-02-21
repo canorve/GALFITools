@@ -64,7 +64,9 @@ single component or multiple components. For instance,
 a barred galaxy can be model by 3 components: bulge, bar
 and disk. 
 
-
+Before presenting the five sections of the instructional 
+material, we will show three video tutorials to demonstrate 
+the full capabilities of GALFITools in action.
 
 **Video Tutorials**
 ---------------------

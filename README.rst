@@ -78,7 +78,8 @@ Install GALFITools via pip:
    pip install GALFITools 
 
 
-Here is video tutorial for the installation of GALFITools:
+Here is a detailed video tutorial on installing GALFITools 
+using a virtual environment created with Conda:
 
 
 .. image:: https://img.youtube.com/vi/rqZLxR1yRCs/maxresdefault.jpg
