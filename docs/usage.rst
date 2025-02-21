@@ -53,10 +53,11 @@ These sections are delineated as follows: GALFIT Input,
 GALFIT Output, Multi-Gaussian Expansion (MGE), 
 Simulation of galaxy images, and Sky Computation.
 
-.. important:: Routines necessitating the utilization of a Ds9 
-          region input, need that the Ds9 region to be saved in image 
-          (or physical) coordinates. Ds9 regions saved in the World
-          Coordinate System (WCS) coordinates will not work.
+.. important:: Routines that require the use of a DS9 region 
+               file as input need the region to be saved in 
+               **image** (or **physical**) coordinates. DS9 regions 
+               saved in **World Coordinate System (WCS)** coordinates 
+               will not function correctly.
 
 
 This section explains how to use the GALFITools routines. 
