@@ -53,10 +53,17 @@ These sections are delineated as follows: GALFIT Input,
 GALFIT Output, Multi-Gaussian Expansion (MGE), 
 Simulation of galaxy images, and Sky Computation.
 
-**Note**: Routines necessitating the utilization of a Ds9 
-region input, need that the Ds9 region to be saved in image 
-(or physical) coordinates. Ds9 regions saved in the World
-Coordinate System (WCS) coordinates will not work.
+.. Note:: Routines necessitating the utilization of a Ds9 
+          region input, need that the Ds9 region to be saved in image 
+          (or physical) coordinates. Ds9 regions saved in the World
+          Coordinate System (WCS) coordinates will not work.
+
+
+This section explains how to use the GALFITools routines. 
+All of these routines are *shell commands*. If you wish to use 
+the Python functions underlying these routines within 
+your own scripts, please refer to the :doc:`api` section.
+
 
 Components refer to individual surface brightness 
 models, each following a specific order within 
@@ -66,7 +73,7 @@ a barred galaxy can be model by 3 components: bulge, bar
 and disk. 
 
 Before presenting the five sections of the instructional 
-material, we will show three video tutorials to demonstrate 
+material, check the  three video tutorials below which show 
 the full capabilities of GALFITools in action.
 
 ---------------------
