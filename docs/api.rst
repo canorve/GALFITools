@@ -39,7 +39,7 @@ invoking the routines for specific tasks.
 To comprehensively comprehend the invocational 
 mechanics, it is advisable to reference the Python 
 scripts located in the directory "src/galfitools/shell/commands_*.py". 
-These scripts serve as exemplars, illustrating 
+These scripts serve as examples, illustrating 
 the precise syntax and methodologies for calling 
 the respective routines. Analyzing these scripts 
 aids in the assimilation of the necessary syntax 
