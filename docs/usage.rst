@@ -57,7 +57,7 @@ Simulation of galaxy images, and Sky Computation.
                file as input need the region to be saved in 
                **image** (or **physical**) coordinates. DS9 regions 
                saved in **World Coordinate System (WCS)** coordinates 
-               will not function correctly.
+               will not work.
 
 
 This section explains how to use the GALFITools routines. 
@@ -65,7 +65,18 @@ All of these routines are *shell commands*. If you wish to use
 the Python functions underlying these routines within 
 your own scripts, please check to the :doc:`api`.
 
-Components refer to individual surface brightness 
+Many of the routines (specially the **GALFIT Output** routines)
+require the GALFIT output file (named galfit.XX where XX refer
+to a numbers). Those files are generated after GALFIT have finished
+a fit. Those files are used as a input parsing in those routines.
+
+Many of the routines (particularly the **GALFIT Output** routines) 
+require the GALFIT output file, typically named "galfit.XX", where 
+"XX" refers to a numerical identifier. These files are generated 
+after GALFIT completes a fitting process. They serve as input for 
+parsing data within these routines.
+
+Components within the GALFIT file refer to individual surface brightness 
 models, each following a specific order within 
 the GALFIT file. A galaxy can be composed of a 
 single component or multiple components. For instance,
