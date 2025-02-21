@@ -53,7 +53,7 @@ These sections are delineated as follows: GALFIT Input,
 GALFIT Output, Multi-Gaussian Expansion (MGE), 
 Simulation of galaxy images, and Sky Computation.
 
-.. Note:: Routines necessitating the utilization of a Ds9 
+.. important:: Routines necessitating the utilization of a Ds9 
           region input, need that the Ds9 region to be saved in image 
           (or physical) coordinates. Ds9 regions saved in the World
           Coordinate System (WCS) coordinates will not work.
@@ -62,8 +62,7 @@ Simulation of galaxy images, and Sky Computation.
 This section explains how to use the GALFITools routines. 
 All of these routines are *shell commands*. If you wish to use 
 the Python functions underlying these routines within 
-your own scripts, please refer to the :doc:`api` section.
-
+your own scripts, please check to the :doc:`api`.
 
 Components refer to individual surface brightness 
 models, each following a specific order within 
@@ -782,6 +781,7 @@ Routines that use the Multi-Gaussian Expansion.
 
 
 -----------------
+
 **SIM**
 ---------------
 
@@ -804,6 +804,7 @@ adds Poisson and sky noise to the image.
 
 
 -------------
+
 **Sky**
 -------------
 
