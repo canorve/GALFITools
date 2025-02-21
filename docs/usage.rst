@@ -22,10 +22,9 @@
 
 
 
--------------------
-
+=======================
 **Introduction**
--------------------
+=======================
 
 GALFITools constitutes a collection of specialized 
 routines aimed at facilitating the utilization of 
@@ -67,7 +66,7 @@ and disk.
 
 
 
-**VIDEO TUTORIALS**
+**Video Tutorials**
 ---------------------
 
 For the videos, please turn on English subtitles.
@@ -98,7 +97,7 @@ with GALFITools v1.11.0:
 
 
 
-**GALFIT INPUT**
+**GALFIT Input**
 ------------------
 
 Routines that aid the GALFIT's user to
@@ -395,7 +394,7 @@ such as Boxes, Ellipses and Polygons
                           number of gaussians that will be used for galfit.
 
 
-**GALFIT OUTPUT**
+**GALFIT Output**
 -------------------
 Routines that computes photometric variables from 
 the surface brightness models fitted by GALFIT 
@@ -779,7 +778,7 @@ adds Poisson and sky noise to the image.
     -std STD, --std STD   the sky standard deviation. default = 1
     -g GAIN, --gain GAIN  the gain value of the image. default = 1
 
-**SKY**
+**Sky**
 -------------
 
 Routines that compute the sky background.
