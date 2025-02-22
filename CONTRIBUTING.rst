@@ -161,7 +161,7 @@ Implement your changes
    This should automatically use flake8_/black_ to check/fix the code style
    in a way that is compatible with the project.
 
-   .. important:: Don't forget to add unit tests and documentation in case your
+   .. important:: Don't forget to add automated tests and documentation in case your
       contribution adds an additional feature and is not just a bugfix.
 
       Moreover, writing a `descriptive commit message`_ is highly recommended.
@@ -171,7 +171,7 @@ Implement your changes
 
       to look for recurring communication patterns.
 
-#. Please check that your changes don't break any unit tests with::
+#. Please check that your changes don't break any automated tests with::
 
     tox
 
@@ -254,7 +254,7 @@ If you are part of the group of maintainers and have correct user permissions
 on PyPI_, the following steps can be used to release a new version for
 ``GALFITools``:
 
-#. Make sure all unit tests are successful.
+#. Make sure all automated tests are successful.
 #. Tag the current commit on the main branch with a release tag, e.g., ``v1.2.3``.
 #. Push the new tag to the upstream repository_, e.g., ``git push upstream v1.2.3``
 #. Clean up the ``dist`` and ``build`` folders with ``tox -e clean``
