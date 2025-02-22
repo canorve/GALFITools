@@ -41,34 +41,14 @@ accessible through your bash (or zsh) environment.
 The text below elucidates the function and 
 operation of each of these routines.
 
-For an enhanced comprehension of the intricacies 
-of each routine, a explanation of their 
-respective parameters can be summoned through 
-the deployment of the "-h" option.
+For a better understanding of the intricacies 
+of each routine, an explanation of their respective 
+parameters can be accessed by using the '-h' option
 
-The instructional material presented herein is 
-structured into five distinct sections, each 
-devoted to a specific facet of GALFIT's application. 
-These sections are delineated as follows: GALFIT Input, 
-GALFIT Output, Multi-Gaussian Expansion (MGE), 
-Simulation of galaxy images, and Sky Computation.
-
-.. important:: Routines that require the use of a DS9 region 
-               file as input need the region to be saved in 
-               **image** (or **physical**) coordinates. DS9 regions 
-               saved in **World Coordinate System (WCS)** coordinates 
-               will not work.
-
-
-This section explains how to use the GALFITools routines. 
+This usage guide explains how to use the GALFITools routines. 
 All of these routines are *shell commands*. If you wish to use 
 the Python functions underlying these routines within 
-your own scripts, please check to the :doc:`api`.
-
-Many of the routines (specially the **GALFIT Output** routines)
-require the GALFIT output file (named galfit.XX where XX refer
-to a numbers). Those files are generated after GALFIT have finished
-a fit. Those files are used as a input parsing in those routines.
+your own scripts, please check the :doc:`api`.
 
 Many of the routines (particularly the **GALFIT Output** routines) 
 require the GALFIT output file, typically named "galfit.XX", where 
@@ -82,6 +62,22 @@ the GALFIT file. A galaxy can be composed of a
 single component or multiple components. For instance,
 a barred galaxy can be model by 3 components: bulge, bar
 and disk. 
+
+.. important:: Soome routines require the use of a `DS9 <http://tdc-www.harvard.edu/saoimage/>`_ 
+               region file as a input. The region file needs to be saved in 
+               **image** (or **physical**) coordinates. DS9 regions 
+               saved in **World Coordinate System (WCS)** coordinates 
+               will not work.
+
+
+
+The instructional material presented herein is 
+structured into five distinct sections, each 
+devoted to a specific facet of GALFIT's application. 
+These sections are delineated as follows: GALFIT Input, 
+GALFIT Output, Multi-Gaussian Expansion (MGE), 
+Simulation of galaxy images, and Sky Computation.
+
 
 Before presenting the five sections of the instructional 
 material, check the  three video tutorials below which show 
