@@ -48,7 +48,7 @@ parameters can be accessed by using the '-h' option
 This usage guide explains how to use the GALFITools routines. 
 All of these routines are *shell commands*. If you wish to use 
 the Python functions underlying these routines within 
-your own scripts, please check the :doc:`api`.
+your own scripts, please check the :doc:`api` or :doc:`api/modules`.
 
 Many of the routines (particularly the **GALFIT Output** routines) 
 require the GALFIT output file, typically named "galfit.XX", where 
