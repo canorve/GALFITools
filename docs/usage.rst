@@ -64,6 +64,13 @@ single component or multiple components. For instance,
 a barred galaxy can be model by 3 components: bulge, bar
 and disk. 
 
+To differentiate the components of different galaxies, 
+components belonging to the same galaxy must share the 
+same center. This is determined by a tolerance parameter 
+specified by the '-d' flag, which indicates the maximum 
+allowable distance among components (default 10 pixels).
+
+
 .. important:: Soome routines require the use of a `DS9 <http://tdc-www.harvard.edu/saoimage/>`_ 
                region file as a input. The region file needs to be saved in 
                **image** (or **physical**) coordinates. DS9 regions 
