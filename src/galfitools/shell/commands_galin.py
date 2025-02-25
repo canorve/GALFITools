@@ -86,7 +86,6 @@ def mainInitGal():
 
     printWelcome()
 
-    # parser argument section
 
     parser = argparse.ArgumentParser(
         description="Creates GALFIT's input files with different initial parameters"
