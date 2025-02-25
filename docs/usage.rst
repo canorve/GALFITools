@@ -96,7 +96,7 @@ the full capabilities of GALFITools in action.
 **Video Tutorials**
 ---------------------
 
-For the videos, please turn on English subtitles.
+For the videos, click on the images and turn on English subtitles.
 
 Here is a tutorial video for galaxy NGC720 using GALFITools:
 

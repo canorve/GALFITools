@@ -48,7 +48,7 @@ and parameters for API invocation.
 
 The API integration process is expounded across 
 five distinct sections, mirroring the structural 
-delineation observed in the  `"HowTo" <docs/howto.rst>`__ section. 
+delineation observed in the  `"Usage guide" <usage.rst>`__ section. 
 
 Some of the routines are optional arguments
 for argparse library and can be ignored. Those 
