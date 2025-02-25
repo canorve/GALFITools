@@ -46,19 +46,18 @@ aids in the assimilation of the necessary syntax
 and parameters for API invocation.
 
 
-The API integration process is expounded across 
+The API integration process is explained across 
 five distinct sections, mirroring the structural 
-delineation observed in the  `"Usage guide" <usage.rst>`__ section. 
+delineation observed in the  :doc:`usage` section. 
 
 Some of the routines are optional arguments
 for argparse library and can be ignored. Those 
 optional arguments can be empty 
 variables (e.g. None or False values but check -h option when calling
-the shell command version) 
+the shell command version).
 
 
-Certain routines encompass optional arguments managed by the 
-argparse library). While these optional arguments 
+While these optional arguments 
 can be omitted, it is recommended 
 to consult the help documentation ("-h" option) 
 associated with the respective shell command version. 

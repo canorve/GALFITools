@@ -98,7 +98,8 @@ the commands in the console.
 
 In the example below, the command *getReComp* is executed in a terminal 
 using the GALFIT output file 
-`galfit.01 <docs/galfit.01>`__  to calculate the effective radius of a model 
+`galfit.01 <https://github.com/canorve/GALFITools/blob/master/docs/galfit.01>`__  to 
+calculate the effective radius of a model 
 with three Sersic components:
 
 ::
