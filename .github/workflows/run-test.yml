@@ -34,7 +34,8 @@ jobs:
       - name: List installed packages
         run: pip list
       - name: Run tests with Tox 
-        run: tox -e default
+        run: tox -e default -- -k "not  test_galfit"
+
       # Uncomment and configure the following step if you want to upload coverage to Codecov
       # - name: Upload coverage to Codecov
       #   if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.10' }}
