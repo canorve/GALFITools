@@ -67,6 +67,8 @@ First of all, install `GALFIT`_ if you haven't done so. Check
 instructions `here <https://users.obs.carnegiescience.edu/peng/work/galfit/galfit.html>`__.
 Make sure that GALFIT can run in any path in your *linux/macOS* terminal.
 
+If you want to learn how to use GALFIT, click `here <https://users.obs.carnegiescience.edu/peng/work/galfit/README.pdf>`__.
+
 
 *Optionally*, consider setting up a virtual environment.
 
