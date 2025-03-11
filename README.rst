@@ -54,7 +54,7 @@ expansion (MGE) fitting, as well as computation of sky background
 and other pertinent photometric variables.
 
 
-.. _GALFIT: https://users.obs.carnegiescience.edu/peng/work/galfit/galfit.html
+.. _GALFIT: https://users.obs.carnegiescience.edu/peng/work/galfit/GFAQ.html
 
 
 
