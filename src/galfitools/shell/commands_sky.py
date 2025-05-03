@@ -195,8 +195,10 @@ def mainSkyRing():
 
     mean, std, median, rad = SkyRing(image, mask, ds9regfile, width, center, outliers)
 
-    line = "Total sky:  mean = "
-    +" {:.2f}; std={:.2f}; median = {:.2f} at radius {:.2f} ".format(
-        mean, std, median, rad
+    line = (
+        "Total sky:  mean = "
+        + " {:.2f}; std={:.2f}; median = {:.2f} at radius {:.2f} ".format(
+            mean, std, median, rad
+        )
     )
     print(line)
