@@ -1555,7 +1555,7 @@ class GetMe:
 
     def Me(self, head, comps, EffRad, theta):
 
-        comps.Rad = comps.Rad * head.scale
+        comps.Rad = comps.Rad * head.scale  # converting to arcsec
         comps.Flux = 10 ** ((-comps.Mag) / 2.5)
 
         k = gammaincinv(2 * comps.Exp, 0.5)

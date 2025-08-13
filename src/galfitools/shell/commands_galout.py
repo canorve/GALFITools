@@ -17,6 +17,7 @@ from galfitools.galout.getRads import (
     getReComp,
     getSlope,
 )
+from galfitools.galout.getMeRad import getMeRad
 from galfitools.galout.PhotDs9 import photDs9
 from galfitools.galout.showcube import displayCube
 from galfitools.shell.prt import printWelcome
@@ -701,6 +702,96 @@ def mainGetReComp() -> None:
         eff * 100, EffRad, EffRad_arc
     )
     print(line)
+
+
+def mainGetMeRad() -> None:
+    """
+    Calls the getMeRad function based on argument parsing.
+    This function serves as an example of an API for getMeRad.
+    """
+
+    printWelcome()
+    # reading arguments parsing
+    parser = argparse.ArgumentParser(
+        description="getMeRad: gets the surface brightness at a given radius from a set of Sersics "
+    )
+
+    # required arguments
+    parser.add_argument(
+        "GalfitFile", help="Galfit File containing the Sersics or gaussians components"
+    )
+
+    parser.add_argument(
+        "-d",
+        "--dis",
+        type=int,
+        help="Maximum distance among components (pixels)",
+        default=5,
+    )
+    parser.add_argument(
+        "-r",
+        "--rad",
+        type=float,
+        help="Radius in pixels where the surface brightness will be computed. Default = 10 pixels",
+        default=10,
+    )
+
+    parser.add_argument(
+        "-n",
+        "--numcomp",
+        type=int,
+        help="Number of component where it'll obtain center of all components,"
+        + " default = 1 ",
+        default=1,
+    )
+
+    parser.add_argument(
+        "-pa",
+        "--angle",
+        type=float,
+        help="Angle of the major axis of the galaxy. Default = it will take the "
+        + " angle of the last components. Angle measured from Y-Axis as"
+        + "same as GALFIT. ",
+    )
+
+    args = parser.parse_args()
+
+    galfitFile = args.GalfitFile
+    dis = args.dis
+    rad = args.rad
+    num_comp = args.numcomp
+    angle = args.angle
+
+    totmag, meanme, merad, N, theta = getMeRad(galfitFile, dis, rad, angle, num_comp)
+
+    galfit = Galfit(galfitFile)
+
+    head = galfit.ReadHead()
+
+    plate = head.scale
+    rad_arc = rad * plate
+
+    print("number of model components: ", N)
+
+    line = "Using a theta value of : {:.2f} degrees \n".format(theta)
+    print(line)
+
+    line = "Total Magnitude of the galaxy: {:.2f} \n".format(totmag)
+    print(line)
+
+    line = 'The radius used is {:.2f} pixels or {:.2f} " \n'.format(rad, rad_arc)
+    print(line)
+
+    line1 = "Surface brightness at this radius is"
+    line2 = "(\u03BCr): {:.2f} mag/'' \n".format(merad)
+    line = line1 + line2
+    print(line)
+
+    line1 = "Mean Surface Brightness at  radius (<\u03BC>e):"
+    line2 = " {:.2f} mag/'' \n".format(meanme)
+    line = line1 + line2
+    # if eff == 0.5:
+    #    print(line)
 
 
 def maingetSlope() -> None:
