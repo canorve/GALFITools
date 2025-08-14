@@ -14,6 +14,7 @@ from galfitools.galin.galfit import (
     conver2Sersic,
     numComps,
 )
+from galfitools.galout.getRads import GetMe
 
 from scipy.interpolate import UnivariateSpline
 from scipy.optimize import bisect, newton
@@ -48,11 +49,11 @@ def getMeRad(
 
     totmag : float
              total magnitude
-    meanme : float
-             mean of surface brightness at effective radius
+    meanmerad : float
+             mean of surface brightness at rad
              in mag/arcsec**2
     merad : float
-             surface brightness at EffRad  in mag/arcsec**2
+             surface brightness at rad in mag/arcsec**2
     N : int
         total number of components
     theta : float
@@ -74,8 +75,10 @@ def getMeRad(
     maskgal = galcomps.Active == 1
     if angle:
         theta = angle
+        axrat = 1  # assuming cirle it has no effect
     else:
         theta = galcomps.PosAng[maskgal][-1]
+        axrat = galcomps.AxRat[maskgal][-1]  # to compensate, it has no effect
 
     # convert all exp, gaussian and de vaucouleurs to Sersic format
     comps = conver2Sersic(galcomps)
@@ -90,12 +93,15 @@ def getMeRad(
     totmag = getTotMag(head, comps)
 
     meanme = GetMe().MeanMe(totmag, rad * head.scale)
-    me = GetMe().Me(head, comps, rad * head.scale, theta)
 
-    return totmag, meanme, me, N, theta
+    meanmerad = getMeanRad(head, comps, rad * head.scale)  # it does not work
+    merad = GetMe().Me(head, comps, rad * head.scale, theta)
+
+    return totmag, meanmerad, merad, N, theta
 
 
 def getTotMag(galhead: GalHead, comps: GalComps) -> float:
+    """Returns the total magnitude of a set of sersics"""
 
     maskgal = comps.Active == 1
 
@@ -106,3 +112,66 @@ def getTotMag(galhead: GalHead, comps: GalComps) -> float:
     totmag = -2.5 * np.log10(totFlux) + galhead.mgzpt
 
     return totmag
+
+
+def getMeanRad(galhead: GalHead, comps: GalComps, rad: float) -> float:
+    """
+    mean surface brightness at radius rad
+    Note: As contrary to surface brightness at rad it
+    does not assume angle direction
+    """
+
+    maskgal = comps.Active == 1
+
+    comps.Flux = 10 ** ((galhead.mgzpt - comps.Mag) / 2.5)
+
+    comps.Rad = comps.Rad * galhead.scale  # converting to arcsec
+    FluxR = GetFtotser(
+        rad,
+        comps.Flux[maskgal],
+        comps.Rad[maskgal],
+        comps.Exp[maskgal],
+        comps.AxRat[maskgal],
+        comps.PosAng[maskgal],
+    )
+    ####
+
+    meanIerad = FluxR / (np.pi * rad**2)
+
+    meanmerad = -2.5 * np.log10(meanIerad) + galhead.mgzpt
+
+    return meanmerad
+
+
+def GetFtotser(
+    R: float,
+    flux: list,
+    rad: list,
+    n: list,
+    q: list,
+    pa: list,
+) -> float:
+    """partial sersic flux computed from zero up to R for a set of sersics"""
+
+    ftotR = Fser(R, flux, rad, n, q, pa)
+
+    return ftotR.sum()
+
+
+def Fser(
+    R: float,
+    Flux: list,
+    Re: list,
+    n: list,
+    q: list,
+    pa: list,
+) -> float:
+    """partial sersic flux computed from zero up to R for a single sersic"""
+
+    k = gammaincinv(2 * n, 0.5)
+
+    X = k * (R / Re) ** (1 / n)
+
+    Fr = Flux * gammainc(2 * n, X)
+
+    return Fr

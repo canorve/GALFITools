@@ -762,7 +762,7 @@ def mainGetMeRad() -> None:
     num_comp = args.numcomp
     angle = args.angle
 
-    totmag, meanme, merad, N, theta = getMeRad(galfitFile, dis, rad, angle, num_comp)
+    totmag, meanmerad, merad, N, theta = getMeRad(galfitFile, dis, rad, angle, num_comp)
 
     galfit = Galfit(galfitFile)
 
@@ -782,16 +782,15 @@ def mainGetMeRad() -> None:
     line = 'The radius used is {:.2f} pixels or {:.2f} " \n'.format(rad, rad_arc)
     print(line)
 
-    line1 = "Surface brightness at this radius is"
+    line1 = "Surface brightness at this radius is "
     line2 = "(\u03BCr): {:.2f} mag/'' \n".format(merad)
     line = line1 + line2
     print(line)
 
-    line1 = "Mean Surface Brightness at  radius (<\u03BC>e):"
-    line2 = " {:.2f} mag/'' \n".format(meanme)
+    line1 = "Mean Surface Brightness at radius (<\u03BC>r):"
+    line2 = " {:.2f} mag/'' \n".format(meanmerad)
     line = line1 + line2
-    # if eff == 0.5:
-    #    print(line)
+    print(line)
 
 
 def maingetSlope() -> None:

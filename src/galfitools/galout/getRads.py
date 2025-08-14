@@ -1531,7 +1531,7 @@ def getReComp(
 class GetMe:
     """Class to obtain the surface brightness at effective radius
        and the mean surface brightness at effective radius
-
+       in units of mag/''
 
     Methods
     -------
@@ -1726,6 +1726,7 @@ class GetReff:
     def Ftotser(
         self, R: float, flux: list, rad: list, n: list, q: list, pa: list, theta: float
     ) -> float:
+        """partial sersic flux computed from zero up to R for a set of sersics"""
 
         ftotR = self.Fser(R, flux, rad, n, q, pa, theta)
 
@@ -1734,7 +1735,7 @@ class GetReff:
     def Fser(
         self, R: float, Flux: list, Re: list, n: list, q: list, pa: list, theta: float
     ) -> float:
-        """sersic flux to a determined R"""
+        """partial sersic flux computed from zero up to R for a single sersic"""
 
         k = gammaincinv(2 * n, 0.5)
 
