@@ -704,6 +704,25 @@ equal
                           the name of the output file 
 
 
+**getBT** computes the Bulge to Total luminosity ratio
+::
+
+  usage: getBT [-h] [-d DIS] [-n NUMCOMP] GalfitFile
+
+
+  positional arguments:
+    GalfitFile            Galfit File containing the bulge-disk or bulge-bar-disk surface
+                          brightness model
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components
+    -n NUMCOMP, --numcomp NUMCOMP
+                          Number of component where it'll obtain center of all components,
+                          default = 1
+
+
+
 
 **getBarSize** computes the barsize from a composed Sersic model: Bulge, bar and disk.
 . It assumes that bar is a gaussian (Sersic index = 0.5) and it is positioned as a 
@@ -729,6 +748,55 @@ second component in galfit file galfit.XX
     -p, --plot            makes plot of double derivatives and Kappa radius
     -rx RANX RANX, --ranx RANX RANX
                           x-axis range to search for the Break and Kappa radius: xmin - xmax
+
+
+
+**getCOW** plots the curve-of-growth from the galfit.XX file. Only for Sersic functions
+::
+
+  usage: getCOW [-h] [-d DIS] [-pf PLOTFILE] [-g GALFITF2] [-md] [-fr FRACRAD] [-n NUMCOMP] [-pa ANGLE] [-dpi DOTSINCH] GalfitFile
+
+  positional arguments:
+    GalfitFile            GALFIT File containing the Sersics
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components
+    -pf PLOTFILE, --plotfile PLOTFILE
+                          name of the plot file
+    -g GALFITF2, --galfitF2 GALFITF2
+                          Second GALFIT file to add to the plot (optional)
+    -md, --maxdiff        plot the maximum difference between model 1 and 2 (a vertical line)
+    -fr FRACRAD, --fracrad FRACRAD
+                          fraction of light radius. This is the upper limit of X-Axis. default=.95
+    -n NUMCOMP, --numcomp NUMCOMP
+                          Number of component where it'll obtain center of all components, default = 1
+    -pa ANGLE, --angle ANGLE
+                          Angle of the major axis of the galaxy. Default = it will take the angle of the last components. Angle
+                          measured from Y-Axis as same as GALFIT.
+    -dpi DOTSINCH, --dotsinch DOTSINCH
+                          dots per inch used for images files
+
+
+**getMeRad** gets the surface brightness at a given radius from a set of Sersics
+::
+
+  usage: getMeRad [-h] [-d DIS] [-r RAD] [-n NUMCOMP] [-pa ANGLE] GalfitFile
+
+
+  positional arguments:
+    GalfitFile            Galfit File containing the Sersics or gaussians components
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components (pixels)
+    -r RAD, --rad RAD     Radius in pixels where the surface brightness will be computed. Default = 10 pixels
+    -n NUMCOMP, --numcomp NUMCOMP
+                          Number of component where it'll obtain center of all components, default = 1
+    -pa ANGLE, --angle ANGLE
+                          Angle of the major axis of the galaxy. Default = it will take the angle of the last components. Angle
+                          measured from Y-Axis assame as GALFIT.
+
 
 
 -----------------

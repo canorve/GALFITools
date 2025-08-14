@@ -1283,8 +1283,8 @@ def mainShowCube():
 
 def maingetCOW() -> None:
     """
-    Calls the getStar function based on argument parsing.
-    This function serves as an example of an API for getStar.
+    plots the curve-of-growth from a set of Sersics
+    This function serves as an example of an API for getCOW.
     """
 
     printWelcome()

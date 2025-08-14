@@ -941,6 +941,36 @@ equal
 
 
 
+**getBT** computes the Bulge to Total luminosity ratio
+::
+
+
+    from galfitools.galout.getBT import getBT
+
+
+    args = parser.parse_args()
+
+    #galfitFile = args.GalfitFile # Galfit File containing the bulge-disk or bulge-bar-disk surface brightness model
+    # dis = args.dis   # Maximum distance among components
+
+    #num_comp = args.numcomp # Number of component where it'll obtain the center
+
+    bulge_total, totmag, N = getBT(galfitFile, dis, num_comp)
+
+    print("number of model components: ", N)
+
+    line = "Total Magnitude of the galaxy: {:.2f} \n".format(totmag)
+    print(line)
+
+    line = "Bulge to total luminosity ratio: {:.2f} \n".format(bulge_total)
+    print(line)
+
+
+
+
+
+
+
 **getPeak**  Obtains the center, axis ratio and angular position from DS9 region
 ::
 
@@ -987,6 +1017,91 @@ Sersic function: Bulge, bar and disk.
     #rbar: size of bar in pixels
     #N: number of components of the galaxy
     #theta: angle of bar measured from Y-axis (same as GALFIT)
+
+
+**getCOW**: plots the curve-of-growth from the galfit.XX
+::
+
+    from galfitools.galout.getCOW import getCOW
+
+    #args = parser.parse_args()
+
+    #galfitFile = args.GalfitFile #GALFIT File containing the Sersics 
+    #dis = args.dis #Maximum distance among components
+    #plotfile = args.plotfile #name of the plot file
+
+    #dpival = args.dotsinch # dots per inch used for images files 
+
+    #frac = args.fracrad #fraction of light radius. It sets the upper limit of X-axis 
+
+    #maxdiff = args.maxdiff #plot the maximum difference between model 1 and 2
+
+    #num_comp = args.numcomp #Number of component where it'll obtain center 
+
+    #angle = args.angle #Angle of the major axis of the galaxy. 
+
+    #galfitF2 = args.galfitF2 #Second GALFIT file to add to the plot (optional)  
+
+    totmag, N, theta = getCOW(
+        galfitFile, dis, angle, frac, num_comp, plotfile, dpival, galfitF2, maxdiff
+    )
+
+    print("number of model components: ", N)
+
+    line = "Using a theta value of : {:.2f} degrees \n".format(theta)
+    print(line)
+
+    line = "Total Magnitude of the galaxy: {:.2f} \n".format(totmag)
+    print(line)
+
+    print("plot file: ", plotfile)
+
+
+
+**getMeRad** gets the surface brightness at a given radius from a set of Sersics
+::
+
+
+    from galfitools.galout.getMeRad import getMeRad
+
+
+    #args = parser.parse_args()
+
+    #galfitFile = args.GalfitFile #Galfit File containing the Sersics or gaussians components
+    dis = args.dis # Maximum distance among components (pixels)
+    #rad = args.rad # Radius in pixels where the surface brightness will be computed. 
+    #num_comp = args.numcomp # Number of component where it'll obtain center 
+    #angle = args.angle # Angle of the major axis of the galaxy.
+
+    totmag, meanmerad, merad, N, theta = getMeRad(galfitFile, dis, rad, angle, num_comp)
+
+    galfit = Galfit(galfitFile)
+
+    head = galfit.ReadHead()
+
+    plate = head.scale
+    rad_arc = rad * plate
+
+    print("number of model components: ", N)
+
+    line = "Using a theta value of : {:.2f} degrees \n".format(theta)
+    print(line)
+
+    line = "Total Magnitude of the galaxy: {:.2f} \n".format(totmag)
+    print(line)
+
+    line = 'The radius used is {:.2f} pixels or {:.2f} " \n'.format(rad, rad_arc)
+    print(line)
+
+    line1 = "Surface brightness at this radius is "
+    line2 = "(\u03BCr): {:.2f} mag/'' \n".format(merad)
+    line = line1 + line2
+    print(line)
+
+    line1 = "Mean Surface Brightness at radius (<\u03BC>r):"
+    line2 = " {:.2f} mag/'' \n".format(meanmerad)
+    line = line1 + line2
+    print(line)
 
 
 **MGE**
