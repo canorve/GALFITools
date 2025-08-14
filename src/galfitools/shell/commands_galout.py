@@ -6,6 +6,7 @@ from galfitools.galout.getBarSize import getBarSize
 from galfitools.galout.getCOW import getCOW
 from galfitools.galout.getMissingLight import getMissLight
 from galfitools.galout.getN import getN
+from galfitools.galout.getBT import getBT
 from galfitools.galout.getPeak import getPeak
 from galfitools.galout.getRads import (
     getBreak,
@@ -993,6 +994,58 @@ def maingetN() -> None:
     line = "Sersic index mean: {:.2f}  Standard deviation: {:.2f}  ".format(
         meanser, stdser
     )
+    print(line)
+
+
+def maingetBT() -> None:
+    """
+    Calls the getBT function based on argument parsing.
+    This function serves as an example of an API for getBT.
+    """
+
+    printWelcome()
+    # reading arguments parsing
+
+    parser = argparse.ArgumentParser(
+        description="getBT: computes the Bulge to Total luminosity ratio"
+    )
+
+    # required arguments
+    parser.add_argument(
+        "GalfitFile",
+        help="Galfit File containing the bulge-disk or bulge-bar-disk surface brightness model",
+    )
+
+    parser.add_argument(
+        "-d", "--dis", type=int, help="Maximum distance among components", default=10
+    )
+
+    parser.add_argument(
+        "-n",
+        "--numcomp",
+        type=int,
+        help="Number of component where it'll obtain center of all components, "
+        + "default = 1 ",
+        default=1,
+    )
+
+    # parsing variables
+
+    args = parser.parse_args()
+
+    galfitFile = args.GalfitFile
+    dis = args.dis
+
+    num_comp = args.numcomp
+
+    bulge_total, totmag = getBT(galfitFile, dis, num_comp)
+
+    print("number of model components: ", N)
+
+    line = "Total Magnitude of the galaxy: {:.2f} \n".format(totmag)
+    print(line)
+
+    line = "Bulge to total luminosity ratio: {:.2f} \n".format(bulge_total)
     print(line)
 
 

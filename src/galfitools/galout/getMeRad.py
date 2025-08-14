@@ -75,10 +75,8 @@ def getMeRad(
     maskgal = galcomps.Active == 1
     if angle:
         theta = angle
-        axrat = 1  # assuming cirle it has no effect
     else:
         theta = galcomps.PosAng[maskgal][-1]
-        axrat = galcomps.AxRat[maskgal][-1]  # to compensate, it has no effect
 
     # convert all exp, gaussian and de vaucouleurs to Sersic format
     comps = conver2Sersic(galcomps)
