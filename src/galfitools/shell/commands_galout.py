@@ -1038,7 +1038,7 @@ def maingetBT() -> None:
 
     num_comp = args.numcomp
 
-    bulge_total, totmag = getBT(galfitFile, dis, num_comp)
+    bulge_total, totmag, N = getBT(galfitFile, dis, num_comp)
 
     print("number of model components: ", N)
 

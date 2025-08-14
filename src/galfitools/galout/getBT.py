@@ -109,7 +109,7 @@ def getBT(
         mag_disk = comps.Mag[maskgal][2]
         bulge_total = bulge_to_total(mag_bulge, mag_disk, mag_bar)
 
-    return bulge_total, totmag
+    return bulge_total, totmag, N
 
 
 def bulge_to_total(mag_bulge, mag_disk, mag_bar=99):
