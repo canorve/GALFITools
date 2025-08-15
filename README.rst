@@ -55,13 +55,14 @@ and other pertinent photometric variables.
 
 
 **NOTE:** GALFITools assumes the user has a basic knowledge of GALFIT and SaoImage DS9.  
-How to use GALFIT is found in the official `GALFIT <GALFIT2>`_ webpage.  
-The DS9 webpage can be found `here <here>`_ and a basic tutorial `here <here2>`_.
+How to use GALFIT is found in the official `GALFIT <GALFIT2_>`_ webpage.  
+The DS9 webpage can be found `here <ds9_>`_ and a basic tutorial `here <ds9_tutorial_>`_.
 
 .. _GALFIT: https://users.obs.carnegiescience.edu/peng/work/galfit/GFAQ.html
 .. _GALFIT2: https://users.obs.carnegiescience.edu/peng/work/galfit/galfit.html
-.. _here: https://sites.google.com/cfa.harvard.edu/saoimageds9
-.. _here2: https://astrobites.org/2011/03/09/how-to-use-sao-ds9-to-examine-astronomical-images
+.. _ds9: https://sites.google.com/cfa.harvard.edu/saoimageds9
+.. _ds9_tutorial: https://astrobites.org/2011/03/09/how-to-use-sao-ds9-to-examine-astronomical-images
+
 
 
 -----------------------------------
