@@ -54,9 +54,16 @@ expansion (MGE) fitting, as well as computation of sky background
 and other pertinent photometric variables.
 
 
+**Note** GALFITools assume the user has a basic knowledge of GALFIT and SaoImage DS9. 
+How to use GALFIT is found in the oficial `GALFIT`_'s webpage. DS9 webpage 
+can be found here_ and a basic tutorial here_
+
+
 .. _GALFIT: https://users.obs.carnegiescience.edu/peng/work/galfit/GFAQ.html
 
+.. _found here: https://sites.google.com/cfa.harvard.edu/saoimageds9
 
+.. _tutorial here: https://astrobites.org/2011/03/09/how-to-use-sao-ds9-to-examine-astronomical-images 
 
 -----------------------------------
 
