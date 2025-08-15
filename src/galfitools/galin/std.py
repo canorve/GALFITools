@@ -3,6 +3,7 @@
 
 import numpy as np
 from galfitools.galin.galfit import GalComps
+import subprocess as sp
 
 from astropy.io import fits
 import os.path
