@@ -39,7 +39,7 @@
 GALFITools
 ============
 
-`GALFIT`_, a well-established two-dimensional image fitting algorithm, 
+`GALFIT <GALFIT_>`_, a well-established two-dimensional image fitting algorithm, 
 as outlined in the work by Peng et al. (2002, AJ, 124, 266), 
 serves as the basis for precise astronomical image surface brightness 
 analysis. In pursuit of optimizing the utilization of GALFIT, GALFITools emerges 
