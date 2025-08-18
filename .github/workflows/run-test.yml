@@ -59,15 +59,22 @@ jobs:
       #    fail_ci_if_error: true
 
 
+
       - name: Upload coverage to Codecov
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.10' }}
         uses: codecov/codecov-action@v4
+        env:
+          # Make the CLI see the correct repo
+          CODECOV_SLUG: canorve/GALFITools
+          GITHUB_REPOSITORY: canorve/GALFITools
         with:
           use_oidc: true
-          files: ./coverage.xml
+          git_service: github
           slug: canorve/GALFITools
-          root_dir: .
+          files: ./coverage.xml
           override_branch: master
+          override_commit: ${{ github.sha }}
+          root_dir: .
           fail_ci_if_error: true
           verbose: true
 
