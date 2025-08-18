@@ -59,6 +59,11 @@ jobs:
       #    fail_ci_if_error: true
 
 
+     - name: Show repo context seen by action
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.10' }}
+        run: |
+          echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
+          echo "CODECOV_SLUG=$CODECOV_SLUG"
 
       - name: Upload coverage to Codecov
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.10' }}
@@ -75,6 +80,7 @@ jobs:
           override_branch: master
           override_commit: ${{ github.sha }}
           root_dir: .
+          use_legacy_upload_endpoint: true
           fail_ci_if_error: true
           verbose: true
 
