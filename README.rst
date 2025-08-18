@@ -43,9 +43,10 @@
    :target: https://github.com/canorve/galfitools/actions/workflows/run-test.yml
    :alt: Build Status
 
-.. image:: https://github.com/canorve/galfitools/actions/workflows/run-test.yml/badge.svg
-   :target: https://github.com/canorve/galfitools/actions/workflows/run-test.yml
-   :alt: Build Status
+.. image:: https://codecov.io/gh/canorve/galfitools/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/canorve/galfitools
+   :alt: Coverage
+
 
 ============
 GALFITools
