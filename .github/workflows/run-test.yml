@@ -50,12 +50,26 @@ jobs:
 
 
       # Uncomment and configure the following step if you want to upload coverage to Codecov
+      #- name: Upload coverage to Codecov
+      #  if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.10' }}
+      #  uses: codecov/codecov-action@v4
+      #  with:
+      #    use_oidc: true
+      #    file: ./coverage.xml
+      #    fail_ci_if_error: true
+
+
       - name: Upload coverage to Codecov
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.10' }}
         uses: codecov/codecov-action@v4
         with:
           use_oidc: true
-          file: ./coverage.xml
+          files: ./coverage.xml
+          slug: canorve/GALFITools
+          root_dir: .
+          override_branch: master
           fail_ci_if_error: true
+          verbose: true
+
 
 
