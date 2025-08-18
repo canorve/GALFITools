@@ -6,6 +6,10 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+  pull-requests: write
+
 # Use bash by default in all jobs
 defaults:
   run:
@@ -43,5 +47,6 @@ jobs:
         with:
           file: ./coverage.xml
           fail_ci_if_error: true
+          fetch-depth: 0
 
 
