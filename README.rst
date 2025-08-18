@@ -34,6 +34,9 @@
 .. image:: https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg 
    :target: CODE_OF_CONDUCT.md 
 
+.. image:: https://www.repostatus.org/badges/latest/active.svg
+   :alt: Project Status: Active – The project has reached a stable, usable state and is being actively developed.
+   :target: https://www.repostatus.org/#active
 
 ============
 GALFITools
