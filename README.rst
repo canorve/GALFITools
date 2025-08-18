@@ -39,8 +39,8 @@
    :target: https://www.repostatus.org/#active
 
 
-.. image:: https://github.com/canorve/galfitools/actions/workflows/ci.yml/badge.svg
-   :target: https://github.com/canorve/galfitools/actions/workflows/ci.yml
+.. image:: https://github.com/canorve/galfitools/actions/workflows/run-test.yml/badge.svg
+   :target: https://github.com/canorve/galfitools/actions/workflows/run-test.yml
    :alt: Build Status
 
 
