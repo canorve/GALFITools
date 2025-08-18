@@ -38,6 +38,12 @@
    :alt: Project Status: Active – The project has reached a stable, usable state and is being actively developed.
    :target: https://www.repostatus.org/#active
 
+
+.. image:: https://github.com/canorve/galfitools/actions/workflows/ci.yml/badge.svg
+   :target: https://github.com/canorve/galfitools/actions/workflows/ci.yml
+   :alt: Build Status
+
+
 ============
 GALFITools
 ============
