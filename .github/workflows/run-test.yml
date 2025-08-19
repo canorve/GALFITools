@@ -59,7 +59,7 @@ jobs:
       #    fail_ci_if_error: true
 
 
-     - name: Show repo context seen by action
+      - name: Show repo context seen by action
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.10' }}
         run: |
           echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
