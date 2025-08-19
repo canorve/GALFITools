@@ -47,6 +47,9 @@
    :target: https://codecov.io/gh/canorve/galfitools
    :alt: Coverage
 
+.. image:: https://img.shields.io/pypi/pyversions/your-package.svg
+   :target: https://pypi.org/project/your-package/
+   :alt: Supported Python versions
 
 ============
 GALFITools
