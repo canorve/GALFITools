@@ -29,22 +29,22 @@ Contents
    :maxdepth: 2
 
    Overview <readme>
+   Usage guide <usage>
+   API Reference <api>
+   Module Reference <api/modules>
    Contributions & Help <contributing>
    License <license>
    Authors <authors>
    Changelog <changelog>
-   Module Reference <api/modules>
-   Usage guide <usage>
-   API Reference <api>
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 * :ref:`usage`
 * :ref:`api`
+* :ref:`modindex`
+* :ref:`search`
 
 
 .. _GALFIT: https://users.obs.carnegiescience.edu/peng/work/galfit/galfit.html
