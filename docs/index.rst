@@ -29,7 +29,7 @@ Contents
    :maxdepth: 2
 
    Overview <readme>
-   statement of need <statement>
+   Statement of need <statement>
    Usage guide <usage>
    API Reference <api>
    Module Reference <api/modules>
