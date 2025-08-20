@@ -29,6 +29,7 @@ Contents
    :maxdepth: 2
 
    Overview <readme>
+   statement of need <statement>
    Usage guide <usage>
    API Reference <api>
    Module Reference <api/modules>
@@ -41,6 +42,8 @@ Indices and tables
 ==================
 
 * :ref:`genindex`
+* :ref:`readme`
+* :ref:`statement`
 * :ref:`usage`
 * :ref:`api`
 * :ref:`modindex`
