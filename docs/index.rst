@@ -50,6 +50,7 @@ Indices and tables
 * :ref:`search`
 
 
+
 .. _GALFIT: https://users.obs.carnegiescience.edu/peng/work/galfit/galfit.html
 
 .. _toctree: https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html
