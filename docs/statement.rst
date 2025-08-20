@@ -8,7 +8,28 @@ Statement of need
 ============
 
 
+GALFITools addresses a key gap in astronomical image analysis: while
+GALFIT is a powerful 2D fitting engine, its input/output management,
+mask creation, PSF star selection, and sky background estimation
+require repetitive manual work. GALFITools provides Python routines
+to streamline these tasks, making the fitting workflow reproducible
+and efficient for both research and teaching.
 
+
+GALFIT is a widely used tool for two–dimensional surface–brightness
+modeling of galaxies. However, preparing inputs and handling outputs
+from GALFIT often involves repetitive manual steps, such as mask
+construction, PSF star selection, generation of initial parameters,
+and organization of fitting results. These tasks can become
+time–consuming and error–prone, particularly in large surveys.
+
+GALFITools provides a set of Python routines that automate and
+streamline these tasks. By integrating common pre– and post–processing
+steps into a reproducible workflow, GALFITools lowers the technical
+barriers for new users and increases efficiency for experienced
+researchers. The package is designed for astronomers who analyze
+galaxy images and require flexible, scriptable tools that complement
+GALFIT in both research and teaching contexts.
 
 
 The analysis of galaxy morphology through image fitting is a fundamental task 
