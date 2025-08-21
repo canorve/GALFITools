@@ -87,7 +87,7 @@ The DS9 webpage can be found `here <ds9_>`_ and a basic tutorial `here <ds9_tuto
 -----------------------------------
 
 First of all, install `GALFIT`_ if you haven't done so. Check
-instructions `here <https://users.obs.carnegiescience.edu/peng/work/galfit/galfit.html>`__.
+instructions `here <https://raw.githubusercontent.com/canorve/GALFITools/refs/heads/master/docs/README.INSTALL>`__.
 Make sure that GALFIT can run in any path in your *linux/macOS* terminal.
 
 If you want to learn how to use GALFIT, click `here <https://users.obs.carnegiescience.edu/peng/work/galfit/README.pdf>`__.
