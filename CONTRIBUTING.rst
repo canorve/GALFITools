@@ -39,8 +39,6 @@ that still illustrates the problem you are facing. By removing other factors,
 you help us to identify the root cause of the issue.
 
 
-
-
 Running Tests
 =============
 
