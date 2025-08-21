@@ -22,6 +22,16 @@ A library for `GALFIT`_
     `Google style`_ (recommended!), `NumPy style`_ and `classical style`_.
 
 
+.. admonition:: Audience
+   :class: note
+
+   GALFITools is designed for researchers and students working with
+   galaxy images who wish to streamline their use of GALFIT. While
+   familiarity with Python is assumed, no advanced astronomy background
+   is required. Key terms are defined in the :doc:`concepts` section, and
+   tutorials are available in the :doc:`usage` guide.
+
+
 Contents
 ========
 
@@ -30,6 +40,7 @@ Contents
 
    Overview <readme>
    Statement of need <statement>
+   Concepts <concepts>
    Usage guide <usage>
    API Reference <api>
    Module Reference <api/modules>
