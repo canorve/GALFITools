@@ -39,6 +39,30 @@ that still illustrates the problem you are facing. By removing other factors,
 you help us to identify the root cause of the issue.
 
 
+
+
+Running Tests
+=============
+
+GALFITools uses `pytest <https://docs.pytest.org/>`_ for testing and
+`pytest-cov <https://pytest-cov.readthedocs.io/>`_ for coverage reports.
+
+If you are using ``tox`` (recommended), these dependencies are installed
+automatically:
+
+.. code-block:: bash
+
+   tox
+
+If you prefer to run ``pytest`` directly, you will need to install the
+testing dependencies yourself:
+
+.. code-block:: bash
+
+   pip install pytest pytest-cov
+   pytest --cov=galfitools --cov-report=term-missing
+
+
 Documentation Improvements
 ==========================
 
