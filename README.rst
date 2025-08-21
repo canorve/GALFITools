@@ -92,11 +92,10 @@ Make sure that GALFIT can run in any path in your *linux/macOS* terminal.
 
 If you want to learn how to use GALFIT, click `here <https://users.obs.carnegiescience.edu/peng/work/galfit/README.pdf>`__.
 
-
-*Optionally*, consider setting up a virtual environment.
+GALFITools supports Python 3.9 through 3.13.   
+*Optionally*, we recommend using a virtual environment
 
 Install GALFITools via pip:
-
 
 ::
 

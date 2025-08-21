@@ -1,0 +1,149 @@
+
+To install GALFIT, do the following using the command line. Note that ">" below
+is the command line prompt:
+
+(For WinXP/Cygwin, see README.INSTALL-Cygwin.)
+
+1.  put galfit.tar.gz into the directory where you normally store all your
+    source code, and "cd" into that directory.  Below, I'll assume that the
+    directory is ~/src.  If it doesn't exist, simply create one.
+
+2.  Uncompress the file:
+
+        > gunzip galfit-version-number.tar.gz
+
+3.  "Un-tar" the file:
+
+        > tar xvf galfit-version-number.tar
+
+-- The next 4 steps assume you do not have CFITSIO already installed.  If you
+   already have CFITSIO, you should modify the Makefile in the "galfit"
+   directory, and set the CFITSIO parameter to your CFITSIO directory.  GALFIT
+   will work with the cfitsio package included in the same tar file, but I
+   don't know if it works with other older or newer versions.
+
+4.  Go into the CFITSIO directory:
+
+        > cd galfit/cfitsio
+
+5.  Configure CFITSIO for build:
+
+        > ./configure
+
+6.  Compile CFITSIO:
+
+        > make
+
+    This will reate a file called "libcfitsio.so.?" where "?" is a number.
+    Later on, if you should run into an error about this file not being found
+    then see step 10a or 10b.
+
+7.  Go into the galfit source code directory:
+
+        > cd ..
+
+8.  Compile galfit:
+
+        > make
+
+9.  The executable is called "galfit" in the ~/src/galfit/
+    directory.  So either make a link or alias to it by:
+
+        > alias galfit "~/src/galfit/galfit"
+
+    or, go into the directory where you store your binary executable files and
+    create a symbolic link the binary there:
+
+        > ln -s ~/src/galfit/galfit
+
+
+If things went well, this would be the end. However, if you should run into problems,
+continue below.
+
+In the galfit source directory, I prepared a "Quick Start" document called
+README.pdf which will hopefully get new users started quickly on fitting.  A
+template file called EXAMPLE.INPUT can be copied and modified as needed, and
+fed into GALFIT.
+
+In Mac OS X, if you want to use the interaction window (i.e. Option O = both),
+you need to run GALFIT under X11.  Otherwise, if you don't have X11 installed,
+set Option O) to "regular".
+
+Any problems or questions, feel free to email: Chien.Y.Peng@gmail.com
+
+
+---------------------  POTENTIAL PROBLEM ON LINUX INSTALLATION -------------------
+
+On Non-MacOS Linux, if you run into an issue when running galfit:
+
+    "galfit: error while loading shared libraries: libcfitsio.so.#: cannot open
+	shared object file: No such file or directory
+
+where "#" is a number, it means that the OS doesn't know the "libcfitsio.so.#" file 
+is in the CFITSIO directory. To correct for this problem, you can either put a symbolic link
+to that file in one of the shared-library directories (might need to "sudo"), e.g.:
+
+    sudo ln -s /path/to/cfitsio/libcfitsio.so.# /usr/local/lib
+
+or else, you might have to set the appropriate environmental variable, e.g. for 'zsh' or
+'bash' shells:
+
+    export LD_LIBRARY_PATH=/path/to/cfitsio:$LD_LIBRARY_PATH
+
+or, for 'csh' or 'tcsh' shells:
+
+    setenv LD_LIBRARY_PATH "/path/to/cfitsio:$LD_LIBRARY_PATH"
+
+
+
+---------------------  POTENTIAL PROBLEMS ON MAC OS X INSTALLATION  -------------------
+
+On a MAC, you may run into an issue either with the dynamic library of
+CFITSIO or with "ncurses" not being found when running galfit. Here are possible solutions.
+
+*   If you receive an error message like the following:
+
+        dyld: Library not loaded: @rpath/libcfitsio.9.dylib
+          Referenced from: /Users/your_home/path_to_galfit/galfit
+          Reason: image not found
+
+    You can try one of two solutions:
+
+    Solution 1 -
+        Provide a link to "libcfitsio.9.dylib" by doing the
+        following:
+
+            > cd /usr/local/lib
+            > ln -s ~/path_to_galfit/galfit/cfitsio/libcfitsio.9.dylib .
+
+    Solution 2
+	First compile 'galfit' and CFITSIO all the way through to generate an executable 
+	'galfit' file as before.
+
+        Next, do the following:
+
+    	   > install_name_tool -add_rpath ~/PATH_TO_GALFIT/cfitsio/ ~/PATH_TO_GALFIT/galfit
+
+    	For example, I have galfit under in my '~/src/galfit3.0.7d' directory, so:
+
+    	   > install_name_tool -add_rpath ~/src/galfit3.0.7d/cfitsio/ ~/src/galfit3.0.7d/galfit
+
+
+*   Galfit uses something called the "curses" or "ncurses" library in C.
+    According to Peter Erwin, in MacOS X, this became part of the default
+    installation in OS version more current than 10.2, known as the "Jaguar",
+    which came out the summer or fall of 2002.  Users of MacOS X with older
+    versions may experience problems with "curses" or "ncurses" not being
+    installed.  If so, they may wish to download installer packages on the web
+    that would do so.  Then the user would have change the "Makefile" and add the
+    library path for the "curses" directory by saying something like:
+
+        -L/the/library/path/of/curses
+
+
+---------------------------  ACKNOWLEDGEMENT -----------------------------
+
+Galfit makes use of the CFITSIO library (Pence, W. 1999, ADASS, 8:487, and
+Pence, W. 1999, ASP Conf. Ser., Vol. 172: 487) to read and write FITS files.
+For more information see:
+    http://heasarc.gsfc.nasa.gov/docs/software/fitsio/fitsio.html
