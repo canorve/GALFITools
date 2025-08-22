@@ -402,11 +402,13 @@ the mathematical definition.
 - :py:func:`galfitools.galout.getRads.getKappa`
 - :py:func:`galfitools.galout.getRads.getKappa2`
 
-.. admonition:: Related GALFITools CLI commands
-   :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+.. rubric:: Related GALFITools CLI commands
+
+- :ref:`getKappa <routine-getKappa>`
+- :ref:`getKappa2 <routine-getKappa2>`
+
+
 
 
 
