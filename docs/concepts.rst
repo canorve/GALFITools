@@ -36,8 +36,8 @@ DS9 regions
 -----------
 In DS9, a *region* is a user–defined geometric shape (circle, box,
 polygon, etc.) drawn on an image. Regions can mark sources, masks,
-or fitting boundaries, and can be saved to files that GALFIT or
-GALFITools can read.
+or fitting boundaries, and can be saved to files that GALFITools 
+can read.
 
 .. _concept-mask:
 
