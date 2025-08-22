@@ -405,10 +405,14 @@ the mathematical definition.
 
 .. rubric:: Related GALFITools CLI commands
 
-- :ref:`getKappa <routine-getKappa>`
-- :ref:`getKappa2 <routine-getKappa2>`
+  - :ref:`getKappa <routine-getKappa>`
+  - :ref:`getKappa2 <routine-getKappa2>`
 
 
 
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
 
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
 
