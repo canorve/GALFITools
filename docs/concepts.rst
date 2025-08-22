@@ -58,8 +58,35 @@ Providing reasonable initial values helps GALFIT converge to the correct
 solution.
 
 
+.. _concept-sb-model:
 
+Surface brightness model
+------------------------
+A surface brightness model is a mathematical description of how the
+light distribution of a galaxy is represented. Models are constructed
+by combining analytic functions such as Sérsic profiles, de Vaucouleurs
+laws, exponential disks, Gaussians, or Nuker profiles. Each function
+contributes to the total brightness distribution, and the complete
+model can include one or many components.
 
+.. _concept-component:
+
+Component
+---------
+A component refers to a single analytic function used within a surface
+brightness model, for example one Sérsic profile, one exponential disk,
+or one Gaussian. A model may consist of a single component (e.g. one
+Sérsic function) or several components combined (e.g. bulge + disk,
+or bulge + disk + bar). Components allow complex galaxy structures to be
+described in a modular way.
+
+.. _concept-sbp:
+
+Surface brightness profile
+--------------------------
+A surface brightness profile is a one–dimensional curve showing how the
+surface brightness of a galaxy changes with radius. Profiles are often
+used to characterize galaxy structure and to fit analytic models.
 
 
 Image Properties
@@ -107,13 +134,6 @@ Photometry is the measurement of fluxes or magnitudes of astronomical
 objects. It can be performed with apertures, PSF fitting, or model
 fitting methods such as GALFIT.
 
-.. _concept-sbp:
-
-Surface brightness profile
---------------------------
-A surface brightness profile is a one–dimensional curve showing how the
-surface brightness of a galaxy changes with radius. Profiles are often
-used to characterize galaxy structure and to fit analytic models.
 
 .. _concept-simulated-galaxy:
 
