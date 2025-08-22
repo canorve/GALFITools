@@ -128,10 +128,12 @@ with GALFITools v1.11.0:
 **GALFIT Input**
 --------------------
 
+
 Routines that aid the GALFIT's user to
 prepare the necessary files for GALFIT input 
 
 
+.. _routine-getStar:
 **getStar** gets a image slice centered on the object peak
 
 ::
@@ -152,6 +154,7 @@ prepare the necessary files for GALFIT input
     -so SIGOUT, --sigout SIGOUT
                           the sigma image output
 
+.. _routine-initGal:
 **initGal** Creates GALFIT's input files with different initial parameters
 
 
@@ -185,6 +188,7 @@ prepare the necessary files for GALFIT input
        
 
 
+.. _routine-gtmakeMask:
 **gtmakeMask**  creates mask file from a SExtractor's catalog 
 
 ::
@@ -228,6 +232,7 @@ prepare the necessary files for GALFIT input
 
 
 
+.. _routine-maskDs9:
 **maskDs9**  creates (or modify) a mask image for GALFIT using DS9 regions 
 such as Boxes, Ellipses and Polygons
 
@@ -250,6 +255,7 @@ such as Boxes, Ellipses and Polygons
                           value of the border if it is different from zero
 
 
+.. _routine-maskSky:
 **maskSky** creates a mask image for GALFIT using original image and sky mean and sigma
 
 ::
@@ -275,6 +281,7 @@ such as Boxes, Ellipses and Polygons
     -bv BORVALUE, --borValue BORVALUE
                           value of the border if it is different from zero
 
+.. _routine-xy2fits:
 **xy2fits** code to convert ASCII x,y positions to FTIS mask
 
 ::
@@ -292,6 +299,7 @@ such as Boxes, Ellipses and Polygons
 
 
 
+.. _routine-checkFile:
 **checkFile** check that the parameters and file names inside the GALFIT input file are correct 
 
 ::
@@ -306,6 +314,7 @@ such as Boxes, Ellipses and Polygons
     -d DIS, --dis DIS  Maximum distance in pixels among components. Default = 10
 
 
+.. _routine-boxSize:
 **boxSize** computes the box size from a ds9 box region for galfit header option H) 
 
 ::
@@ -323,6 +332,7 @@ such as Boxes, Ellipses and Polygons
 
 
 
+.. _routine-getPeak:
 **getPeak**  Obtains the center, axis ratio and angular position from DS9 region
 
 ::
@@ -337,6 +347,7 @@ such as Boxes, Ellipses and Polygons
       -m MASK, --mask MASK  the mask file
 
 
+.. _routine-imarith:
 **imarith** makes arithmetic operations on image 
 
 ::
@@ -366,6 +377,7 @@ such as Boxes, Ellipses and Polygons
 
  
 
+.. _routine-getSersic:
 **getSersic** Its estimates and prints initial parameters for Sersic components. It
               addtion if proved options for single Sersic, bulge/disk and bulge/bar/disk
 
@@ -398,6 +410,7 @@ such as Boxes, Ellipses and Polygons
                           activated
 
 
+.. _routine-makePSF:
 **MakePSF** Makes a PSF model of a star using Multi Gaussian Expansion
 
 ::
@@ -427,10 +440,15 @@ such as Boxes, Ellipses and Polygons
 **GALFIT Output**
 -------------------
 
+
+
+
+
 Routines that computes photometric variables from 
 the surface brightness models fitted by GALFIT 
 
 
+.. _routine-getBreak:
 **getBreak** gets the break radius from a set of Sersics
 
 ::
@@ -460,6 +478,7 @@ the surface brightness models fitted by GALFIT
                           provide a range for the plot x-axis: xmin - xmax
 
 
+.. _routine-getBreak2:
 **getBreak2** gets the break radius from a set of Sersics using an 
 alternative method to getBreak
 
@@ -482,6 +501,7 @@ alternative method to getBreak
 
 
 
+.. _routine-getFWHM:
 **getFWHM** gets the FWHM from a set of Sersics
 ::
 
@@ -552,6 +572,7 @@ alternative method to getKappa
 
 
 
+.. _routine-getReComp:
 **getReComp** gets the effective radius from a set of Sersics
 ::
 
@@ -571,6 +592,7 @@ alternative method to getKappa
 
 
 
+.. _routine-getSlope:
 **getSlope** gets the slope radius from a set of Sersics
 ::
 
@@ -595,6 +617,7 @@ alternative method to getKappa
 
 
 
+.. _routine-getN:
 **getN** computes the Sersic index from surface brightness at effective radius
 ::
 
@@ -615,6 +638,7 @@ alternative method to getKappa
 
 
 
+.. _routine-getMissLight:
 **getMissLight** computes the missing light from two surface brightness models
 ::
 
@@ -631,6 +655,7 @@ alternative method to getKappa
 
 
 
+.. _routine-getBulgeRad:
 **getBulgeRad** gets the bulge radius or the radius where two models of surface brightness models are
 equal
 ::
@@ -652,6 +677,7 @@ equal
                           provide a range for x-axis: xmin - xmax
 
 
+.. _routine-showCube:
 **showCube** takes the GALFIT output and creates an image that shows galaxy, model and residual 
 ::
 
@@ -677,6 +703,7 @@ equal
     -np, --noplot         it doesn't show plotting window
 
 
+.. _routine-photDs9:
 **photDs9** computes photometry from a Ds9 region file: Box, Ellipses and Polygons
 ::
 
@@ -695,6 +722,7 @@ equal
 
 
 
+.. _routine-fitlog2csv:
 **fitlog2csv** converts fit.log file into a comma separated values file 
 ::
 
@@ -706,6 +734,7 @@ equal
                           the name of the output file 
 
 
+.. _routine-getBT:
 **getBT** computes the Bulge to Total luminosity ratio
 ::
 
@@ -726,6 +755,7 @@ equal
 
 
 
+.. _routine-getBarSize:
 **getBarSize** computes the barsize from a composed Sersic model: Bulge, bar and disk.
 . It assumes that bar is a gaussian (Sersic index = 0.5) and it is positioned as a 
 second component in galfit file galfit.XX
@@ -753,6 +783,7 @@ second component in galfit file galfit.XX
 
 
 
+.. _routine-getCOW:
 **getCOW** plots the curve-of-growth from the galfit.XX file. Only for Sersic functions
 ::
 
@@ -780,6 +811,7 @@ second component in galfit file galfit.XX
                           dots per inch used for images files
 
 
+.. _routine-getMeRad:
 **getMeRad** gets the surface brightness at a given radius from a set of Sersics
 ::
 
@@ -806,8 +838,10 @@ second component in galfit file galfit.XX
 **MGE**
 ---------------
 
+
 Routines that use the Multi-Gaussian Expansion.
 
+.. _routine-mge2galfit:
 **mge2galfit** fits multi-gaussian expansion of Cappellari (2002) and formats to GALFIT
 ::
 
@@ -829,6 +863,7 @@ Routines that use the Multi-Gaussian Expansion.
 
 
 
+.. _routine-SbProf:
 
 **SbProf** creates a surface brightness profile from a ellipse ds9 region
 ::
@@ -873,6 +908,8 @@ Routines that use the Multi-Gaussian Expansion.
 
 Routines that make a simulated galaxy image using GALFIT.
 
+
+.. _routine-makeSim:
 **makeSim** simulates a observed galaxy from a GALFIT model. It 
 adds Poisson and sky noise to the image.
 ::
@@ -894,8 +931,12 @@ adds Poisson and sky noise to the image.
 **Sky**
 -------------
 
+
+
+
 Routines that compute the sky background.
 
+.. _routine-galSky:
 **galSky** computes the sky using GALFIT
 ::
 
@@ -914,6 +955,7 @@ Routines that compute the sky background.
     -is INITSKY, --initsky INITSKY
                           the initial sky value default=0
 
+.. _routine-getSky:
 **getSky** computes sky from a ds9 region box file
 ::
 
@@ -926,6 +968,7 @@ Routines that compute the sky background.
     -h, --help  show this help message and exit
 
 
+.. _routine-skyDs9:
 **skyDs9** computes sky using ds9 region file
 ::
 
@@ -938,6 +981,7 @@ Routines that compute the sky background.
 
 
 
+.. _routine-skyRing:
 **skyRing** computes sky computing the gradient over concentric rings
 around the galaxy.
 
