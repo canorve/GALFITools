@@ -8,32 +8,36 @@ the package more accessible for users who may be less familiar with
 astronomical jargon.
 
 
-.. _concept-surface-brightness:
 
-Surface brightness (SB)
------------------------
-Surface brightness is the flux received per unit area on the sky,
-commonly reported in magnitudes per square arcsecond (mag arcsec⁻²).
-It describes how light is distributed across a galaxy image.
+Software Tools
+--------------
 
-.. _concept-psf:
+.. _concept-galfit:
 
-Point–spread function (PSF)
----------------------------
-The point–spread function represents the response of the telescope and
-detector to a point source of light (such as a star). It describes the
-blurring of the image due to the instrument and atmosphere (for
-ground–based observations). GALFIT requires a PSF to deconvolve models.
+GALFIT
+------
+GALFIT is a widely used program for two–dimensional fitting of galaxy
+images (Peng et al. 2002). It models galaxies with analytic functions
+(e.g., Sérsic, exponential disks, Nuker profiles) convolved with the
+point–spread function (PSF). GALFIT is the external engine that
+GALFITools interfaces with.
 
-.. _concept-sersic:
+.. _concept-ds9:
 
-Sérsic profile and index
-------------------------
-A Sérsic profile is a mathematical function that describes how the
-brightness of a galaxy varies with radius. The **Sérsic index** (*n*)
-controls the shape of the profile: low *n* values represent disk–like,
-exponential profiles, while high *n* values represent more concentrated,
-bulge–like profiles.
+SaoImage DS9
+------------
+SaoImage DS9 is an astronomical imaging and visualization application.
+It is commonly used to inspect FITS images, define regions of interest,
+and interactively examine astronomical data.
+
+.. _concept-ds9-regions:
+
+DS9 regions
+-----------
+In DS9, a *region* is a user–defined geometric shape (circle, box,
+polygon, etc.) drawn on an image. Regions can mark sources, masks,
+or fitting boundaries, and can be saved to files that GALFIT or
+GALFITools can read.
 
 .. _concept-mask:
 
@@ -53,6 +57,74 @@ as galaxy magnitude, effective radius, axis ratio, and Sérsic index.
 Providing reasonable initial values helps GALFIT converge to the correct
 solution.
 
+
+
+
+
+
+Image Properties
+----------------
+
+.. _concept-star-image:
+
+Star (in an image)
+------------------
+In the context of astronomical images, a *star* usually appears as a
+point–like source broadened by the PSF. Stars are often used to
+construct PSFs or to calibrate the image.
+
+.. _concept-psf:
+
+Point–spread function (PSF)
+---------------------------
+The point–spread function represents the response of the telescope and
+detector to a point source of light (such as a star). It describes the
+blurring of the image due to the instrument and atmosphere (for
+ground–based observations). GALFIT requires a PSF to deconvolve models.
+
+.. _concept-fwhm:
+
+Full Width at Half Maximum (FWHM)
+---------------------------------
+FWHM is a measure of the width of a profile. It is the distance between
+the two points on the profile where the value falls to half of its
+maximum. In astronomy, the FWHM of a stellar image provides an estimate
+of the PSF size and image resolution.
+
+.. _concept-surface-brightness:
+
+Surface brightness (SB)
+-----------------------
+Surface brightness is the flux received per unit area on the sky,
+commonly reported in magnitudes per square arcsecond (mag arcsec⁻²).
+It describes how light is distributed across a galaxy image.
+
+.. _concept-photometry:
+
+Photometry
+----------
+Photometry is the measurement of fluxes or magnitudes of astronomical
+objects. It can be performed with apertures, PSF fitting, or model
+fitting methods such as GALFIT.
+
+.. _concept-sbp:
+
+Surface brightness profile
+--------------------------
+A surface brightness profile is a one–dimensional curve showing how the
+surface brightness of a galaxy changes with radius. Profiles are often
+used to characterize galaxy structure and to fit analytic models.
+
+.. _concept-simulated-galaxy:
+
+Simulated galaxy (photometric)
+------------------------------
+A simulated galaxy is a synthetic image constructed using analytic
+profiles (e.g., Sérsic, exponential disk) and observational effects such
+as PSF convolution and noise. Simulated galaxies are used for testing,
+teaching, and validating analysis pipelines.
+
+
 .. _concept-sky:
 
 Sky background
@@ -60,6 +132,67 @@ Sky background
 The sky background is the level of light in an image not associated with
 the target object. Accurate background estimation is important because
 it strongly affects measured magnitudes and profiles.
+
+
+
+
+
+
+Galaxy Components
+-----------------
+
+.. _concept-bulge:
+
+Bulge
+-----
+The bulge is the central, spheroidal component of a galaxy. It is
+generally more concentrated and has higher surface brightness than the
+surrounding disk.
+
+.. _concept-disk:
+
+Disk
+----
+The disk is the flattened, rotating component of a galaxy, typically
+hosting spiral arms and ongoing star formation. Its brightness profile
+is often well described by an exponential law.
+
+.. _concept-bar:
+
+Galactic bar
+------------
+A bar is an elongated structure of stars crossing the central region of
+a disk galaxy. Bars redistribute angular momentum and can drive gas
+inflows toward the galaxy center.
+
+.. _concept-bt:
+
+Bulge–to–total luminosity ratio (B/T)
+-------------------------------------
+The bulge–to–total luminosity ratio is the fraction of a galaxy’s total
+light that comes from the bulge compared to the sum of bulge and disk.
+It is commonly used to quantify galaxy morphology.
+
+.. _concept-effective-radius:
+
+Effective radius (Re)
+---------------------
+The effective radius is the radius of a circular aperture that contains
+half of the total light of a galaxy or model component. It is a standard
+measure of galaxy size.
+
+Modeling and Mathematics
+------------------------
+
+.. _concept-sersic:
+
+Sérsic profile and index
+------------------------
+A Sérsic profile is a mathematical function that describes how the
+brightness of a galaxy varies with radius. The **Sérsic index** (*n*)
+controls the shape of the profile: low *n* values represent disk–like,
+exponential profiles, while high *n* values represent more concentrated,
+bulge–like profiles.
 
 .. _concept-mge:
 
@@ -70,6 +203,44 @@ two–dimensional light distribution as a sum of multiple two–dimensional
 Gaussian functions. This approach provides a flexible but compact way to
 model galaxy surface brightness profiles and is often used as input for
 dynamical modeling.
+
+
+.. _concept-nuker:
+
+Nuker profile
+-------------
+The Nuker profile is a broken power–law function used to describe the
+inner surface brightness distribution of galaxies, especially elliptical
+galaxies and bulges. It is defined by an inner slope, an outer slope,
+a break radius where the transition occurs, and a smoothness parameter
+that controls how sharp the transition is. The Nuker profile was
+introduced by Lauer et al. (1995) to fit the central light profiles of
+early–type galaxies observed with the Hubble Space Telescope.
+
+
+.. _concept-break-radius:
+
+Break radius (Nuker function)
+-----------------------------
+In the Nuker profile, the break radius is the scale at which the slope
+of the surface brightness profile changes from the inner power–law to
+the outer power–law regime.
+
+.. _concept-gamma-radius:
+
+Gamma radius (Nuker function)
+-----------------------------
+The gamma radius is defined as the radius where the negative logarithmic
+slope of the Nuker profile equals 0.5. It is used as a scale indicator
+for the transition between the core and outer regions.
+
+.. _concept-slope:
+
+Slope of a function
+-------------------
+The slope of a function is the rate at which the function changes with
+respect to its variable. In logarithmic surface brightness profiles,
+slopes describe how steeply brightness declines with radius.
 
 .. _concept-kappa:
 
@@ -84,9 +255,5 @@ disk around their guiding center orbit. See
 the mathematical definition.
 
 
-References
-----------
-- Peng, C. Y., et al. (2002). *Detailed structural decomposition of
-  galaxy images*. AJ, 124, 266.
-- Graham, A., & Driver, S. (2005). *A review of galaxy structural
-  parameters*. PASA, 22, 118.
+
+
