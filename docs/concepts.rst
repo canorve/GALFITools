@@ -9,7 +9,7 @@ astronomical jargon.
 
 
 
-Software Tools
+**Software Tools**
 --------------
 
 .. _concept-galfit:
@@ -89,7 +89,7 @@ surface brightness of a galaxy changes with radius. Profiles are often
 used to characterize galaxy structure and to fit analytic models.
 
 
-Image Properties
+**Image Properties**
 ----------------
 
 .. _concept-star-image:
@@ -158,7 +158,7 @@ it strongly affects measured magnitudes and profiles.
 
 
 
-Galaxy Components
+**Galaxy Components**
 -----------------
 
 .. _concept-bulge:
@@ -201,7 +201,9 @@ The effective radius is the radius of a circular aperture that contains
 half of the total light of a galaxy or model component. It is a standard
 measure of galaxy size.
 
-Modeling and Mathematics
+
+
+**Modeling and Mathematics**
 ------------------------
 
 .. _concept-sersic:
