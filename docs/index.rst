@@ -53,7 +53,7 @@ Indices and tables
 ==================
 
 * :ref:`genindex`
-* :doc:`readme`
+* :doc:`Overview <readme>`
 * :ref:`usage`
 * :ref:`api`
 * :ref:`modindex`
