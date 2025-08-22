@@ -23,6 +23,19 @@ images (Peng et al. 2002). It models galaxies with analytic functions
 point–spread function (PSF). GALFIT is the external engine that
 GALFITools interfaces with.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
 
 .. _concept-galfit-file:
 
@@ -37,6 +50,17 @@ radius, Sérsic index). After a run, the file can also record the final
 fitted parameters. GALFITools provides utilities to create and manage
 these files programmatically.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
 
 
 Example of a GALFIT file
@@ -76,6 +100,17 @@ parameter is free or fixed during fitting.
   10) 45.0     1             # Position angle (degrees)
    Z) 0                      # Skip this model in output image? (no=0)
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
 
 
 .. _concept-ds9:
@@ -86,6 +121,18 @@ SaoImage DS9 is an astronomical imaging and visualization application.
 It is commonly used to inspect FITS images, define regions of interest,
 and interactively examine astronomical data.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
 .. _concept-ds9-regions:
 
 DS9 regions
@@ -94,6 +141,19 @@ In DS9, a *region* is a user–defined geometric shape (circle, box,
 polygon, etc.) drawn on an image. Regions can mark sources, masks,
 or fitting boundaries, and can be saved to files that GALFITools 
 can read.
+
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
 
 .. _concept-mask:
 
@@ -104,6 +164,19 @@ fitting (for example, bright foreground stars, cosmic rays, or image
 defects). GALFITools includes utilities to create masks automatically or
 manually.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
 .. _concept-initial-params:
 
 Initial parameters
@@ -112,6 +185,19 @@ Initial parameters are starting guesses for the fitting procedure, such
 as galaxy magnitude, effective radius, axis ratio, and Sérsic index.
 Providing reasonable initial values helps GALFIT converge to the correct
 solution.
+
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
 
 
 .. _concept-sb-model:
@@ -125,6 +211,21 @@ laws, exponential disks, Gaussians, or Nuker profiles. Each function
 contributes to the total brightness distribution, and the complete
 model can include one or many components.
 
+
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
+
 .. _concept-component:
 
 Component
@@ -136,6 +237,21 @@ Sérsic function) or several components combined (e.g. bulge + disk,
 or bulge + disk + bar). Components allow complex galaxy structures to be
 described in a modular way.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
+
+
 .. _concept-sbp:
 
 Surface brightness profile
@@ -143,6 +259,19 @@ Surface brightness profile
 A surface brightness profile is a one–dimensional curve showing how the
 surface brightness of a galaxy changes with radius. Profiles are often
 used to characterize galaxy structure and to fit analytic models.
+
+
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
 
 
 --------------------
@@ -157,6 +286,19 @@ In the context of astronomical images, a *star* usually appears as a
 point–like source broadened by the PSF. Stars are often used to
 construct PSFs or to calibrate the image.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
 .. _concept-psf:
 
 Point–spread function (PSF)
@@ -165,6 +307,21 @@ The point–spread function represents the response of the telescope and
 detector to a point source of light (such as a star). It describes the
 blurring of the image due to the instrument and atmosphere (for
 ground–based observations). GALFIT requires a PSF to deconvolve models.
+
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
+
 
 .. _concept-fwhm:
 
@@ -175,6 +332,20 @@ the two points on the profile where the value falls to half of its
 maximum. In astronomy, the FWHM of a stellar image provides an estimate
 of the PSF size and image resolution.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
+
 .. _concept-surface-brightness:
 
 Surface brightness (SB)
@@ -183,6 +354,20 @@ Surface brightness is the flux received per unit area on the sky,
 commonly reported in magnitudes per square arcsecond (mag arcsec⁻²).
 It describes how light is distributed across a galaxy image.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
+
 .. _concept-photometry:
 
 Photometry
@@ -190,6 +375,19 @@ Photometry
 Photometry is the measurement of fluxes or magnitudes of astronomical
 objects. It can be performed with apertures, PSF fitting, or model
 fitting methods such as GALFIT.
+
+
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
 
 
 .. _concept-simulated-galaxy:
@@ -201,6 +399,17 @@ profiles (e.g., Sérsic, exponential disk) and observational effects such
 as PSF convolution and noise. Simulated galaxies are used for testing,
 teaching, and validating analysis pipelines.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
 
 .. _concept-sky:
 
@@ -210,6 +419,17 @@ The sky background is the level of light in an image not associated with
 the target object. Accurate background estimation is important because
 it strongly affects measured magnitudes and profiles.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
 
 
 .. _concept-magnitude:
@@ -221,6 +441,20 @@ object. A decrease of 1 magnitude corresponds to an increase in
 brightness by a factor of about 2.512. Fainter objects have larger
 magnitude values, while brighter objects have smaller values.
 
+
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
 .. _concept-convolution:
 
 Convolution
@@ -231,6 +465,19 @@ functions, such as a model galaxy image and the point–spread function
 detector. GALFIT uses convolution to compare model components with the
 observed data.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
 .. _concept-sigma-image:
 
 Sigma image
@@ -239,6 +486,20 @@ A sigma image is an auxiliary image where each pixel value represents
 the estimated standard deviation (uncertainty) of the corresponding
 pixel in the science image. GALFIT can use a sigma image to weight the
 fit, giving less importance to noisy pixels.
+
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
 
 .. _concept-mag-zero:
 
@@ -250,6 +511,20 @@ depends on the instrument, filter, and exposure time. A correct zero
 point ensures that fitted magnitudes can be compared with standard
 photometric systems.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
+
 .. _concept-plate-scale:
 
 Plate scale
@@ -257,6 +532,20 @@ Plate scale
 The plate scale is the conversion factor between pixel units in the
 image and angular units on the sky, usually expressed in arcseconds per
 pixel. It depends on the telescope optics and detector.
+
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
 
 .. _concept-axis-ratio:
 
@@ -266,6 +555,19 @@ The axis ratio (*b/a*) is the ratio of the minor axis length (*b*) to
 the major axis length (*a*) of an ellipse that describes the projected
 shape of a galaxy component. Values near 1 correspond to nearly circular
 objects, while smaller values indicate more elongated shapes.
+
+
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
 
 
 
@@ -283,6 +585,20 @@ The bulge is the central, spheroidal component of a galaxy. It is
 generally more concentrated and has higher surface brightness than the
 surrounding disk.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
+
 .. _concept-disk:
 
 Disk
@@ -292,6 +608,20 @@ The disk is the flattened, rotating component of a galaxy, typically
 hosting spiral arms and ongoing star formation. Its brightness profile
 is often well described by an exponential law.
 
+
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
 .. _concept-bar:
 
 Galactic bar
@@ -300,6 +630,19 @@ Galactic bar
 A bar is an elongated structure of stars crossing the central region of
 a disk galaxy. Bars redistribute angular momentum and can drive gas
 inflows toward the galaxy center.
+
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
 
 .. _concept-bt:
 
@@ -311,6 +654,18 @@ The bulge–to–total luminosity ratio is the fraction of a galaxy’s total
 light that comes from the bulge compared to the sum of bulge and disk.
 It is commonly used to quantify galaxy morphology.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
 .. _concept-effective-radius:
 
 Effective radius (Re)
@@ -320,6 +675,17 @@ The effective radius is the radius of a circular aperture that contains
 half of the total light of a galaxy or model component. It is a standard
 measure of galaxy size.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
 
 
 ------------------------------
@@ -336,6 +702,19 @@ controls the shape of the profile: low *n* values represent disk–like,
 exponential profiles, while high *n* values represent more concentrated,
 bulge–like profiles.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
 .. _concept-mge:
 
 Multi–Gaussian Expansion (MGE)
@@ -346,6 +725,17 @@ Gaussian functions. This approach provides a flexible but compact way to
 model galaxy surface brightness profiles and is often used as input for
 dynamical modeling.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
 
 .. _concept-nuker:
 
@@ -359,6 +749,19 @@ that controls how sharp the transition is. The Nuker profile was
 introduced by Lauer et al. (1995) to fit the central light profiles of
 early–type galaxies observed with the Hubble Space Telescope.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
 
 .. _concept-break-radius:
 
@@ -368,6 +771,19 @@ In the Nuker profile, the break radius is the scale at which the slope
 of the surface brightness profile changes from the inner power–law to
 the outer power–law regime.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
 .. _concept-gamma-radius:
 
 Gamma radius (Nuker function)
@@ -376,6 +792,19 @@ The gamma radius is defined as the radius where the negative logarithmic
 slope of the Nuker profile equals 0.5. It is used as a scale indicator
 for the transition between the core and outer regions.
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
+
 .. _concept-slope:
 
 Slope of a function
@@ -383,6 +812,19 @@ Slope of a function
 The slope of a function is the rate at which the function changes with
 respect to its variable. In logarithmic surface brightness profiles,
 slopes describe how steeply brightness declines with radius.
+
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
+- :py:func:`galfitools.galout.getRads.getKappa2`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getKappa <routine-getKappa>`
+   - :ref:`getKappa2 <routine-getKappa2>`
+
 
 .. _concept-kappa:
 
@@ -397,17 +839,12 @@ disk around their guiding center orbit. See
 the mathematical definition.
 
 
+
+
 **Related GALFITools API**
 
 - :py:func:`galfitools.galout.getRads.getKappa`
 - :py:func:`galfitools.galout.getRads.getKappa2`
-
-
-.. rubric:: Related GALFITools CLI commands
-
-  - :ref:`getKappa <routine-getKappa>`
-  - :ref:`getKappa2 <routine-getKappa2>`
-
 
 
 .. admonition:: Related GALFITools CLI commands
