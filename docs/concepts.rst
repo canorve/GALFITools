@@ -263,9 +263,11 @@ shape of a galaxy component. Values near 1 correspond to nearly circular
 objects, while smaller values indicate more elongated shapes.
 
 
--------------------------
+
+------------------------------
 **Galaxy Components**
--------------------------
+------------------------------
+
 
 .. _concept-bulge:
 
@@ -395,4 +397,7 @@ the mathematical definition.
 - :py:func:`galfitools.galout.getRads.getKappa`
 - :py:func:`galfitools.galout.getRads.getKappa2`
 
+**Related GALFITools routine**
 
+- :ref:`getKappa <routine-getKappa>`
+- :ref:`getKappa <routine-getKappa2>`

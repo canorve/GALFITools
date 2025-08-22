@@ -498,6 +498,7 @@ alternative method to getBreak
                           Angle of the major axis of the galaxy. Default= it will take the angle of the
                           last components
 
+.. _routine-getKappa:
 
 **getKappa** gets the Kappa radius from a set of Sersics
 
@@ -527,6 +528,7 @@ alternative method to getBreak
                           provide a range for x-axis: xmin - xmax
 
 
+.. _routine-getKappa2:
 
 **getKappa2** gets the kappa radius from a set of Sersics using an 
 alternative method to getKappa
