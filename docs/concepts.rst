@@ -49,6 +49,8 @@ parameter is free or fixed during fitting.
 
 .. code-block:: text
 
+   =============================================================================
+   # IMAGE and GALFIT CONTROL PARAMETERS
    A) galaxy.fits            # Input data image (FITS file)
    B) output.fits            # Output data image block
    C) none                   # Sigma image name (or "none")
@@ -58,6 +60,11 @@ parameter is free or fixed during fitting.
    G) none                   # Parameter constraint file (or "none")
    H) 1    512   1    512    # Image fitting region (xmin xmax ymin ymax)
    I) 100    100             # Size of convolution box (x y)
+   J) 25.0000             # Magnitude photometric zeropoint 
+   K) 0.2500  0.2500      # Plate scale (dx dy)   [arcsec per pixel]
+   O) regular             # Display type (regular, curses, both)
+   P) 0                   # Choose: 0=optimize, 1=model, 2=imgblock, 3=subcomps
+
 
    # Component 1: Sérsic profile
    0) sersic                 # Object type
@@ -67,9 +74,7 @@ parameter is free or fixed during fitting.
    5) 2.5      1             # Sérsic index
    9) 0.9      1             # Axis ratio (b/a)
   10) 45.0     1             # Position angle (degrees)
-
    Z) 0                      # Skip this model in output image? (no=0)
-
 
 
 
