@@ -22,6 +22,56 @@ images (Peng et al. 2002). It models galaxies with analytic functions
 point–spread function (PSF). GALFIT is the external engine that
 GALFITools interfaces with.
 
+
+.. _concept-galfit-file:
+
+GALFIT file
+-----------
+A GALFIT file (often called a *feedme file*) is a text file that
+contains all of the information required for GALFIT to run a model fit.
+It specifies the image properties (such as image filename, plate scale,
+and photometric zero point), the fitting and convolution regions, and
+the initial parameters of each component (e.g., magnitude, effective
+radius, Sérsic index). After a run, the file can also record the final
+fitted parameters. GALFITools provides utilities to create and manage
+these files programmatically.
+
+
+
+Example of a GALFIT file
+------------------------
+
+Below is a simplified snippet of a GALFIT input file (*feedme file*).  
+Each line specifies a property of the image or a parameter of a model
+component. The symbols in brackets (A, B, etc.) indicate whether a
+parameter is free or fixed during fitting.
+
+.. code-block:: text
+
+   A) galaxy.fits            # Input data image (FITS file)
+   B) output.fits            # Output data image block
+   C) none                   # Sigma image name (or "none")
+   D) psf.fits               # Input PSF image
+   E) 1                      # PSF oversampling factor
+   F) mask.fits              # Bad pixel mask (or "none")
+   G) none                   # Parameter constraint file (or "none")
+   H) 1    512   1    512    # Image fitting region (xmin xmax ymin ymax)
+   I) 100    100             # Size of convolution box (x y)
+
+   # Component 1: Sérsic profile
+   0) sersic                 # Object type
+   1) 256.0   256.0   1 1    # Position x, y [pixel]
+   3) 18.5     1             # Total magnitude
+   4) 20.0     1             # Effective radius [pixels]
+   5) 2.5      1             # Sérsic index
+   9) 0.9      1             # Axis ratio (b/a)
+  10) 45.0     1             # Position angle (degrees)
+
+   Z) 0                      # Skip this model in output image? (no=0)
+
+
+
+
 .. _concept-ds9:
 
 SaoImage DS9
@@ -155,6 +205,60 @@ it strongly affects measured magnitudes and profiles.
 
 
 
+.. _concept-magnitude:
+
+Magnitude
+---------
+Magnitude is a logarithmic measure of the brightness of an astronomical
+object. A decrease of 1 magnitude corresponds to an increase in
+brightness by a factor of about 2.512. Fainter objects have larger
+magnitude values, while brighter objects have smaller values.
+
+.. _concept-convolution:
+
+Convolution
+-----------
+In image analysis, convolution is the process of combining two
+functions, such as a model galaxy image and the point–spread function
+(PSF), to simulate how the model would appear through a telescope and
+detector. GALFIT uses convolution to compare model components with the
+observed data.
+
+.. _concept-sigma-image:
+
+Sigma image
+-----------
+A sigma image is an auxiliary image where each pixel value represents
+the estimated standard deviation (uncertainty) of the corresponding
+pixel in the science image. GALFIT can use a sigma image to weight the
+fit, giving less importance to noisy pixels.
+
+.. _concept-mag-zero:
+
+Magnitude zero point
+--------------------
+The magnitude zero point is a calibration constant that converts between
+instrumental fluxes (in counts or electrons) and standard magnitudes. It
+depends on the instrument, filter, and exposure time. A correct zero
+point ensures that fitted magnitudes can be compared with standard
+photometric systems.
+
+.. _concept-plate-scale:
+
+Plate scale
+-----------
+The plate scale is the conversion factor between pixel units in the
+image and angular units on the sky, usually expressed in arcseconds per
+pixel. It depends on the telescope optics and detector.
+
+.. _concept-axis-ratio:
+
+Axis ratio
+----------
+The axis ratio (*b/a*) is the ratio of the minor axis length (*b*) to
+the major axis length (*a*) of an ellipse that describes the projected
+shape of a galaxy component. Values near 1 correspond to nearly circular
+objects, while smaller values indicate more elongated shapes.
 
 
 
