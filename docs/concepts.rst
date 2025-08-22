@@ -397,7 +397,7 @@ the mathematical definition.
 - :py:func:`galfitools.galout.getRads.getKappa`
 - :py:func:`galfitools.galout.getRads.getKappa2`
 
-**Related GALFITools routine**
+**Related GALFITools CLI command**
 
 - :ref:`getKappa <routine-getKappa>`
-- :ref:`getKappa <routine-getKappa2>`
+- :ref:`getKappa2 <routine-getKappa2>`
