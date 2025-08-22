@@ -381,5 +381,8 @@ disk around their guiding center orbit. See
 the mathematical definition.
 
 
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getKappa`
 
 
