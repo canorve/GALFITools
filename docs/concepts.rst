@@ -265,7 +265,6 @@ objects, while smaller values indicate more elongated shapes.
 
 
 --------------------
-
 **Galaxy Components**
 ---------------------
 
