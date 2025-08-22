@@ -263,9 +263,9 @@ shape of a galaxy component. Values near 1 correspond to nearly circular
 objects, while smaller values indicate more elongated shapes.
 
 
---------------------
+-------------------------
 **Galaxy Components**
----------------------
+-------------------------
 
 .. _concept-bulge:
 
@@ -288,7 +288,7 @@ is often well described by an exponential law.
 .. _concept-bar:
 
 Galactic bar
------------
+----------------
 
 A bar is an elongated structure of stars crossing the central region of
 a disk galaxy. Bars redistribute angular momentum and can drive gas
@@ -298,7 +298,7 @@ inflows toward the galaxy center.
 
 
 Bulge–to–total luminosity ratio (B/T)
------------
+---------------------------------------
 
 The bulge–to–total luminosity ratio is the fraction of a galaxy’s total
 light that comes from the bulge compared to the sum of bulge and disk.
@@ -307,7 +307,7 @@ It is commonly used to quantify galaxy morphology.
 .. _concept-effective-radius:
 
 Effective radius (Re)
------------
+-----------------------
 
 The effective radius is the radius of a circular aperture that contains
 half of the total light of a galaxy or model component. It is a standard
