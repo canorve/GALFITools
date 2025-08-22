@@ -25,15 +25,15 @@ GALFITools interfaces with.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galin.MakePSF.makePSF`
+- :py:func:`galfitools.mge.mge2galfit.mge2gal`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`makePSF <routine-makePSF>`
+   - :ref:`mge2galfit <routine-mge2galfit>`
 
 
 
@@ -52,15 +52,15 @@ these files programmatically.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galin.getSersic.getSersic`
+- :py:func:`galfitools.galin.initgal.InitGal`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getSersic <routine-getSersic>`
+   - :ref:`initgal <routine-initGal>`
 
 
 Example of a GALFIT file
@@ -100,18 +100,21 @@ parameter is free or fixed during fitting.
   10) 45.0     1             # Position angle (degrees)
    Z) 0                      # Skip this model in output image? (no=0)
 
+
+
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galin.getSersic.getSersic`
+- :py:func:`galfitools.galin.initgal.InitGal`
+- :py:func:`galfitools.galin.checkGalFile.checkFile`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
-
+   - :ref:`getSersic <routine-getSersic>`
+   - :ref:`initgal <routine-initGal>`
+   - :ref:`checkFile <routine-checkFile>`
 
 .. _concept-ds9:
 
@@ -123,15 +126,18 @@ and interactively examine astronomical data.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
-
+- :py:func:`galfitools.galin.MaskDs9.maskDs9`
+- :py:func:`galfitools.galout.PhotDs9.photDs9`
+- :py:func:`galfitools.sky.SkyDs9.SkyDs9`
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`maskDs9 <routine-maskDs9>`
+   - :ref:`photDs9 <routine-photDs9>`
+   - :ref:`skyDs9 <routine-skyDs9>`
+
+
 
 .. _concept-ds9-regions:
 
@@ -140,19 +146,24 @@ DS9 regions
 In DS9, a *region* is a user–defined geometric shape (circle, box,
 polygon, etc.) drawn on an image. Regions can mark sources, masks,
 or fitting boundaries, and can be saved to files that GALFITools 
-can read.
+can read. In GALFITools, DS9 regions must be saved in physical or image
+coordinates.
+
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
-
+- :py:func:`galfitools.galin.MaskDs9.maskDs9`
+- :py:func:`galfitools.galout.PhotDs9.photDs9`
+- :py:func:`galfitools.sky.SkyDs9.SkyDs9`
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`maskDs9 <routine-maskDs9>`
+   - :ref:`photDs9 <routine-photDs9>`
+   - :ref:`skyDs9 <routine-skyDs9>`
+
+
 
 
 .. _concept-mask:
@@ -166,15 +177,18 @@ manually.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galin.MaskDs9.maskDs9`
+- :py:func:`galfitools.galin.MaskSky.skyRem`
+- :py:func:`galfitools.galin.MakeMask.makeMask`
+
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`maskDs9 <routine-maskDs9>`
+   - :ref:`maskSky <routine-maskSky>`
+   - :ref:`gtmakeMask <routine-gtmakeMask>`
 
 
 .. _concept-initial-params:
@@ -186,17 +200,20 @@ as galaxy magnitude, effective radius, axis ratio, and Sérsic index.
 Providing reasonable initial values helps GALFIT converge to the correct
 solution.
 
+
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galin.getSersic.getSersic`
+- :py:func:`galfitools.galin.initgal.InitGal`
+- :py:func:`galfitools.galin.checkGalFile.checkFile`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getSersic <routine-getSersic>`
+   - :ref:`initgal <routine-initGal>`
+   - :ref:`checkFile <routine-checkFile>`
 
 
 
@@ -211,18 +228,19 @@ laws, exponential disks, Gaussians, or Nuker profiles. Each function
 contributes to the total brightness distribution, and the complete
 model can include one or many components.
 
-
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galin.getSersic.getSersic`
+- :py:func:`galfitools.galin.initgal.InitGal`
+- :py:func:`galfitools.galin.checkGalFile.checkFile`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getSersic <routine-getSersic>`
+   - :ref:`initgal <routine-initGal>`
+   - :ref:`checkFile <routine-checkFile>`
 
 
 
@@ -239,16 +257,17 @@ described in a modular way.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galin.getSersic.getSersic`
+- :py:func:`galfitools.galin.initgal.InitGal`
+- :py:func:`galfitools.galin.checkGalFile.checkFile`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
-
+   - :ref:`getSersic <routine-getSersic>`
+   - :ref:`initgal <routine-initGal>`
+   - :ref:`checkFile <routine-checkFile>`
 
 
 
@@ -263,15 +282,13 @@ used to characterize galaxy structure and to fit analytic models.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.mge.SbProf.sbProf`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`SbProf <routine-SbProf>`
 
 
 --------------------
@@ -288,15 +305,15 @@ construct PSFs or to calibrate the image.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galin.getStar.getStar`
+- :py:func:`galfitools.galin.MakePSF.makePSF`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getStar <routine-getStar>`
+   - :ref:`makePSF <routine-makePSF>`
 
 
 .. _concept-psf:
@@ -308,17 +325,18 @@ detector to a point source of light (such as a star). It describes the
 blurring of the image due to the instrument and atmosphere (for
 ground–based observations). GALFIT requires a PSF to deconvolve models.
 
+
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galin.getStar.getStar`
+- :py:func:`galfitools.galin.MakePSF.makePSF`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getStar <routine-getStar>`
+   - :ref:`makePSF <routine-makePSF>`
 
 
 
@@ -334,16 +352,17 @@ of the PSF size and image resolution.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galin.getStar.getStar`
+- :py:func:`galfitools.galin.MakePSF.makePSF`
+- :py:func:`galfitools.galout.getRads.getFWHM`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
-
+   - :ref:`getStar <routine-getStar>`
+   - :ref:`makePSF <routine-makePSF>`
+   - :ref:`getFWHM <routine-getFWHM>`
 
 
 .. _concept-surface-brightness:
@@ -356,15 +375,15 @@ It describes how light is distributed across a galaxy image.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galout.getRads.getReComp`
+- :py:func:`galfitools.galout.getMeRad.getMeRad`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getReComp <routine-getReComp>`
+   - :ref:`getMeRad <routine-getMeRad>`
 
 
 
@@ -376,18 +395,17 @@ Photometry is the measurement of fluxes or magnitudes of astronomical
 objects. It can be performed with apertures, PSF fitting, or model
 fitting methods such as GALFIT.
 
-
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
-
+- :py:func:`galfitools.galout.PhotDs9.photDs9`
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`photDs9 <routine-photDs9>`
+
+
+
 
 
 .. _concept-simulated-galaxy:
@@ -401,35 +419,41 @@ teaching, and validating analysis pipelines.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.sim.MakeSim.makeSim`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`makeSim <routine-makeSim>`
+
+
+
 
 .. _concept-sky:
 
+
+
 Sky background
---------------
+----------------
 The sky background is the level of light in an image not associated with
 the target object. Accurate background estimation is important because
 it strongly affects measured magnitudes and profiles.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.sky.SkyDs9.SkyDs9`
+- :py:func:`galfitools.sky.GalfitSky.galfitsky`
+- :py:func:`galfitools.sky.SkyRing.SkyRing`
+
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`skyDs9 <routine-skyDs9>`
+   - :ref:`galSky <routine-galSky>`
+   - :ref:`skyRing <routine-skyRing>`
 
 
 .. _concept-magnitude:
@@ -444,15 +468,22 @@ magnitude values, while brighter objects have smaller values.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
-
+- :py:func:`galfitools.galout.getRads.getReComp`
+- :py:func:`galfitools.galout.PhotDs9.photDs9`
+- :py:func:`galfitools.galout.getMeRad.getMeRad`
+- :py:func:`galfitools.galout.getN.getN`
+- :py:func:`galfitools.galout.get.getCOW`
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getReComp <routine-getReComp>`
+   - :ref:`photDs9 <routine-photDs9>`
+   - :ref:`getMeRad <routine-getMeRad>`
+   - :ref:`getN <routine-getN>`
+   - :ref:`getBT <routine-getBT>`
+   - :ref:`getCOW <routine-getCOW>`
+
 
 
 .. _concept-convolution:
@@ -467,15 +498,15 @@ observed data.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galin.getStar.getStar`
+- :py:func:`galfitools.galin.MakePSF.makePSF`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getStar <routine-getStar>`
+   - :ref:`makePSF <routine-makePSF>`
 
 
 .. _concept-sigma-image:
@@ -486,18 +517,6 @@ A sigma image is an auxiliary image where each pixel value represents
 the estimated standard deviation (uncertainty) of the corresponding
 pixel in the science image. GALFIT can use a sigma image to weight the
 fit, giving less importance to noisy pixels.
-
-**Related GALFITools API**
-
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
-
-
-.. admonition:: Related GALFITools CLI commands
-   :class: seealso
-
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
 
 
 
@@ -511,18 +530,6 @@ depends on the instrument, filter, and exposure time. A correct zero
 point ensures that fitted magnitudes can be compared with standard
 photometric systems.
 
-**Related GALFITools API**
-
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
-
-
-.. admonition:: Related GALFITools CLI commands
-   :class: seealso
-
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
-
 
 
 .. _concept-plate-scale:
@@ -535,15 +542,15 @@ pixel. It depends on the telescope optics and detector.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galout.getRads.getReComp`
+- :py:func:`galfitools.galout.getMeRad.getMeRad`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getReComp <routine-getReComp>`
+   - :ref:`getMeRad <routine-getMeRad>`
 
 
 
@@ -556,18 +563,6 @@ the major axis length (*a*) of an ellipse that describes the projected
 shape of a galaxy component. Values near 1 correspond to nearly circular
 objects, while smaller values indicate more elongated shapes.
 
-
-**Related GALFITools API**
-
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
-
-
-.. admonition:: Related GALFITools CLI commands
-   :class: seealso
-
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
 
 
 
@@ -587,15 +582,17 @@ surrounding disk.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galin.getSersic.getSersic`
+- :py:func:`galfitools.galin.initgal.InitGal`
+- :py:func:`galfitools.galin.checkGalFile.checkFile`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getSersic <routine-getSersic>`
+   - :ref:`initgal <routine-initGal>`
+   - :ref:`checkFile <routine-checkFile>`
 
 
 
@@ -611,15 +608,18 @@ is often well described by an exponential law.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galin.getSersic.getSersic`
+- :py:func:`galfitools.galin.initgal.InitGal`
+- :py:func:`galfitools.galin.checkGalFile.checkFile`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getSersic <routine-getSersic>`
+   - :ref:`initgal <routine-initGal>`
+   - :ref:`checkFile <routine-checkFile>`
+
 
 
 .. _concept-bar:
@@ -631,17 +631,23 @@ A bar is an elongated structure of stars crossing the central region of
 a disk galaxy. Bars redistribute angular momentum and can drive gas
 inflows toward the galaxy center.
 
+
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galin.getSersic.getSersic`
+- :py:func:`galfitools.galin.initgal.InitGal`
+- :py:func:`galfitools.galin.checkGalFile.checkFile`
+- :py:func:`galfitools.galout.getBarSize.getBarSize`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getSersic <routine-getSersic>`
+   - :ref:`initgal <routine-initGal>`
+   - :ref:`checkFile <routine-checkFile>`
+   - :ref:`getBarSize <routine-getBarSize>`
+
 
 
 .. _concept-bt:
@@ -656,15 +662,14 @@ It is commonly used to quantify galaxy morphology.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galout.getBT.getBT`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getBT <routine-getBT>`
+
 
 .. _concept-effective-radius:
 
@@ -675,17 +680,20 @@ The effective radius is the radius of a circular aperture that contains
 half of the total light of a galaxy or model component. It is a standard
 measure of galaxy size.
 
+
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galout.getRads.getReComp`
+- :py:func:`galfitools.galout.getMeRad.getMeRad`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getReComp <routine-getReComp>`
+   - :ref:`getMeRad <routine-getMeRad>`
+
+
 
 
 ------------------------------
@@ -696,6 +704,7 @@ measure of galaxy size.
 
 Sérsic profile and index
 ------------------------
+
 A Sérsic profile is a mathematical function that describes how the
 brightness of a galaxy varies with radius. The **Sérsic index** (*n*)
 controls the shape of the profile: low *n* values represent disk–like,
@@ -704,15 +713,17 @@ bulge–like profiles.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galin.getSersic.getSersic`
+- :py:func:`galfitools.galin.initgal.InitGal`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getSersic <routine-getSersic>`
+   - :ref:`initgal <routine-initGal>`
+
+
 
 
 .. _concept-mge:
@@ -727,15 +738,18 @@ dynamical modeling.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galin.MakePSF.makePSF`
+- :py:func:`galfitools.mge.mge2galfit.mge2gal`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`makePSF <routine-makePSF>`
+   - :ref:`mge2galfit <routine-mge2galfit>`
+
+
+
 
 .. _concept-nuker:
 
@@ -751,15 +765,15 @@ early–type galaxies observed with the Hubble Space Telescope.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galout.getRads.getBreak`
+- :py:func:`galfitools.galout.getRads.getBreak2`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getBreak <routine-getBreak>`
+   - :ref:`getBreak2 <routine-getBreak2>`
 
 
 
@@ -771,17 +785,19 @@ In the Nuker profile, the break radius is the scale at which the slope
 of the surface brightness profile changes from the inner power–law to
 the outer power–law regime.
 
+
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galout.getRads.getBreak`
+- :py:func:`galfitools.galout.getRads.getBreak2`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getBreak <routine-getBreak>`
+   - :ref:`getBreak2 <routine-getBreak2>`
+
 
 
 .. _concept-gamma-radius:
@@ -794,15 +810,13 @@ for the transition between the core and outer regions.
 
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galout.getRads.getSlope`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getSlope <routine-getSlope>`
 
 
 .. _concept-slope:
@@ -813,17 +827,18 @@ The slope of a function is the rate at which the function changes with
 respect to its variable. In logarithmic surface brightness profiles,
 slopes describe how steeply brightness declines with radius.
 
+
 **Related GALFITools API**
 
-- :py:func:`galfitools.galout.getRads.getKappa`
-- :py:func:`galfitools.galout.getRads.getKappa2`
+- :py:func:`galfitools.galout.getRads.getSlope`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
-   - :ref:`getKappa <routine-getKappa>`
-   - :ref:`getKappa2 <routine-getKappa2>`
+   - :ref:`getSlope <routine-getSlope>`
+
+
 
 
 .. _concept-kappa:

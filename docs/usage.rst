@@ -282,7 +282,7 @@ such as Boxes, Ellipses and Polygons
                           value of the border if it is different from zero
 
 .. _routine-xy2fits:
-**xy2fits** code to convert ASCII x,y positions to FTIS mask
+**xy2fits** code to convert ASCII x,y positions to FITS mask
 
 ::
 
@@ -954,18 +954,6 @@ Routines that compute the sky background.
     -y YPOS, --ypos YPOS  the y position. default=1
     -is INITSKY, --initsky INITSKY
                           the initial sky value default=0
-
-.. _routine-getSky:
-**getSky** computes sky from a ds9 region box file
-::
-
-  positional arguments:
-    image       the image file 
-    maskfile    the Mask image file 
-    Ds9regFile  the DS9 box region file containing the galaxy
-
-  options:
-    -h, --help  show this help message and exit
 
 
 .. _routine-skyDs9:
