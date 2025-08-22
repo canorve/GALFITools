@@ -767,13 +767,14 @@ early–type galaxies observed with the Hubble Space Telescope.
 
 - :py:func:`galfitools.galout.getRads.getBreak`
 - :py:func:`galfitools.galout.getRads.getBreak2`
-
+- :py:func:`galfitools.galout.getRads.getSlope`
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
    - :ref:`getBreak <routine-getBreak>`
    - :ref:`getBreak2 <routine-getBreak2>`
+   - :ref:`getSlope <routine-getSlope>`
 
 
 
