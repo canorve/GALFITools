@@ -3,7 +3,7 @@ import types
 import pytest
 
 # Import the module under test
-import galfitools.shell.commands_mge as cli  # adjust to real module path
+import galfitools.shell.commands_mge as cli
 
 
 def test_mainMGE_calls_mge2gal_with_parsed_args(monkeypatch):

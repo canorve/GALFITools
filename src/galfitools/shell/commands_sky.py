@@ -1,4 +1,4 @@
-# commands_sky.py  (rename to your actual module)
+# commands_sky.py
 import argparse
 
 from galfitools.shell.prt import printWelcome

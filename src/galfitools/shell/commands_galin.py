@@ -1,7 +1,7 @@
 import argparse
 from collections import Counter
-
 import numpy as np
+
 from galfitools.galin.checkGalFile import checkFile
 from galfitools.galin.getBoxSizeDs9 import getBoxSizeDs9
 from galfitools.galin.getSersic import getSersic
@@ -16,18 +16,11 @@ from galfitools.galin.xy2fits import xy2fits
 from galfitools.shell.prt import printWelcome
 
 
-def mainGetStar():
-    """
-    Calls the getStar function based on argument parsing.
-    This function serves as an example of an API for getStar.
-    """
-
+def mainGetStar(argv=None) -> int:
     printWelcome()
-
     parser = argparse.ArgumentParser(
-        description="gets a image slice centered on the object peak"
+        description="gets an image slice centered on the object peak"
     )
-
     parser.add_argument("image", help="the image file to obtain the slice")
     parser.add_argument(
         "Ds9regFile", help="the DS9 ellipse region file containing the star"
@@ -37,8 +30,7 @@ def mainGetStar():
         "-c",
         "--center",
         action="store_true",
-        help="uses the center given in DS9 region file,"
-        + "otherwise it will find the x,y peaks within DS9 ellipse",
+        help="use the center in DS9 region; else find x,y peak within DS9 ellipse",
     )
     parser.add_argument(
         "-s", "--sky", type=float, help="the sky background to be removed"
@@ -46,9 +38,7 @@ def mainGetStar():
     parser.add_argument(
         "-o", "--out", type=str, help="the image output.", default="star.fits"
     )
-
     parser.add_argument("-sig", "--sigma", type=str, help="introduce the sigma image")
-
     parser.add_argument(
         "-so",
         "--sigout",
@@ -56,465 +46,281 @@ def mainGetStar():
         help="the sigma image output.",
         default="sigma.fits",
     )
+    args = parser.parse_args(argv)
 
-    args = parser.parse_args()
-
-    image = args.image
-    regfile = args.Ds9regFile
-    imsize = args.size
-    center = args.center
-
-    sky = args.sky
-    imout = args.out
-
-    sigma = args.sigma
-    sigout = args.sigout
-
-    getStar(image, regfile, imsize, center, sky, imout, sigma, sigout)
-
-    print("Done. Object fits file: {} created ".format(imout))
-
-    if sigma:
-        print("Done. sigma fits file: {} created ".format(sigout))
-
-
-def mainInitGal():
-    """
-    Calls the InitGal function based on argument parsing.
-    This function serves as an example of an API for InitGal.
-    """
-
-    printWelcome()
-
-
-    parser = argparse.ArgumentParser(
-        description="Creates GALFIT's input files with different initial parameters"
+    getStar(
+        args.image,
+        args.Ds9regFile,
+        args.size,
+        args.center,
+        args.sky,
+        args.out,
+        args.sigma,
+        args.sigout,
     )
+    print(f"Done. Object fits file: {args.out} created ")
+    if args.sigma:
+        print(f"Done. sigma fits file: {args.sigout} created ")
+    return 0
 
-    parser.add_argument("inFile", help="the galfit file galfit.XX ")
+
+def mainInitGal(argv=None) -> int:
+    printWelcome()
+    parser = argparse.ArgumentParser(
+        description="Creates GALFIT input files with different initial parameters"
+    )
+    parser.add_argument("inFile", help="the galfit file galfit.XX")
     parser.add_argument(
         "-n",
         "--number",
         type=int,
-        help="the number of files generated. Default = 1",
         default=1,
-    )
-
-    parser.add_argument(
-        "-p3",
-        "--param3",
-        nargs=2,
-        type=float,
-        help="range of values to give to the 3) model's parameter in format [min max] ",
+        help="number of files generated. Default=1",
     )
     parser.add_argument(
-        "-p4",
-        "--param4",
-        nargs=2,
-        type=float,
-        help="range of values to give to the 4) model's parameter in format [min max] ",
+        "-p3", "--param3", nargs=2, type=float, help="values for parameter 3) [min max]"
     )
     parser.add_argument(
-        "-p5",
-        "--param5",
-        nargs=2,
-        type=float,
-        help="range of values to give to the 5) model's parameter in format [min max] ",
+        "-p4", "--param4", nargs=2, type=float, help="values for parameter 4) [min max]"
     )
     parser.add_argument(
-        "-p6",
-        "--param6",
-        nargs=2,
-        type=float,
-        help="range of values to give to the 6) model's parameter in format  [min max]",
+        "-p5", "--param5", nargs=2, type=float, help="values for parameter 5) [min max]"
     )
     parser.add_argument(
-        "-p7",
-        "--param7",
-        nargs=2,
-        type=float,
-        help="range of values to give to the 7) model's parameter in format [min max]",
+        "-p6", "--param6", nargs=2, type=float, help="values for parameter 6) [min max]"
     )
     parser.add_argument(
-        "-p8",
-        "--param8",
-        nargs=2,
-        type=float,
-        help="range of values to give to the 8) model's parameter in format [min max]",
+        "-p7", "--param7", nargs=2, type=float, help="values for parameter 7) [min max]"
     )
     parser.add_argument(
-        "-p9",
-        "--param9",
-        nargs=2,
-        type=float,
-        help="range of values to give to the 9) model's parameter in format [min max]",
+        "-p8", "--param8", nargs=2, type=float, help="values for parameter 8) [min max]"
+    )
+    parser.add_argument(
+        "-p9", "--param9", nargs=2, type=float, help="values for parameter 9) [min max]"
     )
     parser.add_argument(
         "-p10",
         "--param10",
         nargs=2,
         type=float,
-        help="range of values to give to the 10) model's parameter in format [min max]",
+        help="values for parameter 10) [min max]",
     )
-
     parser.add_argument(
         "-nc",
         "--numcomp",
         type=int,
-        help="the component number which parameters will be changed",
+        help="component number whose parameters will be changed",
     )
-
-    args = parser.parse_args()
-
-    GalfitFile = args.inFile
-    number = args.number
-    param3 = args.param3
-    param4 = args.param4
-    param5 = args.param5
-    param6 = args.param6
-    param7 = args.param7
-
-    param8 = args.param8
-    param9 = args.param9
-    param10 = args.param10
-
-    numcomp = args.numcomp
+    args = parser.parse_args(argv)
 
     InitGal(
-        GalfitFile,
-        number,
-        param3,
-        param4,
-        param5,
-        param6,
-        param7,
-        param8,
-        param9,
-        param10,
-        numcomp,
+        args.inFile,
+        args.number,
+        args.param3,
+        args.param4,
+        args.param5,
+        args.param6,
+        args.param7,
+        args.param8,
+        args.param9,
+        args.param10,
+        args.numcomp,
     )
-
     print("rungalfit.sh has been created")
+    return 0
 
 
-def mainMakeMask():
-    """
-    Calls the makeMask function based on argument parsing.
-    This function serves as an example of an API for makeMask.
-    """
-
+def mainMakeMask(argv=None) -> int:
     printWelcome()
-
     parser = argparse.ArgumentParser(
-        description="creates mask file from a catalog of Sextractor"
+        description="creates mask file from a SExtractor catalog"
     )
-
-    parser.add_argument("Sexfile", help="Sextractor catalog file ")
+    parser.add_argument("Sexfile", help="SExtractor catalog file")
     parser.add_argument("ImageFile", help="Image file")
-
     parser.add_argument(
         "-o",
         "--maskout",
         type=str,
-        help="the output mask file name  ",
         default="masksex.fits",
+        help="output mask file name",
     )
     parser.add_argument(
-        "-sf", "--satds9", type=str, help="ds9 saturation file", default="ds9sat.reg"
+        "-sf", "--satds9", type=str, default="ds9sat.reg", help="ds9 saturation file"
     )
-
     parser.add_argument(
-        "-s",
-        "--scale",
-        type=float,
-        help="scale factor to increase the ellipses. Default=1",
-        default=1,
+        "-s", "--scale", type=float, default=1, help="scale factor for ellipses"
     )
+    args = parser.parse_args(argv)
 
-    args = parser.parse_args()
-
-    sexfile = args.Sexfile
-    image = args.ImageFile
-    maskfile = args.maskout
-    scale = args.scale
-    satfileout = args.satds9
-
-    makeMask(sexfile, image, maskfile, scale, satfileout)
-
+    makeMask(args.Sexfile, args.ImageFile, args.maskout, args.scale, args.satds9)
     print("Done. Mask image created ")
+    return 0
 
 
-def mainMaskDs9():
-    """
-    Calls the maskDs9 function based on argument parsing.
-    This function serves as an example of an API for maskDs9.
-    """
-
+def mainMaskDs9(argv=None) -> int:
     printWelcome()
-
     parser = argparse.ArgumentParser(
-        description="creates (or modify) a mask image for GALFIT"
-        + "using Ds9 regions such as Boxes, Ellipses and Polygons "
+        description="creates/modifies a mask image for GALFIT using DS9 regions"
     )
-
-    parser.add_argument("MaskFile", help="the Mask image file to modify or create")
-    parser.add_argument("RegFile", help="the DS9 region file")
-
+    parser.add_argument("MaskFile", help="Mask image file to modify or create")
+    parser.add_argument("RegFile", help="DS9 region file")
     parser.add_argument(
-        "-f",
-        "--fill",
-        type=int,
-        help="the value in counts to fill into the Ds9 regions. Default = 0 (remove)",
-        default=0,
+        "-f", "--fill", type=int, default=0, help="value to fill DS9 regions (0=remove)"
     )
-
-    parser.add_argument("-i", "--image", type=str, help="image to obtain the size  ")
-
+    parser.add_argument("-i", "--image", type=str, help="image to obtain the size")
     parser.add_argument(
         "-b",
         "--border",
         action="store_true",
-        help="Mask the borders when their value is zero",
+        help="mask borders when their value is zero",
     )
     parser.add_argument(
         "-bv",
         "--borValue",
+        type=float,
         default=0,
-        type=float,
-        help="value of the border if it is different from zero",
+        help="border value if different from zero",
     )
-
+    parser.add_argument("-sm", "--skymean", type=float, help="sky mean for sky patch")
     parser.add_argument(
-        "-sm", "--skymean", type=float, help="sky mean to be used as a patch of sky"
+        "-sd", "--skystd", type=float, default=1, help="sky std for sky patch"
     )
-    parser.add_argument(
-        "-sd",
-        "--skystd",
-        type=float,
-        help="sky standard deviation to be used with skymean as a patch of sky",
-        default=1,
-    )
-
-    args = parser.parse_args()
-
-    MaskFile = args.MaskFile
-    RegFile = args.RegFile
-    fill = args.fill
-    image = args.image
-
-    bor_flag = args.border
-    borValue = args.borValue
-
-    skymean = args.skymean
-    skystd = args.skystd
+    args = parser.parse_args(argv)
 
     maskDs9(
-        MaskFile,
-        RegFile,
-        fill,
-        image,
-        bor_flag,
-        borValue,
-        skymean=skymean,
-        skystd=skystd,
+        args.MaskFile,
+        args.RegFile,
+        args.fill,
+        args.image,
+        args.border,
+        args.borValue,
+        skymean=args.skymean,
+        skystd=args.skystd,
     )
+    print(f"Done. Mask {args.MaskFile} created (or modified)")
+    return 0
 
-    print("Done. Mask {} created (or modified)".format(MaskFile))
 
-
-def mainMaskSky():
-    """
-    Calls the skyRem function based on argument parsing.
-    This function serves as an example of an API for skyRem.
-    """
-
+def mainMaskSky(argv=None) -> int:
     printWelcome()
-
     parser = argparse.ArgumentParser(
-        description="creates a mask image for GALFIT using "
-        + "original image and sky mean and sigma"
+        description="creates a mask using image and sky mean/sigma"
     )
-
-    parser.add_argument("ImageFile", help="original data image ")
-    parser.add_argument("MaskFile", help="Name of the new Mask file")
+    parser.add_argument("ImageFile", help="original data image")
+    parser.add_argument("MaskFile", help="name of the new Mask file")
     parser.add_argument(
-        "-sm", "--skymean", default=0, type=float, help="mean of the sky background"
+        "-sm", "--skymean", type=float, default=0, help="sky background mean"
     )
     parser.add_argument(
-        "-ss", "--skysigma", default=0, type=float, help="sigma of the sky background"
+        "-ss", "--skysigma", type=float, default=0, help="sky background sigma"
     )
     parser.add_argument(
         "-ns",
         "--numbersig",
-        default=1,
         type=float,
-        help="number of times that the sigma of the sky will "
-        + "be multiplied to remove the sky background",
+        default=1,
+        help="multiplier for sigma to remove sky background",
     )
-
     parser.add_argument(
-        "-r", "--region", type=str, help="Ds9 region to remove from mask"
+        "-r", "--region", type=str, help="DS9 region to remove from mask"
     )
-
     parser.add_argument(
         "-b",
         "--border",
         action="store_true",
-        help="Mask the borders when their value is zero",
+        help="mask borders when their value is zero",
     )
-
     parser.add_argument(
         "-bv",
         "--borValue",
-        default=0,
         type=float,
-        help="value of the border if it is different from zero",
+        default=0,
+        help="border value if different from zero",
     )
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
-    image = args.ImageFile
-    mask = args.MaskFile
-    sky_mean = args.skymean
-    sky_sig = args.skysigma
-    nsig = args.numbersig
-
-    region = args.region
-
-    bor_flag = args.border
-    borValue = args.borValue
-
-    skyRem(image, mask, sky_mean, sky_sig, nsig, borValue, bor_flag)
-
-    if region:
-        maskDs9(mask, region, 0, None, False, 0)  # remove ds9 region if provided
-
-    print("Done. Mask file {} created".format(mask))
+    skyRem(
+        args.ImageFile,
+        args.MaskFile,
+        args.skymean,
+        args.skysigma,
+        args.numbersig,
+        args.borValue,
+        args.border,
+    )
+    if args.region:
+        maskDs9(
+            args.MaskFile, args.region, 0, None, False, 0
+        )  # remove ds9 region if provided
+    print(f"Done. Mask file {args.MaskFile} created")
+    return 0
 
 
-def mainxy2fits():
-    """
-    Calls the xy2fits function based on argument parsing.
-    This function serves as an example of an API for xy2fits.
-    """
-
+def mainxy2fits(argv=None) -> int:
     printWelcome()
-
     parser = argparse.ArgumentParser(
-        description="code to convert ASCII x,y positions to FTIS mask"
+        description="convert ASCII x,y positions to FITS mask"
     )
-
-    parser.add_argument("ImageFile", help="The Image file ")
-    parser.add_argument("AsciiMask", help="The ascii file with the x,y positions ")
+    parser.add_argument("ImageFile", help="The Image file")
+    parser.add_argument("AsciiMask", help="The ASCII file with the x,y positions")
     parser.add_argument(
-        "-c",
-        "--val",
-        type=int,
-        help="the value in counts for the masked pixels. Default = 1",
-        default=1,
+        "-c", "--val", type=int, default=1, help="value for masked pixels (counts)"
     )
+    args = parser.parse_args(argv)
 
-    args = parser.parse_args()
-
-    ImageFile = args.ImageFile
-    AsciiFile = args.AsciiMask
-    Value = args.val
-
-    xy2fits().MakeFits(ImageFile, AsciiFile, Value)
-
+    xy2fits().MakeFits(args.ImageFile, args.AsciiMask, args.val)
     print("Ascii -> Fits done ")
+    return 0
 
 
-# console scripts
-def maincheckFile() -> None:
-    """
-    Calls the checkFile function based on argument parsing.
-    This function serves as an example of an API for checkFile.
-    """
-
+def maincheckFile(argv=None) -> int:
     printWelcome()
-    # reading arguments parsing
-
     parser = argparse.ArgumentParser(
-        description="checkFile: check that the parameters and file "
-        + "names inside the GALFIT input file are correct"
+        description="check parameters and file names inside a GALFIT input file"
     )
-
-    # required arguments
-    parser.add_argument("GalfitFile", help="GALFIT input File ")
-
+    parser.add_argument("GalfitFile", help="GALFIT input file")
     parser.add_argument(
         "-d",
         "--dis",
         type=int,
-        help="Maximum distance in pixels among components. Default = 10",
         default=10,
+        help="maximum distance in pixels among components (Default=10)",
     )
+    args = parser.parse_args(argv)
 
-    # parsing variables
-
-    args = parser.parse_args()
-
-    galfitFile = args.GalfitFile
-    dis = args.dis
-
-    headinfo, galax, mag, freepar = checkFile(galfitFile, dis)
+    headinfo, galax, mag, freepar = checkFile(args.GalfitFile, args.dis)
 
     testflag = False
-
     if not (headinfo.inputimageflag):
-        line = "File {} not found ".format(headinfo.inputimage)
-        print(line)
+        print(f"File {headinfo.inputimage} not found ")
         testflag = True
-
-    # if not(headinfo.outimageflag):
-    #    line="File {} not found ".format(headinfo.outimage)
-    #    print(line)
-    #    testflag = True
-
     if not (headinfo.sigimageflag):
-        line = "File {} not found ".format(headinfo.sigimage)
-        print(line)
-        # testflag = True
-        line = "GALFIT will create a sigma file "
-        print(line)
-
+        print(f"File {headinfo.sigimage} not found ")
+        print("GALFIT will create a sigma file ")
     if not (headinfo.psfimageflag):
-        line = "File {} not found ".format(headinfo.psfimage)
-        print(line)
+        print(f"File {headinfo.psfimage} not found ")
         testflag = True
-
     if headinfo.psfimageflag:
         if not (headinfo.convxflag):
-            line = "Warning: x-size of convolution is smaller than psf image x-axis"
-            print(line)
+            print("Warning: x-size of convolution is smaller than psf image x-axis")
             testflag = True
-
         if not (headinfo.convyflag):
-            line = "Warning: y-size of convolution is smaller than psf image y-axis"
-            print(line)
+            print("Warning: y-size of convolution is smaller than psf image y-axis")
             testflag = True
-
     if not (headinfo.maskimageflag):
-        line = "File {} not found ".format(headinfo.maskimage)
-        print(line)
+        print(f"File {headinfo.maskimage} not found ")
         testflag = True
-
     if not (headinfo.constraintsflag):
-        line = "File {} not found ".format(headinfo.constraints)
-        print(line)
+        print(f"File {headinfo.constraints} not found ")
         testflag = True
-
     if not (headinfo.xsizeflag):
-        line = "format of size in x-axis not valid. xmax < xmin"
-        print(line)
+        print("format of size in x-axis not valid. xmax < xmin")
         testflag = True
-
     if not (headinfo.ysizeflag):
-        line = "Format of size in y-axis not valid. ymax < ymin"
-        print(line)
+        print("Format of size in y-axis not valid. ymax < ymin")
         testflag = True
 
-    if not (testflag):
+    if not testflag:
         print("No issues with the header information")
     else:
         print(
@@ -523,254 +329,157 @@ def maincheckFile() -> None:
 
     print("Total number of model components: ", len(galax))
     print("Total number of galaxies: ", len(np.unique(galax)))
-
     print("Components per galaxy: ")
 
     cnt = Counter(galax)
-
-    Flux = 10 ** (
-        (25 - mag) / 2.5
-    )  # 25 is just a constant to avoid small numbers. I substract it later
-
-    for idx, item in enumerate(np.unique(galax)):
-        totcomp = cnt[item]
+    Flux = 10 ** ((25 - mag) / 2.5)
+    for item in np.unique(galax):
         maskgal = galax == item
-
         totFlux = Flux[maskgal].sum()
-
         totmag = -2.5 * np.log10(totFlux) + 25
-
-        line = "galaxy {} has {} components and a total mag of: {:.2f} ".format(
-            int(item), totcomp, totmag
+        print(
+            f"galaxy {int(item)} has {cnt[item]} components and a total mag of: {totmag:.2f} "
         )
-        print(line)
 
-    line = "Total number of free parameters: {} ".format(freepar)
-    print(line)
+    print(f"Total number of free parameters: {freepar} ")
+    return 0
 
 
-def mainGetBoxSizeDs9():
-    """
-    Calls the getBoxSizeDs9 function based on argument parsing.
-    This function serves as an example of an API for getBoxSizeDs9.
-    """
-
+def mainGetBoxSizeDs9(argv=None) -> int:
     printWelcome()
-
-    # parser argument section
-
     parser = argparse.ArgumentParser(
-        description="Computes the Box size from a Ds9 region file for galfit header"
+        description="Compute Box size from a DS9 region file for GALFIT header"
     )
+    parser.add_argument("RegFile", help="DS9 region file containing the box region")
+    args = parser.parse_args(argv)
 
-    parser.add_argument("RegFile", help="Ds9 region file containing the box region ")
-    args = parser.parse_args()
-
-    RegFile = args.RegFile
-
-    xmin, xmax, ymin, ymax = getBoxSizeDs9(RegFile)
-
-    line = "xmin, xmax, ymin, ymax: {} {} {} {} ".format(xmin, xmax, ymin, ymax)
-    print(line)
+    xmin, xmax, ymin, ymax = getBoxSizeDs9(args.RegFile)
+    print(f"xmin, xmax, ymin, ymax: {xmin} {xmax} {ymin} {ymax} ")
+    return 0
 
 
-def maingetSersic():
-    """
-    Calls the getSersic function based on argument parsing.
-    This function serves as an example of an API for getSersic.
-    """
-
+def maingetSersic(argv=None) -> int:
     printWelcome()
-
     parser = argparse.ArgumentParser(
-        description="prints the Sersic function from DS9 ellipse region"
+        description="prints the Sérsic function from a DS9 ellipse region"
     )
-
-    parser.add_argument("Image", help="image fits file")
+    parser.add_argument("Image", help="image FITS file")
     parser.add_argument("RegFile", help="DS9 ellipse region file")
-
     parser.add_argument(
-        "-zp",
-        "--zeropoint",
-        type=float,
-        help="The value of the zero point. Default = 25 ",
-        default=25,
+        "-zp", "--zeropoint", type=float, default=25, help="photometric zero point"
     )
-
     parser.add_argument(
-        "-sk",
-        "--sky",
-        default=0,
-        type=float,
-        help="Sky background value to be removed from image "
-        + "before photometry. Default = 0",
+        "-sk", "--sky", type=float, default=0, help="sky background to subtract"
     )
-
     parser.add_argument(
         "-bt",
         "--bulgetot",
         type=float,
-        help="Bulge to total ratio. If set it will print two sersics: "
-        + "one for the bulge and the other for the disk",
+        help="bulge-to-total ratio (prints two Sérsics: bulge and disk)",
     )
-
     parser.add_argument(
-        "-c", "--center", action="store_true", help="takes center of ds9 region file"
+        "-c", "--center", action="store_true", help="take center from DS9 region file"
     )
-
     parser.add_argument(
         "-n",
         "--noprint",
         action="store_true",
-        help="avoids to print Sersic functionts to stdout",
+        help="do not print Sérsic functions to stdout",
     )
-    parser.add_argument("-m", "--mask", type=str, help="the mask file")
-
+    parser.add_argument("-m", "--mask", type=str, help="mask file")
     parser.add_argument(
         "-b",
         "--bards9",
         type=str,
-        help="DS9 ellipse region file that containts the bar region. "
-        + " bulgetot flag must be activated",
+        help="DS9 ellipse region containing the bar (requires --bulgetot)",
     )
-
-    args = parser.parse_args()
-
-    image = args.Image
-    regfile = args.RegFile
-    center = args.center
-    maskfile = args.mask
-    zeropoint = args.zeropoint
-    sky = args.sky
-    bulgetot = args.bulgetot
-    noprint = args.noprint
-    bards9 = args.bards9
+    args = parser.parse_args(argv)
 
     getSersic(
-        image, regfile, center, maskfile, zeropoint, sky, noprint, bulgetot, bards9
+        args.Image,
+        args.RegFile,
+        args.center,
+        args.mask,
+        args.zeropoint,
+        args.sky,
+        args.noprint,
+        args.bulgetot,
+        args.bards9,
     )
+    return 0
 
 
-def main_imarith() -> None:
-    """
-    Calls the imarith function based on argument parsing.
-    This function serves as an example of an API for imarith.
-    """
-
+def main_imarith(argv=None) -> int:
     printWelcome()
-    # reading arguments parsing
-
     parser = argparse.ArgumentParser(
-        description="imarith: makes arithmetics operations on images"
+        description="imarith: arithmetic operations on images"
     )
-
-    # required arguments
-    parser.add_argument("ImageFile", help="The input image")
-
+    parser.add_argument("ImageFile", help="the input image")
     parser.add_argument(
-        "-o", "--output", type=str, default="output.fits", help="The output image"
+        "-o", "--output", type=str, default="output.fits", help="the output image"
     )
-
     parser.add_argument(
         "-i",
         "--image2",
         type=str,
-        help="second input image to make arithmetic operations with "
-        + "ImageFile. Image2 must be of the same size of ImageFile. "
-        + "If this second image is provided it will make operations "
-        + "indicated by arithmetic flag ignoring its constant input",
+        help=(
+            "second input image; if provided, operations use ImageFile and image2; "
+            "otherwise they use the given constants"
+        ),
     )
-
     parser.add_argument("-a", "--add", type=float, help="add constant to image pixels")
     parser.add_argument("-d", "--div", type=float, help="divide all pixels by constant")
     parser.add_argument(
         "-m", "--mul", type=float, help="multiply all pixels by constant"
     )
     parser.add_argument(
-        "-s", "--sub", type=float, help="substract constant to all pixels"
+        "-s", "--sub", type=float, help="subtract constant from all pixels"
     )
+    args = parser.parse_args(argv)
 
-    # parsing variables
-
-    args = parser.parse_args()
-
-    ImageFile = args.ImageFile
-    output = args.output
-    image2 = args.image2
-
-    add = args.add
-    mul = args.mul
-    div = args.div
-    sub = args.sub
-
-    imarith(ImageFile, output, image2, add, mul, div, sub)
-
+    imarith(
+        args.ImageFile, args.output, args.image2, args.add, args.mul, args.div, args.sub
+    )
     print("done")
+    return 0
 
 
-def mainMakePSF():
-    """
-    Calls the makePSF function based on argument parsing.
-    This function serves as an example of an API for makePSF.
-    """
-
+def mainMakePSF(argv=None) -> int:
     printWelcome()
-
     parser = argparse.ArgumentParser(
         description="Makes a PSF model of a star using MGE"
     )
-
+    parser.add_argument("image", help="image containing the star to be modeled")
+    parser.add_argument("GalfitFile", help="GALFIT file to obtain header options")
     parser.add_argument(
-        "image", help="the image file where it contains the star to be modelled "
+        "Ds9regFile", help="DS9 ellipse region file containing the star"
     )
-    parser.add_argument("GalfitFile", help="GALFIT file to obtain the header options")
-
-    parser.add_argument(
-        "Ds9regFile", help="the DS9 ellipse region file containing the star to model"
-    )
-
     parser.add_argument(
         "-c",
         "--center",
         action="store_true",
-        help="uses the center given in DS9 region file, "
-        + "otherwise it will find the (x,y) peak within DS9 ellipse",
+        help="use DS9 center; else find (x,y) peak within DS9 ellipse",
     )
-
     parser.add_argument(
-        "-o", "--out", type=str, help="the PSF model image", default="psf.fits"
+        "-o", "--out", type=str, default="psf.fits", help="PSF model image"
     )
-
-    parser.add_argument("-sig", "--sigma", type=str, help="introduce the sigma image")
-
+    parser.add_argument("-sig", "--sigma", type=str, help="sigma image")
     parser.add_argument(
-        "-t", "--twist", action="store_true", help="uses twist option for mge "
+        "-t", "--twist", action="store_true", help="use twist option for MGE"
     )
-
     parser.add_argument(
-        "-ng",
-        "--numgauss",
-        type=int,
-        help="number of gaussians that will be used for galfit.",
+        "-ng", "--numgauss", type=int, help="number of Gaussians used for GALFIT"
     )
+    args = parser.parse_args(argv)
 
-    #######################
-    args = parser.parse_args()
-    ##
-
-    image = args.image
-    regfile = args.Ds9regFile
-    center = args.center
-
-    psfout = args.out
-
-    sigma = args.sigma
-
-    galfitFile = args.GalfitFile
-    twist = args.twist
-
-    numgauss = args.numgauss
-
-    #######################
-
-    makePSF(galfitFile, image, regfile, center, psfout, sigma, twist, numgauss)
+    makePSF(
+        args.GalfitFile,
+        args.image,
+        args.Ds9regFile,
+        args.center,
+        args.out,
+        args.sigma,
+        args.twist,
+        args.numgauss,
+    )
+    return 0
