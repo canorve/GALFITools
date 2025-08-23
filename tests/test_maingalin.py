@@ -1,6 +1,7 @@
 import pytest
 
 import galfitools.shell.commands_galin as cli
+import numpy as np
 
 
 def test_mainGetStar(monkeypatch, capsys):
