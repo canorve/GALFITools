@@ -4,45 +4,45 @@ from galfitools.shell.prt import printWelcome
 from galfitools.sim.MakeSim import makeSim
 
 
-def mainMakeSim():
-    """
-    Calls the makeSim function based on argument parsing.
-    This function serves as an example of an API.
-    """
-
-    printWelcome()
-
-    parser = argparse.ArgumentParser(
-        description="simulates a observed galaxy from a GALFIT model"
+def _build_parser_make_sim() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        description="simulates an observed galaxy from a GALFIT model"
     )
-
-    parser.add_argument("image", help="the GALFIT galaxy model")
-    parser.add_argument("newimage", help="the name of the new galaxy image")
-
-    parser.add_argument(
+    p.add_argument("image", help="the GALFIT galaxy model")
+    p.add_argument("newimage", help="the name of the new galaxy image")
+    p.add_argument(
         "-s",
         "--sky",
         type=float,
         help="the sky background value. default = 0",
         default=0,
     )
-    parser.add_argument(
+    p.add_argument(
         "-std",
         "--std",
         type=float,
         help="the sky standard deviation. default = 1",
         default=1,
     )
-
-    parser.add_argument(
+    p.add_argument(
         "-g",
         "--gain",
         type=float,
-        help="the gain value of the image. default =  1",
+        help="the gain value of the image. default = 1",
         default=1,
     )
+    return p
 
-    args = parser.parse_args()
+
+def mainMakeSim(argv=None) -> int:
+    """
+    Parse args and call makeSim. Return 0 on success.
+    Accepts an optional argv list for testing.
+    """
+    printWelcome()
+
+    parser = _build_parser_make_sim()
+    args = parser.parse_args(argv)
 
     image = args.image
     GAIN = args.gain
@@ -53,3 +53,5 @@ def mainMakeSim():
     newimage = args.newimage
 
     makeSim(image, GAIN, skymean, skystd, newimage)
+
+    return 0
