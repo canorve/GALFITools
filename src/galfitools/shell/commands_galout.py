@@ -1,5 +1,5 @@
+# commands_galout.py
 import argparse
-
 from galfitools.galin.galfit import Galfit
 from galfitools.galout.fitlog2csv import log2csv
 from galfitools.galout.getBarSize import getBarSize
@@ -24,1439 +24,425 @@ from galfitools.galout.showcube import displayCube
 from galfitools.shell.prt import printWelcome
 
 
-def mainPhotDs9():
-    """
-    Calls the photDs9 function based on argument parsing.
-    This function serves as an example of an API for photDs9.
-    """
-
+def mainPhotDs9(argv=None) -> int:
     printWelcome()
-
-    parser = argparse.ArgumentParser(
-        description="computes photometry from a Ds9 region "
-        + "file: Box, Ellipses and Polygons "
+    p = argparse.ArgumentParser(
+        description="computes photometry from a DS9 region file: Box, Ellipses and Polygons"
     )
-
-    parser.add_argument(
-        "ImageFile", help="the image file where the photometry will be computed"
-    )
-    parser.add_argument("RegFile", help="the DS9 region file")
-
-    parser.add_argument(
-        "-zp",
-        "--zeropoint",
-        type=float,
-        help="The value of the zero point. Default = 25 ",
-        default=25,
-    )
-
-    parser.add_argument("-m", "--mask", type=str, help="the mask file")
-
-    parser.add_argument(
-        "-sk",
-        "--sky",
-        default=0,
-        type=float,
-        help="Sky background value to be removed from image "
-        + "before photometry. Default = 0",
-    )
-
-    args = parser.parse_args()
-
-    ImageFile = args.ImageFile
-    RegFile = args.RegFile
-    maskfile = args.mask
-    zeropoint = args.zeropoint
-    sky = args.sky
-
-    mag, exptime = photDs9(ImageFile, RegFile, maskfile, zeropoint, sky)
-
-    line = "the exposition time is is: {} \n".format(exptime)
-    print(line)
-
-    line = "the magnitude from the ds9 region is: {:.2f} \n".format(mag)
-    print(line)
+    p.add_argument("ImageFile")
+    p.add_argument("RegFile")
+    p.add_argument("-zp", "--zeropoint", type=float, default=25)
+    p.add_argument("-m", "--mask", type=str)
+    p.add_argument("-sk", "--sky", type=float, default=0)
+    a = p.parse_args(argv)
+    mag, exptime = photDs9(a.ImageFile, a.RegFile, a.mask, a.zeropoint, a.sky)
+    print(f"the exposition time is is: {exptime} \n")
+    print(f"the magnitude from the ds9 region is: {mag:.2f} \n")
+    return 0
 
 
-# console scripts
-def mainGetBreak() -> None:
-    """
-    Calls the getBreak function based on argument parsing.
-    This function serves as an example of an API for getBreak.
-    """
-
+def mainGetBreak(argv=None) -> int:
     printWelcome()
-    # reading argument parsing
-
-    parser = argparse.ArgumentParser(
-        description="getBreak: gets the break radius from a set of Sersics "
+    p = argparse.ArgumentParser(
+        description="getBreak: gets the break radius from a set of Sersics"
     )
-
-    # required arguments
-    parser.add_argument(
-        "GalfitFile", help="Galfit File containing the Sersics or gaussians components"
-    )
-
-    parser.add_argument(
-        "-d", "--dis", type=int, help="Maximum distance among components", default=10
-    )
-
-    parser.add_argument(
-        "-n",
-        "--numcomp",
-        type=int,
-        help="Number of component where it'll obtain center of "
-        + "all components, default = 1 ",
-        default=1,
-    )
-
-    parser.add_argument(
-        "-pa",
-        "--angle",
-        type=float,
-        help="Position angle of the major axis of the galaxy. Default ="
-        + " it will take the angle of the last components",
-    )
-
-    parser.add_argument(
-        "-ni",
-        "--numinitial",
-        type=int,
-        help="Number of component where it'll obtain the initial parameter "
-        + "to search break radius or to generated random initial radius. ",
-        default=2,
-    )
-
-    parser.add_argument(
-        "-q",
-        "--quick",
-        action="store_true",
-        help="evaluate in position only (given by -ni parameter)",
-    )
-
-    parser.add_argument(
-        "-r",
-        "--random",
-        type=int,
-        help="Number of random radius as initial parameters to search for the "
-        + "minimum. It will generated random radius from 0 to effective radius"
-        + " of the component indicated by parameter -ni ",
-    )
-
-    parser.add_argument(
-        "-p",
-        "--plot",
-        action="store_true",
-        help="makes plot of double derivative vs. radius ",
-    )
-    parser.add_argument(
-        "-rx",
-        "--ranx",
-        nargs=2,
-        type=float,
-        help="provide a range for the plot x-axis: xmin - xmax ",
-    )
-
-    args = parser.parse_args()
-
-    galfitFile = args.GalfitFile
-    dis = args.dis
-
-    inicomp = args.numinitial
-
-    quick = args.quick
-    random = args.random
-
-    num_comp = args.numcomp
-
-    angle = args.angle
-
-    ranx = args.ranx
-    plot = args.plot
-
+    p.add_argument("GalfitFile")
+    p.add_argument("-d", "--dis", type=int, default=10)
+    p.add_argument("-n", "--numcomp", type=int, default=1)
+    p.add_argument("-pa", "--angle", type=float)
+    p.add_argument("-ni", "--numinitial", type=int, default=2)
+    p.add_argument("-q", "--quick", action="store_true")
+    p.add_argument("-r", "--random", type=int)
+    p.add_argument("-p", "--plot", action="store_true")
+    p.add_argument("-rx", "--ranx", nargs=2, type=float)
+    a = p.parse_args(argv)
     rbreak, N, theta = getBreak(
-        galfitFile, dis, inicomp, quick, random, num_comp, angle, plot, ranx
+        a.GalfitFile,
+        a.dis,
+        a.numinitial,
+        a.quick,
+        a.random,
+        a.numcomp,
+        a.angle,
+        a.plot,
+        a.ranx,
     )
-
     print("number of model components: ", N)
-
-    line = "Using a theta value of: {:.2f} degrees\n".format(theta)
-    print(line)
-
-    galfit = Galfit(galfitFile)
-
-    head = galfit.ReadHead()
-
-    plate = head.scale
-    rbreak_arc = rbreak * plate
-
-    line = 'The break radius is {:.2f} pixels or {:.2f} "  \n'.format(
-        rbreak, rbreak_arc
-    )
-    print(line)
+    print(f"Using a theta value of: {theta:.2f} degrees\n")
+    plate = Galfit(a.GalfitFile).ReadHead().scale
+    print(f'The break radius is {rbreak:.2f} pixels or {rbreak*plate:.2f} "  \n')
+    return 0
 
 
-def mainGetBreak2():
-    """
-    Calls the getBreak2 function based on argument parsing.
-    This function serves as an example of an API for getBreak2.
-    """
-
+def mainGetBreak2(argv=None) -> int:
     printWelcome()
-
-    parser = argparse.ArgumentParser(
-        description="getBreak2: gets the break radius from a set of Sersics "
+    p = argparse.ArgumentParser(
+        description="getBreak2: gets the break radius from a set of Sersics"
     )
-
-    # required arguments
-    parser.add_argument(
-        "GalfitFile", help="Galfit File containing the Sersics or gaussians components"
+    p.add_argument("GalfitFile")
+    p.add_argument("-d", "--dis", type=int, default=10)
+    p.add_argument("-n", "--numcomp", type=int, default=1)
+    p.add_argument("-pa", "--angle", type=float)
+    p.add_argument("-p", "--plot", action="store_true")
+    p.add_argument("-rx", "--ranx", nargs=2, type=float)
+    a = p.parse_args(argv)
+    rbreak, N, theta = getBreak2(
+        a.GalfitFile, a.dis, a.angle, a.numcomp, a.plot, a.ranx
     )
-
-    parser.add_argument(
-        "-d", "--dis", type=int, help="Maximum distance among components", default=10
-    )
-    parser.add_argument(
-        "-n",
-        "--numcomp",
-        type=int,
-        help="Number of component where it'll obtain center of all components,"
-        + " default = 1 ",
-        default=1,
-    )
-
-    parser.add_argument(
-        "-pa",
-        "--angle",
-        type=float,
-        help="Position angle of the major axis of the galaxy. Default = it will"
-        + " take the angle of the last components",
-    )
-
-    parser.add_argument(
-        "-p",
-        "--plot",
-        action="store_true",
-        help="makes plot of double derivative vs. radius ",
-    )
-
-    parser.add_argument(
-        "-rx",
-        "--ranx",
-        nargs=2,
-        type=float,
-        help="x-axis range to search for the Break radius: xmin - xmax ",
-    )
-
-    args = parser.parse_args()
-
-    galfitFile = args.GalfitFile
-    dis = args.dis
-    angle = args.angle
-    num_comp = args.numcomp
-    plot = args.plot
-    ranx = args.ranx
-
-    rbreak, N, theta = getBreak2(galfitFile, dis, angle, num_comp, plot, ranx)
-
-    galfit = Galfit(galfitFile)
-
-    head = galfit.ReadHead()
-
-    plate = head.scale
-    rbreak_arc = rbreak * plate
-
+    plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
-
-    line = "Using a theta value of: {:.2f} degrees\n".format(theta)
-    print(line)
-
-    line = 'The break radius is {:.2f} pixels or {:.2f} " \n'.format(rbreak, rbreak_arc)
-    print(line)
+    print(f"Using a theta value of: {theta:.2f} degrees\n")
+    print(f'The break radius is {rbreak:.2f} pixels or {rbreak*plate:.2f} " \n')
+    return 0
 
 
-def mainGetBarSize():
-    """
-    Calls the getBarSize function based on argument parsing.
-    This function serves as an example of an API for getBarSize.
-    """
-
+def mainGetBarSize(argv=None) -> int:
     printWelcome()
-
-    parser = argparse.ArgumentParser(
-        description="getBarSize: gets the bar size from Sersic models: Bulge,"
-        + " Bar and disk. It assumes that bar is galfit component 2 "
+    p = argparse.ArgumentParser(
+        description="getBarSize: gets the bar size from Sersic models"
     )
-
-    # required arguments
-    parser.add_argument(
-        "GalfitFile",
-        help="Galfit File containing the Sersics components bulge, bar, disk",
-    )
-
-    parser.add_argument(
-        "-d", "--dis", type=int, help="Maximum distance among components", default=10
-    )
-    parser.add_argument(
-        "-n",
-        "--numcomp",
-        type=int,
-        help="Number of component where it'll obtain center of all components,"
-        + " default = 1 ",
-        default=1,
-    )
-
-    parser.add_argument(
-        "-o",
-        "--out",
-        type=str,
-        default="bar.reg",
-        help="output DS9 ellipse region file",
-    )
-
-    parser.add_argument(
-        "-p",
-        "--plot",
-        action="store_true",
-        help="makes plot of double derivatives and Kappa radius ",
-    )
-
-    parser.add_argument(
-        "-rx",
-        "--ranx",
-        nargs=2,
-        type=float,
-        help="x-axis range to search for the Break and Kappa radius: xmin - xmax ",
-    )
-
-    args = parser.parse_args()
-
-    galfitFile = args.GalfitFile
-    dis = args.dis
-    out = args.out
-    num_comp = args.numcomp
-    plot = args.plot
-    ranx = args.ranx
-
-    rbar, N, theta = getBarSize(galfitFile, dis, num_comp, plot, ranx, out)
-
-    galfit = Galfit(galfitFile)
-
-    head = galfit.ReadHead()
-
-    plate = head.scale
-    rbar_arc = rbar * plate
-
+    p.add_argument("GalfitFile")
+    p.add_argument("-d", "--dis", type=int, default=10)
+    p.add_argument("-n", "--numcomp", type=int, default=1)
+    p.add_argument("-o", "--out", type=str, default="bar.reg")
+    p.add_argument("-p", "--plot", action="store_true")
+    p.add_argument("-rx", "--ranx", nargs=2, type=float)
+    a = p.parse_args(argv)
+    rbar, N, theta = getBarSize(a.GalfitFile, a.dis, a.numcomp, a.plot, a.ranx, a.out)
+    plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
-
-    line = "Using a theta value of: {:.2f} degrees\n".format(theta)
-    print(line)
-
-    line = 'The bar size is {:.2f} pixels or {:.2f} " \n'.format(rbar, rbar_arc)
-    print(line)
+    print(f"Using a theta value of: {theta:.2f} degrees\n")
+    print(f'The bar size is {rbar:.2f} pixels or {rbar*plate:.2f} " \n')
+    return 0
 
 
-def mainFWHM() -> None:
-    """
-    Calls the getFWHM function based on argument parsing.
-    This function serves as an example of an API for getFWHM.
-    """
-
+def mainFWHM(argv=None) -> int:
     printWelcome()
-
-    parser = argparse.ArgumentParser(
-        description="getFWHM: gets the FWHM from a set of Sersics "
+    p = argparse.ArgumentParser(
+        description="getFWHM: gets the FWHM from a set of Sersics"
     )
-
-    # required arguments
-    parser.add_argument(
-        "GalfitFile", help="Galfit File containing the Sersics or gaussians components"
-    )
-
-    parser.add_argument(
-        "-d", "--dis", type=int, help="Maximum distance among components", default=10
-    )
-
-    parser.add_argument(
-        "-n",
-        "--numcomp",
-        type=int,
-        help="Number of component where it'll obtain center of all components,"
-        + " default = 1 ",
-        default=1,
-    )
-
-    parser.add_argument(
-        "-pa",
-        "--angle",
-        type=float,
-        help="Position angle of the major axis of the galaxy. Default ="
-        + " it will take the angle of the last components",
-    )
-
-    args = parser.parse_args()
-
-    galfitFile = args.GalfitFile
-    dis = args.dis
-    angle = args.angle
-
-    num_comp = args.numcomp
-
-    fwhm, N, theta = getFWHM(galfitFile, dis, angle, num_comp)
-
-    galfit = Galfit(galfitFile)
-
-    head = galfit.ReadHead()
-
-    plate = head.scale
-    fwhm_arc = fwhm * plate
-
+    p.add_argument("GalfitFile")
+    p.add_argument("-d", "--dis", type=int, default=10)
+    p.add_argument("-n", "--numcomp", type=int, default=1)
+    p.add_argument("-pa", "--angle", type=float)
+    a = p.parse_args(argv)
+    fwhm, N, theta = getFWHM(a.GalfitFile, a.dis, a.angle, a.numcomp)
+    plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
-
-    line = "Using a theta value of : {:.2f} degrees\n".format(theta)
-    print(line)
-
-    line = 'The FWHM is {:.2f} pixels or {:.2f} " \n'.format(fwhm, fwhm_arc)
-    print(line)
+    print(f"Using a theta value of : {theta:.2f} degrees\n")
+    print(f'The FWHM is {fwhm:.2f} pixels or {fwhm*plate:.2f} " \n')
+    return 0
 
 
-# console scripts
-def mainKappa() -> None:
-    """
-    Calls the getKappa function based on argument parsing.
-    This function serves as an example of an API for getKappa.
-    """
-
+def mainKappa(argv=None) -> int:
     printWelcome()
-
-    # reading argument parsing
-
-    parser = argparse.ArgumentParser(
-        description="getKappa: gets the Kappa radius from a set of Sersics "
+    p = argparse.ArgumentParser(
+        description="getKappa: gets the Kappa radius from a set of Sersics"
     )
-
-    # required arguments
-    parser.add_argument(
-        "GalfitFile", help="Galfit File containing the Sersics or gaussians components"
-    )
-
-    parser.add_argument(
-        "-d", "--dis", type=int, help="Maximum distance among components", default=10
-    )
-
-    parser.add_argument(
-        "-n",
-        "--numcomp",
-        type=int,
-        help="Number of component where it'll obtain center of all components,"
-        + " default = 1 ",
-        default=1,
-    )
-
-    parser.add_argument(
-        "-pa",
-        "--angle",
-        type=float,
-        help="Position angle of the major axis of the galaxy. Default ="
-        + " it will take the angle of the last components",
-    )
-
-    parser.add_argument(
-        "-ni",
-        "--numinitial",
-        type=int,
-        help="Number of component where it'll obtain the initial parameter"
-        + " to search break radius or to generated random initial radius. ",
-        default=2,
-    )
-
-    parser.add_argument(
-        "-q",
-        "--quick",
-        action="store_true",
-        help="evaluate in position only (given by -ni parameter",
-    )
-
-    parser.add_argument(
-        "-r",
-        "--random",
-        type=int,
-        help="Number of random radius as initial parameters to search "
-        + "for the minimum. It will generated random radius from 0 to "
-        + "effective radius of the component indicated by parameter -ni ",
-    )
-
-    parser.add_argument(
-        "-p",
-        "--plot",
-        action="store_true",
-        help="makes plot of maximum curvature vs. radius ",
-    )
-    parser.add_argument(
-        "-rx",
-        "--ranx",
-        nargs=2,
-        type=float,
-        help="provide a range for x-axis: xmin - xmax ",
-    )
-
-    args = parser.parse_args()
-
-    galfitFile = args.GalfitFile
-    dis = args.dis
-
-    inicomp = args.numinitial
-
-    quick = args.quick
-    random = args.random
-    angle = args.angle
-
-    ranx = args.ranx
-    plot = args.plot
-
-    num_comp = args.numcomp
-
+    p.add_argument("GalfitFile")
+    p.add_argument("-d", "--dis", type=int, default=10)
+    p.add_argument("-n", "--numcomp", type=int, default=1)
+    p.add_argument("-pa", "--angle", type=float)
+    p.add_argument("-ni", "--numinitial", type=int, default=2)
+    p.add_argument("-q", "--quick", action="store_true")
+    p.add_argument("-r", "--random", type=int)
+    p.add_argument("-p", "--plot", action="store_true")
+    p.add_argument("-rx", "--ranx", nargs=2, type=float)
+    a = p.parse_args(argv)
     rkappa, N, theta = getKappa(
-        galfitFile, dis, inicomp, quick, random, angle, num_comp, plot, ranx
+        a.GalfitFile,
+        a.dis,
+        a.numinitial,
+        a.quick,
+        a.random,
+        a.angle,
+        a.numcomp,
+        a.plot,
+        a.ranx,
     )
-
-    galfit = Galfit(galfitFile)
-
-    head = galfit.ReadHead()
-
-    plate = head.scale
-    rkappa_arc = rkappa * plate
-
+    plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
-
-    line = 'The Kappa radius  is {:.2f} pixels or {:.2f} " \n'.format(
-        rkappa, rkappa_arc
-    )
-    print(line)
+    print(f'The Kappa radius  is {rkappa:.2f} pixels or {rkappa*plate:.2f} " \n')
+    return 0
 
 
-def mainKappa2():
-    """
-    Calls the getKappa2 function based on argument parsing.
-    This function serves as an example of an API for getKappa2.
-    """
-
+def mainKappa2(argv=None) -> int:
     printWelcome()
-
-    parser = argparse.ArgumentParser(
-        description="getKappa2: gets the Kappa radius (maximum curvature radius)"
-        + " from a set of Sersics "
+    p = argparse.ArgumentParser(
+        description="getKappa2: maximum curvature radius from Sersics"
     )
-
-    # required arguments
-    parser.add_argument(
-        "GalfitFile", help="Galfit File containing the Sersics or gaussians components"
+    p.add_argument("GalfitFile")
+    p.add_argument("-d", "--dis", type=int, default=10)
+    p.add_argument("-n", "--numcomp", type=int, default=1)
+    p.add_argument("-pa", "--angle", type=float)
+    p.add_argument("-p", "--plot", action="store_true")
+    p.add_argument("-rx", "--ranx", nargs=2, type=float)
+    a = p.parse_args(argv)
+    rkappa, N, theta = getKappa2(
+        a.GalfitFile, a.dis, a.angle, a.numcomp, a.plot, a.ranx
     )
-
-    parser.add_argument(
-        "-d", "--dis", type=int, help="Maximum distance among components", default=10
-    )
-    parser.add_argument(
-        "-n",
-        "--numcomp",
-        type=int,
-        help="Number of component where it'll obtain center of all components,"
-        + " default = 1 ",
-        default=1,
-    )
-
-    parser.add_argument(
-        "-pa",
-        "--angle",
-        type=float,
-        help="Position angle of the major axis of the galaxy. Default = "
-        + "it will take the angle of the last components",
-    )
-
-    parser.add_argument(
-        "-p",
-        "--plot",
-        action="store_true",
-        help="makes plot of double derivative vs. radius ",
-    )
-
-    parser.add_argument(
-        "-rx",
-        "--ranx",
-        nargs=2,
-        type=float,
-        help="x-axis range to search for the Break radius: xmin - xmax ",
-    )
-
-    args = parser.parse_args()
-
-    galfitFile = args.GalfitFile
-    dis = args.dis
-    angle = args.angle
-    num_comp = args.numcomp
-    plot = args.plot
-    ranx = args.ranx
-
-    rkappa, N, theta = getKappa2(galfitFile, dis, angle, num_comp, plot, ranx)
-
-    galfit = Galfit(galfitFile)
-
-    head = galfit.ReadHead()
-
-    plate = head.scale
-    rkappa_arc = rkappa * plate
-
+    plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
-
-    line = "Using a theta value of: {:.2f} degrees\n".format(theta)
-    print(line)
-
-    line = 'The kappa radius is {:.2f} pixels or {:.2f} " \n'.format(rkappa, rkappa_arc)
-    print(line)
+    print(f"Using a theta value of: {theta:.2f} degrees\n")
+    print(f'The kappa radius is {rkappa:.2f} pixels or {rkappa*plate:.2f} " \n')
+    return 0
 
 
-def mainGetReComp() -> None:
-    """
-    Calls the getReComp function based on argument parsing.
-    This function serves as an example of an API for getReComp.
-    """
-
+def mainGetReComp(argv=None) -> int:
     printWelcome()
-    # reading arguments parsing
-    parser = argparse.ArgumentParser(
-        description="getReComp: gets the effective radius from a set of Sersics "
+    p = argparse.ArgumentParser(
+        description="getReComp: gets the effective radius from Sersics"
     )
-
-    # required arguments
-    parser.add_argument(
-        "GalfitFile", help="Galfit File containing the Sersics or gaussians components"
-    )
-
-    parser.add_argument(
-        "-d", "--dis", type=int, help="Maximum distance among components", default=10
-    )
-    parser.add_argument(
-        "-fr",
-        "--fracrad",
-        type=float,
-        help="fraction of light radius. default=.5 for effective radius ",
-        default=0.5,
-    )
-
-    parser.add_argument(
-        "-n",
-        "--numcomp",
-        type=int,
-        help="Number of component where it'll obtain center of all components,"
-        + " default = 1 ",
-        default=1,
-    )
-
-    parser.add_argument(
-        "-pa",
-        "--angle",
-        type=float,
-        help="Angle of the major axis of the galaxy. Default = it will take the "
-        + " angle of the last components. Angle measured from Y-Axis as"
-        + "same as GALFIT. ",
-    )
-
-    args = parser.parse_args()
-
-    galfitFile = args.GalfitFile
-    dis = args.dis
-    eff = args.fracrad
-    num_comp = args.numcomp
-    angle = args.angle
-
+    p.add_argument("GalfitFile")
+    p.add_argument("-d", "--dis", type=int, default=10)
+    p.add_argument("-fr", "--fracrad", type=float, default=0.5)
+    p.add_argument("-n", "--numcomp", type=int, default=1)
+    p.add_argument("-pa", "--angle", type=float)
+    a = p.parse_args(argv)
     EffRad, totmag, meanme, me, N, theta = getReComp(
-        galfitFile, dis, eff, angle, num_comp
+        a.GalfitFile, a.dis, a.fracrad, a.angle, a.numcomp
     )
-
-    galfit = Galfit(galfitFile)
-
-    head = galfit.ReadHead()
-
-    plate = head.scale
-    EffRad_arc = EffRad * plate
-
+    plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
-
-    line = "Using a theta value of : {:.2f} degrees \n".format(theta)
-    print(line)
-
-    line = "Total Magnitude of the galaxy: {:.2f} \n".format(totmag)
-    print(line)
-
-    line1 = "Surface brightness at radius of "
-    line2 = "{:.0f}% of light (\u03BCr): {:.2f} mag/'' \n".format(eff * 100, me)
-    line = line1 + line2
-    print(line)
-
-    line1 = "Mean Surface Brightness at effective radius (<\u03BC>e):"
-    line2 = " {:.2f} mag/'' \n".format(meanme)
-    line = line1 + line2
-    if eff == 0.5:
-        print(line)
-
-    line = 'The radius at {:.0f}% of light is {:.2f} pixels or {:.2f} " \n'.format(
-        eff * 100, EffRad, EffRad_arc
+    print(f"Using a theta value of : {theta:.2f} degrees \n")
+    print(f"Total Magnitude of the galaxy: {totmag:.2f} \n")
+    print(
+        f"Surface brightness at radius of {a.fracrad*100:.0f}% of light (μr): {me:.2f} mag/'' \n"
     )
-    print(line)
+    if a.fracrad == 0.5:
+        print(
+            f"Mean Surface Brightness at effective radius (<μ>e): {meanme:.2f} mag/'' \n"
+        )
+    print(
+        f'The radius at {a.fracrad*100:.0f}% of light is {EffRad:.2f} pixels or {EffRad*plate:.2f} " \n'
+    )
+    return 0
 
 
-def mainGetMeRad() -> None:
-    """
-    Calls the getMeRad function based on argument parsing.
-    This function serves as an example of an API for getMeRad.
-    """
-
+def mainGetMeRad(argv=None) -> int:
     printWelcome()
-    # reading arguments parsing
-    parser = argparse.ArgumentParser(
-        description="getMeRad: gets the surface brightness at a given radius from a set of Sersics "
+    p = argparse.ArgumentParser(
+        description="getMeRad: surface brightness at a given radius from Sersics"
     )
-
-    # required arguments
-    parser.add_argument(
-        "GalfitFile", help="Galfit File containing the Sersics or gaussians components"
+    p.add_argument("GalfitFile")
+    p.add_argument("-d", "--dis", type=int, default=5)
+    p.add_argument("-r", "--rad", type=float, default=10)
+    p.add_argument("-n", "--numcomp", type=int, default=1)
+    p.add_argument("-pa", "--angle", type=float)
+    a = p.parse_args(argv)
+    totmag, meanmerad, merad, N, theta = getMeRad(
+        a.GalfitFile, a.dis, a.rad, a.angle, a.numcomp
     )
-
-    parser.add_argument(
-        "-d",
-        "--dis",
-        type=int,
-        help="Maximum distance among components (pixels)",
-        default=5,
-    )
-    parser.add_argument(
-        "-r",
-        "--rad",
-        type=float,
-        help="Radius in pixels where the surface brightness will be computed. Default = 10 pixels",
-        default=10,
-    )
-
-    parser.add_argument(
-        "-n",
-        "--numcomp",
-        type=int,
-        help="Number of component where it'll obtain center of all components,"
-        + " default = 1 ",
-        default=1,
-    )
-
-    parser.add_argument(
-        "-pa",
-        "--angle",
-        type=float,
-        help="Angle of the major axis of the galaxy. Default = it will take the "
-        + " angle of the last components. Angle measured from Y-Axis as"
-        + "same as GALFIT. ",
-    )
-
-    args = parser.parse_args()
-
-    galfitFile = args.GalfitFile
-    dis = args.dis
-    rad = args.rad
-    num_comp = args.numcomp
-    angle = args.angle
-
-    totmag, meanmerad, merad, N, theta = getMeRad(galfitFile, dis, rad, angle, num_comp)
-
-    galfit = Galfit(galfitFile)
-
-    head = galfit.ReadHead()
-
-    plate = head.scale
-    rad_arc = rad * plate
-
+    plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
-
-    line = "Using a theta value of : {:.2f} degrees \n".format(theta)
-    print(line)
-
-    line = "Total Magnitude of the galaxy: {:.2f} \n".format(totmag)
-    print(line)
-
-    line = 'The radius used is {:.2f} pixels or {:.2f} " \n'.format(rad, rad_arc)
-    print(line)
-
-    line1 = "Surface brightness at this radius is "
-    line2 = "(\u03BCr): {:.2f} mag/'' \n".format(merad)
-    line = line1 + line2
-    print(line)
-
-    line1 = "Mean Surface Brightness at radius (<\u03BC>r):"
-    line2 = " {:.2f} mag/'' \n".format(meanmerad)
-    line = line1 + line2
-    print(line)
+    print(f"Using a theta value of : {theta:.2f} degrees \n")
+    print(f"Total Magnitude of the galaxy: {totmag:.2f} \n")
+    print(f'The radius used is {a.rad:.2f} pixels or {a.rad*plate:.2f} " \n')
+    print(f"Surface brightness at this radius is (μr): {merad:.2f} mag/'' \n")
+    print(f"Mean Surface Brightness at radius (<μ>r): {meanmerad:.2f} mag/'' \n")
+    return 0
 
 
-def maingetSlope() -> None:
-    """
-    Calls the getSlope function based on argument parsing.
-    This function serves as an example of an API for getSlope.
-    """
-
+def maingetSlope(argv=None) -> int:
     printWelcome()
-    # reading argument parsing
-
-    parser = argparse.ArgumentParser(
-        description="getSlope: gets the slope radius from a set of Sersics "
+    p = argparse.ArgumentParser(
+        description="getSlope: gets the slope radius from a set of Sersics"
     )
-
-    # required arguments
-    parser.add_argument(
-        "GalfitFile", help="Galfit File containing the Sersics or gaussians components"
+    p.add_argument("GalfitFile")
+    p.add_argument("-d", "--dis", type=int, default=10)
+    p.add_argument("-n", "--numcomp", type=int, default=1)
+    p.add_argument("-a", "--angle", type=float)
+    p.add_argument("-s", "--slope", type=float, default=0.5)
+    p.add_argument("-p", "--plot", action="store_true")
+    p.add_argument("-rx", "--ranx", nargs=2, type=float)
+    a = p.parse_args(argv)
+    rgam, N, theta = getSlope(
+        a.GalfitFile, a.dis, a.slope, a.angle, a.numcomp, a.plot, a.ranx
     )
-
-    parser.add_argument(
-        "-d", "--dis", type=int, help="Maximum distance among components", default=10
-    )
-
-    parser.add_argument(
-        "-n",
-        "--numcomp",
-        type=int,
-        help="Number of component where it'll obtain center of "
-        + "all components, default = 1 ",
-        default=1,
-    )
-
-    parser.add_argument(
-        "-a",
-        "--angle",
-        type=float,
-        help="Angle of the major axis of the galaxy. Default = "
-        + "it will take the angle of the last components",
-    )
-
-    parser.add_argument(
-        "-s",
-        "--slope",
-        type=float,
-        help="value of slope to find. default=.5 ",
-        default=0.5,
-    )
-
-    parser.add_argument(
-        "-p",
-        "--plot",
-        action="store_true",
-        help="makes plot of first derivative vs. radius ",
-    )
-    parser.add_argument(
-        "-rx",
-        "--ranx",
-        nargs=2,
-        type=float,
-        help="provide a range for x-axis: xmin - xmax ",
-    )
-
-    args = parser.parse_args()
-
-    galfitFile = args.GalfitFile
-    dis = args.dis
-
-    slope = args.slope
-
-    num_comp = args.numcomp
-
-    angle = args.angle
-
-    ranx = args.ranx
-    plot = args.plot
-
-    rgam, N, theta = getSlope(galfitFile, dis, slope, angle, num_comp, plot, ranx)
-
-    galfit = Galfit(galfitFile)
-
-    head = galfit.ReadHead()
-
-    plate = head.scale
-    rgam_arc = rgam * plate
-
+    plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
-
-    line = "Using a theta value of : {:.2f} degrees\n".format(theta)
-    print(line)
-
-    line = 'The radius with slope {:.2f} is {:.2f} pixels, or {:.2f} " \n'.format(
-        slope, rgam, rgam_arc
+    print(f"Using a theta value of : {theta:.2f} degrees\n")
+    print(
+        f'The radius with slope {a.slope:.2f} is {rgam:.2f} pixels, or {rgam*plate:.2f} " \n'
     )
-    print(line)
+    return 0
 
 
-def maingetN() -> None:
-    """
-    Calls the getN function based on argument parsing.
-    This function serves as an example of an API for getN.
-    """
-
+def maingetN(argv=None) -> int:
     printWelcome()
-    # reading arguments parsing
-
-    parser = argparse.ArgumentParser(
-        description="getN: computes the Sersic index from surface brightness"
-        + " at effective radius"
+    p = argparse.ArgumentParser(
+        description="getN: Sérsic index from surface brightness at effective radius"
     )
-
-    # required arguments
-    parser.add_argument(
-        "GalfitFile", help="Galfit File containing the Sersics or gaussians components"
-    )
-
-    parser.add_argument(
-        "-d", "--dis", type=int, help="Maximum distance among components", default=10
-    )
-
-    parser.add_argument(
-        "-n",
-        "--numcomp",
-        type=int,
-        help="Number of component where it'll obtain center of all components, "
-        + "default = 1 ",
-        default=1,
-    )
-
-    parser.add_argument(
-        "-pa",
-        "--angle",
-        type=float,
-        help="Angle of the major axis of the galaxy. Default = it will take "
-        + "the angle of the last components. Angle measured from Y-Axis as "
-        + "same as GALFIT. ",
-    )
-
-    parser.add_argument(
-        "-rf",
-        "--radfrac",
-        type=float,
-        help="fraction of light radius. Default = .2 ",
-        default=0.2,
-    )
-
-    parser.add_argument(
-        "-p",
-        "--plot",
-        action="store_true",
-        help="makes plot of Sersic index vs. fraction of light ",
-    )
-
-    parser.add_argument(
-        "-c",
-        "--const",
-        type=float,
-        help="Substract constant from plot. Default = 0",
-        default=0,
-    )
-
-    # parsing variables
-
-    args = parser.parse_args()
-
-    galfitFile = args.GalfitFile
-    dis = args.dis
-
-    num_comp = args.numcomp
-
-    frac = args.radfrac
-
-    angle = args.angle
-
-    plot = args.plot
-    const = args.const
-
+    p.add_argument("GalfitFile")
+    p.add_argument("-d", "--dis", type=int, default=10)
+    p.add_argument("-n", "--numcomp", type=int, default=1)
+    p.add_argument("-pa", "--angle", type=float)
+    p.add_argument("-rf", "--radfrac", type=float, default=0.2)
+    p.add_argument("-p", "--plot", action="store_true")
+    p.add_argument("-c", "--const", type=float, default=0)
+    a = p.parse_args(argv)
     sersic, meanser, stdser, totmag, N, theta = getN(
-        galfitFile, dis, frac, angle, num_comp, plot, const
+        a.GalfitFile, a.dis, a.radfrac, a.angle, a.numcomp, a.plot, a.const
     )
-
     print("number of model components: ", N)
-
-    line = "Using a theta value of : {:.2f} degrees \n".format(theta)
-    print(line)
-
-    line = "Total Magnitude of the galaxy: {:.2f} \n".format(totmag)
-    print(line)
-
-    line = "Sersic index with the method of Mean Surface "
-    line2 = "Brightness at effective radius: {:.2f} \n".format(sersic)
-    line = line + line2
-    print(line)
-
-    line = "Sersic index with the method of fraction of light\n"
-    line2 = "(evaluated at different radius)\n"
-    line = line + line2
-    print(line)
-
-    line = "Sersic index mean: {:.2f}  Standard deviation: {:.2f}  ".format(
-        meanser, stdser
+    print(f"Using a theta value of : {theta:.2f} degrees \n")
+    print(f"Total Magnitude of the galaxy: {totmag:.2f} \n")
+    print(
+        "Sersic index with the method of Mean Surface Brightness at effective radius: {:.2f} ".format(
+            sersic
+        )
     )
-    print(line)
+    print(
+        "Sersic index with the method of fraction of light\n(evaluated at different radius)\n"
+    )
+    print(
+        "Sersic index mean: {:.2f}  Standard deviation: {:.2f}  ".format(
+            meanser, stdser
+        )
+    )
+    return 0
 
 
-def maingetBT() -> None:
-    """
-    Calls the getBT function based on argument parsing.
-    This function serves as an example of an API for getBT.
-    """
-
+def maingetBT(argv=None) -> int:
     printWelcome()
-    # reading arguments parsing
-
-    parser = argparse.ArgumentParser(
-        description="getBT: computes the Bulge to Total luminosity ratio"
-    )
-
-    # required arguments
-    parser.add_argument(
-        "GalfitFile",
-        help="Galfit File containing the bulge-disk or bulge-bar-disk surface brightness model",
-    )
-
-    parser.add_argument(
-        "-d", "--dis", type=int, help="Maximum distance among components", default=10
-    )
-
-    parser.add_argument(
-        "-n",
-        "--numcomp",
-        type=int,
-        help="Number of component where it'll obtain center of all components, "
-        + "default = 1 ",
-        default=1,
-    )
-
-    # parsing variables
-
-    args = parser.parse_args()
-
-    galfitFile = args.GalfitFile
-    dis = args.dis
-
-    num_comp = args.numcomp
-
-    bulge_total, totmag, N = getBT(galfitFile, dis, num_comp)
-
+    p = argparse.ArgumentParser(description="getBT: Bulge to Total luminosity ratio")
+    p.add_argument("GalfitFile")
+    p.add_argument("-d", "--dis", type=int, default=10)
+    p.add_argument("-n", "--numcomp", type=int, default=1)
+    a = p.parse_args(argv)
+    bulge_total, totmag, N = getBT(a.GalfitFile, a.dis, a.numcomp)
     print("number of model components: ", N)
-
-    line = "Total Magnitude of the galaxy: {:.2f} \n".format(totmag)
-    print(line)
-
-    line = "Bulge to total luminosity ratio: {:.2f} \n".format(bulge_total)
-    print(line)
+    print(f"Total Magnitude of the galaxy: {totmag:.2f} \n")
+    print(f"Bulge to total luminosity ratio: {bulge_total:.2f} \n")
+    return 0
 
 
-def mainGetBulgeRad() -> None:
-    """
-    Calls the getBulgeRad function based on argument parsing.
-    This function serves as an example of an API for getBulgeRad.
-    """
-
+def mainGetBulgeRad(argv=None) -> int:
     printWelcome()
-
-    parser = argparse.ArgumentParser(
-        description="getBulgeRad: gets the bulge radius or the radius where "
-        + "two models of surface brightness models are equal"
+    p = argparse.ArgumentParser(
+        description="getBulgeRad: radius where two SB models are equal"
     )
-
-    # required arguments
-    parser.add_argument(
-        "GalfitFile1",
-        help="Galfit File containing the coreless surface brightness model",
-    )
-    parser.add_argument(
-        "GalfitFile2", help="Galfit File containing the core surface brightness model"
-    )
-
-    parser.add_argument(
-        "-d", "--dis", type=int, help="Maximum distance among components", default=10
-    )
-
-    parser.add_argument(
-        "-n",
-        "--numcomp",
-        type=int,
-        help="Number of component where it'll obtain center of all components,"
-        + " default = 1 ",
-        default=1,
-    )
-
-    parser.add_argument(
-        "-pa",
-        "--angle",
-        type=float,
-        help="Angle of the major axis of the galaxy. Default = "
-        + "it will take the angle of the last components. Angle "
-        + "measured from Y-Axis as same as GALFIT. ",
-    )
-
-    parser.add_argument(
-        "-p",
-        "--plot",
-        action="store_true",
-        help="makes plot of GalfitFile1 - GalfitFile2 vs. radius ",
-    )
-    parser.add_argument(
-        "-rx",
-        "--ranx",
-        nargs=2,
-        type=float,
-        help="provide a range for x-axis: xmin - xmax ",
-    )
-
-    args = parser.parse_args()
-
-    galfitFile1 = args.GalfitFile1
-    galfitFile2 = args.GalfitFile2
-
-    dis = args.dis
-
-    num_comp = args.numcomp
-
-    angle = args.angle
-
-    ranx = args.ranx
-    plot = args.plot
-
+    p.add_argument("GalfitFile1")
+    p.add_argument("GalfitFile2")
+    p.add_argument("-d", "--dis", type=int, default=10)
+    p.add_argument("-n", "--numcomp", type=int, default=1)
+    p.add_argument("-pa", "--angle", type=float)
+    p.add_argument("-p", "--plot", action="store_true")
+    p.add_argument("-rx", "--ranx", nargs=2, type=float)
+    a = p.parse_args(argv)
     rbulge, N1, N2, theta = getBulgeRad(
-        galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx
+        a.GalfitFile1, a.GalfitFile2, a.dis, a.numcomp, a.angle, a.plot, a.ranx
     )
-
-    galfit = Galfit(galfitFile1)
-
-    head = galfit.ReadHead()
-
-    plate = head.scale
-    rbulge_arc = rbulge * plate
-
+    plate = Galfit(a.GalfitFile1).ReadHead().scale
     print("number of model components for the bulge: ", N1)
     print("number of model components for the rest of the galaxy: ", N2)
-
-    line = "Using a theta value of: {:.2f} degrees\n".format(theta)
-    print(line)
-
-    line = 'The bulge radius is {:.2f} pixels or {:.2f} "  \n'.format(
-        rbulge, rbulge_arc
-    )
-    print(line)
+    print(f"Using a theta value of: {theta:.2f} degrees\n")
+    print(f'The bulge radius is {rbulge:.2f} pixels or {rbulge*plate:.2f} "  \n')
+    return 0
 
 
-def mainMissingLight() -> None:
-    """
-    Calls the getMissLight function based on argument parsing.
-    This function serves as an example of an API for getMissLight.
-    """
-
+def mainMissingLight(argv=None) -> int:
     printWelcome()
-    # reading arguments parsing
-
-    parser = argparse.ArgumentParser(
-        description="getMissLight: computes the missing light from two "
-        + "surface brightness models"
+    p = argparse.ArgumentParser(
+        description="getMissLight: missing light between two SB models"
     )
-
-    # required arguments
-    parser.add_argument(
-        "GalfitFile1",
-        help="Galfit File containing the coreless surface brightness model",
+    p.add_argument("GalfitFile1")
+    p.add_argument("GalfitFile2")
+    p.add_argument("rad", type=float)
+    p.add_argument("-d", "--dis", type=int, default=10)
+    p.add_argument("-n", "--numcomp", type=int, default=1)
+    a = p.parse_args(argv)
+    magmiss, N1, N2 = getMissLight(
+        a.GalfitFile1, a.GalfitFile2, a.dis, a.numcomp, a.rad
     )
-    parser.add_argument(
-        "GalfitFile2", help="Galfit File containing the core surface brightness model"
-    )
-
-    parser.add_argument(
-        "rad",
-        type=float,
-        help="upper limit of radius to integrate the missing light in pixels",
-    )
-
-    parser.add_argument(
-        "-d", "--dis", type=int, help="Maximum distance among components", default=10
-    )
-
-    parser.add_argument(
-        "-n",
-        "--numcomp",
-        type=int,
-        help="Number of component where it'll obtain center of all "
-        + "components, default = 1 ",
-        default=1,
-    )
-
-    # parsing variables
-
-    args = parser.parse_args()
-
-    galfitFile1 = args.GalfitFile1
-    galfitFile2 = args.GalfitFile2
-
-    dis = args.dis
-
-    num_comp = args.numcomp
-
-    rad = args.rad
-
-    magmiss, N1, N2 = getMissLight(galfitFile1, galfitFile2, dis, num_comp, rad)
-
     print("number of model components coreless model: ", N1)
     print("number of model components core model: ", N2)
+    print(f"the missing light is {magmiss:.2f} mag \n")
+    return 0
 
-    line = "the missing light is {:.2f} mag \n".format(magmiss)
-    print(line)
 
-
-def mainShowCube():
-    """
-    Calls the displayCube function based on argument parsing.
-    This function serves as an example of an API for displayCube.
-    """
-
+def mainShowCube(argv=None) -> int:
     printWelcome()
-    parser = argparse.ArgumentParser(
-        description="show the cube fits of the galfit output"
+    p = argparse.ArgumentParser(description="show the cube fits of the galfit output")
+    p.add_argument("cubeimage")
+    p.add_argument("-o", "--outimage", type=str, default="cube.png")
+    p.add_argument("-br", "--brightness", type=float, default=0)
+    p.add_argument("-co", "--contrast", type=float, default=1)
+    p.add_argument("-cm", "--cmap", type=str, default="viridis")
+    p.add_argument("-dpi", "--dotsinch", type=int, default=100)
+    p.add_argument("-s", "--scale", type=float, default=1)
+    p.add_argument("-np", "--noplot", action="store_true")
+    a = p.parse_args(argv)
+    displayCube(
+        a.cubeimage,
+        a.outimage,
+        a.dotsinch,
+        a.brightness,
+        a.contrast,
+        a.cmap,
+        a.scale,
+        a.noplot,
     )
-
-    parser.add_argument("cubeimage", help="the cube GALFIT image")
-    parser.add_argument(
-        "-o", "--outimage", type=str, help="the output png file", default="cube.png"
-    )
-
-    ####
-    parser.add_argument(
-        "-br",
-        "--brightness",
-        type=float,
-        help="brightness of the image. Only for galaxy and model. "
-        + "Default = 0. Preferible range goes from -1 to 1",
-        default=0,
-    )
-    parser.add_argument(
-        "-co",
-        "--contrast",
-        type=float,
-        help="contrast of the image. Only for galaxy and model. Default = 1. "
-        + "Preferible range goes from 0 to 1",
-        default=1,
-    )
-
-    parser.add_argument(
-        "-cm",
-        "--cmap",
-        type=str,
-        help="cmap to be used for the cube image ",
-        default="viridis",
-    )
-    parser.add_argument(
-        "-dpi",
-        "--dotsinch",
-        type=int,
-        help="dots per inch used for images files ",
-        default=100,
-    )
-    parser.add_argument(
-        "-s",
-        "--scale",
-        type=float,
-        help="plate scale of the image. Default = 1",
-        default=1,
-    )
-    parser.add_argument(
-        "-np", "--noplot", action="store_true", help="it doesn't show plotting window"
-    )
-
-    args = parser.parse_args()
-
-    cubeimage = args.cubeimage
-    namecube = args.outimage
-    dpival = args.dotsinch
-    brightness = args.brightness
-    contrast = args.contrast
-    cmap = args.cmap
-    scale = args.scale
-    noplot = args.noplot
-
-    displayCube(cubeimage, namecube, dpival, brightness, contrast, cmap, scale, noplot)
+    return 0
 
 
-def maingetCOW() -> None:
-    """
-    plots the curve-of-growth from a set of Sersics
-    This function serves as an example of an API for getCOW.
-    """
-
+def maingetCOW(argv=None) -> int:
     printWelcome()
-    # reading arguments parsing
-
-    parser = argparse.ArgumentParser(
-        description="getCOW: plots the curve-of-growth from the galfit.XX "
-        + "file. Only for Sersic functions"
+    p = argparse.ArgumentParser(
+        description="getCOW: plot curve-of-growth from galfit.XX (Sersic only)"
     )
-
-    # required arguments
-    parser.add_argument("GalfitFile", help="GALFIT File containing the Sersics")
-
-    parser.add_argument(
-        "-d", "--dis", type=int, help="Maximum distance among components", default=10
-    )
-
-    parser.add_argument(
-        "-pf", "--plotfile", type=str, help="name of the plot file", default="cow.png"
-    )
-
-    parser.add_argument(
-        "-g",
-        "--galfitF2",
-        type=str,
-        help="Second GALFIT file to add to the plot (optional) ",
-    )
-
-    parser.add_argument(
-        "-md",
-        "--maxdiff",
-        action="store_true",
-        help="plot the maximum difference between model 1 and 2 (a vertical line) ",
-    )
-
-    parser.add_argument(
-        "-fr",
-        "--fracrad",
-        type=float,
-        help="fraction of light radius. This is the upper limit of "
-        + "X-Axis. default=.95 ",
-        default=0.95,
-    )
-
-    parser.add_argument(
-        "-n",
-        "--numcomp",
-        type=int,
-        help="Number of component where it'll obtain center of all "
-        + "components, default = 1 ",
-        default=1,
-    )
-
-    parser.add_argument(
-        "-pa",
-        "--angle",
-        type=float,
-        help="Angle of the major axis of the galaxy. Default = "
-        + "it will take the angle of the last components. Angle "
-        + "measured from Y-Axis as same as GALFIT. ",
-    )
-
-    parser.add_argument(
-        "-dpi",
-        "--dotsinch",
-        type=int,
-        help="dots per inch used for images files ",
-        default=100,
-    )
-
-    # parsing variables
-
-    args = parser.parse_args()
-
-    galfitFile = args.GalfitFile
-    dis = args.dis
-    plotfile = args.plotfile
-
-    dpival = args.dotsinch
-
-    frac = args.fracrad
-
-    maxdiff = args.maxdiff
-
-    num_comp = args.numcomp
-
-    angle = args.angle
-
-    galfitF2 = args.galfitF2
-
+    p.add_argument("GalfitFile")
+    p.add_argument("-d", "--dis", type=int, default=10)
+    p.add_argument("-pf", "--plotfile", type=str, default="cow.png")
+    p.add_argument("-g", "--galfitF2", type=str)
+    p.add_argument("-md", "--maxdiff", action="store_true")
+    p.add_argument("-fr", "--fracrad", type=float, default=0.95)
+    p.add_argument("-n", "--numcomp", type=int, default=1)
+    p.add_argument("-pa", "--angle", type=float)
+    p.add_argument("-dpi", "--dotsinch", type=int, default=100)
+    a = p.parse_args(argv)
     totmag, N, theta = getCOW(
-        galfitFile, dis, angle, frac, num_comp, plotfile, dpival, galfitF2, maxdiff
+        a.GalfitFile,
+        a.dis,
+        a.angle,
+        a.fracrad,
+        a.numcomp,
+        a.plotfile,
+        a.dotsinch,
+        a.galfitF2,
+        a.maxdiff,
     )
-
     print("number of model components: ", N)
-
-    line = "Using a theta value of : {:.2f} degrees \n".format(theta)
-    print(line)
-
-    line = "Total Magnitude of the galaxy: {:.2f} \n".format(totmag)
-    print(line)
-
-    print("plot file: ", plotfile)
+    print(f"Using a theta value of : {theta:.2f} degrees \n")
+    print(f"Total Magnitude of the galaxy: {totmag:.2f} \n")
+    print("plot file: ", a.plotfile)
+    return 0
 
 
-def mainFitlog2CSV():
-    """
-    Calls the getStar function based on argument parsing.
-    This function serves as an example of an API for getStar.
-    """
-
+def mainFitlog2CSV(argv=None) -> int:
     printWelcome()
-
-    parser = argparse.ArgumentParser(
-        description="converts fit.log file into a comma separated values file"
-    )
-
-    parser.add_argument(
-        "-o", "--fileout", type=str, help="output file", default="fitlog.csv"
-    )
-
-    parser.add_argument(
-        "-n",
-        "--num",
-        type=int,
-        help="number of the fit in fit.log to convert to csv. Default: last fit",
-    )
-
-    parser.add_argument("-p", "--path", type=str, help="path where fit.log is located")
-
-    args = parser.parse_args()
-
-    fileout = args.fileout
-    num = args.num
-    path = args.path
-
-    log2csv(num, fileout, path=path)
-
+    p = argparse.ArgumentParser(description="converts fit.log file into a CSV file")
+    p.add_argument("-o", "--fileout", type=str, default="fitlog.csv")
+    p.add_argument("-n", "--num", type=int, help="fit number; default is last fit")
+    p.add_argument("-p", "--path", type=str, help="path where fit.log is located")
+    a = p.parse_args(argv)
+    log2csv(a.num, a.fileout, path=a.path)
     print("conversion to CSV file done.")
+    return 0
 
 
-def maingetPeak():
-    """
-    Calls the getStar function based on argument parsing.
-    This function serves as an example of an API for getStar.
-    """
-
+def maingetPeak(argv=None) -> int:
     printWelcome()
-
-    parser = argparse.ArgumentParser(
-        description="Obtains the center, axis ratio and angular "
-        + "position from DS9 region"
+    p = argparse.ArgumentParser(
+        description="Obtains center, axis ratio and PA from DS9 region"
     )
-
-    parser.add_argument("Image", help="image fits file")
-    parser.add_argument("RegFile", help="DS9 ellipse region file")
-
-    parser.add_argument(
-        "-c", "--center", action="store_true", help="takes center of ds9 region file"
-    )
-    parser.add_argument("-m", "--mask", type=str, help="the mask file")
-
-    args = parser.parse_args()
-
-    image = args.Image
-    regfile = args.RegFile
-    center = args.center
-    maskfile = args.mask
-
-    X, Y, AxRat, PA = getPeak(image, regfile, center, maskfile)
-
+    p.add_argument("Image")
+    p.add_argument("RegFile")
+    p.add_argument("-c", "--center", action="store_true")
+    p.add_argument("-m", "--mask", type=str)
+    a = p.parse_args(argv)
+    X, Y, AxRat, PA = getPeak(a.Image, a.RegFile, a.center, a.mask)
     print("peak is at (x, y) = ", X, Y)
-
     print("axis ratio q = {:.2f} ".format(AxRat))
     print("angular position = {:.2f}".format(PA))
+    return 0
