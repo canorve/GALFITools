@@ -73,8 +73,8 @@ and other pertinent photometric variables.
 **NOTE:** GALFITools assumes the user has a basic knowledge of GALFIT and SaoImage DS9.  
 How to use GALFIT is found in the official `GALFIT <GALFIT2_>`_ webpage.  
 The DS9 webpage can be found `here <ds9_>`_ and a basic tutorial `here <ds9_tutorial_>`_.
-Useful concepts with related functions and CLI commands can be found :doc:`here <concepts>`.
-
+Useful concepts with related functions and CLI commands can be found 
+`here <https://galfitools.readthedocs.io/en/latest/concepts.html>`_.
 
 
 .. _GALFIT: https://users.obs.carnegiescience.edu/peng/work/galfit/GFAQ.html
