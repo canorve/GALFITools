@@ -1,7 +1,7 @@
 import pytest
 
 # adjust import to your actual module path
-import galfitools.cli_make_sim as cli
+import galfitools.shell.commands_sim as cli
 
 
 def test_mainMakeSim_calls_makeSim_with_args(monkeypatch):
