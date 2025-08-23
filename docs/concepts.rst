@@ -291,6 +291,52 @@ used to characterize galaxy structure and to fit analytic models.
    - :ref:`SbProf <routine-SbProf>`
 
 
+
+
+.. _concept-simultaneous-fitting:
+
+Simultaneous fitting
+--------------------
+In GALFIT, *simultaneous fitting* refers to fitting **two or more galaxies at
+the same time within the same image**. Each galaxy may have its own surface
+brightness model (bulge, disk, bar, etc.), and all models are optimized
+together in a single run.
+
+**Why use it.**  
+- To correctly account for light contamination when galaxies overlap or lie
+  close to one another in projection.  
+- To avoid bias in parameter estimates that would occur if neighboring galaxies
+  were ignored or subtracted beforehand.  
+- To ensure that the global sky, PSF, and noise properties are treated
+  consistently across the field.
+
+**How GALFITools interprets simultaneous fitting.**  
+- Components belonging to the *same* galaxy are grouped by a common center
+  (within a distance tolerance given by ``-d/--dis``).  
+- Components belonging to *different* galaxies have distinct centers.  
+- Many GALFITools routines allow you to specify which galaxy (set of components)
+  to analyze via ``--numcomp`` or similar options.  
+- The software can therefore compute quantities for one galaxy (e.g., bulge to
+  total ratio) even if several galaxies were fit simultaneously.
+
+.. note::
+   This is different from fitting multiple components of a single galaxy.
+   Here, **entire galaxies** (each possibly with multiple components) are fit
+   together.
+
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getReComp`
+- :py:func:`galfitools.galout.getMeRad.getMeRad`
+
+.. admonition:: Related GALFITools CLI commands
+   :class: dropdown
+
+   - :ref:`routine-getReComp`
+   - :ref:`routine-getMeRad`
+
+
+
 --------------------
 **Image Properties**
 --------------------
