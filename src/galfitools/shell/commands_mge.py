@@ -73,7 +73,7 @@ def _build_parser_mge() -> argparse.ArgumentParser:
 
 
 # check modify: remove initgauss
-def mainMGE():
+def mainMGE(argv=None) -> int:
     """
     Calls the mge2gal function based on argument parsing.
     This function serves as an example of an API.
@@ -183,7 +183,7 @@ def _build_parser_sbprof() -> argparse.ArgumentParser:
     return p
 
 
-def mainSbProf():
+def mainSbProf(argv=None) -> int:
     """
     Calls the sbProf function based on argument parsing.
     This function serves as an example of an API.
