@@ -54,6 +54,7 @@ Indices and tables
 
 * :ref:`genindex`
 * :doc:`Overview <readme>`
+* :ref:`Concepts <concepts>`
 * :ref:`usage`
 * :ref:`api`
 * :ref:`modindex`
