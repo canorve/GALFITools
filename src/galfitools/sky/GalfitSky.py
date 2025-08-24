@@ -84,10 +84,9 @@ def galfitSky(imgname, maskfile, mgzpt, scale, X, Y, sky) -> None:
     T2 = outname + "-sky.fits"
     T3 = "{}".format(rmsname)
 
-    if flagpos is False:
+    if flagpos is False:  # pragma: no cover
         xlo = 1
         ylo = 1
-
         (xhi, yhi) = GetAxis(imgname)
 
     plate = 1
