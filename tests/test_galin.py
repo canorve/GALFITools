@@ -6,7 +6,7 @@ import subprocess as sp
 import numpy as np
 
 from collections import Counter
-
+from astropy.io import fits
 
 from galfitools.galin.getStar import getStar
 from galfitools.galin.initgal import InitGal
@@ -296,6 +296,92 @@ def test_getSersic():
         os.remove(constfile)
 
     return None
+
+
+def _make_gaussian(n=100, cx=50, cy=50, amp=1000.0, sigma=5.0):
+    y, x = np.indices((n, n))
+    r2 = (x - cx) ** 2 + (y - cy) ** 2
+    return amp * np.exp(-0.5 * r2 / sigma**2)
+
+
+def _write_fits(path, data, header=None):
+    hdu = fits.PrimaryHDU(data=data, header=header)
+    hdul = fits.HDUList([hdu])
+    hdul.writeto(path, overwrite=True)
+
+
+def _write_ds9_ellipse(path, x=50, y=50, a=12, b=8, pa=30):
+    # Minimal DS9 region file in IMAGE coords
+    # See: https://ds9.si.edu/doc/ref/region.html
+    txt = (
+        "# Region file format: DS9 version 4.1\n"
+        "global color=green dashlist=8 3 width=1\n"
+        "image\n"
+        f"ellipse({x},{y},{a},{b},{pa})\n"
+    )
+    path.write_text(txt)
+
+
+@pytest.mark.filterwarnings("ignore::astropy.wcs.wcs.FITSFixedWarning")
+def test_getSersic_smoke(tmp_path, capsys):
+    """Call the real getSersic on a tiny synthetic image + DS9 ellipse.
+    We only assert that it runs and (optionally) emits a sensible line.
+    """
+    img_path = tmp_path / "img.fits"
+    reg_path = tmp_path / "ell.reg"
+
+    data = _make_gaussian()
+    _write_fits(img_path, data)
+    _write_ds9_ellipse(reg_path)
+
+    # Call with noprint=True to keep output quiet; we only require no exception.
+    res = getSersic(
+        str(img_path),  # Image
+        str(reg_path),  # RegFile
+        True,  # center from DS9
+        None,  # mask
+        25.0,  # zeropoint
+        0.0,  # sky
+        True,  # noprint
+        None,  # bulgetot
+        None,  # bards9
+    )
+
+    # getSersic may return None or some tuple/object depending on your impl.
+    # The key thing for an integration "smoke" test is: it did not raise.
+    assert True  # reached here without exceptions
+
+
+@pytest.mark.filterwarnings("ignore::astropy.wcs.wcs.FITSFixedWarning")
+def test_getSersic_with_mask_and_print(tmp_path, capsys):
+    """Same as above, but pass a mask and allow printing; check output contains 'Sersic'."""
+    img_path = tmp_path / "img.fits"
+    reg_path = tmp_path / "ell.reg"
+    mask_path = tmp_path / "mask.fits"
+
+    data = _make_gaussian()
+    _write_fits(img_path, data)
+    _write_ds9_ellipse(reg_path)
+
+    # Simple boolean (or 0/1) mask of the same shape
+    mask = np.zeros_like(data, dtype=np.int16)
+    _write_fits(mask_path, mask)
+
+    # Now let it print (noprint=False) and inspect stdout
+    getSersic(
+        str(img_path),
+        str(reg_path),
+        True,  # center
+        str(mask_path),  # mask file
+        25.0,  # zeropoint
+        0.0,  # sky
+        False,  # noprint -> allow output
+        None,  # bulgetot
+        None,  # bards9
+    )
+    out = capsys.readouterr().out.lower()
+    # Be tolerant: just look for the word 'sersic' somewhere
+    assert "sersic" in out
 
 
 def test_imarith():
