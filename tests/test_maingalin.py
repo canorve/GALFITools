@@ -256,3 +256,73 @@ def test_mainMakePSF(monkeypatch):
     assert seen["out"] == "psf.fits"
     assert seen["twist"] is True
     assert seen["numgauss"] == 5
+
+
+def test_mainMakeMask_defaults(monkeypatch, capsys):
+    """Call with only required args; defaults for maskout, satds9, scale."""
+    called = {}
+
+    def fake_makeMask(sexfile, imagefile, maskout, scale, satds9):
+        called.update(
+            {
+                "sexfile": sexfile,
+                "imagefile": imagefile,
+                "maskout": maskout,
+                "scale": scale,
+                "satds9": satds9,
+            }
+        )
+
+    monkeypatch.setattr(cli, "makeMask", fake_makeMask)
+    monkeypatch.setattr(cli, "printWelcome", lambda: None)
+
+    rc = cli.mainMakeMask(["catalog.sex", "image.fits"])
+    assert rc == 0
+
+    out = capsys.readouterr().out
+    assert "Done. Mask image created" in out
+    # Verify defaults passed correctly
+    assert called["maskout"] == "masksex.fits"
+    assert called["satds9"] == "ds9sat.reg"
+    assert called["scale"] == 1
+
+
+def test_mainMakeMask_with_options(monkeypatch, capsys):
+    """Call with explicit overrides for optional args."""
+    called = {}
+    monkeypatch.setattr(
+        cli,
+        "makeMask",
+        lambda sexfile, imagefile, maskout, scale, satds9: called.update(
+            dict(
+                sexfile=sexfile,
+                imagefile=imagefile,
+                maskout=maskout,
+                scale=scale,
+                satds9=satds9,
+            )
+        ),
+    )
+    monkeypatch.setattr(cli, "printWelcome", lambda: None)
+
+    rc = cli.mainMakeMask(
+        [
+            "cat.sex",
+            "img.fits",
+            "-o",
+            "custom_mask.fits",
+            "-sf",
+            "custom_sat.reg",
+            "-s",
+            "2.5",
+        ]
+    )
+    assert rc == 0
+
+    out = capsys.readouterr().out
+    assert re.search(r"Done\. Mask image created", out)
+
+    # Ensure options were passed through
+    assert called["maskout"] == "custom_mask.fits"
+    assert called["satds9"] == "custom_sat.reg"
+    assert called["scale"] == 2.5

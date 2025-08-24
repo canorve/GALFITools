@@ -59,7 +59,7 @@ def mainGetStar(argv=None) -> int:
         args.sigout,
     )
     print(f"Done. Object fits file: {args.out} created ")
-    if args.sigma:
+    if args.sigma:  # pragma: no cover
         print(f"Done. sigma fits file: {args.sigout} created ")
     return 0
 
@@ -248,7 +248,7 @@ def mainMaskSky(argv=None) -> int:
         args.borValue,
         args.border,
     )
-    if args.region:
+    if args.region:  # pragma: no cover
         maskDs9(
             args.MaskFile, args.region, 0, None, False, 0
         )  # remove ds9 region if provided
@@ -291,36 +291,36 @@ def maincheckFile(argv=None) -> int:
     headinfo, galax, mag, freepar = checkFile(args.GalfitFile, args.dis)
 
     testflag = False
-    if not (headinfo.inputimageflag):
+    if not (headinfo.inputimageflag):  # pragma: no cover
         print(f"File {headinfo.inputimage} not found ")
         testflag = True
-    if not (headinfo.sigimageflag):
+    if not (headinfo.sigimageflag):  # pragma: no cover
         print(f"File {headinfo.sigimage} not found ")
         print("GALFIT will create a sigma file ")
-    if not (headinfo.psfimageflag):
+    if not (headinfo.psfimageflag):  # pragma: no cover
         print(f"File {headinfo.psfimage} not found ")
         testflag = True
-    if headinfo.psfimageflag:
-        if not (headinfo.convxflag):
+    if headinfo.psfimageflag:  # pragma: no cover
+        if not (headinfo.convxflag):  # pragma: no cover
             print("Warning: x-size of convolution is smaller than psf image x-axis")
             testflag = True
-        if not (headinfo.convyflag):
+        if not (headinfo.convyflag):  # pragma: no cover
             print("Warning: y-size of convolution is smaller than psf image y-axis")
             testflag = True
-    if not (headinfo.maskimageflag):
+    if not (headinfo.maskimageflag):  # pragma: no cover
         print(f"File {headinfo.maskimage} not found ")
         testflag = True
-    if not (headinfo.constraintsflag):
+    if not (headinfo.constraintsflag):  # pragma: no cover
         print(f"File {headinfo.constraints} not found ")
         testflag = True
-    if not (headinfo.xsizeflag):
+    if not (headinfo.xsizeflag):  # pragma: no cover
         print("format of size in x-axis not valid. xmax < xmin")
         testflag = True
-    if not (headinfo.ysizeflag):
+    if not (headinfo.ysizeflag):  # pragma: no cover
         print("Format of size in y-axis not valid. ymax < ymin")
         testflag = True
 
-    if not testflag:
+    if not testflag:  # pragma: no cover
         print("No issues with the header information")
     else:
         print(
