@@ -28,19 +28,24 @@ def test_mainGetBreak(monkeypatch, capsys):
 
 
 def test_mainGetBreak2(monkeypatch, capsys):
-    monkeypatch.setattr(cli, "getBreak", lambda *a, **k: (12.5, 3, 45.0))
+    # Patch the correct function used by mainGetBreak2
+    monkeypatch.setattr(cli, "getBreak2", lambda *a, **k: (12.5, 3, 45.0))
 
+    # Stub Galfit only for the post-processing (arcsec conversion)
     class Head:
         scale = 0.4
 
     monkeypatch.setattr(
         cli, "Galfit", lambda f: type("G", (), {"ReadHead": lambda self: Head()})()
     )
+
     monkeypatch.setattr(cli, "printWelcome", lambda: None)
+
     rc = cli.mainGetBreak2(["galfit.01"])
     assert rc == 0
+
     out = capsys.readouterr().out
-    assert "break radius is 12.50" in out
+    assert "The break radius is 12.50" in out
 
 
 def test_mainKappa2(monkeypatch, capsys):
@@ -73,6 +78,31 @@ def test_mainGetMeRad(monkeypatch, capsys):
     assert rc == 0
     out = capsys.readouterr().out
     assert "Surface brightness at this radius" in out and "17.00" in out
+
+
+def test_mainGetBarSize(monkeypatch, capsys):
+    # stub heavy functions
+    monkeypatch.setattr(cli, "getBarSize", lambda *a: (20.0, 1, 17))
+
+    class Head:
+        scale = 1.0
+
+    monkeypatch.setattr(
+        cli, "Galfit", lambda f: type("G", (), {"ReadHead": lambda self: Head()})()
+    )
+    monkeypatch.setattr(cli, "printWelcome", lambda: None)
+
+    # minimal valid args (no ranx, no plot)
+    rc = cli.mainGetBarSize(["g.01", "-d", "5", "-n", "1", "-o", "bar.reg"])
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "bar size is 20.00" in out
+
+    # with plot flag and ranx range
+    rc = cli.mainGetBarSize(
+        ["g.01", "-d", "5", "-n", "1", "-o", "bar.reg", "--plot", "-rx", "10", "100"]
+    )
+    assert rc == 0
 
 
 def test_mainShowCube(monkeypatch):
