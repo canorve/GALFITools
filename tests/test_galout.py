@@ -3,6 +3,7 @@ import os
 
 
 import subprocess as sp
+import numpy as np
 
 from galfitools.galout.getRads import getBreak
 from galfitools.galout.getRads import getBreak2
@@ -24,6 +25,8 @@ from galfitools.galout.PhotDs9 import photDs9
 from galfitools.galout.fitlog2csv import log2csv
 
 from galfitools.galout.getCOW import getCOW
+from galfitools.galout.getCOW import readGalfitF2 as mod
+import galfitools.galout.getCOW as cow
 
 from galfitools.galout.getPeak import getPeak
 
@@ -533,3 +536,95 @@ def test_getBarSize():
         os.remove(out)
 
     return None
+
+
+def test_readGalfitF2_with_angle(monkeypatch):
+    """Angle provided → theta equals provided angle; arrays behave correctly."""
+
+    class FakeGalfit:
+        def __init__(self, f):
+            self.f = f
+
+        def ReadHead(self):
+            return {"scale": 0.5}
+
+        def ReadComps(self):
+            return type(
+                "Comps",
+                (),
+                {
+                    "Active": np.array([1, 1]),
+                    "PosAng": np.array([10.0, 20.0]),
+                },
+            )()
+
+    monkeypatch.setattr(cow, "Galfit", FakeGalfit)
+    monkeypatch.setattr(cow, "SelectGal", lambda comps, dis, num: comps)
+    monkeypatch.setattr(cow, "conver2Sersic", lambda comps: comps)
+    monkeypatch.setattr(cow, "numComps", lambda comps, mode: 2)
+
+    head, comps, theta = cow.readGalfitF2("dummy.fits", dis=10, angle=45.0, num_comp=2)
+    assert head["scale"] == 0.5
+    assert theta == 45.0
+    assert isinstance(comps.PosAng, np.ndarray)
+
+
+def test_readGalfitF2_without_angle(monkeypatch):
+    """Angle None → use last active component PosAng (boolean mask indexing works)."""
+
+    class FakeGalfit:
+        def __init__(self, f):
+            self.f = f
+
+        def ReadHead(self):
+            return {"scale": 1.0}
+
+        def ReadComps(self):
+            return type(
+                "Comps",
+                (),
+                {
+                    "Active": np.array([1, 0, 1]),
+                    "PosAng": np.array([15.0, 25.0, 35.0]),
+                },
+            )()
+
+    monkeypatch.setattr(cow, "Galfit", FakeGalfit)
+    monkeypatch.setattr(cow, "SelectGal", lambda comps, dis, num: comps)
+    monkeypatch.setattr(cow, "conver2Sersic", lambda comps: comps)
+    monkeypatch.setattr(cow, "numComps", lambda comps, mode: 3)
+
+    head, comps, theta = cow.readGalfitF2("dummy2.fits", dis=5, angle=None, num_comp=3)
+    assert head["scale"] == 1.0
+    assert theta == 35.0  # last active PosAng
+
+
+def test_readGalfitF2_no_components_exits(monkeypatch):
+    """numComps == 0 → sys.exit(1). Provide angle to skip PosAng indexing."""
+
+    class FakeGalfit:
+        def __init__(self, f):
+            self.f = f
+
+        def ReadHead(self):
+            return {"scale": 1.0}
+
+        def ReadComps(self):
+            return type(
+                "Comps",
+                (),
+                {
+                    "Active": np.array([0]),  # no active comps
+                    "PosAng": np.array([0.0]),
+                },
+            )()
+
+    monkeypatch.setattr(cow, "Galfit", FakeGalfit)
+    monkeypatch.setattr(cow, "SelectGal", lambda comps, dis, num: comps)
+    monkeypatch.setattr(cow, "conver2Sersic", lambda comps: comps)
+    monkeypatch.setattr(cow, "numComps", lambda comps, mode: 0)
+
+    with pytest.raises(SystemExit) as exc:
+        # angle provided → avoid PosAng[mask][-1] on empty selection
+        cow.readGalfitF2("dummy.fits", dis=10, angle=30.0, num_comp=1)
+    assert exc.value.code == 1

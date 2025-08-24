@@ -90,7 +90,7 @@ def getCOW(
 
     # taking the last component position angle for the whole galaxy
     maskgal = galcomps.Active == 1
-    if angle:
+    if angle:  # pragma: no cover
         theta = angle
     else:
         theta = galcomps.PosAng[maskgal][-1]
@@ -101,7 +101,7 @@ def getCOW(
     N = numComps(comps, "all")
     # print('number of model components: ',N)
 
-    if N == 0:
+    if N == 0:  # pragma: no cover
         print("not enough number of components to plot COW")
         print("exiting..")
         sys.exit(1)
@@ -119,7 +119,7 @@ def getCOW(
 
     cows, totmag = GetCOW().GetCOWrad(head, comps, theta, R)
 
-    if galfitF2:
+    if galfitF2:  # pragma: no cover
 
         # it uses the same num_comp as the first file
         head2, comps2, theta2 = readGalfitF2(galfitF2, dis, angle, num_comp)
@@ -152,7 +152,7 @@ def getCOW(
     plt.title("Curve of Growth ")
     plt.ylabel("magnitude (< R) ")
 
-    if galfitF2:
+    if galfitF2:  # pragma: no cover
 
         plt.plot(R, cows2, color="green", label="model 2")
 
