@@ -27,6 +27,22 @@ def test_mainGetBreak(monkeypatch, capsys):
     assert "break radius is 12.50" in out
 
 
+def test_mainGetBreak2(monkeypatch, capsys):
+    monkeypatch.setattr(cli, "getBreak", lambda *a, **k: (12.5, 3, 45.0))
+
+    class Head:
+        scale = 0.4
+
+    monkeypatch.setattr(
+        cli, "Galfit", lambda f: type("G", (), {"ReadHead": lambda self: Head()})()
+    )
+    monkeypatch.setattr(cli, "printWelcome", lambda: None)
+    rc = cli.mainGetBreak2(["galfit.01", "--numinitial", "2", "--quick"])
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "break radius is 12.50" in out
+
+
 def test_mainKappa2(monkeypatch, capsys):
     monkeypatch.setattr(cli, "getKappa2", lambda *a: (7.0, 4, 30.0))
 
