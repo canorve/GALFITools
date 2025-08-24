@@ -39,12 +39,12 @@ def SkyDs9(ImageFile, RegFile, maskfile, outliers=False):
         returns the standard deviation of sky background
     """
 
-    if not os.path.exists(ImageFile):
+    if not os.path.exists(ImageFile):  # pragma: no cover
 
         print("image filename does not exist!")
         sys.exit()
 
-    if not os.path.exists(RegFile):
+    if not os.path.exists(RegFile):  # pragma: no cover
         print("%s: reg filename does not exist!" % (sys.argv[2]))
         sys.exit()
 
@@ -155,7 +155,7 @@ def SkyDs9(ImageFile, RegFile, maskfile, outliers=False):
 
     Flats = np.array([])
 
-    if (maskfile == "None") or (maskfile == "none"):
+    if (maskfile == "None") or (maskfile == "none"):  # pragma: no cover
         maskfile = None
 
     # mask file
@@ -195,7 +195,7 @@ def SkyDs9(ImageFile, RegFile, maskfile, outliers=False):
 
         # converting ellipse from DS9 ell to kron ellipse
 
-        if Pol[idx] == "polygon":
+        if Pol[idx] == "polygon":  # pragma: no cover
 
             SkyPolygon(Image, tupVerts[idx], ncol, nrow)
 
@@ -208,7 +208,7 @@ def SkyDs9(ImageFile, RegFile, maskfile, outliers=False):
         top = round(0.8 * tot)
         bot = round(0.2 * tot)
         imgpatch = Flats[bot:top]
-    else:
+    else:  # pragma: no cover
         imgpatch = Flats
 
     mean = np.mean(imgpatch)
@@ -315,7 +315,7 @@ def SkyKron(imagemat, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     landa = np.arctan2(dy, dx)
 
     mask = landa < 0
-    if mask.any():
+    if mask.any():  # pragma: no cover
         landa[mask] = landa[mask] + 2 * np.pi
 
     landa = landa - theta

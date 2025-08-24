@@ -190,22 +190,82 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
     assert "1 2 3 4" in out
 
 
-def test_maingetSersic(monkeypatch):
-    args_seen = {}
+@pytest.mark.parametrize(
+    "argv, expected",
+    [
+        # 1) Minimal: only required args → all defaults
+        (
+            ["img.fits", "ell.reg"],
+            # image, regfile, center, mask, zeropoint, sky, noprint, bulgetot, bards9
+            ("img.fits", "ell.reg", False, None, 25.0, 0.0, False, None, None),
+        ),
+        # 2) Typical flags: custom zeropoint/sky + center + mask + noprint
+        (
+            [
+                "img.fits",
+                "ell.reg",
+                "--zeropoint",
+                "26",
+                "--sky",
+                "1.0",
+                "--center",
+                "-m",
+                "mask.fits",
+                "--noprint",
+            ],
+            ("img.fits", "ell.reg", True, "mask.fits", 26.0, 1.0, True, None, None),
+        ),
+        # 3) Bulge/Disk with a bar region: requires --bulgetot and --bards9
+        (
+            ["img.fits", "ell.reg", "--bulgetot", "0.35", "--bards9", "bar.reg"],
+            ("img.fits", "ell.reg", False, None, 25.0, 0.0, False, 0.35, "bar.reg"),
+        ),
+        # 4) Everything at once (different values)
+        (
+            [
+                "img.fits",
+                "ell.reg",
+                "-zp",
+                "24.5",
+                "-sk",
+                "0.2",
+                "-c",
+                "-n",
+                "-m",
+                "m.fits",
+                "-bt",
+                "0.6",
+                "-b",
+                "bar2.reg",
+            ],
+            ("img.fits", "ell.reg", True, "m.fits", 24.5, 0.2, True, 0.6, "bar2.reg"),
+        ),
+    ],
+)
+def test_maingetSersic(monkeypatch, argv, expected):
+    seen = {}
 
-    def fake_getSersic(*a):
-        args_seen["nargs"] = len(a)
-        args_seen["image"] = a[0]
+    def fake_getSersic(
+        image, regfile, center, mask, zeropoint, sky, noprint, bulgetot, bards9
+    ):
+        seen["args"] = (
+            image,
+            regfile,
+            center,
+            mask,
+            zeropoint,
+            sky,
+            noprint,
+            bulgetot,
+            bards9,
+        )
 
     monkeypatch.setattr(cli, "getSersic", fake_getSersic)
     monkeypatch.setattr(cli, "printWelcome", lambda: None)
 
-    rc = cli.maingetSersic(
-        ["img.fits", "ell.reg", "--zeropoint", "26", "--sky", "1.0", "--center"]
-    )
+    rc = cli.maingetSersic(argv)
     assert rc == 0
-    assert args_seen["image"] == "img.fits"
-    assert args_seen["nargs"] == 9  # matches signature
+    assert seen["args"] == expected
 
 
 def test_main_imarith(monkeypatch):
