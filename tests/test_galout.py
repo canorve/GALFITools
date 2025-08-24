@@ -209,14 +209,14 @@ def test_getMeRad():
     num_comp = 1
     angle = None
 
-    totmag, meanmerad, merad, N, theta = getMeRad(GalfitFile, dis, rad, angle, num_comp)
+    totmag, meanmerad, merad, N, theta = getMeRad(galfitFile, dis, rad, angle, num_comp)
 
     result = 19.16
     result2 = 19.66
     tol = 1e-2
 
     diffmeanme = abs(meanmerad - result)
-    diffme = abs(merad - result)
+    diffme = abs(merad - result2)
 
     assert diffmeanme < tol
     assert diffme < tol
@@ -233,7 +233,7 @@ def test_getBT():
     dis = 5
     num_comp = 1
 
-    bulge_total, totmag, N = getBT(GalfitFile, dis, num_comp)
+    bulge_total, totmag, N = getBT(galfitFile, dis, num_comp)
 
     result = 0.44
     tol = 1e-2
