@@ -411,6 +411,74 @@ def test_imarith():
     return None
 
 
+def _write_fits(path, arr):
+    fits.PrimaryHDU(data=np.array(arr, dtype=float)).writeto(path, overwrite=True)
+
+
+def _read_fits(path):
+    with fits.open(path) as hdul:
+        return np.array(hdul[0].data, dtype=float)
+
+
+def test_imarith_add_constant(tmp_path):
+    in1 = tmp_path / "in1.fits"
+    out = tmp_path / "out.fits"
+    _write_fits(in1, [[1, 2], [3, 4]])
+
+    # add=2.5
+    imarith(str(in1), str(out), image2=None, add=2.5, mul=None, div=None, sub=None)
+    out_arr = _read_fits(out)
+    np.testing.assert_allclose(out_arr, np.array([[3.5, 4.5], [5.5, 6.5]]))
+
+
+def test_imarith_add_image(tmp_path):
+    in1 = tmp_path / "in1.fits"
+    in2 = tmp_path / "in2.fits"
+    out = tmp_path / "sum.fits"
+    _write_fits(in1, [[1, 2], [3, 4]])
+    _write_fits(in2, [[10, 20], [30, 40]])
+
+    # add with image2 present → elementwise sum
+    imarith(str(in1), str(out), image2=str(in2), add=1.0, mul=None, div=None, sub=None)
+    out_arr = _read_fits(out)
+    np.testing.assert_allclose(out_arr, np.array([[11, 22], [33, 44]]))
+
+
+def test_imarith_mul_constant(tmp_path):
+    in1 = tmp_path / "in1.fits"
+    out = tmp_path / "out.fits"
+    _write_fits(in1, [[1, 2], [3, 4]])
+
+    imarith(str(in1), str(out), image2=None, add=None, mul=3.0, div=None, sub=None)
+    out_arr = _read_fits(out)
+    np.testing.assert_allclose(out_arr, np.array([[3, 6], [9, 12]]), rtol=0, atol=0)
+
+
+def test_imarith_missing_input_exits(tmp_path):
+    out = tmp_path / "out.fits"
+    with pytest.raises(SystemExit):
+        imarith(
+            "no_such.fits", str(out), image2=None, add=1.0, mul=None, div=None, sub=None
+        )
+
+
+def test_imarith_missing_image2_exits(tmp_path):
+    in1 = tmp_path / "in1.fits"
+    out = tmp_path / "out.fits"
+    _write_fits(in1, [[1, 2], [3, 4]])
+
+    with pytest.raises(SystemExit):
+        imarith(
+            str(in1),
+            str(out),
+            image2="no_such2.fits",
+            add=1.0,
+            mul=None,
+            div=None,
+            sub=None,
+        )
+
+
 def test_getBoxSizeDs9():
 
     tol = 1e-2
