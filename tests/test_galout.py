@@ -14,6 +14,8 @@ from galfitools.galout.getRads import getSlope
 from galfitools.galout.getRads import getBulgeRad
 from galfitools.galout.getMissingLight import getMissLight
 from galfitools.galout.getN import getN
+from galfitools.galout.getMeRad import getMeRad
+from galfitools.galout.getBT import getBT
 from galfitools.galout.showcube import displayCube
 
 from galfitools.galout.PhotDs9 import photDs9
@@ -192,6 +194,53 @@ def test_getReComp():
     diffEffRad = abs(EffRad - result)
 
     assert diffEffRad < tol
+
+    return None
+
+
+def test_getMeRad():
+
+    galfitFile = "galfit.galout"
+    path = "tests/"
+    galfitFile = path + galfitFile
+
+    dis = 5
+    rad = 10
+    num_comp = 1
+    angle = None
+
+    totmag, meanmerad, merad, N, theta = getMeRad(GalfitFile, dis, rad, angle, num_comp)
+
+    result = 19.16
+    result2 = 19.66
+    tol = 1e-2
+
+    diffmeanme = abs(meanmerad - result)
+    diffme = abs(merad - result)
+
+    assert diffmeanme < tol
+    assert diffme < tol
+
+    return None
+
+
+def test_getBT():
+
+    galfitFile = "galfit.barsize"
+    path = "tests/"
+    galfitFile = path + galfitFile
+
+    dis = 5
+    num_comp = 1
+
+    bulge_total, totmag, N = getBT(GalfitFile, dis, num_comp)
+
+    result = 0.44
+    tol = 1e-2
+
+    diffbt = abs(bulge_total - result)
+
+    assert diffbt < tol
 
     return None
 
