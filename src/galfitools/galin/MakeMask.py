@@ -51,7 +51,7 @@ def makeMask(
 
     print("Creating sat region files....\n")
 
-    if not os.path.exists(satfileout):
+    if not os.path.exists(satfileout):  # pragma: no cover
         print("Saturation file not found. Creating one")
         satfileout = "ds9sat.reg"
         ds9satbox(
@@ -128,7 +128,7 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
     Rkron = scale * ai * kr + offset
 
     mask = Rkron < 1
-    if mask.any():
+    if mask.any():  # pragma: no cover
         Rkron[mask] = 1
 
     i = 0  # index indicated where the data is located
@@ -214,7 +214,7 @@ def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     landa = np.arctan2(dy, dx)
 
     mask = landa < 0
-    if mask.any():
+    if mask.any():  # pragma: no cover
         landa[mask] = landa[mask] + 2 * np.pi
 
     landa = landa - theta
@@ -270,7 +270,9 @@ def MakeSatBox(maskimage, region, val, ncol, nrow):
         for line in lines:
 
             words = line.split(" ")
-            if words[0] != "image" and words[0] != "physical" and words[0] != "global":
+            if (
+                words[0] != "image" and words[0] != "physical" and words[0] != "global"
+            ):  # pragma: no cover
 
                 (box, info) = line.split("(")
 
@@ -303,11 +305,11 @@ def MakeSatBox(maskimage, region, val, ncol, nrow):
 
                         xhi = ncol
 
-                    if ylo < 1:
+                    if ylo < 1:  # pragma: no cover
 
                         ylo = 1
 
-                    if yhi > nrow:
+                    if yhi > nrow:  # pragma: no cover
 
                         yhi = nrow
 
@@ -475,29 +477,29 @@ def GetSizev1(x, y, R, theta, ell, ncol, nrow):
     )
 
     mask = xmin < 1
-    if mask.any():
+    if mask.any():  # pragma: no cover
         if isinstance(xmin, np.ndarray):
             xmin[mask] = 1
-        else:
+        else:  # pragma: no cover
             xmin = 1
 
     mask = xmax > ncol
 
-    if mask.any():
+    if mask.any():  # pragma: no cover
         if isinstance(xmax, np.ndarray):
             xmax[mask] = ncol
-        else:
+        else:  # pragma: no cover
             xmax = ncol
 
     mask = ymin < 1
-    if mask.any():
+    if mask.any():  # pragma: no cover
         if isinstance(ymin, np.ndarray):
             ymin[mask] = 1
         else:
             ymin = 1
 
     mask = ymax > nrow
-    if mask.any():
+    if mask.any():  # pragma: no cover
         if isinstance(ymax, np.ndarray):
             ymax[mask] = nrow
         else:

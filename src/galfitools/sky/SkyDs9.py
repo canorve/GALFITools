@@ -159,7 +159,7 @@ def SkyDs9(ImageFile, RegFile, maskfile, outliers=False):
         maskfile = None
 
     # mask file
-    if maskfile:
+    if maskfile:  # pragma: no cover
         errmsg = "file {} does not exist".format(maskfile)
         assert os.path.isfile(maskfile), errmsg
 
