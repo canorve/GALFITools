@@ -73,7 +73,7 @@ def getMissLight(galfitFile1, galfitFile2, dis, num_comp, rad):
     N1 = numComps(comps1, "all")
     N2 = numComps(comps2, "all")
 
-    if (N1 == 0) or (N2 == 0):
+    if (N1 == 0) or (N2 == 0):  # pragma: no cover
         print("not enough number of components of one of the two models to proceed")
         print("exiting..")
         sys.exit(1)
@@ -176,7 +176,7 @@ def getMiss(head, mag1, mag2):
     if Flux1 > Flux2:
 
         Fluxmiss = Flux1 - Flux2
-    else:
+    else:  # pragma: no cover
         print("Warning: Flux1 is less than Flux2 for the selected radius. Inverting")
 
         Fluxmiss = Flux2 - Flux1

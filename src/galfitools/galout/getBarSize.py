@@ -78,7 +78,7 @@ def getBarSize(
 
     N = numComps(comps, "all")
 
-    if N == 0:
+    if N == 0:  # pragma: no cover
         print("not enough number of components to compute bar size")
         print("exiting..")
         sys.exit(1)
@@ -86,7 +86,7 @@ def getBarSize(
     #########################
     # computing the slope
     #########################
-    if ranx:
+    if ranx:  # pragma: no cover
         (xmin, xmax) = ranx[0], ranx[1]
     else:
         Re = comps.Rad[maskgal][

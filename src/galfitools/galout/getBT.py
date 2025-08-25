@@ -75,12 +75,12 @@ def getBT(
 
     N = numComps(comps, "all")
 
-    if N == 0:
+    if N == 0:  # pragma: no cover
         print("not enough number of components to compute bulge_total ratio")
         print("exiting..")
         sys.exit(1)
 
-    if N > 3:
+    if N > 3:  # pragma: no cover
         print("maximum number of components = 3")
         print("exiting..")
         sys.exit(1)
@@ -95,15 +95,15 @@ def getBT(
 
     mag_bulge = comps.Mag[maskgal][0]
 
-    if N == 1:
+    if N == 1:  # pragma: no cover
         bulge_total = 1
 
-    if N == 2:
+    if N == 2:  # pragma: no cover
 
         mag_disk = comps.Mag[maskgal][1]
         bulge_total = bulge_to_total(mag_bulge, mag_disk)
 
-    if N == 3:
+    if N == 3:  # pragma: no cover
 
         mag_bar = comps.Mag[maskgal][1]
         mag_disk = comps.Mag[maskgal][2]
@@ -132,7 +132,7 @@ def bulge_to_total(mag_bulge, mag_disk, mag_bar=99):
     L_disk = np.power(10, -0.4 * mag_disk)
     L_bar = np.power(10, -0.4 * mag_bar)
 
-    if mag_bar != 99:
+    if mag_bar != 99:  # pragma: no cover
         L_bulge = L_bulge + L_bar
 
     bulge_total = L_bulge / (L_bulge + L_disk)

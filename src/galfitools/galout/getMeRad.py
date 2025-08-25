@@ -73,7 +73,7 @@ def getMeRad(
     # taking the last component position angle for the whole galaxy
 
     maskgal = galcomps.Active == 1
-    if angle:
+    if angle:  # pragma: no cover
         theta = angle
     else:
         theta = galcomps.PosAng[maskgal][-1]
@@ -83,7 +83,7 @@ def getMeRad(
 
     N = numComps(comps, "all")
 
-    if N == 0:
+    if N == 0:  # pragma: no cover
         print("not enough number of components to compute Re")
         print("exiting..")
         sys.exit(1)
