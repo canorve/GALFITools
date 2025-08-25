@@ -199,11 +199,16 @@ def test_initgal_generates_files_and_bash(tmp_path):
         assert "galfit galfit-1.gal" in btxt
         assert "galfit galfit-2.gal" in btxt
     finally:
+        # Cleanup
+        for f in tmp_path.glob("*"):
+            f.unlink(missing_ok=True)
         os.chdir(old_cwd)
 
 
-def test_initgal_only_target_component_changes(tmp_path: Path):
+def test_initgal_only_target_component_changes(tmp_path, monkeypatch):
     """numcomp=2 → only component 2 parameters are randomized; component 1 stays at original values; sky 3) unchanged."""
+    monkeypatch.chdir(tmp_path)
+
     gal_in = tmp_path / "galfit.gal"
     _write_minimal_galfit(gal_in)
 
