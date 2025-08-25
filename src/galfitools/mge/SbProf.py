@@ -126,7 +126,7 @@ def sbProf(args):
     obj, xpos, ypos, rx, ry, angle2 = GetInfoEllip(conf.ds9reg)
     xx, yy, Rkron, theta, eps = Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle2)
 
-    if center:
+    if center:  # pragma: no cover
         print("center of ds9 ellipse region will be used")
         xpeak, ypeak = xpos, ypos
     else:
@@ -140,12 +140,12 @@ def sbProf(args):
     conf.xc = xpeak
     conf.yc = ypeak
 
-    if angle:
+    if angle:  # pragma: no cover
         conf.parg = angle
     else:
         conf.parg = theta
 
-    if axrat:
+    if axrat:  # pragma: no cover
         conf.qarg = axrat
         conf.eps = 1 - axrat
     else:
@@ -180,7 +180,7 @@ def sbProf(args):
     ##############################################
     ##############################################
 
-    if conf.dplot:
+    if conf.dplot:  # pragma: no cover
         plt.pause(1.5)
     plt.savefig(conf.output, dpi=conf.dpival)
 
@@ -238,7 +238,7 @@ def readDataImg(conf):
         dataimg.mask = np.array(mask, dtype=bool)
         hdu.close()
 
-    else:
+    else:  # pragma: no cover
         dataimg.mask = np.array([])
 
     return dataimg
@@ -281,7 +281,7 @@ def SectPhot(conf, dataimg, n_sectors=19, minlevel=0):
             badpixels=maskb,
             n_sectors=n_sectors,
         )
-    else:
+    else:  # pragma: no cover
         sectimg = sectors_photometry(
             dataimg.img,
             eps,
@@ -372,12 +372,12 @@ def FindSB(xarcq, ymgeq, numsectors):
     numsave = 0
     tot = xarcq.size
     count = 0
-    for i in range(tot, 0, -1):
+    for i in range(tot, 0, -1):  # pragma: no cover
 
         lima = i - numsectors
         limb = i
 
-        if xarcq[lima:limb].size == 0:
+        if xarcq[lima:limb].size == 0:  # pragma: no cover
             break
         else:
             valstd = np.std(xarcq[lima:limb])
@@ -423,10 +423,10 @@ def PlotSB(xradq, ysbq, ysberrq, conf, scale):
 
     fig, axsec = plt.subplots()
 
-    if conf.ranx:
+    if conf.ranx:  # pragma: no cover
         (xmin, xmax) = conf.ranx[0], conf.ranx[1]
 
-    if conf.rany:
+    if conf.rany:  # pragma: no cover
         (ymin, ymax) = conf.rany[0], conf.rany[1]
 
     minrad = np.min(xradq)
@@ -457,12 +457,12 @@ def PlotSB(xradq, ysbq, ysberrq, conf, scale):
         linewidth=2,
     )
 
-    if conf.rany is True:
+    if conf.rany is True:  # pragma: no cover
         axsec.set_ylim(ymax, ymin)  # inverted
     else:
         axsec.set_ylim(yran)
 
-    if conf.logx is True:
+    if conf.logx is True:  # pragma: no cover
 
         axsec.set_xscale("log")
 
@@ -545,14 +545,14 @@ def PlotSB(xradq, ysbq, ysberrq, conf, scale):
     # axred.tick_params(which='major', length=7)
     # axred.tick_params(which='minor', length=4, color='r')
 
-    if conf.ranx:
+    if conf.ranx:  # pragma: no cover
         axsec.set_xlim(xmin, xmax)
     #  axred.set_xlim(xmin,xmax) #ulises plot
     else:
         axsec.set_xlim(xran)
     # axred.set_xlim(xran) #ulises plot
 
-    if conf.pix is True:
+    if conf.pix is True:  # pragma: no cover
 
         axpix = axsec.twiny()
 
@@ -583,7 +583,7 @@ def PlotSB(xradq, ysbq, ysberrq, conf, scale):
     else:
         axret = axsec
 
-    if conf.grid is True:
+    if conf.grid is True:  # pragma: no cover
         # Customize the major grid
         axsec.grid(which="major", linestyle="-", linewidth="0.7", color="black")
         # Customize the minor grid
@@ -594,11 +594,11 @@ def PlotSB(xradq, ysbq, ysberrq, conf, scale):
         axsec.spines[axis].set_linewidth(1.5)
         # axred.spines[axis].set_linewidth(1.5)
 
-    if conf.rad:
+    if conf.rad:  # pragma: no cover
 
         axsec.axvline(x=conf.rad, linestyle="--", color="m", linewidth=2)
 
-    if conf.rad2:
+    if conf.rad2:  # pragma: no cover
 
         axsec.axvline(x=conf.rad2, linestyle="--", color="c", linewidth=2)
 

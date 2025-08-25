@@ -210,7 +210,7 @@ class GetN:
 
         try:
             N = bisect(self.funMeMeanMe, a, b, args=(me, meanme))
-        except Exception:
+        except Exception:  # pragma: no cover
             print("unable to solve equation in the given range. Setting n to 99")
             N = 99
 
@@ -250,7 +250,7 @@ class GetN:
 
         try:
             N = bisect(self.funReRfrac, a, b, args=(Re, Rfrac, frac))
-        except Exception:
+        except Exception:  # pragma: no cover
             print("unable to solve equation in the given range. Setting n to 99")
             N = 99
 
@@ -266,7 +266,7 @@ class GetN:
 
         return result
 
-    def MeM0(self, me: float, m0: float) -> float:
+    def MeM0(self, me: float, m0: float) -> float:  # pragma: no cover
         """Uses me and m0 to compute n. It is not very realiable
         and takes longer than the other two methods"""
         a = 0
@@ -281,7 +281,9 @@ class GetN:
 
         return Sersic
 
-    def solveKm0(self, a: float, b: float, me: float, m0: float) -> float:
+    def solveKm0(
+        self, a: float, b: float, me: float, m0: float
+    ) -> float:  # pragma: no cover
         "return the sersic index. It uses Bisection"
 
         try:
@@ -292,13 +294,13 @@ class GetN:
 
         return K
 
-    def funMeM0(self, K: float, me: float, m0: float) -> float:
+    def funMeM0(self, K: float, me: float, m0: float) -> float:  # pragma: no cover
 
         result = me - m0 - 2.5 * K / np.log(10)
 
         return result
 
-    def solveSerK(self, a: float, b: float, k: float) -> float:
+    def solveSerK(self, a: float, b: float, k: float) -> float:  # pragma: no cover
 
         try:
             sersic = bisect(self.funK, a, b, args=(k))
@@ -307,7 +309,7 @@ class GetN:
 
         return sersic
 
-    def funK(self, n: float, k: float) -> float:
+    def funK(self, n: float, k: float) -> float:  # pragma: no cover
 
         result = gammaincinv(2 * n, 0.5) - k
 

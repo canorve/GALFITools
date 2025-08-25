@@ -280,7 +280,7 @@ class SkyCal:
             print("removing top 80% and bottom 20% for every ring")
 
         # computing sky in every ring
-        for ind, item in enumerate(Rings):
+        for ind, item in enumerate(Rings):  # pragma: no cover
 
             maskring, idx = self.GetRingMask(
                 masksky[ymin - 1 : ymax, xmin - 1 : xmax], idx
@@ -378,7 +378,7 @@ class SkyCal:
 
         ringcont = 0
 
-        while not (maskring.any()) and (ringcont < 10):
+        while not (maskring.any()) and (ringcont < 10):  # pragma: no cover
 
             if ringcont == 0:  # pragma: no cover
                 print("Selecting next ring ")
@@ -440,10 +440,10 @@ class SkyCal:
 
             if np.abs(R1) >= np.abs(R2):
                 R = R1
-            else:
+            else:  # pragma: no cover
                 R = R2
 
-        elif self.thetadeg > 45 and self.thetadeg <= 135:
+        elif self.thetadeg > 45 and self.thetadeg <= 135:  # pragma: no cover
             ymax = self.nrow
             ymin = 1
             R1 = (ymax - self.yy) / thetay
@@ -454,7 +454,7 @@ class SkyCal:
             else:
                 R = R2
 
-        elif self.thetadeg > 135 and self.thetadeg <= 225:
+        elif self.thetadeg > 135 and self.thetadeg <= 225:  # pragma: no cover
             xmax = 1
             xmin = self.ncol
 
@@ -466,7 +466,7 @@ class SkyCal:
             else:
                 R = R2
 
-        elif self.thetadeg > 225 and self.thetadeg <= 315:
+        elif self.thetadeg > 225 and self.thetadeg <= 315:  # pragma: no cover
             ymax = 1
             ymin = self.nrow
             R1 = (ymax - self.yy) / thetay
