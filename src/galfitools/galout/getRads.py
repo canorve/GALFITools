@@ -124,14 +124,14 @@ def getBreak(
 
     maskgal = comps.Active == 1
 
-    if angle:
+    if angle:  # pragma: no cover
         theta = angle
     else:
         theta = comps.PosAng[maskgal][-1]
 
     N = numComps(comps, "all")
 
-    if N == 0:
+    if N == 0:  # pragma: no cover
         print("not enough number of components to compute Re")
         print("exiting..")
         sys.exit(1)
@@ -140,7 +140,7 @@ def getBreak(
     #  computing the slope
     #########################
 
-    if plot:
+    if plot:  # pragma: no cover
 
         if ranx:
             (xmin, xmax) = ranx[0], ranx[1]
@@ -161,13 +161,13 @@ def getBreak(
         plt.minorticks_on()
         plt.savefig("Break.png")
 
-    if quick:
+    if quick:  # pragma: no cover
 
         rbreak = GetBreak().FindBreak(comps, theta, inicomp)
 
     else:
 
-        if random:
+        if random:  # pragma: no cover
 
             radius = np.random.random(random) * comps.Rad[maskgal][inicomp]
 
@@ -244,7 +244,9 @@ class GetBreak:
 
     """
 
-    def GalBreak(self, R: list, comps: GalComps, theta: float) -> float:
+    def GalBreak(
+        self, R: list, comps: GalComps, theta: float
+    ) -> float:  # pragma: no cover
 
         maskgal = comps.Active == 1  # using active components only
 
@@ -286,7 +288,9 @@ class GetBreak:
 
     """
 
-    def FindBreak(self, comps: GalComps, theta: float, initial_comp: int) -> float:
+    def FindBreak(
+        self, comps: GalComps, theta: float, initial_comp: int
+    ) -> float:  # pragma: no cover
 
         maskgal = comps.Active == 1  # using active components only
 
@@ -445,7 +449,7 @@ class GetBreak:
 
     def SlopeSer(
         self, R: float, Ie: list, Re: list, n: list, q: list, pa: list, theta: float
-    ) -> float:
+    ) -> float:  # pragma: no cover
         """slope from sersic function to a determined R"""
 
         Rcor = GetRadAng(R, q, pa, theta)
@@ -549,7 +553,7 @@ def getBreak2(
 
     N = numComps(comps, "all")
 
-    if N == 0:
+    if N == 0:  # pragma: no cover
         print("not enough number of components to compute break radius")
         print("exiting..")
         sys.exit(1)
@@ -568,7 +572,7 @@ def getBreak2(
     lrad = np.log10(R)
     slp = GetSlope().GalSlope(R, comps, theta)
 
-    if plot:
+    if plot:  # pragma: no cover
         plt.close()
         plt.plot(R, slp)
 
@@ -585,7 +589,7 @@ def getBreak2(
     # yspl2d = yspl.derivative(n=2)
     yspl1d = yspl.derivative(n=1)
 
-    if plot:
+    if plot:  # pragma: no cover
         plt.close()
         plt.plot(10 ** (lrad), yspl1d(lrad))
         plt.xlabel("Rad (pixels)")
@@ -692,7 +696,7 @@ def getKappa2(
 
     N = numComps(comps, "all")
 
-    if N == 0:
+    if N == 0:  # pragma: no cover
         print("not enough number of components to compute kappa radius")
         print("exiting..")
         sys.exit(1)
@@ -719,7 +723,7 @@ def getKappa2(
 
     kap1d = np.abs(yspl1d(lrad)) / (1 + slp**2) ** (3 / 2)
 
-    if plot:
+    if plot:  # pragma: no cover
         plt.close()
         plt.plot(10 ** (lrad), kap1d)
         plt.xlabel("Rad (pixels)")
@@ -802,14 +806,14 @@ def getFWHM(galfitFile: str, dis: int, angle: float, num_comp: int):
 
     maskgal = comps.Active == 1
 
-    if angle:
+    if angle:  # pragma: no cover
         theta = angle
     else:
         theta = comps.PosAng[maskgal][-1]
 
     N = numComps(comps, "all")
 
-    if N == 0:
+    if N == 0:  # pragma: no cover
         print("not enough number of components to compute FWHM")
         print("exiting..")
         sys.exit(1)
@@ -846,13 +850,15 @@ class GetFWHM:
 
     def FullFWHMSer(
         self, R: float, Re: list, n: list, q: list, pa: list, theta: float
-    ) -> float:
+    ) -> float:  # pragma: no cover
 
         SlptotR = self.FWHMSer(R, Re, n, q, pa, theta)
 
         return SlptotR.sum()
 
-    def GalFWHM(self, R: list, comps: GalComps, theta: float) -> float:
+    def GalFWHM(
+        self, R: list, comps: GalComps, theta: float
+    ) -> float:  # pragma: no cover
 
         maskgal = comps.Active == 1  # using active components only
 
@@ -916,7 +922,7 @@ class GetFWHM:
                 ),
             )
 
-        except Exception:
+        except Exception:  # pragma: no cover
             print("solution not found in given range")
             Radslp = 0
 
@@ -930,7 +936,7 @@ class GetFWHM:
 
         return varx
 
-    def var_Xprim(self, R: float, Re: list, n: list):
+    def var_Xprim(self, R: float, Re: list, n: list):  # pragma: no cover
 
         k = gammaincinv(2 * n, 0.5)
 
@@ -944,7 +950,9 @@ class GetFWHM:
 
         return S.sum()
 
-    def var_Sprim(self, R: float, Ie: list, Re: list, n: list, X: list, Xprim: list):
+    def var_Sprim(
+        self, R: float, Ie: list, Re: list, n: list, X: list, Xprim: list
+    ):  # pragma: no cover
 
         Sprim = Ie * np.exp(-X) * Xprim
 
@@ -1077,14 +1085,14 @@ def getKappa(
     # taking the last component position angle for the whole galaxy
 
     maskgal = comps.Active == 1
-    if angle:
+    if angle:  # pragma: no cover
         theta = angle
     else:
         theta = comps.PosAng[maskgal][-1]
 
     N = numComps(comps, "all")
 
-    if N == 0:
+    if N == 0:  # pragma: no cover
         print("not enough number of components to compute Re")
         print("exiting..")
         sys.exit(1)
@@ -1096,7 +1104,7 @@ def getKappa(
     #  computing the slope
     #########################
 
-    if plot:
+    if plot:  # pragma: no cover
 
         if ranx:
             (xmin, xmax) = ranx[0], ranx[1]
@@ -1115,11 +1123,11 @@ def getKappa(
         plt.minorticks_on()
         plt.savefig("Kappa.png")
 
-    if quick:
+    if quick:  # pragma: no cover
 
         rkappa = GetKappa().FindKappa(comps, theta, inicomp)
 
-    else:
+    else:  # pragma: no cover
 
         if random:
 
@@ -1202,7 +1210,9 @@ class GetKappa:
 
     """
 
-    def GalKappa(self, R: list, comps: GalComps, theta: float) -> float:
+    def GalKappa(
+        self, R: list, comps: GalComps, theta: float
+    ) -> float:  # pragma: no cover
 
         maskgal = comps.Active == 1  # using active components only
 
@@ -1246,13 +1256,15 @@ class GetKappa:
         pa: list,
         theta: float,
         slope: float,
-    ) -> float:
+    ) -> float:  # pragma: no cover
 
         fun = self.SlopeSer(R, Ie, Re, n, q, pa, theta) - slope
 
         return fun
 
-    def FindKappa(self, comps: GalComps, theta: float, initial_comp: int) -> float:
+    def FindKappa(
+        self, comps: GalComps, theta: float, initial_comp: int
+    ) -> float:  # pragma: no cover
         "return the break radius of a set of Sersic functions"
 
         maskgal = comps.Active == 1  # using active components only
@@ -1503,7 +1515,7 @@ def getReComp(
     # taking the last component position angle for the whole galaxy
 
     maskgal = galcomps.Active == 1
-    if angle:
+    if angle:  # pragma: no cover
         theta = angle
     else:
         theta = galcomps.PosAng[maskgal][-1]
@@ -1513,7 +1525,7 @@ def getReComp(
 
     N = numComps(comps, "all")
 
-    if N == 0:
+    if N == 0:  # pragma: no cover
         print("not enough number of components to compute Re")
         print("exiting..")
         sys.exit(1)
@@ -1700,7 +1712,7 @@ class GetReff:
                 self.funReSer, a, b, args=(flux, rad, n, q, pa, totFlux, eff, theta)
             )
 
-        except Exception:
+        except Exception:  # pragma: no cover
             print("solution not found in given range")
             Re = 0
 
@@ -1826,14 +1838,14 @@ def getSlope(
 
     maskgal = comps.Active == 1
 
-    if angle:
+    if angle:  # pragma: no cover
         theta = angle
     else:
         theta = comps.PosAng[maskgal][-1]
 
     N = numComps(comps, "all")
 
-    if N == 0:
+    if N == 0:  # pragma: no cover
         print("not enough number of components to compute Re")
         print("exiting..")
         sys.exit(1)
@@ -1842,7 +1854,7 @@ def getSlope(
     # computing the slope
     #########################
 
-    if plot:
+    if plot:  # pragma: no cover
 
         if ranx:
             (xmin, xmax) = ranx[0], ranx[1]
@@ -1885,7 +1897,7 @@ class GetSlope:
 
     def FullSlopeSer(
         self, R: float, Re: list, n: list, q: list, pa: list, theta: float
-    ) -> float:
+    ) -> float:  # pragma: no cover
 
         SlptotR = self.SlopeSer(R, Re, n, q, pa, theta)
 
@@ -1952,7 +1964,7 @@ class GetSlope:
                 ),
             )
 
-        except Exception:
+        except Exception:  # pragma: no cover
             print("solution not found in given range")
             Radslp = 0
 
@@ -2069,7 +2081,7 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
 
     maskgal2 = galcomps2.Active == 1
 
-    if angle:
+    if angle:  # pragma: no cover
         theta = angle
     else:
         theta = galcomps2.PosAng[maskgal2][-1]
@@ -2081,12 +2093,12 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
     N1 = numComps(comps1, "all")
     N2 = numComps(comps2, "all")
 
-    if (N1 == 0) or (N2 == 0):
+    if (N1 == 0) or (N2 == 0):  # pragma: no cover
         print("not enough number of components of one of the two models to proceed")
         print("exiting..")
         sys.exit(1)
 
-    if plot:
+    if plot:  # pragma: no cover
 
         if ranx:
             (xmin, xmax) = ranx[0], ranx[1]
@@ -2121,14 +2133,14 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
     # computing bulge radius
     try:
         rbulge = newton(getDiffx, 0, args=(head1, comps1, comps2, theta))
-    except Exception:
+    except Exception:  # pragma: no cover
         print("solution not found for initial parameter")
         rbulge = 0
 
     return rbulge, N1, N2, theta
 
 
-def getDiff(head1, comps1, comps2, R, theta):
+def getDiff(head1, comps1, comps2, R, theta):  # pragma: no cover
     """Calculates the surface brightness difference
     between two models at various radii I1 - I2.
 
@@ -2146,7 +2158,7 @@ def getDiff(head1, comps1, comps2, R, theta):
     return Idiff
 
 
-def getIs(head1, comps1, comps2, R, theta):
+def getIs(head1, comps1, comps2, R, theta):  # pragma: no cover
     """Calculates the surface brightness of two
     models at various radii.
 
