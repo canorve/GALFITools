@@ -116,7 +116,7 @@ class InitGal:
 
                 if self.numcomp:
 
-                    if self.numcomp == comp:  # pragma: no cover
+                    if self.numcomp == comp:
 
                         if (tmp[0] == "3)") and (flagsky3 is False):
                             if self.param3:
@@ -181,7 +181,7 @@ class InitGal:
                                 tmp[1] = str(np.round(c10[0], 2))
                                 line = " ".join(tmp)
 
-                else:  # pragma: no cover
+                else:
 
                     if (tmp[0] == "3)") and (flagsky3 is False):
                         if self.param3:
@@ -271,7 +271,7 @@ class InitGal:
         lineout = "#!/bin/bash \n"
         bashout.write(lineout)
 
-        for gfile in listfiles:  # pragma: no cover
+        for gfile in listfiles:
 
             lineout = "galfit " + gfile + "\n"
             bashout.write(lineout)

@@ -8,6 +8,10 @@ import numpy as np
 from collections import Counter
 from astropy.io import fits
 
+import stat
+import re
+from pathlib import Path
+
 from galfitools.galin.getStar import getStar
 from galfitools.galin.initgal import InitGal
 from galfitools.galin.MaskDs9 import maskDs9
@@ -106,6 +110,175 @@ def test_InitGal():
         os.remove(namefile)
 
     return None
+
+
+def _write_minimal_galfit(path: Path):
+    """
+    Create a minimal GALFIT input file with:
+      - component 1: lines 0), 3) .. 10)
+      - component 2: lines 0), 3) .. 10)
+      - sky component: 0) sky and a 3) line (must NOT be changed)
+    """
+    lines = []
+    # component 1
+    lines += [
+        "0) sersic",
+        "3) 1.00",  # typical radius-like parameter
+        "4) 2.00",
+        "5) 3.00",
+        "6) 4.00",
+        "7) 5.00",
+        "8) 6.00",
+        "9) 7.00",
+        "10) 8.00",
+    ]
+    # component 2
+    lines += [
+        "0) sersic",
+        "3) 10.00",
+        "4) 20.00",
+        "5) 30.00",
+        "6) 40.00",
+        "7) 50.00",
+        "8) 60.00",
+        "9) 70.00",
+        "10) 80.00",
+    ]
+    # sky component at end (flagsky3 must prevent changing its 3))
+    lines += [
+        "0) sky",
+        "3) 999.00",
+    ]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def _extract_param_values(text: str, token: str):
+    """
+    Return a list of floats for a given parameter token like '3)' found at
+    the beginning of a line (possibly with a leading space that InitGal adds).
+    """
+    vals = []
+    for line in text.splitlines():
+        m = re.match(rf"^\s*{re.escape(token)}\)\s+([+-]?\d+(\.\d+)?)", line)
+        if m:
+            vals.append(float(m.group(1)))
+    return vals
+
+
+def test_initgal_generates_files_and_bash(tmp_path):
+    gal_in = tmp_path / "galfit.gal"
+    _write_minimal_galfit(gal_in)
+
+    # Change cwd so InitGal.MakeBash() sees tmp_path/*.gal
+    old_cwd = os.getcwd()
+    os.chdir(tmp_path)
+    try:
+        InitGal(
+            str(gal_in),
+            number=2,
+            param3=(0.5, 1.5),
+            param4=(1.5, 2.5),
+            param5=(2.5, 3.5),
+            param6=(3.5, 4.5),
+            param7=(4.5, 5.5),
+            param8=(5.5, 6.5),
+            param9=(6.5, 7.5),
+            param10=(7.5, 8.5),
+            numcomp=0,
+        )
+
+        # Now check generated files
+        files = sorted(p.name for p in tmp_path.glob("*.gal"))
+        assert "galfit-1.gal" in files
+        assert "galfit-2.gal" in files
+
+        # Bash script created and executable
+        bash = tmp_path / "rungalfit.sh"
+        assert bash.exists()
+        btxt = bash.read_text()
+        assert "galfit galfit-1.gal" in btxt
+        assert "galfit galfit-2.gal" in btxt
+    finally:
+        os.chdir(old_cwd)
+
+
+def test_initgal_only_target_component_changes(tmp_path: Path):
+    """numcomp=2 → only component 2 parameters are randomized; component 1 stays at original values; sky 3) unchanged."""
+    gal_in = tmp_path / "galfit.gal"
+    _write_minimal_galfit(gal_in)
+
+    # Choose ranges that make it easy to detect change vs original
+    InitGal(
+        str(gal_in),
+        number=1,
+        param3=(100.0, 200.0),
+        param4=(200.0, 300.0),
+        param5=(300.0, 400.0),
+        param6=(400.0, 500.0),
+        param7=(500.0, 600.0),
+        param8=(600.0, 700.0),
+        param9=(700.0, 800.0),
+        param10=(800.0, 900.0),
+        numcomp=2,  # only second component should change
+    )
+
+    out = tmp_path / "galfit-1.gal"
+    assert out.exists()
+    txt = out.read_text(encoding="utf-8").splitlines()
+
+    # Walk lines and track which component we're in; verify values
+    comp = 0
+    seen_sky_3 = False
+    for line in txt:
+        parts = line.strip().split()
+        if not parts:
+            continue
+        if parts[0] == "0)":
+            comp += 1
+            # mark sky
+            if len(parts) > 1 and parts[1] == "sky":
+                comp = 999  # sentinel for sky
+            continue
+        if parts[0].endswith(")"):
+            key = parts[0][:-1]  # '3'..'10'
+            try:
+                val = float(parts[1])
+            except Exception:
+                continue
+            if comp == 1:
+                # original values from _write_minimal_galfit()
+                original = {
+                    "3": 1.00,
+                    "4": 2.00,
+                    "5": 3.00,
+                    "6": 4.00,
+                    "7": 5.00,
+                    "8": 6.00,
+                    "9": 7.00,
+                    "10": 8.00,
+                }[key]
+                assert val == original, f"comp1 param {key} unexpectedly changed"
+            elif comp == 2:
+                # randomized into big ranges
+                bounds = {
+                    "3": (100, 200),
+                    "4": (200, 300),
+                    "5": (300, 400),
+                    "6": (400, 500),
+                    "7": (500, 600),
+                    "8": (600, 700),
+                    "9": (700, 800),
+                    "10": (800, 900),
+                }[key]
+                assert (
+                    bounds[0] <= val <= bounds[1]
+                ), f"comp2 param {key} not randomized"
+            elif comp == 999 and key == "3":
+                # sky's 3) must remain 999.00
+                assert val == 999.00
+                seen_sky_3 = True
+
+    assert seen_sky_3, "sky 3) line not found or modified"
 
 
 def test_maskDs9():
