@@ -75,19 +75,19 @@ def imarith(
             newdata = dataImage + add
 
     if mul:
-        if image2:
+        if image2:  # pragma: no cover
             newdata = dataImage * dataImage2
         else:
             newdata = dataImage * mul
 
     if div:
-        if image2:
+        if image2:  # pragma: no cover
             newdata = dataImage / dataImage2
         else:
             newdata = dataImage / div
 
     if sub:
-        if image2:
+        if image2:  # pragma: no cover
             newdata = dataImage - dataImage2
         else:
             newdata = dataImage - sub

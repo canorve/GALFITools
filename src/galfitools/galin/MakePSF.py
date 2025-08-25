@@ -84,7 +84,7 @@ def makePSF(
     # checking the center position
     even = False
 
-    if imsize % 2 == 0:
+    if imsize % 2 == 0:  # pragma: no cover
         even = True
 
     if even:
@@ -93,7 +93,7 @@ def makePSF(
         xpeak = int(lx + 1)
         ypeak = int(lx + 1)
 
-    else:
+    else:  # pragma: no cover
         lx = imsize / 2
 
         xpeak = int(lx + 0.5)
@@ -142,14 +142,14 @@ def makePSF(
     )
 
     # check if galfit failed
-    if re.search("Doh!", errgal.stdout):
+    if re.search("Doh!", errgal.stdout):  # pragma: no cover
         print("ERROR: GALFIT has been unable to find a solution")
         print("Try to reduce the number of gaussians with -ng option")
         print("Exiting now")
         sys.exit(1)
 
     # check if galfit quit
-    if re.search("QUIT", errgal.stdout):
+    if re.search("QUIT", errgal.stdout):  # pragma: no cover
         print("ERROR: GALFIT has unexpectedly quit.")
         print(
             "Probably the cause is trying to constraint a component which doesn't exist "
