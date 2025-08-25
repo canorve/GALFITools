@@ -64,7 +64,7 @@ def displayCube(
         plate=scale,
     )
 
-    if noplot is False:
+    if noplot is False:  # pragma: no cover
         plt.pause(1.5)
 
     plt.close()
@@ -206,7 +206,7 @@ class ShowCube:
         if arcsec.value >= 60:
             lxlinearc = arcsec.to("arcmin").value
             s = "{}'".format(round(lxlinearc))
-        else:
+        else:  # pragma: no cover
             lxlinearc = arcsec.value
             s = "{}''".format(round(lxlinearc))
 
@@ -217,7 +217,7 @@ class ShowCube:
         # ax1.set_xlabel(r'$\circ$')
         # ax2.set_ylabel('23\"')
 
-        for ell in ellipse:
+        for ell in ellipse:  # pragma: no cover
             ax1.add_patch(ell)
 
         ax2.imshow(

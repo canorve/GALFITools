@@ -15,6 +15,9 @@ from galfitools.galout.getRads import getSlope
 from galfitools.galout.getRads import getBulgeRad
 from galfitools.galout.getMissingLight import getMissLight
 from galfitools.galout.getN import getN
+
+# import galfitools.galout.getN as mod
+import galfitools.galout.getN as getn_mod
 from galfitools.galout.getMeRad import getMeRad
 from galfitools.galout.getBT import getBT
 from galfitools.galout.showcube import displayCube
@@ -364,6 +367,161 @@ def test_getN():
     assert diffser2 < tol
 
     return None
+
+
+def _fake_comps(active, posang):
+    return type(
+        "Comps",
+        (),
+        {
+            "Active": np.array(active, dtype=int),
+            "PosAng": np.array(posang, dtype=float),
+        },
+    )()
+
+
+def test_getN_nominal(monkeypatch):
+    class FakeGalfit:
+        def __init__(self, f):
+            self.f = f
+
+        def ReadHead(self):
+            return type("H", (), {"scale": 0.5})()
+
+        def ReadComps(self):
+            return _fake_comps([1, 0, 1], [10.0, 20.0, 30.0])
+
+    class FakeGetReff:
+        def GetReSer(self, head, comps, frac, theta):
+            return (10.0 if np.isclose(frac, 0.5) else 8.0), 12.34
+
+        def GetRfracSer(self, head, comps, F, theta):
+            return 20.0 * F
+
+    class FakeGetMe:
+        def MeanMe(self, totmag, r):
+            return 20.0
+
+        def Me(self, head, comps, r, theta):
+            return 18.0
+
+    class FakeGetN:
+        def MeMeanMe(self, me, meanme):
+            return 3.5
+
+        def GalNs(self, Re, R, F):
+            return np.full_like(F, 4.0, dtype=float)
+
+    monkeypatch.setattr(getn_mod, "Galfit", FakeGalfit)
+    monkeypatch.setattr(getn_mod, "SelectGal", lambda comps, dis, num: comps)
+    monkeypatch.setattr(getn_mod, "conver2Sersic", lambda comps: comps)
+    monkeypatch.setattr(getn_mod, "numComps", lambda comps, mode: 3)
+    monkeypatch.setattr(getn_mod, "GetReff", lambda: FakeGetReff())
+    monkeypatch.setattr(getn_mod, "GetMe", lambda: FakeGetMe())
+    monkeypatch.setattr(getn_mod, "GetN", lambda: FakeGetN())
+
+    sersic, ns_mean, ns_std, totmag, N, theta = getn_mod.getN(
+        "galfit.01", dis=10, frac=0.2, angle=None, num_comp=1, plot=False, const=0
+    )
+    assert sersic == 3.5
+    assert ns_mean == 4.0
+    assert ns_std == 0.0
+    assert totmag == 12.34
+    assert N == 3
+    assert theta == 30.0
+
+
+def test_getN_with_plot_calls_savefig(monkeypatch):
+    class FakeGalfit:
+        def __init__(self, f):
+            self.f = f
+
+        def ReadHead(self):
+            return type("H", (), {"scale": 1.0})()
+
+        def ReadComps(self):
+            return _fake_comps([1], [42.0])
+
+    class FakeGetReff:
+        def GetReSer(self, head, comps, frac, theta):
+            return (5.0, 10.0)
+
+        def GetRfracSer(self, head, comps, F, theta):
+            return 10.0 * F
+
+    class FakeGetMe:
+        def MeanMe(self, totmag, r):
+            return 1.0
+
+        def Me(self, head, comps, r, theta):
+            return 0.5
+
+    class FakeGetN:
+        def MeMeanMe(self, me, meanme):
+            return 2.0
+
+        def GalNs(self, Re, R, F):
+            return np.ones_like(F) * 2.5
+
+    # define FakePlt BEFORE patching
+    calls = {"savefig": None}
+
+    class FakePlt:
+        def plot(self, *a, **k):
+            pass
+
+        def grid(self, *a, **k):
+            pass
+
+        def minorticks_on(self, *a, **k):
+            pass
+
+        def xlabel(self, *a, **k):
+            pass
+
+        def ylabel(self, *a, **k):
+            pass
+
+        def savefig(self, path):
+            calls["savefig"] = path
+
+    monkeypatch.setattr(getn_mod, "Galfit", FakeGalfit)
+    monkeypatch.setattr(getn_mod, "SelectGal", lambda comps, dis, num: comps)
+    monkeypatch.setattr(getn_mod, "conver2Sersic", lambda comps: comps)
+    monkeypatch.setattr(getn_mod, "numComps", lambda comps, mode: 1)
+    monkeypatch.setattr(getn_mod, "GetReff", lambda: FakeGetReff())
+    monkeypatch.setattr(getn_mod, "GetMe", lambda: FakeGetMe())
+    monkeypatch.setattr(getn_mod, "GetN", lambda: FakeGetN())
+    monkeypatch.setattr(getn_mod, "plt", FakePlt())  # only in this test
+
+    sersic, ns_mean, ns_std, totmag, N, theta = getn_mod.getN(
+        "galfit.01", dis=5, frac=0.3, angle=10.0, num_comp=1, plot=True, const=0.1
+    )
+    assert calls["savefig"] == "Serind.png"
+    assert (sersic, ns_mean, ns_std, totmag, N, theta) == (2.0, 2.5, 0.0, 10.0, 1, 10.0)
+
+
+def test_getN_no_components_exits(monkeypatch):
+    class FakeGalfit:
+        def __init__(self, f):
+            self.f = f
+
+        def ReadHead(self):
+            return type("H", (), {"scale": 1.0})()
+
+        def ReadComps(self):
+            return _fake_comps([0], [0.0])
+
+    monkeypatch.setattr(getn_mod, "Galfit", FakeGalfit)
+    monkeypatch.setattr(getn_mod, "SelectGal", lambda comps, dis, num: comps)
+    monkeypatch.setattr(getn_mod, "conver2Sersic", lambda comps: comps)
+    monkeypatch.setattr(getn_mod, "numComps", lambda comps, mode: 0)
+
+    with pytest.raises(SystemExit) as exc:
+        getn_mod.getN(
+            "galfit.01", dis=10, frac=0.2, angle=10.0, num_comp=1, plot=False, const=0.0
+        )
+    assert exc.value.code == 1
 
 
 def test_displayCube():
