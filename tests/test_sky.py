@@ -48,12 +48,16 @@ def test_SkyDs9():
     RegFile = path + RegFile
     maskfile = "none"
 
-    mean, sig = SkyDs9(ImageFile, RegFile, maskfile, outliers=True)
+    mean, sig, ms, mstd = SkyDs9(
+        ImageFile, RegFile, maskfile, outliers=True, mgzpt=21.471, scale=0.68
+    )
 
     tol = 1e-2
 
     result1 = 1146.627
     result2 = 6.919
+    result3 = 21.102
+    result4 = 0.014
 
     diffsky1 = abs(mean - result1)
 
@@ -62,6 +66,14 @@ def test_SkyDs9():
     diffsky2 = abs(sig - result2)
 
     assert diffsky2 < tol
+
+    diffsky3 = abs(ms - result3)
+
+    assert diffsky3 < tol
+
+    diffsky4 = abs(mstd - result4)
+
+    assert diffsky4 < tol
 
     return None
 

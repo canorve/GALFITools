@@ -7,11 +7,12 @@ import numpy as np
 from astropy.io import fits
 from galfitools.galin.std import GetAxis
 from galfitools.galin.std import GetSize
+from galfitools.galin.std import GetExpTime
 from galfitools.galin.std import Ds9ell2Kronell
 from matplotlib.path import Path
 
 
-def SkyDs9(ImageFile, RegFile, maskfile, outliers=False):
+def SkyDs9(ImageFile, RegFile, maskfile, outliers=False, mgzpt=25, scale=1):
     """Computes sky background from a Ds9 region file.
     The DS9 region file can be a box, ellipses or
     polygons
@@ -29,6 +30,10 @@ def SkyDs9(ImageFile, RegFile, maskfile, outliers=False):
     outliers : bool
              if True, it removes the top 80% and bottom 20% of
              the pixel values.
+    mgzpt: float
+            magnitud zeropoint
+    scale : float
+            plate scale
 
     Returns
     -------
@@ -50,7 +55,7 @@ def SkyDs9(ImageFile, RegFile, maskfile, outliers=False):
 
     (ncol, nrow) = GetAxis(ImageFile)
 
-    # exptime = GetExpTime(ImageFile)
+    exptime = GetExpTime(ImageFile)
 
     hdu = fits.open(ImageFile)
 
@@ -214,7 +219,14 @@ def SkyDs9(ImageFile, RegFile, maskfile, outliers=False):
     mean = np.mean(imgpatch)
     std = np.std(imgpatch)
 
-    return mean, std
+    # computing mean and sigma of surface brightness
+
+    arglog = mean / (exptime * scale)
+    ms = mgzpt - 2.5 * np.log10(arglog)
+
+    mstd = (2.5 / np.log(10)) * (std / mean)
+
+    return mean, std, ms, mstd
 
 
 def SkyEllip(Image, xpos, ypos, rx, ry, angle, ncol, nrow):

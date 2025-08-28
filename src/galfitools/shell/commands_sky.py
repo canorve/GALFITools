@@ -51,8 +51,23 @@ def _build_parser_sky_ds9() -> argparse.ArgumentParser:
         "-ol",
         "--outliers",
         action="store_true",
-        help="remove top 80% and bottom 20% of pixel values when computing sky",
+        help="remove top 80%% and bottom 20%% of pixel values when computing sky",
     )
+    p.add_argument(
+        "-zp",
+        "--mgzpt",
+        type=float,
+        help="the magnitude zero point. default=25",
+        default=25,
+    )
+    p.add_argument(
+        "-s",
+        "--scale",
+        type=float,
+        help="Plate scale. default=1",
+        default=1,
+    )
+
     return p
 
 
@@ -73,7 +88,7 @@ def _build_parser_sky_ring() -> argparse.ArgumentParser:
         "-ol",
         "--outliers",
         action="store_true",
-        help="remove top 80% and bottom 20% of pixel values within the ring",
+        help="remove top 80%% and bottom 20%% of pixel values within the ring",
     )
     p.add_argument(
         "-w",
@@ -108,9 +123,13 @@ def mainSkyDs9(argv=None) -> int:
     printWelcome()
     parser = _build_parser_sky_ds9()
     args = parser.parse_args(argv)
-    mean, sig = SkyDs9(args.ImageFile, args.RegFile, args.mask, args.outliers)
+    mean, sig, ms, mstd = SkyDs9(
+        args.ImageFile, args.RegFile, args.mask, args.outliers, args.mgzpt, args.scale
+    )
     print(f"mean sky: {mean:.3f} ")
     print(f"std sky: {sig:.3f} ")
+    print(f"surface brighntess sky: {ms:.3f} ")
+    print(f"error surface brighntess sky: {mstd:.3f} ")
     return 0
 
 

@@ -49,18 +49,30 @@ def test_mainGalfitSky_missing_args(monkeypatch):
 
 
 def test_mainSkyDs9_calls_SkyDs9_and_prints(monkeypatch, capsys):
-    def fake_SkyDs9(ImageFile, RegFile, mask, outliers):
+    def fake_SkyDs9(ImageFile, RegFile, mask, outliers=False, mgzpt=25.0, scale=1.0):
         assert ImageFile == "img.fits"
         assert RegFile == "regions.reg"
         assert mask == "mask.fits"
         assert outliers is True
-        return 12.3456, 0.789
+        assert mgzpt == 25
+        assert scale == 1
+        return 12.3456, 0.789, 22, 0.1
 
     monkeypatch.setattr(cli, "SkyDs9", fake_SkyDs9)
     monkeypatch.setattr(cli, "printWelcome", lambda: None)
 
     rc = cli.mainSkyDs9(
-        ["img.fits", "regions.reg", "--mask", "mask.fits", "--outliers"]
+        [
+            "img.fits",
+            "regions.reg",
+            "--mask",
+            "mask.fits",
+            "--outliers",
+            "--mgzpt",
+            "25",
+            "--scale",
+            "1",
+        ]
     )
     assert rc == 0
     out = capsys.readouterr().out
