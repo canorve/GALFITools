@@ -9,9 +9,9 @@ astronomical jargon.
 
 
 
---------------------
-**Software Tools**
---------------------
+-------------------------
+**GALFITools Ecosystem**
+-------------------------
 
 .. _concept-galfit:
 
@@ -338,7 +338,7 @@ together in a single run.
 
 
 --------------------
-**Image Properties**
+**Image Photometry**
 --------------------
 
 .. _concept-star-image:
@@ -742,9 +742,9 @@ measure of galaxy size.
 
 
 
-------------------------------
-**Modeling and Mathematics**
-------------------------------
+----------------------------------------------
+**Surface Brightness Modeling and properties**
+----------------------------------------------
 
 .. _concept-sersic:
 
