@@ -97,6 +97,21 @@ def _build_parser_sky_ring() -> argparse.ArgumentParser:
         help="ring width for gradient method. default = 20",
         default=20,
     )
+    p.add_argument(
+        "-zp",
+        "--mgzpt",
+        type=float,
+        help="the magnitude zero point. default=25",
+        default=25,
+    )
+    p.add_argument(
+        "-s",
+        "--scale",
+        type=float,
+        help="Plate scale. default=1",
+        default=1,
+    )
+
     return p
 
 
@@ -128,8 +143,8 @@ def mainSkyDs9(argv=None) -> int:
     )
     print(f"mean sky: {mean:.3f} ")
     print(f"std sky: {sig:.3f} ")
-    print(f"surface brighntess sky: {ms:.3f} ")
-    print(f"error surface brighntess sky: {mstd:.3f} ")
+    print(f"surface brighntess sky: {ms:.3f} mag/''^2 ")
+    print(f"error surface brighntess sky: {mstd:.3f} mag/''^2 ")
     return 0
 
 
@@ -140,10 +155,20 @@ def mainSkyRing(argv=None) -> int:
     args = parser.parse_args(argv)
 
     print("Major axis of ellipse is used as initial radius.")
-    mean, std, median, rad = SkyRing(
-        args.Image, args.mask, args.Ds9regFile, args.width, args.center, args.outliers
+    mean, std, median, ms, mstd, rad = SkyRing(
+        args.Image,
+        args.mask,
+        args.Ds9regFile,
+        args.width,
+        args.center,
+        args.outliers,
+        args.mgzpt,
+        args.scale,
     )
     print(
-        f"Total sky:  mean =  {mean:.2f}; std={std:.2f}; median = {median:.2f} at radius {rad:.2f} "
+        f"Total sky:  mean =  {mean:.3f}; sigma = {std:.3f}; median = {median:.3f} at radius {rad:.2f}"
+    )
+    print(
+        f"Surface brighntess sky = {ms:.2f} mag/''^2; error surface brightness = {mstd:.2f}; at radius {rad:.2f}"
     )
     return 0

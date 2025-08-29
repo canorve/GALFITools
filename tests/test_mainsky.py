@@ -87,24 +87,41 @@ def test_mainSkyDs9_requires_positionals(monkeypatch):
 
 
 def test_mainSkyRing_calls_SkyRing_and_prints(monkeypatch, capsys):
-    def fake_SkyRing(Image, mask, Ds9regFile, width, center, outliers):
+    def fake_SkyRing(
+        Image, mask, Ds9regFile, width, center, outliers=True, mgzpt=25.0, scale=1.0
+    ):
         assert Image == "img.fits"
         assert mask is None
         assert Ds9regFile == "ell.reg"
         assert width == 25
         assert center is True
-        assert outliers is False
-        return 10.0, 2.0, 9.5, 30.25
+        assert outliers is True
+        assert mgzpt == 25
+        assert scale == 1
+        return 10.0, 2.0, 9.5, 22, 0.1, 30.25
 
     monkeypatch.setattr(cli, "SkyRing", fake_SkyRing)
     monkeypatch.setattr(cli, "printWelcome", lambda: None)
 
-    rc = cli.mainSkyRing(["img.fits", "ell.reg", "--width", "25", "--center"])
+    rc = cli.mainSkyRing(
+        [
+            "img.fits",
+            "ell.reg",
+            "--width",
+            "25",
+            "--center",
+            "--outliers",
+            "--mgzpt",
+            "25",
+            "--scale",
+            "1",
+        ]
+    )
     assert rc == 0
     out = capsys.readouterr().out
     assert "Major axis of ellipse is used as initial radius." in out
     assert "mean =  10.00" in out
-    assert "std=2.00" in out
+    assert "sigma = 2.000" in out
     assert "median = 9.50" in out
     assert "radius 30.25" in out
 

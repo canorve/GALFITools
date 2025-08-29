@@ -38,10 +38,18 @@ def SkyDs9(ImageFile, RegFile, maskfile, outliers=False, mgzpt=25, scale=1):
     Returns
     -------
     mean : float
-        returns the mean of sky background
+        returns the mean of sky background in counts
 
     std : float
-        returns the standard deviation of sky background
+        returns the standard deviation of sky background in counts
+
+    ms:  float
+        returns the surface brightness in mag/''^2
+
+    mstd:  float
+        returns the error of the surface brightness in mag/''^2
+
+
     """
 
     if not os.path.exists(ImageFile):  # pragma: no cover

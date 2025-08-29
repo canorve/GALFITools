@@ -93,15 +93,16 @@ def test_skyring():
     center = False
 
     ##end input
-    mean, std, median, rad = SkyRing(
-        image, mask, ds9regfile, width, center, outliers=True
+    mean, std, median, ms, mstd, rad = SkyRing(
+        image, mask, ds9regfile, width, center, outliers=True, mgzpt=21.817, scale=0.68
     )
 
     tol = 1e-2
 
-    # update numbers
-    result1 = 370.41
-    result2 = 4.43
+    result1 = 370.415
+    result2 = 4.429
+    result3 = 21.48
+    result4 = 0.01
 
     diffsky1 = abs(mean - result1)
 
@@ -111,10 +112,18 @@ def test_skyring():
 
     assert diffsky2 < tol
 
+    diffsky3 = abs(ms - result3)
+
+    assert diffsky3 < tol
+
+    diffsky4 = abs(mstd - result4)
+
+    assert diffsky4 < tol
+
     # assert os.path.isfile("ring.fits")
 
-    if os.path.isfile("skyring.fits"):
-        os.remove("skyring.fits")
+    if os.path.isfile("tests/skyring.fits"):
+        os.remove("tests/skyring.fits")
 
     # assert os.path.isfile("ringmask.fits")
 

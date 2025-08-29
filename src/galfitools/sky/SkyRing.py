@@ -7,12 +7,13 @@ from astropy.io import fits
 from galfitools.mge.mge2galfit import GetSize
 
 from galfitools.galin.std import GetAxis
+from galfitools.galin.std import GetExpTime
 from galfitools.galin.std import Ds9ell2Kronellv2
 from galfitools.galin.std import GetInfoEllip
 from galfitools.galin.std import GetPmax
 
 
-def SkyRing(image, mask, ds9regfile, width, center, outliers):
+def SkyRing(image, mask, ds9regfile, width, center, outliers=False, mgzpt=25, scale=1):
     """Computes the sky background using concentric rings
 
     Computes the sky background of an object by identifying
@@ -40,20 +41,28 @@ def SkyRing(image, mask, ds9regfile, width, center, outliers):
             of the peak's value
     outliers : bool
                 if True removes the top 80% and bottom 20% of pixels values
+    mgzpt: float
+            magnitud zeropoint
+    scale : float
+            plate scale
 
 
     Returns
     -------
 
     mean : float
-           the sky mean
+           the sky mean in counts
     std  : float
-           the standard deviation of sky
+           the standard deviation of sky in counts
     median : float
             the median of sky
     rad  : float
             the major axis of the ellipse where the sky
             was estimated
+    ms   :  float
+            returns the surface brightness in mag/''^2
+    mstd :  float
+            returns the error of the surface brightness in mag/''^2
 
 
     """
@@ -102,7 +111,15 @@ def SkyRing(image, mask, ds9regfile, width, center, outliers):
         outliers=outliers,
     )
 
-    return mean, std, median, rad
+    exptime = GetExpTime(image)
+    # computing mean and sigma of surface brightness
+
+    arglog = mean / (exptime * scale)
+    ms = mgzpt - 2.5 * np.log10(arglog)
+
+    mstd = (2.5 / np.log(10)) * (std / mean)
+
+    return mean, std, median, ms, mstd, rad
 
 
 class SkyCal:
@@ -338,7 +355,9 @@ class SkyCal:
                     print("sky computed in ring {} ".format(savidx + 2))
 
                     print("Ring radius = {:.2f} ".format(radius[1:-1][savidx]))
-                    print("the counts value within ring represent the long axis")
+                    print(
+                        "the counts value within ring in the output image represent the long axis"
+                    )
                     self.img[ymin - 1 : ymax, xmin - 1 : xmax][maskring] = radius[1:-1][
                         savidx
                     ]
