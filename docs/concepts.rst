@@ -283,14 +283,16 @@ used to characterize galaxy structure and to fit analytic models.
 **Related GALFITools API**
 
 - :py:func:`galfitools.mge.SbProf.sbProf`
+- :py:func:`galfitools.galout.showcube.displayCube`
+- :py:func:`galfitools.galout.getCOW.getCOW`
 
 
 .. admonition:: Related GALFITools CLI commands
    :class: seealso
 
    - :ref:`SbProf <routine-SbProf>`
-
-
+   - :ref:`ShowCube <routine-showCube>`
+   - :ref:`getCOW <routine-getCOW>`
 
 
 .. _concept-simultaneous-fitting:
