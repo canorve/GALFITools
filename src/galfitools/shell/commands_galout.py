@@ -68,7 +68,11 @@ def mainGetBreak(argv=None) -> int:
         a.ranx,
     )
     print("number of model components: ", N)
-    print(f"Using a theta value of: {theta:.2f} degrees\n")
+    if a.angle:
+        print(f"position angle: {theta:.2f} degrees\n")
+    else:
+        print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
+
     plate = Galfit(a.GalfitFile).ReadHead().scale
     print(f'The break radius is {rbreak:.2f} pixels or {rbreak*plate:.2f} "  \n')
     return 0
@@ -91,7 +95,10 @@ def mainGetBreak2(argv=None) -> int:
     )
     plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
-    print(f"Using a theta value of: {theta:.2f} degrees\n")
+    if a.angle:
+        print(f"position angle: {theta:.2f} degrees\n")
+    else:
+        print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
     print(f'The break radius is {rbreak:.2f} pixels or {rbreak*plate:.2f} " \n')
     return 0
 
@@ -111,7 +118,7 @@ def mainGetBarSize(argv=None) -> int:
     rbar, N, theta = getBarSize(a.GalfitFile, a.dis, a.numcomp, a.plot, a.ranx, a.out)
     plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
-    print(f"Using a theta value of: {theta:.2f} degrees\n")
+
     print(f'The bar size is {rbar:.2f} pixels or {rbar*plate:.2f} " \n')
     return 0
 
@@ -129,7 +136,10 @@ def mainFWHM(argv=None) -> int:
     fwhm, N, theta = getFWHM(a.GalfitFile, a.dis, a.angle, a.numcomp)
     plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
-    print(f"Using a theta value of : {theta:.2f} degrees\n")
+    if a.angle:
+        print(f"position angle: {theta:.2f} degrees\n")
+    else:
+        print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
     print(f'The FWHM is {fwhm:.2f} pixels or {fwhm*plate:.2f} " \n')
     return 0
 
@@ -162,6 +172,11 @@ def mainKappa(argv=None) -> int:
     )
     plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
+    if a.angle:
+        print(f"position angle: {theta:.2f} degrees\n")
+    else:
+        print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
+
     print(f'The Kappa radius  is {rkappa:.2f} pixels or {rkappa*plate:.2f} " \n')
     return 0
 
@@ -183,7 +198,11 @@ def mainKappa2(argv=None) -> int:
     )
     plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
-    print(f"Using a theta value of: {theta:.2f} degrees\n")
+    if a.angle:
+        print(f"position angle: {theta:.2f} degrees\n")
+    else:
+        print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
+
     print(f'The kappa radius is {rkappa:.2f} pixels or {rkappa*plate:.2f} " \n')
     return 0
 
@@ -204,7 +223,11 @@ def mainGetReComp(argv=None) -> int:
     )
     plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
-    print(f"Using a theta value of : {theta:.2f} degrees \n")
+    if a.angle:
+        print(f"position angle: {theta:.2f} degrees\n")
+    else:
+        print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
+
     print(f"Total Magnitude of the galaxy: {totmag:.2f} \n")
     print(
         f"Surface brightness at radius of {a.fracrad*100:.0f}% of light (μr): {me:.2f} mag/'' \n"
@@ -235,7 +258,11 @@ def mainGetMeRad(argv=None) -> int:
     )
     plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
-    print(f"Using a theta value of : {theta:.2f} degrees \n")
+    if a.angle:
+        print(f"position angle: {theta:.2f} degrees\n")
+    else:
+        print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
+
     print(f"Total Magnitude of the galaxy: {totmag:.2f} \n")
     print(f'The radius used is {a.rad:.2f} pixels or {a.rad*plate:.2f} " \n')
     print(f"Surface brightness at this radius is (μr): {merad:.2f} mag/'' \n")
@@ -261,7 +288,11 @@ def maingetSlope(argv=None) -> int:
     )
     plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
-    print(f"Using a theta value of : {theta:.2f} degrees\n")
+    if a.angle:
+        print(f"position angle: {theta:.2f} degrees\n")
+    else:
+        print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
+
     print(
         f'The radius with slope {a.slope:.2f} is {rgam:.2f} pixels, or {rgam*plate:.2f} " \n'
     )
@@ -285,7 +316,11 @@ def maingetN(argv=None) -> int:
         a.GalfitFile, a.dis, a.radfrac, a.angle, a.numcomp, a.plot, a.const
     )
     print("number of model components: ", N)
-    print(f"Using a theta value of : {theta:.2f} degrees \n")
+    if a.angle:
+        print(f"position angle: {theta:.2f} degrees\n")
+    else:
+        print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
+
     print(f"Total Magnitude of the galaxy: {totmag:.2f} \n")
     print(
         "Sersic index with the method of Mean Surface Brightness at effective radius: {:.2f} ".format(
@@ -336,7 +371,11 @@ def mainGetBulgeRad(argv=None) -> int:
     plate = Galfit(a.GalfitFile1).ReadHead().scale
     print("number of model components for the bulge: ", N1)
     print("number of model components for the rest of the galaxy: ", N2)
-    print(f"Using a theta value of: {theta:.2f} degrees\n")
+    if a.angle:
+        print(f"position angle: {theta:.2f} degrees\n")
+    else:
+        print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
+
     print(f'The bulge radius is {rbulge:.2f} pixels or {rbulge*plate:.2f} "  \n')
     return 0
 
@@ -413,7 +452,11 @@ def maingetCOW(argv=None) -> int:
         a.maxdiff,
     )
     print("number of model components: ", N)
-    print(f"Using a theta value of : {theta:.2f} degrees \n")
+    if a.angle:
+        print(f"position angle: {theta:.2f} degrees\n")
+    else:
+        print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
+
     print(f"Total Magnitude of the galaxy: {totmag:.2f} \n")
     print("plot file: ", a.plotfile)
     return 0
@@ -444,5 +487,5 @@ def maingetPeak(argv=None) -> int:
     X, Y, AxRat, PA = getPeak(a.Image, a.RegFile, a.center, a.mask)
     print("peak is at (x, y) = ", X, Y)
     print("axis ratio q = {:.2f} ".format(AxRat))
-    print("angular position = {:.2f}".format(PA))
+    print("position angle = {:.2f}".format(PA))
     return 0
