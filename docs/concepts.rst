@@ -336,10 +336,9 @@ together in a single run.
    - :ref:`routine-getMeRad`
 
 
-
-----------------------------
+------------------------------
 **Photometric Parameters**
------------------------------
+------------------------------
 
 .. _concept-star-image:
 
