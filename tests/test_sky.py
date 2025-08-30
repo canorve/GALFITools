@@ -125,6 +125,9 @@ def test_skyring():
     if os.path.isfile("tests/skyring.fits"):
         os.remove("tests/skyring.fits")
 
+    if os.path.isfile("skyring.fits"):
+        os.remove("skyring.fits")
+
     # assert os.path.isfile("ringmask.fits")
 
     # if os.path.isfile("ringmask.fits"):

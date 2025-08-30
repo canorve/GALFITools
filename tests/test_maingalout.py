@@ -71,7 +71,7 @@ def test_mainFWHM(monkeypatch, capsys):
     out = capsys.readouterr().out
     # Validate key parts of output
     assert "number of model components:  3" in out
-    assert "theta value of : 42.00" in out
+    assert "position angle: 42.00 degrees" in out
     assert "FWHM is 8.50 pixels or 4.25" in out  # 8.5 * 0.5 = 4.25
 
 
@@ -141,7 +141,7 @@ def test_mainGetReComp_default_half(monkeypatch, capsys):
     out = capsys.readouterr().out
     # Key checks
     assert "number of model components:  3" in out
-    assert "Using a theta value of : 37.00 degrees" in out
+    assert "position angle: 37.00 degrees" in out
     assert "Total Magnitude of the galaxy: 19.25" in out
     assert "Surface brightness at radius of 50% of light" in out
     assert "(μr): 20.50 mag/''" in out
@@ -175,7 +175,7 @@ def test_mainGetReComp_nonhalf_fraction(monkeypatch, capsys):
 
     out = capsys.readouterr().out
     assert "number of model components:  2" in out
-    assert "Using a theta value of : 10.00 degrees" in out
+    assert "position angle: 10.00 degrees" in out
     assert "Total Magnitude of the galaxy: 18.00" in out
     assert "Surface brightness at radius of 30% of light" in out
     assert "(μr): 21.50 mag/''" in out
@@ -223,7 +223,7 @@ def test_maingetSlope_default(monkeypatch, capsys):
 
     out = capsys.readouterr().out
     assert "number of model components:  3" in out
-    assert "Using a theta value of : 25.00 degrees" in out
+    assert "position angle: 25.00 degrees" in out
     # 15.0 px * 0.4 = 6.0 arcsec
     assert 'The radius with slope 0.50 is 15.00 pixels, or 6.00 "' in out
 
@@ -261,7 +261,7 @@ def test_maingetSlope_with_options(monkeypatch, capsys):
 
     out = capsys.readouterr().out
     assert "number of model components:  2" in out
-    assert "Using a theta value of : 10.00 degrees" in out
+    assert "position angle: 10.00 degrees" in out
     # 8.0 px * 0.5 = 4.0 arcsec
     assert 'The radius with slope 0.75 is 8.00 pixels, or 4.00 "' in out
 
@@ -279,7 +279,7 @@ def test_maingetN_default(monkeypatch, capsys):
     # Be tolerant to spacing/newlines
     norm = " ".join(out.split())
     assert "number of model components: 4" in norm
-    assert "Using a theta value of : 22.00 degrees" in norm
+    assert "position angle: 22.00 degrees" in norm
     assert "Total Magnitude of the galaxy: 18.75" in norm
     assert "Mean Surface Brightness at effective radius: 3.20" in norm
     assert "Sersic index mean: 3.10 Standard deviation: 0.25" in norm
@@ -311,7 +311,7 @@ def test_maingetN_with_options(monkeypatch, capsys):
     out = capsys.readouterr().out
     norm = " ".join(out.split())
     assert "number of model components: 2" in norm
-    assert "Using a theta value of : 10.00 degrees" in norm
+    assert "position angle: 10.00 degrees" in norm
     assert "Total Magnitude of the galaxy: 19.00" in norm
     # Spot-check both index lines
     assert "Mean Surface Brightness at effective radius: 2.50" in norm
@@ -384,7 +384,7 @@ def test_maingetCOW_defaults(monkeypatch, capsys):
     out = capsys.readouterr().out
     norm = " ".join(out.split())
     assert "number of model components: 3" in norm
-    assert "Using a theta value of : 25.00 degrees" in norm
+    assert "position angle: 25.00 degrees" in norm
     assert "Total Magnitude of the galaxy: 18.75" in norm
     assert "plot file: cow.png" in norm
 
@@ -403,7 +403,8 @@ def test_maingetPeak_defaults(monkeypatch, capsys):
     # Tolerant checks (whitespace/newlines can vary)
     assert re.search(r"peak is at \(x,\s*y\)\s*=\s*123\.4\s+56\.7", out)
     assert re.search(r"axis ratio q\s*=\s*0\.82", out)
-    assert re.search(r"angular position\s*=\s*37\.50", out)
+    assert re.search(r"position angle\s*=\s*37\.50", out)
+    # assert "position angle = 37.50 degrees" in out
 
 
 def test_maingetPeak_with_flags(monkeypatch, capsys):
@@ -425,7 +426,8 @@ def test_maingetPeak_with_flags(monkeypatch, capsys):
     out = capsys.readouterr().out
     assert re.search(r"peak is at \(x,\s*y\)\s*=\s*200\.0\s+150\.0", out)
     assert re.search(r"axis ratio q\s*=\s*0\.60", out)
-    assert re.search(r"angular position\s*=\s*12\.00", out)
+    assert re.search(r"position angle\s*=\s*12\.00", out)
+    # assert "position angle = 12.00 degrees" in out
 
 
 def test_mainGetBulgeRad(monkeypatch, capsys):
@@ -465,7 +467,7 @@ def test_mainGetBulgeRad(monkeypatch, capsys):
     # Use regex to be resilient to spacing/newlines
     assert re.search(r"number of model components for the bulge:\s+4", out)
     assert re.search(r"number of model components for the rest of the galaxy:\s+6", out)
-    assert re.search(r"Using a theta value of:\s+33\.00 degrees", out)
+    assert re.search(r"position angle:\s+33\.00 degrees", out)
     # 12.5 px * 0.4 = 5.00 arcsec
     assert re.search(r"The bulge radius is 12\.50 pixels or 5\.00 \"", out)
 
