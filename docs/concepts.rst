@@ -10,7 +10,7 @@ astronomical jargon.
 
 
 -------------------------
-**GALFITools Ecosystem**
+**Computational Tools**
 -------------------------
 
 .. _concept-galfit:
@@ -337,9 +337,9 @@ together in a single run.
 
 
 
---------------------
-**Image Photometry**
---------------------
+----------------------------
+**Photometric Parameters**
+-----------------------------
 
 .. _concept-star-image:
 
@@ -505,7 +505,7 @@ it strongly affects measured magnitudes and profiles.
 .. _concept-magnitude:
 
 Magnitude
----------
+-----------
 Magnitude is a logarithmic measure of the brightness of an astronomical
 object. A decrease of 1 magnitude corresponds to an increase in
 brightness by a factor of about 2.512. Fainter objects have larger
@@ -535,7 +535,7 @@ magnitude values, while brighter objects have smaller values.
 .. _concept-convolution:
 
 Convolution
------------
+------------
 In image analysis, convolution is the process of combining two
 functions, such as a model galaxy image and the point–spread function
 (PSF), to simulate how the model would appear through a telescope and
@@ -569,7 +569,7 @@ fit, giving less importance to noisy pixels.
 .. _concept-mag-zero:
 
 Magnitude zero point
---------------------
+---------------------
 The magnitude zero point is a calibration constant that converts between
 instrumental fluxes (in counts or electrons) and standard magnitudes. It
 depends on the instrument, filter, and exposure time. A correct zero
@@ -600,21 +600,11 @@ pixel. It depends on the telescope optics and detector.
 
 
 
-.. _concept-axis-ratio:
-
-Axis ratio
-----------
-The axis ratio (*b/a*) is the ratio of the minor axis length (*b*) to
-the major axis length (*a*) of an ellipse that describes the projected
-shape of a galaxy component. Values near 1 correspond to nearly circular
-objects, while smaller values indicate more elongated shapes.
 
 
-
-
-------------------------------
-**Galaxy Components**
-------------------------------
+-------------------------
+**Galactic Components**
+-------------------------
 
 
 .. _concept-bulge:
@@ -696,55 +686,11 @@ inflows toward the galaxy center.
 
 
 
-.. _concept-bt:
 
 
-Bulge–to–total luminosity ratio (B/T)
----------------------------------------
-
-The bulge–to–total luminosity ratio is the fraction of a galaxy’s total
-light that comes from the bulge compared to the sum of bulge and disk.
-It is commonly used to quantify galaxy morphology.
-
-**Related GALFITools API**
-
-- :py:func:`galfitools.galout.getBT.getBT`
-
-
-.. admonition:: Related GALFITools CLI commands
-   :class: seealso
-
-   - :ref:`getBT <routine-getBT>`
-
-
-.. _concept-effective-radius:
-
-Effective radius (Re)
------------------------
-
-The effective radius is the radius of a circular aperture that contains
-half of the total light of a galaxy or model component. It is a standard
-measure of galaxy size.
-
-
-**Related GALFITools API**
-
-- :py:func:`galfitools.galout.getRads.getReComp`
-- :py:func:`galfitools.galout.getMeRad.getMeRad`
-
-
-.. admonition:: Related GALFITools CLI commands
-   :class: seealso
-
-   - :ref:`getReComp <routine-getReComp>`
-   - :ref:`getMeRad <routine-getMeRad>`
-
-
-
-
-----------------------------------------------
-**Surface Brightness Modeling and properties**
-----------------------------------------------
+--------------------------------
+**Surface Brightness Modeling**
+--------------------------------
 
 .. _concept-sersic:
 
@@ -800,7 +746,7 @@ dynamical modeling.
 .. _concept-nuker:
 
 Nuker profile
--------------
+---------------
 The Nuker profile is a broken power–law function used to describe the
 inner surface brightness distribution of galaxies, especially elliptical
 galaxies and bulges. It is defined by an inner slope, an outer slope,
@@ -821,6 +767,66 @@ early–type galaxies observed with the Hubble Space Telescope.
    - :ref:`getBreak <routine-getBreak>`
    - :ref:`getBreak2 <routine-getBreak2>`
    - :ref:`getSlope <routine-getSlope>`
+
+
+---------------------------------
+**Strucutral Parameters**
+---------------------------------
+
+.. _concept-bt:
+
+Bulge–to–total luminosity ratio (B/T)
+---------------------------------------
+
+The bulge–to–total luminosity ratio is the fraction of a galaxy’s total
+light that comes from the bulge compared to the sum of bulge and disk.
+It is commonly used to quantify galaxy morphology.
+
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getBT.getBT`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getBT <routine-getBT>`
+
+
+.. _concept-effective-radius:
+
+Effective radius (Re)
+-----------------------
+
+The effective radius is the radius of a circular aperture that contains
+half of the total light of a galaxy or model component. It is a standard
+measure of galaxy size.
+
+
+**Related GALFITools API**
+
+- :py:func:`galfitools.galout.getRads.getReComp`
+- :py:func:`galfitools.galout.getMeRad.getMeRad`
+
+
+.. admonition:: Related GALFITools CLI commands
+   :class: seealso
+
+   - :ref:`getReComp <routine-getReComp>`
+   - :ref:`getMeRad <routine-getMeRad>`
+
+
+
+.. _concept-axis-ratio:
+
+Axis ratio
+----------
+The axis ratio (*b/a*) is the ratio of the minor axis length (*b*) to
+the major axis length (*a*) of an ellipse that describes the projected
+shape of a galaxy component. Values near 1 correspond to nearly circular
+objects, while smaller values indicate more elongated shapes.
+
+
 
 
 
