@@ -291,7 +291,7 @@ used to characterize galaxy structure and to fit analytic models.
    :class: seealso
 
    - :ref:`SbProf <routine-SbProf>`
-   - :ref:`ShowCube <routine-showCube>`
+   - :ref:`showCube <routine-showCube>`
    - :ref:`getCOW <routine-getCOW>`
 
 
