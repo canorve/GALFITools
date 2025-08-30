@@ -770,7 +770,7 @@ early–type galaxies observed with the Hubble Space Telescope.
 
 
 ---------------------------------
-**Strucutral Parameters**
+**Structural Parameters**
 ---------------------------------
 
 .. _concept-bt:
