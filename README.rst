@@ -20,6 +20,10 @@
         :alt: Twitter
         :target: https://twitter.com/GALFITools
 
+.. image:: https://readthedocs.org/projects/GALFITools/badge/?version=latest
+        :alt: ReadTheDocs
+        :target: https://GALFITools.readthedocs.io/en/stable/
+
 .. image:: https://img.shields.io/pypi/v/GALFITools.svg
     :alt: PyPI-Server
     :target: https://pypi.org/project/GALFITools/
@@ -47,8 +51,8 @@
    :target: https://codecov.io/gh/canorve/galfitools
    :alt: Coverage
 
-.. image:: https://img.shields.io/pypi/pyversions/your-package.svg
-   :target: https://pypi.org/project/your-package/
+.. image:: https://img.shields.io/pypi/pyversions/GALFITools.svg
+   :target: https://pypi.org/project/GALFITools/
    :alt: Supported Python versions
 
 ============
