@@ -133,8 +133,8 @@ to the analysis of GALFIT's output
 In this release:
 
 - New function (getBT) to compute the bulge to total luminosity ratio
-- New function (getMeRad) to compute the surface brightess (and 
-- mean surface brightness at a any radio
+- New function (getMeRad) to compute the surface brightess and 
+  mean surface brightness at a any radio
 - skyRing and skyDs9 functions computes the surface brightness of the sky 
 - better documentation 
 - bugs fixed
