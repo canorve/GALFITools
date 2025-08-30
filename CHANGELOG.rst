@@ -117,7 +117,28 @@ In this release:
 
 - New function (getBT) to compute the bulge to total luminosity ratio
 - New function (getMeRad) to compute the surface brightess (and 
-- mean surface brightness) at a given radio
+- mean surface brightness at a given radio
+
+Version 1.18.0
+================
+
+GALFITools: A library for GALFIT
+
+GALFITools constitutes a collection of specialized routines to facilitate
+the utilization of GALFIT. The toolkit encompasses a spectrum of routines,
+spanning from mask creation, Point Spread Function (PSF) creation,
+Multi-gaussian expansion, sky computation, initial parameter estimation,
+to the analysis of GALFIT's output
+
+In this release:
+
+- New function (getBT) to compute the bulge to total luminosity ratio
+- New function (getMeRad) to compute the surface brightess (and 
+- mean surface brightness at a any radio
+- skyRing and skyDs9 functions computes the surface brightness of the sky 
+- better documentation 
+- bugs fixed
+
 
 
 
