@@ -55,6 +55,11 @@
    :target: https://pypi.org/project/GALFITools/
    :alt: Supported Python versions
 
+.. image:: https://pyopensci.org/badges/peer-reviewed.svg
+   :target: https://github.com/pyOpenSci/software-review/issues/220
+   :alt: pyOpenSci Peer-Reviewed
+
+
 ============
 GALFITools
 ============
