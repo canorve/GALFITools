@@ -26,7 +26,7 @@ to galaxy images to extract properties such as size, brightness, components, and
 GALFIT is a widely used tool for this purpose, but it requires careful 
 preparation of input files and interpretation of results, which can be a barrier to efficient use.
 
-**GALFITools** is a Python library that streamlines this workflow by automating many 
+GALFITools is a Python library that streamlines this workflow by automating many 
 of the tasks surrounding the use of GALFIT. These include generating image masks, 
 estimating sky background, modeling the telescope’s point spread function (PSF), and 
 extracting physical parameters from GALFIT outputs. The software is designed for 
@@ -45,7 +45,7 @@ formats in a structured way. These tasks are typically handled manually or with 
 scripts, which reduces reproducibility, becomes time-consuming and error-prone, 
 raises the barrier for new users, and makes the application to large surveys difficult.
 
-**GALFITools** [@anorve24] addresses this gap by offering a cohesive suite of Python-based tools 
+GALFITools [@anorve24] addresses this gap by offering a cohesive suite of Python-based tools 
 that extend the functionality of GALFIT. It facilitates the full modeling pipeline, 
 from input preparation to result interpretation. This includes routines to construct 
 PSFs, model galaxies via Multi-Gaussian Expansion [MGE, @cappellari02], estimate sky 
