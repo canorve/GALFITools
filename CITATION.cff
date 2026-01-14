@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the preferred citation below."
+title: "GALFITools"
+type: software
+license: "MIT"
+repository-code: "https://github.com/canorve/GALFITools"
+url: "https://github.com/canorve/GALFITools"
+version: "v1.18.0"
+date-released: "2025-08-30"
+doi: "10.5281/zenodo.17010007"
+
+authors:
+  - given-names: "Christopher"
+    family-names: "Añorve"
+    orcid: "https://orcid.org/0000-0002-3721-8869"
+    affiliation: "FACITE"
+
+keywords:
+  - astronomy
+  - galaxy modeling
+  - GALFIT
+  - photometry
+  - python
+
+preferred-citation:
+  type: article
+  title: "GALFITools: A Python library to enhance GALFIT usage in galaxy image modeling"
+  authors:
+    - given-names: "Christopher"
+      family-names: "Añorve"
+      orcid: "https://orcid.org/0000-0002-3721-8869"
+  doi: "10.21105/joss.09534"
+  url: "https://doi.org/10.21105/joss.09534"
+  journal: "Journal of Open Source Software"
+  year: 2025
+  volume: 10
+  issue: 116
+  pages: 9534
+  publisher: "The Open Journal"
+  date-published: "2025-12-31"
