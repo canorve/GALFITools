@@ -1911,15 +1911,26 @@ class GetSlope:
 
         for r in R:
 
-            slp = self.SlopeSer(
-                r,
-                comps.Ie[maskgal],
-                comps.Rad[maskgal],
-                comps.Exp[maskgal],
-                comps.AxRat[maskgal],
-                comps.PosAng[maskgal],
-                theta,
-            )
+            if comps.NameComp == "ferrer":
+                slp = self.SlopeFerrer(
+                    r,
+                    comps.Exp2[maskgal],  # change to beta
+                    comps.Rad[maskgal],
+                    comps.Exp[maskgal],
+                    comps.AxRat[maskgal],
+                    comps.PosAng[maskgal],
+                    theta,
+                )
+            else:
+                slp = self.SlopeSer(
+                    r,
+                    comps.Ie[maskgal],
+                    comps.Rad[maskgal],
+                    comps.Exp[maskgal],
+                    comps.AxRat[maskgal],
+                    comps.PosAng[maskgal],
+                    theta,
+                )
             gam = np.append(gam, slp)
 
         return gam
@@ -2014,6 +2025,42 @@ class GetSlope:
         Slp = (Sprim / S) * R
 
         return Slp
+
+    def SlopeFerrer(
+        self, R: float, Ie: list, Re: list, n: list, q: list, pa: list, theta: float
+    ) -> float:
+        """slope from Ferrer function to a determined R
+
+        def dlogSigma_dlogr_analytic2(r, Sigma0=1.0, rout=10.0, beta=0.5, alpha=2.0):
+        d log10(Σ) / d log10(r) = (r/Σ) dΣ/dr = d ln(Σ) / d ln(r)
+
+        for Σ(r)=Σ0(1-x)^α, x=(r/rout)^(2-β), n=2-β:
+        ln Σ = ln Σ0 + α ln(1-x)
+        d ln Σ / d ln r = α * [1/(1-x)] * d(1-x)/d ln r
+                       = α * [1/(1-x)] * (-(d x / d ln r))
+        and  dx/d ln r = n x,
+        => d log Σ / d log r = - α * n * x / (1-x)
+
+        Note: parameters here are not Sersic anymore, but
+              these use the same positional arguments in
+              sersic file. For instance Re here really means
+              Outer truncation radius of the Sersic Functions
+              Ie does not have an equivalent, but it is used as beta here.
+        """
+
+        beta = Ie
+        alpha = n
+        Rout = Re
+
+        Rcor = GetRadAng(R, q, pa, theta)
+
+        X = Rcor / Rout  # x = r / rout
+
+        gam = 2.0 - beta
+
+        dev = alpha * (beta - 2) * x ** (gam) / (1 - x**gam)
+
+        return dev
 
 
 def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
