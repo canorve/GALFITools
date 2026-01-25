@@ -1910,8 +1910,7 @@ class GetSlope:
         gam = np.array([])
 
         for r in R:
-
-            if comps.NameComp == "ferrer":
+            if comps.NameComp[maskgal][1] == "ferrer":
                 slp = self.SlopeFerrer(
                     r,
                     comps.Exp2[maskgal],  # change to beta
@@ -2058,7 +2057,7 @@ class GetSlope:
 
         gam = 2.0 - beta
 
-        dev = alpha * (beta - 2) * x ** (gam) / (1 - x**gam)
+        dev = alpha * (beta - 2) * X ** (gam) / (1 - X**gam)
 
         return dev
 
