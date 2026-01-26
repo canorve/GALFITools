@@ -1909,18 +1909,38 @@ class GetSlope:
 
         gam = np.array([])
 
-        for r in R:
-            if comps.NameComp[maskgal][1] == "ferrer":
-                slp = self.SlopeFerrer(
+        if comps.NameComp[maskgal][1] == "ferrer":
+
+            masksersic = comps.NameComp[maskgal] == "sersic"
+            maskferrer = comps.NameComp[maskgal] == "ferrer"
+
+            for r in R:
+
+                slp1 = self.SlopeFerrer(
                     r,
-                    comps.Exp2[maskgal],  # change to beta
-                    comps.Rad[maskgal],
-                    comps.Exp[maskgal],
-                    comps.AxRat[maskgal],
-                    comps.PosAng[maskgal],
+                    comps.Exp2[maskgal][maskferrer],  # change to beta
+                    comps.Rad[maskgal][maskferrer],
+                    comps.Exp[maskgal][maskferrer],
+                    comps.AxRat[maskgal][maskferrer],
+                    comps.PosAng[maskgal][maskferrer],
                     theta,
                 )
-            else:
+
+                slp2 = self.SlopeSer(
+                    r,
+                    comps.Ie[maskgal][masksersic],  # change to beta
+                    comps.Rad[maskgal][masksersic],
+                    comps.Exp[maskgal][masksersic],
+                    comps.AxRat[maskgal][masksersic],
+                    comps.PosAng[maskgal][masksersic],
+                    theta,
+                )
+
+                gam = np.append(gam, slp1 + slp2)
+
+        else:
+
+            for r in R:
                 slp = self.SlopeSer(
                     r,
                     comps.Ie[maskgal],
@@ -1930,7 +1950,7 @@ class GetSlope:
                     comps.PosAng[maskgal],
                     theta,
                 )
-            gam = np.append(gam, slp)
+                gam = np.append(gam, slp)
 
         return gam
 
