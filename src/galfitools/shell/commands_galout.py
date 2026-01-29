@@ -106,7 +106,7 @@ def mainGetBreak2(argv=None) -> int:
 def mainGetBarSize(argv=None) -> int:
     printWelcome()
     p = argparse.ArgumentParser(
-        description="getBarSize: gets the bar size from Sersic models"
+        description="getBarSize: gets the bar size from Sersic and Ferrer models"
     )
     p.add_argument("GalfitFile")
     p.add_argument("-d", "--dis", type=int, default=10)

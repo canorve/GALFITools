@@ -20,8 +20,9 @@ def getBarSize(
     Break radius (maximum of double derivative) to estimate the
     bar size of the three composed model of bulge, bar, and disk.
 
-    it assumes that the bar model is the second component of the
-    GALFIT file
+    It assumes the bar model is the second component of the
+    GALFIT file. Bar model can be a Sersic or Ferrer function.
+    The rest of components must be Sersic (or related) models.
 
     Parameters
     ----------

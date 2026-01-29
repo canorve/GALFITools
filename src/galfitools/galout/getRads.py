@@ -1879,11 +1879,12 @@ def getSlope(
 
 
 class GetSlope:
-    """Class to obtain the slope radius from a set of Sersic functions.
+    """Class to obtain the slope radius from a set of Sersic (and Ferrer) functions.
 
     This class is called by GetSlope Function to compute
     the radius at the given slope value.
     The main method is FindSlope.
+    GalSlope accepts Ferrer model
 
     Methods
     -------
@@ -2050,21 +2051,14 @@ class GetSlope:
     ) -> float:
         """slope from Ferrer function to a determined R
 
-        def dlogSigma_dlogr_analytic2(r, Sigma0=1.0, rout=10.0, beta=0.5, alpha=2.0):
-        d log10(Σ) / d log10(r) = (r/Σ) dΣ/dr = d ln(Σ) / d ln(r)
-
-        for Σ(r)=Σ0(1-x)^α, x=(r/rout)^(2-β), n=2-β:
-        ln Σ = ln Σ0 + α ln(1-x)
-        d ln Σ / d ln r = α * [1/(1-x)] * d(1-x)/d ln r
-                       = α * [1/(1-x)] * (-(d x / d ln r))
-        and  dx/d ln r = n x,
         => d log Σ / d log r = - α * n * x / (1-x)
 
         Note: parameters here are not Sersic anymore, but
               these use the same positional arguments in
               sersic file. For instance Re here really means
-              Outer truncation radius of the Sersic Functions
-              Ie does not have an equivalent, but it is used as beta here.
+              Outer truncation radius. Ie does not have an
+              equivalent, but it is used as beta here.
+              Sersic index is alpha here.
         """
 
         beta = Ie
