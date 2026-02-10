@@ -253,11 +253,11 @@ def mge2gal(
         # Perform galaxy photometry
         if maskfile:
             s = sectors_photometry_twist(
-                img, theta, xpeak, ypeak, minlevel=minlevel, badpixels=maskb, plot=1
+                img, theta, xpeak, ypeak, minlevel=minlevel, badpixels=maskb, plot=False
             )
         else:
             s = sectors_photometry_twist(
-                img, theta, xpeak, ypeak, minlevel=minlevel, plot=1
+                img, theta, xpeak, ypeak, minlevel=minlevel, plot=False
             )
 
         plt.savefig(sectorspng)
@@ -331,12 +331,12 @@ def mge2gal(
                 ypeak,
                 minlevel=minlevel,
                 badpixels=maskb,
-                plot=1,
+                plot=False,
             )
         else:
 
             s = sectors_photometry(
-                img, eps, theta, xpeak, ypeak, minlevel=minlevel, plot=1
+                img, eps, theta, xpeak, ypeak, minlevel=minlevel, plot=False
             )
 
         plt.pause(1)  # Allow plot to appear on the screen
