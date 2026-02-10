@@ -260,11 +260,11 @@ def mge2gal(
                 img, theta, xpeak, ypeak, minlevel=minlevel, plot=False
             )
 
-        plt.savefig(sectorspng)
+        # plt.savefig(sectorspng)
 
-        plt.pause(1)  # Allow plot to appear on the screen
+        # plt.pause(1)  # Allow plot to appear on the screen
 
-        plt.clf()
+        # plt.clf()
 
         tolpsf = 0.001
 
@@ -315,9 +315,9 @@ def mge2gal(
                     plot=False,
                 )
 
-        plt.pause(1)  # Allow plot to appear on the screen
+        # plt.pause(1)  # Allow plot to appear on the screen
 
-        plt.savefig(namepng)
+        # plt.savefig(namepng)
 
     else:
         # elif twist == False:
@@ -339,9 +339,9 @@ def mge2gal(
                 img, eps, theta, xpeak, ypeak, minlevel=minlevel, plot=False
             )
 
-        plt.pause(1)  # Allow plot to appear on the screen
+        # plt.pause(1)  # Allow plot to appear on the screen
 
-        plt.savefig(sectorspng)
+        # plt.savefig(sectorspng)
 
         # plt.clf()
 
@@ -404,9 +404,9 @@ def mge2gal(
                     linear=0,
                 )
 
-        plt.pause(1)  # Allow plot to appear on the screen
+        # plt.pause(1)  # Allow plot to appear on the screen
 
-        plt.savefig(namepng)
+        # plt.savefig(namepng)
 
     if twist:  # pragma: no cover
 
