@@ -195,9 +195,20 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
     [
         # 1) Minimal: only required args → all defaults
         (
-            ["img.fits", "ell.reg"],
+            ["img.fits", "ell.reg", "--out", "sersic.init"],
             # image, regfile, center, mask, zeropoint, sky, noprint, bulgetot, bards9
-            ("img.fits", "ell.reg", False, None, 25.0, 0.0, False, None, None),
+            (
+                "img.fits",
+                "ell.reg",
+                False,
+                None,
+                25.0,
+                0.0,
+                False,
+                None,
+                None,
+                "sersic.init",
+            ),
         ),
         # 2) Typical flags: custom zeropoint/sky + center + mask + noprint
         (
@@ -212,13 +223,46 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "-m",
                 "mask.fits",
                 "--noprint",
+                "--out",
+                "sersic.init",
             ],
-            ("img.fits", "ell.reg", True, "mask.fits", 26.0, 1.0, True, None, None),
+            (
+                "img.fits",
+                "ell.reg",
+                True,
+                "mask.fits",
+                26.0,
+                1.0,
+                True,
+                None,
+                None,
+                "sersic.init",
+            ),
         ),
         # 3) Bulge/Disk with a bar region: requires --bulgetot and --bards9
         (
-            ["img.fits", "ell.reg", "--bulgetot", "0.35", "--bards9", "bar.reg"],
-            ("img.fits", "ell.reg", False, None, 25.0, 0.0, False, 0.35, "bar.reg"),
+            [
+                "img.fits",
+                "ell.reg",
+                "--bulgetot",
+                "0.35",
+                "--bards9",
+                "bar.reg",
+                "--out",
+                "sersic.init",
+            ],
+            (
+                "img.fits",
+                "ell.reg",
+                False,
+                None,
+                25.0,
+                0.0,
+                False,
+                0.35,
+                "bar.reg",
+                "sersic.init",
+            ),
         ),
         # 4) Everything at once (different values)
         (
@@ -237,8 +281,21 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "0.6",
                 "-b",
                 "bar2.reg",
+                "--out",
+                "sersic.init",
             ],
-            ("img.fits", "ell.reg", True, "m.fits", 24.5, 0.2, True, 0.6, "bar2.reg"),
+            (
+                "img.fits",
+                "ell.reg",
+                True,
+                "m.fits",
+                24.5,
+                0.2,
+                True,
+                0.6,
+                "bar2.reg",
+                "sersic.init",
+            ),
         ),
     ],
 )
@@ -246,7 +303,7 @@ def test_maingetSersic(monkeypatch, argv, expected):
     seen = {}
 
     def fake_getSersic(
-        image, regfile, center, mask, zeropoint, sky, noprint, bulgetot, bards9
+        image, regfile, center, mask, zeropoint, sky, noprint, bulgetot, bards9, out
     ):
         seen["args"] = (
             image,
@@ -258,6 +315,7 @@ def test_maingetSersic(monkeypatch, argv, expected):
             noprint,
             bulgetot,
             bards9,
+            out,
         )
 
     monkeypatch.setattr(cli, "getSersic", fake_getSersic)

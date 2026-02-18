@@ -513,6 +513,7 @@ def test_getSersic_smoke(tmp_path, capsys):
     """
     img_path = tmp_path / "img.fits"
     reg_path = tmp_path / "ell.reg"
+    out_path = tmp_path / "sersic.init"
 
     data = _make_gaussian()
     _write_fits(img_path, data)
@@ -529,6 +530,7 @@ def test_getSersic_smoke(tmp_path, capsys):
         True,  # noprint
         None,  # bulgetot
         None,  # bards9
+        str(out_path),  # bards9
     )
 
     # getSersic may return None or some tuple/object depending on your impl.
@@ -542,6 +544,7 @@ def test_getSersic_with_mask_and_print(tmp_path, capsys):
     img_path = tmp_path / "img.fits"
     reg_path = tmp_path / "ell.reg"
     mask_path = tmp_path / "mask.fits"
+    out_path = tmp_path / "sersic.init"
 
     data = _make_gaussian()
     _write_fits(img_path, data)
@@ -562,6 +565,7 @@ def test_getSersic_with_mask_and_print(tmp_path, capsys):
         False,  # noprint -> allow output
         None,  # bulgetot
         None,  # bards9
+        str(out_path),
     )
     out = capsys.readouterr().out.lower()
     # Be tolerant: just look for the word 'sersic' somewhere
