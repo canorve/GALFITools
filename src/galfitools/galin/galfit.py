@@ -684,7 +684,7 @@ def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
     ------
     If a galaxy is made up of three components, it does not matter which
     of the three you select as a center. As long these belong to the
-    same galaxy.
+    same galaxy (and center).
 
 
     """
@@ -822,7 +822,7 @@ def galfitLastFit(directory: str) -> str:
 
     Every time GALFIT produces a successful fit it produces
     a file called galfit.XX, where the XX represent a number
-    that increases every time where GALFIT
+    that increases every time where GALFIT finds a solution
 
     Parameters
     ----------

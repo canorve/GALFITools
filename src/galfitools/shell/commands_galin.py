@@ -388,6 +388,9 @@ def maingetSersic(argv=None) -> int:
     )
     parser.add_argument("-m", "--mask", type=str, help="mask file")
     parser.add_argument(
+        "-o", "--out", default="sersic.init", type=str, help="output GALFIT file"
+    )
+    parser.add_argument(
         "-b",
         "--bards9",
         type=str,
@@ -405,6 +408,7 @@ def maingetSersic(argv=None) -> int:
         args.noprint,
         args.bulgetot,
         args.bards9,
+        args.out,
     )
     return 0
 

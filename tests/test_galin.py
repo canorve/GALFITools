@@ -460,8 +460,11 @@ def test_getSersic():
     noprint = False
     bards9 = None
 
+    out = "sersic.init"
+    out = path + out
+
     getSersic(
-        image, regfile, center, maskfile, zeropoint, sky, noprint, bulgetot, bards9
+        image, regfile, center, maskfile, zeropoint, sky, noprint, bulgetot, bards9, out
     )
 
     constfile = "constraints.txt"
@@ -472,6 +475,9 @@ def test_getSersic():
     # assert os.path.isfile(constfile)
     if os.path.isfile(constfile):
         os.remove(constfile)
+
+    if os.path.isfile(out):
+        os.remove(out)
 
     return None
 

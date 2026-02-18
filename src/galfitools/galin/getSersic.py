@@ -1,10 +1,21 @@
 #!/usr/bin/env python3
 
 import numpy as np
+import os
 from galfitools.galin.galfit import GalComps
+from galfitools.galin.galfit import GalHead
+from galfitools.galin.galfit import GalSky
+from galfitools.galin.galfit import galPrintHeader
+from galfitools.galin.galfit import galPrintComp
+from galfitools.galin.galfit import galPrintSky
+
 from galfitools.galout.getPeak import getPeak
 from galfitools.galout.PhotDs9 import photDs9
+
 from galfitools.galin.std import GetInfoEllip
+from galfitools.galin.std import GetAxis
+from galfitools.galin.std import GetSize
+from galfitools.galin.std import Ds9ell2Kronell
 
 
 def getSersic(
@@ -17,6 +28,7 @@ def getSersic(
     noprint: float,
     bulgetot: float,
     bards9: str,
+    out: str,
 ) -> GalComps:
     """Obtains the initial parameters for GALFIT
 
@@ -59,6 +71,10 @@ def getSersic(
             be printed. The bulgetot parameter must be specified
             for this to function.
 
+    out : str
+          output GALFIT file. This is a file where the surface
+          brightness model is formated as a GALFIT file without
+          the header.
 
     Returns
     -------
@@ -72,6 +88,36 @@ def getSersic(
     mag, exptime = photDs9(image, regfile, maskfile, zeropoint, sky)
 
     obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
+
+    (ncol, nrow) = GetAxis(image)
+
+    xx, yy, Rkron, theta, e = Ds9ell2Kronell(xpos, ypos, rx, ry, angle)
+    (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, e, ncol, nrow)
+
+    # enlarging size of the fitting region by 6
+
+    xsize = 6 * (xmax - xmin)
+    ysize = 6 * (ymax - ymin)
+
+    xmax = round(xpos + xsize / 2)
+    xmin = round(xpos - xsize / 2)
+
+    ymax = round(ypos + ysize / 2)
+    ymin = round(ypos - ysize / 2)
+
+    # correcting for fitting regions outside of image
+
+    if xmin < 1:
+        xmin = 1
+
+    if xmax > ncol:
+        xmax = ncol
+
+    if ymin < 1:
+        ymin = 1
+
+    if ymax > nrow:
+        ymax = nrow
 
     if bards9:
 
@@ -108,22 +154,58 @@ def getSersic(
     # wild guesses for n and Re
     n = 2
     skip = 0
-
     N = 1
-    # store in GalComps data class
+
+    fileconst = "constraints.txt"
+
+    # store in GalHead, GalComps and GalSky data class
     galcomps = GalComps()
+    galhead = GalHead()
+    galsky = GalSky()
+
+    # sky setup
+    galsky.sky = sky
+
+    name, extension = os.path.splitext(image)
+
+    # header setup
+    galhead.inputimage = image
+    galhead.outimage = name + "-out.fits"
+    galhead.sigimage = "sigma.fits"
+    galhead.psfimage = "psf.fits"
+    galhead.maskimage = maskfile
+
+    galhead.constraints = fileconst
+    galhead.mgzpt = zeropoint
+
+    galhead.convx = 100
+    galhead.convy = 100
+
+    galhead.xmin = xmin
+    galhead.xmax = xmax
+    galhead.ymin = ymin
+    galhead.ymax = ymax
+    galhead.scale = 0.262  # plate scale for DESI
+    galhead.scaley = 0.262  # plate scale for DESI
+
+    fserout = open(out, "w")
+
+    galPrintHeader(fserout, galhead)
+
+    idxcount = 0  # index for components
 
     if bulgetot:
         if not (noprint):
             print(
-                "The initial parameters for the Sersic component based on "
+                "# The initial parameters for the Sersic component based on "
                 + "the DS9 ellipse region are: "
             )
             print("")
             print(
-                "WARNING: these are initial parameters. True values will be "
+                "# WARNING: these are initial parameters. True values will be "
                 + "computed by GALFIT"
             )
+
             print("")
 
             print("# Component number: 1")
@@ -171,10 +253,8 @@ def getSersic(
             print("10) {:.2f}   1      # Position angle (PA)  ".format(PA))
             print("Z) {}  # Skip this model in output image?  ".format(skip))
 
-            fileconst = "constraints.txt"
-
             print("")
-            print("parameter constraints file: ", fileconst)
+            print("# parameter constraints file: ", fileconst)
 
             fout = open(fileconst, "w")
 
@@ -223,6 +303,10 @@ def getSersic(
         galcomps.Exp2Free = np.append(galcomps.Exp2Free, 0)
         galcomps.Exp3Free = np.append(galcomps.Exp3Free, 0)
         galcomps.AxRatFree = np.append(galcomps.AxRatFree, 1)
+        galcomps.PosAngFree = np.append(galcomps.PosAngFree, 1)
+
+        galPrintComp(fserout, idxcount + 1, idxcount, galcomps)
+        idxcount += 1
 
         if bards9:
 
@@ -251,6 +335,10 @@ def getSersic(
             galcomps.Exp2Free = np.append(galcomps.Exp2Free, 0)
             galcomps.Exp3Free = np.append(galcomps.Exp3Free, 0)
             galcomps.AxRatFree = np.append(galcomps.AxRatFree, 1)
+            galcomps.PosAngFree = np.append(galcomps.PosAngFree, 1)
+
+            galPrintComp(fserout, idxcount + 1, idxcount, galcomps)
+            idxcount += 1
 
         # second component: disk
         N = N + 1
@@ -277,17 +365,21 @@ def getSersic(
         galcomps.Exp2Free = np.append(galcomps.Exp2Free, 0)
         galcomps.Exp3Free = np.append(galcomps.Exp3Free, 0)
         galcomps.AxRatFree = np.append(galcomps.AxRatFree, 1)
+        galcomps.PosAngFree = np.append(galcomps.PosAngFree, 1)
+
+        galPrintComp(fserout, idxcount + 1, idxcount, galcomps)
+        idxcount += 1
 
     else:
 
         if not (noprint):
             print(
-                "The initial parameters for the Sersic component based on "
+                "# The initial parameters for the Sersic component based on "
                 + "the DS9 ellipse region are: "
             )
             print("")
             print(
-                "WARNING: these are initial parameters. True values will be"
+                "# WARNING: these are initial parameters. True values will be"
                 + " computed by GALFIT"
             )
             print("")
@@ -328,5 +420,13 @@ def getSersic(
         galcomps.Exp2Free = np.append(galcomps.Exp2Free, 0)
         galcomps.Exp3Free = np.append(galcomps.Exp3Free, 0)
         galcomps.AxRatFree = np.append(galcomps.AxRatFree, 1)
+        galcomps.PosAngFree = np.append(galcomps.PosAngFree, 1)
+
+        galPrintComp(fserout, idxcount + 1, idxcount, galcomps)
+        idxcount += 1
+
+    galPrintSky(fserout, idxcount + 1, galsky)
+
+    fserout.close()
 
     return galcomps
