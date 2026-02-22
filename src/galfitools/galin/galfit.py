@@ -5,8 +5,10 @@ import numpy as np
 from astropy.io import fits
 from scipy.optimize import bisect
 from scipy.special import gammainc, gammaincinv
+from dataclasses import dataclass, field
 
 
+@dataclass
 class GalHead:
     """
     Data class to store the header info of the galfit file
@@ -42,6 +44,7 @@ class GalHead:
     tempmask = "tempmask.fits"
 
 
+@dataclass
 class GalComps:
     """
     Data class to store the galfit components of the galfit file
@@ -66,16 +69,16 @@ class GalComps:
     Active = np.array([])  # activate component  for galaxy
 
     # store the flags related to parameters
-    PosXFree = np.array([])  # 1)
-    PosYFree = np.array([])  # 2)
-    MagFree = np.array([])  # 3)
-    RadFree = np.array([])  # 4)
-    ExpFree = np.array([])  # 5)
-    Exp2Free = np.array([])  # 6)  for moffat
-    Exp3Free = np.array([])  # 7)  for moffat
-    # 8)  There is No 8 in any galfit model
-    AxRatFree = np.array([])  # 9)  AxisRatio
-    PosAngFree = np.array([])  # 10) position angle
+    PosXFree: np.array = field(default_factory=lambda: np.array([], dtype=np.int64))
+    PosYFree: np.ndarray = field(default_factory=lambda: np.array([], dtype=np.int64))
+    PosYFree: np.array = field(default_factory=lambda: np.array([], dtype=np.int64))
+    MagFree: np.array = field(default_factory=lambda: np.array([], dtype=np.int64))
+    RadFree: np.array = field(default_factory=lambda: np.array([], dtype=np.int64))
+    ExpFree: np.array = field(default_factory=lambda: np.array([], dtype=np.int64))
+    Exp2Free: np.array = field(default_factory=lambda: np.array([], dtype=np.int64))
+    Exp3Free: np.array = field(default_factory=lambda: np.array([], dtype=np.int64))
+    AxRatFree: np.array = field(default_factory=lambda: np.array([], dtype=np.int64))
+    PosAngFree: np.array = field(default_factory=lambda: np.array([], dtype=np.int64))
 
     # computed parameters:
     Rad50 = np.array([])
@@ -95,6 +98,7 @@ class GalComps:
     PetRad = np.array([])
 
 
+@dataclass
 class GalSky:
     """
     Data class to store the sky component of the GALFIT file
@@ -112,6 +116,7 @@ class GalSky:
     dskyyfree = 0
 
 
+@dataclass
 class DataImg:
     """
     Data class to store the galaxy, model and residual images

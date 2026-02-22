@@ -304,7 +304,6 @@ def getSersic(
         galcomps.Exp3Free = np.append(galcomps.Exp3Free, 0)
         galcomps.AxRatFree = np.append(galcomps.AxRatFree, 1)
         galcomps.PosAngFree = np.append(galcomps.PosAngFree, 1)
-
         galPrintComp(fserout, idxcount + 1, idxcount, galcomps)
         idxcount += 1
 
