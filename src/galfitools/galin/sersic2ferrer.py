@@ -88,27 +88,28 @@ def Sersic2Ferrer(
 
     maskgal = comps.Active == 1
 
+    masksec = (comps.NameComp == "sersic") * (comps.N == 2)
+
     if alpha:
-        comps.ExpFree = 1
+        comps.ExpFree[masksec] = 1
     else:
-        comps.ExpFree = 0
+        comps.ExpFree[masksec] = 0
 
     if beta:
-        comps.Exp2Free = 1
+        comps.Exp2Free[masksec] = 1
     else:
-        comps.Exp2Free = 0
+        comps.Exp2Free[masksec] = 0
 
-    comps[1] = conver2Ferrer(comps[1])  # converts only the 2 component
+    comps = conver2Ferrer(comps, galhead.scale, 2)  # converts only the 2 component
 
     # printing output file
     fout = open(fileout, "w")
 
-    galPrintHeader(fout, head)
+    galPrintHeader(fout, galhead)
 
     index = 0
 
     for index, item in enumerate(comps.N):
-
         galPrintComp(fout, index + 1, index, comps)
 
     galPrintSky(fout, index + 1, galsky)

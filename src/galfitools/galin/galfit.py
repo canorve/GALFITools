@@ -52,7 +52,7 @@ class GalComps:
 
     """
 
-    N = np.array([])
+    N: np.array = field(default_factory=lambda: np.array([], dtype=np.int64))
     NameComp = np.array([])  # 0)
     PosX = np.array([])  # 1)
     PosY = np.array([])  # 2)
@@ -64,7 +64,9 @@ class GalComps:
     # 8)  There is No 8 in any galfit model
     AxRat = np.array([])  # 9)  AxisRatio
     PosAng = np.array([])  # 10) position angle
-    skip = np.array([])  # z)  skip model
+    skip: np.array = field(
+        default_factory=lambda: np.array([], dtype=np.int64)
+    )  # z)  skip model
 
     Active = np.array([])  # activate component  for galaxy
 
@@ -775,7 +777,7 @@ def conver2Sersic(galcomps: GalComps) -> GalComps:
     return comps
 
 
-def conver2Ferrer(galcomps: GalComps) -> GalComps:
+def conver2Ferrer(galcomps: GalComps, scale, N) -> GalComps:
     """Converts the Sersic to Ferrer
 
     Using the format of GALFIT with the GalComps data class,
@@ -786,6 +788,8 @@ def conver2Ferrer(galcomps: GalComps) -> GalComps:
     Parameters
     -----------
     galcomps : GalComps data class defined above
+    scale : Plate Scale ''/pixel
+    N : number of component to be converted
 
 
     Returns
@@ -800,14 +804,16 @@ def conver2Ferrer(galcomps: GalComps) -> GalComps:
     K_GAUSS = 0.6931471805599455  # constant k for gaussian
     SQ2 = np.sqrt(2)
 
-    masksec = comps.NameComp == "sersic"
+    masksec = (comps.NameComp == "sersic") * (comps.N == N)
 
     rout = comps.Rad[masksec] / np.sqrt(K_GAUSS)
+    rout_arcsec = rout * scale
 
-    I0 = comps.Flux[masksec] / (np.pi * rout**2)
+    I0 = comps.Flux[masksec] / (np.pi * rout_arcsec**2)
 
-    comps.Rad[masksec] = rout
+    comps.NameComp[masksec] = "ferrer"
     comps.Mag[masksec] = -2.5 * np.log10(I0)
+    comps.Rad[masksec] = rout
     comps.Exp[masksec] = 1
     comps.Exp2[masksec] = 0
 
