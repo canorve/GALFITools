@@ -59,7 +59,7 @@ class GalComps:
     Mag = np.array([])  # 3)
     Rad = np.array([])  # 4)
     Exp = np.array([])  # 5)
-    Exp2 = np.array([])  # 6)  for moffat
+    Exp2 = np.array([])  # 6)  for moffat or Ferrer
     Exp3 = np.array([])  # 7)  for moffat
     # 8)  There is No 8 in any galfit model
     AxRat = np.array([])  # 9)  AxisRatio
@@ -771,6 +771,45 @@ def conver2Sersic(galcomps: GalComps) -> GalComps:
     if maskexp.any():
         comps.Exp[maskexp] = 1
         comps.Rad[maskexp] = K_EXP * comps.Rad[maskexp]  # converting to Re
+
+    return comps
+
+
+def conver2Ferrer(galcomps: GalComps) -> GalComps:
+    """Converts the Sersic to Ferrer
+
+    Using the format of GALFIT with the GalComps data class,
+    it converts the parameters of the functions Sersic n = 0.5,
+    to parameters of Ferrer function.
+
+
+    Parameters
+    -----------
+    galcomps : GalComps data class defined above
+
+
+    Returns
+    -------
+    galcomps : GalComps data class with the functions converted to Ferrer
+              parameters
+
+    """
+
+    comps = copy.deepcopy(galcomps)
+
+    K_GAUSS = 0.6931471805599455  # constant k for gaussian
+    SQ2 = np.sqrt(2)
+
+    masksec = comps.NameComp == "sersic"
+
+    rout = comps.Rad[masksec] / np.sqrt(K_GAUSS)
+
+    I0 = comps.Flux[masksec] / (np.pi * rout**2)
+
+    comps.Rad[masksec] = rout
+    comps.Mag[masksec] = -2.5 * np.log10(I0)
+    comps.Exp[masksec] = 1
+    comps.Exp2[masksec] = 0
 
     return comps
 

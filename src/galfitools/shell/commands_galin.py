@@ -14,6 +14,7 @@ from galfitools.galin.MaskDs9 import maskDs9
 from galfitools.galin.MaskSky import skyRem
 from galfitools.galin.xy2fits import xy2fits
 from galfitools.shell.prt import printWelcome
+from galfitools.galin.sersic2ferrer import Sersic2Ferrer
 
 
 def mainGetStar(argv=None) -> int:
@@ -410,6 +411,34 @@ def maingetSersic(argv=None) -> int:
         args.bards9,
         args.out,
     )
+    return 0
+
+
+def mainSersic2Ferrer(argv=None) -> int:
+    printWelcome()
+    parser = argparse.ArgumentParser(
+        description="converts a Bar Sérsic function (2 component) to a Ferrer function"
+    )
+    parser.add_argument("galfile", help="GALFIT input file")
+    parser.add_argument(
+        "-a", "--alpha", action="store_true", help="keep Ferrer alpha parameter as free"
+    )
+    parser.add_argument(
+        "-b", "--beta", action="store_true", help="keep Ferrer beta parameter as free"
+    )
+    parser.add_argument(
+        "-o", "--out", default="ferrer.init", type=str, help="output GALFIT file"
+    )
+
+    args = parser.parse_args(argv)
+
+    Sersic2Ferrer(
+        args.galfile,
+        args.alpha,
+        args.beta,
+        args.out,
+    )
+
     return 0
 
 
