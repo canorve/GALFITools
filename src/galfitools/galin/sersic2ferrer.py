@@ -5,6 +5,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
+import os
 from galfitools.galin.galfit import (
     GalComps,
     Galfit,
@@ -104,6 +105,11 @@ def Sersic2Ferrer(
 
     # printing output file
     fout = open(fileout, "w")
+
+    filename = galhead.outimage
+    root, extension = os.path.splitext(filename)
+    newname = root + "-ferrer.fits"
+    galhead.outimage = newname
 
     galPrintHeader(fout, galhead)
 
