@@ -7,6 +7,7 @@ import subprocess as sp
 
 from astropy.io import fits
 import os.path
+import sys
 
 
 def MakeImage(newfits, sizex, sizey):
