@@ -187,7 +187,11 @@ def GetInfoEllip(regfile: str):
     found = False
 
     # reading reg file
-    for line in lines:
+    for raw_line in lines:
+
+        line = raw_line.split("#", 1)[0].strip()
+        if not line:
+            continue
 
         b1 = line.split("(")
         p = line.split(",")
@@ -205,7 +209,6 @@ def GetInfoEllip(regfile: str):
             x4 = x3[:-2]
 
             v0 = x0
-
             v1 = float(x2)
             v2 = float(p[1])
             v3 = float(p[2])

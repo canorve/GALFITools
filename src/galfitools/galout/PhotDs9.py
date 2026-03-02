@@ -81,7 +81,11 @@ def photDs9(ImageFile, RegFile, maskfile, zeropoint, sky):
     flag = False
     flagpoly = False
     # reading reg file
-    for line in lines:
+    for raw_line in lines:
+
+        line = raw_line.split("#", 1)[0].strip()
+        if not line:
+            continue
 
         b1 = line.split("(")
         p = line.split(",")
