@@ -9,6 +9,7 @@ from galfitools.galin.std import GetAxis
 from galfitools.galin.std import GetSize
 from galfitools.galin.std import GetExpTime
 from galfitools.galin.std import Ds9ell2Kronell
+from galfitools.galin.std import parse_ds9_ellipse
 from matplotlib.path import Path
 
 
@@ -137,12 +138,14 @@ def photDs9(ImageFile, RegFile, maskfile, zeropoint, sky):
             x3 = p[4]
             x4 = x3[:-2]
 
-            v0.append(x0)
-            v1.append(float(x2) - 1)
-            v2.append(float(p[1]) - 1)
-            v3.append(float(p[2]))
-            v4.append(float(p[3]))
-            v5.append(float(x4))
+            (obje, xe, ye, lxe, lye, anglee) = parse_ds9_ellipse(p)
+
+            v0.append(obje)
+            v1.append(xe)
+            v2.append(ye)
+            v3.append(lxe)
+            v4.append(lye)
+            v5.append(anglee)
 
             flag = False
 

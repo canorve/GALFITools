@@ -206,15 +206,8 @@ def GetInfoEllip(regfile: str):
             found = True
 
         if flag is True:
-            x3 = p[4]
-            x4 = x3[:-2]
 
-            v0 = x0
-            v1 = float(x2)
-            v2 = float(p[1])
-            v3 = float(p[2])
-            v4 = float(p[3])
-            v5 = float(x4)
+            (v0, v1, v2, v3, v4, v5) = parse_ds9_ellipse(p)
 
             flag = False
 
@@ -339,6 +332,30 @@ def GetExpTime(Image):
     except Exception:
         exptime = 1
     return float(exptime)
+
+
+def parse_ds9_ellipse(tokens):
+    """
+    Parse tokens like:
+      ['ellipse(1442', '1061', '16', '16', '0)\\n']
+    or:
+      ['ellipse(1442', '1061', '16', '16', '0)']
+
+    Returns: (shape, x, y, a, b, theta)
+    """
+    first = tokens[0].strip()  # 'ellipse(1442'
+    shape, x0 = first.split("(", 1)  # ('ellipse', '1442')
+
+    # Clean remaining tokens: strip whitespace and remove trailing ')' if present
+    rest = [t.strip().rstrip(")") for t in tokens[1:]]
+
+    x = float(x0)
+    y = float(rest[0])
+    a = float(rest[1])
+    b = float(rest[2])
+    theta = float(rest[3])  # keep float in case angle is not integer
+
+    return shape, x, y, a, b, theta
 
 
 def GetAxis(Image):
