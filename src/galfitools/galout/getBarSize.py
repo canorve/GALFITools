@@ -12,7 +12,13 @@ from galfitools.galout.getRads import getBreak2, getKappa2
 
 
 def getBarSize(
-    galfitFile: str, dis: int, num_comp: int, plot: bool, ranx: list, out: str
+    galfitFile: str,
+    dis: int,
+    num_comp: int,
+    plot: bool,
+    ranx: list,
+    out: str,
+    red: bool,
 ) -> float:
     """gets the bar size of the spiral galaxies
 
@@ -42,6 +48,9 @@ def getBarSize(
     out : str
          Name of the output file for the DS9 ellipse region marking
          the bar.
+    red : bool
+            If True, draws DS9 region ellipse as red color
+
     Returns
     -------
     rbar : float
@@ -111,9 +120,14 @@ def getBarSize(
     # now it creates the ellipse region file
     fout = open(out, "w")
 
+    if red:
+        color = "red"
+    else:
+        color = "blue"
+
     line = "# Region file format: DS9 version 4.1 \n"
     fout.write(line)
-    linea = "global color=red dashlist=8 3 width=2 "
+    linea = "global color=" + color + " dashlist=8 3 width=2 "
     lineb = 'font="helvetica 10 normal roman" select=1 highlite=1 dash=0 '
     linec = "fixed=0 edit=1 move=1 delete=1 include=1 source=1\n"
     line = linea + lineb + linec

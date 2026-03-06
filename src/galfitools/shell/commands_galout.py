@@ -113,9 +113,12 @@ def mainGetBarSize(argv=None) -> int:
     p.add_argument("-n", "--numcomp", type=int, default=1)
     p.add_argument("-o", "--out", type=str, default="bar.reg")
     p.add_argument("-p", "--plot", action="store_true")
+    p.add_argument("-r", "--red", action="store_true")
     p.add_argument("-rx", "--ranx", nargs=2, type=float)
     a = p.parse_args(argv)
-    rbar, N, theta = getBarSize(a.GalfitFile, a.dis, a.numcomp, a.plot, a.ranx, a.out)
+    rbar, N, theta = getBarSize(
+        a.GalfitFile, a.dis, a.numcomp, a.plot, a.ranx, a.out, a.red
+    )
     plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
 

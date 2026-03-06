@@ -677,8 +677,9 @@ def test_getBarSize():
     num_comp = 1
     plot = False
     ranx = None
+    red = False
 
-    rbar, N, theta = getBarSize(galfitFile, dis, num_comp, plot, ranx, out)
+    rbar, N, theta = getBarSize(galfitFile, dis, num_comp, plot, ranx, out, red)
 
     tol = 1e-2
 
