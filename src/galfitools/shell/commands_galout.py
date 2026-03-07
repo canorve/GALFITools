@@ -122,7 +122,9 @@ def mainGetBarSize(argv=None) -> int:
     plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
 
-    print(f'The bar size is {rbar:.2f} pixels or {rbar*plate:.2f} " \n')
+    print(f"The bar length is:  \n")
+    print(f"  pixels   arcsec ")
+    print(f"   {rbar:.2f}     {rbar*plate:.2f}  \n")
     return 0
 
 
