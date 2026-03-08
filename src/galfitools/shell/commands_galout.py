@@ -3,6 +3,7 @@ import argparse
 from galfitools.galin.galfit import Galfit
 from galfitools.galout.fitlog2csv import log2csv
 from galfitools.galout.getBarSize import getBarSize
+from galfitools.galout.getBarSize import getMulBarSize
 from galfitools.galout.getCOW import getCOW
 from galfitools.galout.getMissingLight import getMissLight
 from galfitools.galout.getN import getN
