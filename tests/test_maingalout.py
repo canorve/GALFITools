@@ -488,7 +488,8 @@ def test_mainGetBarSize(monkeypatch, capsys):
     rc = cli.mainGetBarSize(["g.01", "-d", "5", "-n", "1", "-o", "bar.reg"])
     assert rc == 0
     out = capsys.readouterr().out
-    assert "bar size is 20.00" in out
+    textout = "number of model components:  1\nThe bar length is:  \n\n  pixels   arcsec \n   20.00     20.00  \n\n"
+    assert textout in out
 
     # with plot flag and ranx range
     rc = cli.mainGetBarSize(

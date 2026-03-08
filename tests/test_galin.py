@@ -709,15 +709,16 @@ def test_makePSF():
     sigma = None
     # sigma = path+sigma
 
-    galfitFile = "star.gal"
+    galfitFile = "star.init"
     galfitFile = path + galfitFile
     twist = False
 
     numgauss = None
-
+    imsize = 50
+    sky = 367
     #######################
 
-    makePSF(galfitFile, image, regfile, center, psfout, sigma, twist, numgauss)
+    makePSF(image, regfile, center, psfout, sigma, imsize, sky, twist, numgauss)
 
     consfile = "constar.txt"
     assert os.path.isfile(consfile)
@@ -768,5 +769,10 @@ def test_makePSF():
     assert os.path.isfile(psftfile)
     if os.path.isfile(psftfile):
         os.remove(psftfile)
+
+    initfile = "star.init"
+    assert os.path.isfile(initfile)
+    if os.path.isfile(initfile):
+        os.remove(initfile)
 
     return None

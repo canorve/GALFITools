@@ -83,7 +83,7 @@ def makePSF(
     galhead.inputimage = inputimage
     galhead.outimage = "star.out.fits"
     galhead.sigimage = sigfile
-    galhead.constraints = "constar.fits"
+    galhead.constraints = "constar.txt"
     galhead.xmin = 1
     galhead.xmax = imsize
     galhead.ymin = 1

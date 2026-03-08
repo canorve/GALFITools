@@ -347,7 +347,7 @@ def test_mainMakePSF(monkeypatch):
     seen = {}
 
     def fake_makePSF(
-        GalfitFile, image, Ds9regFile, center, out, sigma, twist, numgauss
+        image, Ds9regFile, center, out, sigma, imsize, sky, twist, numgauss
     ):
         seen.update(locals())
 
@@ -357,11 +357,16 @@ def test_mainMakePSF(monkeypatch):
     rc = cli.mainMakePSF(
         [
             "img.fits",
-            "galfit.01",
             "star.reg",
             "--center",
             "--out",
             "psf.fits",
+            "--sigma",
+            "sigma.fits",
+            "--imsize",
+            "100",
+            "--sky",
+            "0",
             "--twist",
             "--numgauss",
             "5",
@@ -369,10 +374,11 @@ def test_mainMakePSF(monkeypatch):
     )
     assert rc == 0
     assert seen["image"] == "img.fits"
-    assert seen["GalfitFile"] == "galfit.01"
     assert seen["Ds9regFile"] == "star.reg"
     assert seen["center"] is True
     assert seen["out"] == "psf.fits"
+    assert seen["imsize"] == 100
+    assert seen["sky"] == 0
     assert seen["twist"] is True
     assert seen["numgauss"] == 5
 
