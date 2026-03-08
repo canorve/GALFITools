@@ -123,7 +123,6 @@ def mainGetBarSize(argv=None) -> int:
     p.add_argument(
         "-o", "--out", type=str, default="bar.reg", help="output DS9 ellipse region"
     )
-    p.add_argument("-o", "--output", type=str, help="output csv file")
     p.add_argument(
         "-p",
         "--plot",
