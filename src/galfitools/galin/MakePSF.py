@@ -7,6 +7,8 @@ import sys
 
 from galfitools.galin.galfit import (
     Galfit,
+    GalHead,
+    GalSky,
     galfitLastFit,
     galPrintComp,
     galPrintHeader,
@@ -19,12 +21,13 @@ from galfitools.mge.mge2galfit import mge2gal
 
 
 def makePSF(
-    galfitFile: str,
     image: str,
     regfile: str,
     center: bool,
     psfout: str,
     sigma: str,
+    imsize: int,
+    sky: float,
     twist: bool,
     numgauss: int,
 ) -> None:
@@ -35,8 +38,6 @@ def makePSF(
 
     Parameters
     ----------
-    galfitFile : str
-                GALFIT initial parameters file
     image : str
             name of the FITS image
     regfile: str
@@ -49,6 +50,10 @@ def makePSF(
             name of the PSF output file
     sigma: str
             If available, the sigma image, otherwise set to None
+    imsize: int
+            size of the PSF image
+    sky: float
+            value of sky background
     twist: bool
             If true use the twist option for the MGE method
     numgauss: int
@@ -64,17 +69,40 @@ def makePSF(
     #######################
     # reading options from galfit header
 
-    galfit = Galfit(galfitFile)
-    head = galfit.ReadHead()
-    galsky = galfit.ReadSky()
+    galfitFile = "star.init"
 
-    inputimage = head.inputimage
+    inputimage = "star.fits"
 
-    sky = galsky.sky
+    sigfile = "psfsig.fits"
 
-    sigfile = head.sigimage
+    # creation of GalfitFile
+    galhead = GalHead()
 
-    imsize = head.xmax - head.xmin + 1
+    galsky = GalSky()
+
+    galhead.inputimage = inputimage
+    galhead.outimage = "star.out.fits"
+    galhead.sigimage = sigfile
+    galhead.constraints = "constar.fits"
+    galhead.xmin = 1
+    galhead.xmax = imsize
+    galhead.ymin = 1
+    galhead.ymax = imsize
+    galhead.convx = 101
+    galhead.convy = 101
+    galhead.mgzpt = 22.5
+    galhead.scale = 0.262
+    galhead.scaley = 0.262
+
+    galsky.sky = sky
+
+    fout = open(galfitFile, "w")
+
+    galPrintHeader(fout, galhead)
+
+    galPrintSky(fout, 1, galsky)
+
+    fout.close()
 
     #################
 

@@ -483,7 +483,6 @@ def mainMakePSF(argv=None) -> int:
         description="Makes a PSF model of a star using MGE"
     )
     parser.add_argument("image", help="image containing the star to be modeled")
-    parser.add_argument("GalfitFile", help="GALFIT file to obtain header options")
     parser.add_argument(
         "Ds9regFile", help="DS9 ellipse region file containing the star"
     )
@@ -492,6 +491,20 @@ def mainMakePSF(argv=None) -> int:
         "--center",
         action="store_true",
         help="use DS9 center; else find (x,y) peak within DS9 ellipse",
+    )
+    parser.add_argument(
+        "-is",
+        "--imsize",
+        type=int,
+        default=100,
+        help="image size of PSF output. Default =100",
+    )
+    parser.add_argument(
+        "-s",
+        "--sky",
+        type=float,
+        default=0,
+        help="value of the sky background. Default = 0",
     )
     parser.add_argument(
         "-o", "--out", type=str, default="psf.fits", help="PSF model image"
@@ -503,15 +516,17 @@ def mainMakePSF(argv=None) -> int:
     parser.add_argument(
         "-ng", "--numgauss", type=int, help="number of Gaussians used for GALFIT"
     )
+
     args = parser.parse_args(argv)
 
     makePSF(
-        args.GalfitFile,
         args.image,
         args.Ds9regFile,
         args.center,
         args.out,
         args.sigma,
+        args.imsize,
+        args.sky,
         args.twist,
         args.numgauss,
     )
