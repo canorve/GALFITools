@@ -24,7 +24,7 @@ from galfitools.galout.getRads import getBreak2, getKappa2
 
 DEFAULT_ENCODING = "utf-8"
 DEFAULT_OUTPUT_FILE = "bar_sizes.csv"
-
+BAR_SIZE_DECIMALS = 2
 
 # ============================================================================
 # Data structures
@@ -35,7 +35,7 @@ DEFAULT_OUTPUT_FILE = "bar_sizes.csv"
 class BarResult:
     """Store the processing result for one input file."""
 
-    input_path: Path
+    relative_path: Path
     input_galfit: Path
     bar_size: float | None  # pixels
     bar_size_arcsec: float | None
@@ -242,6 +242,7 @@ def read_file_list(list_file: Path, encoding: str = DEFAULT_ENCODING) -> list[Pa
     ValueError
         If no valid file paths are found.
     """
+
     if not list_file.is_file():
         raise FileNotFoundError(f"List file not found: {list_file}")
 
@@ -268,7 +269,9 @@ def read_file_list(list_file: Path, encoding: str = DEFAULT_ENCODING) -> list[Pa
     return paths
 
 
-def process_file(file_path: Path, dis, numcomp, plot, ranx, out, red) -> BarResult:
+def process_file(
+    file_path: Path, base_dir: Path, dis, numcomp, plot, ranx, out, red
+) -> BarResult:
     """
     Change to the file directory, process the file, and return the result.
 
@@ -277,6 +280,9 @@ def process_file(file_path: Path, dis, numcomp, plot, ranx, out, red) -> BarResu
     file_path : Path
         File to process.
 
+    base_dir : Path
+        Directory from which relative paths are computed.
+
     rest of parameters: parameters given to getBarSize
 
     Returns
@@ -284,9 +290,11 @@ def process_file(file_path: Path, dis, numcomp, plot, ranx, out, red) -> BarResu
     BarResult
         Result object with status, computed bar size, and message.
     """
+    relative_path = make_relative_path(file_path, base_dir)
+
     if not file_path.exists():
         return BarResult(
-            input_path=file_path,
+            relative_path=relative_path,
             input_galfit=None,
             bar_size=None,
             bar_size_arcsec=None,
@@ -295,25 +303,26 @@ def process_file(file_path: Path, dis, numcomp, plot, ranx, out, red) -> BarResu
         )
 
     original_cwd = Path.cwd()
-
-    plate = Galfit(file_path.name).ReadHead().scale
-    inputimage = Galfit(file_path.name).ReadHead().inputimage
     try:
         os.chdir(file_path.parent)
-        bar, N, theta = getBarSize(file_path.name, dis, numcomp, plot, ranx, out, red)
+        plate = Galfit(file_path.name).ReadHead().scale
+        inputimage = Galfit(file_path.name).ReadHead().inputimage
 
+        bar, N, theta = getBarSize(file_path.name, dis, numcomp, plot, ranx, out, red)
+        bar_rounded = round(float(bar), BAR_SIZE_DECIMALS)
+        bar_arcsec_rounded = round(float(bar * plate), BAR_SIZE_DECIMALS)
         return BarResult(
-            input_path=file_path,
+            relative_path=relative_path,
             input_galfit=inputimage,
-            bar_size=bar,
-            bar_size_arcsec=bar * plate,
+            bar_size=bar_rounded,
+            bar_size_arcsec=bar_arcsec_rounded,
             success=True,
             message="OK",
         )
 
     except Exception as exc:
         return BarResult(
-            input_path=file_path,
+            relative_path=relative_path,
             input_galfit=None,
             bar_size=None,
             bar_size_arcsec=None,
@@ -326,7 +335,7 @@ def process_file(file_path: Path, dis, numcomp, plot, ranx, out, red) -> BarResu
 
 
 def process_files(
-    file_paths: Iterable[Path], dis, numcomp, plot, ranx, out, red
+    file_paths: Iterable[Path], base_dir: Path, dis, numcomp, plot, ranx, out, red
 ) -> list[BarResult]:
     """
     Process all files in the input iterable.
@@ -345,10 +354,34 @@ def process_files(
     results: list[BarResult] = []
 
     for file_path in file_paths:
-        result = process_file(file_path, dis, numcomp, plot, ranx, out, red)
+        result = process_file(file_path, base_dir, dis, numcomp, plot, ranx, out, red)
         results.append(result)
 
     return results
+
+
+def make_relative_path(file_path: Path, base_dir: Path) -> str:
+    """
+    Return the file path relative to the base directory.
+
+    If the file is not inside the base directory, return the full path.
+
+    Parameters
+    ----------
+    file_path : Path
+        Absolute path to the file.
+    base_dir : Path
+        Base directory used to compute the relative path.
+
+    Returns
+    -------
+    str
+        Relative path if possible, otherwise absolute path as string.
+    """
+    try:
+        return str(file_path.relative_to(base_dir))
+    except ValueError:
+        return str(file_path)
 
 
 def write_results(results: Iterable[BarResult], output_file: Path) -> None:
@@ -362,11 +395,12 @@ def write_results(results: Iterable[BarResult], output_file: Path) -> None:
     output_file : Path
         Destination CSV file.
     """
+
     with output_file.open("w", newline="", encoding=DEFAULT_ENCODING) as handle:
         writer = csv.writer(handle)
         writer.writerow(
             [
-                "input_path",
+                "relative_path",
                 "input_galfit",
                 "bar_size",
                 "bar_size_arcsec",
@@ -378,7 +412,7 @@ def write_results(results: Iterable[BarResult], output_file: Path) -> None:
         for result in results:
             writer.writerow(
                 [
-                    str(result.input_path),
+                    str(result.relative_path),
                     str(result.input_galfit),
                     result.bar_size,
                     result.bar_size_arcsec,
@@ -413,7 +447,7 @@ def print_summary(results: Iterable[BarResult]) -> None:
 def getMulBarSize(
     list_file: str,
     dis: int,
-    num_comp: int,
+    numcomp: int,
     plot: bool,
     ranx: list,
     out: str,
@@ -437,7 +471,7 @@ def getMulBarSize(
 
     dis : int
          maximum list among components
-    num_comp : int
+    numcomp : int
               Number of component where it'll obtain center
               of all components. in other words it selects
               the galaxy that contains the bar if simultaneous
@@ -468,12 +502,19 @@ def getMulBarSize(
 
     """
 
+    base_dir = Path.cwd().resolve()
+    list_file = Path(list_file).expanduser().resolve()
+    output_file = Path(output_file).expanduser().resolve()
+
     try:
+
         file_paths = read_file_list(list_file)
-        results = process_files(file_paths, dis, numcomp, plot, ranx, out, red)
+        results = process_files(
+            file_paths, base_dir, dis, numcomp, plot, ranx, out, red
+        )
         write_results(results, output_file)
         print_summary(results)
-        print(f"Results written to: {output_file}")
+        print(f"Results written to: {output_file.name}")
         return 0
 
     except Exception as exc:

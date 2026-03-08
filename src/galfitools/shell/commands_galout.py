@@ -173,9 +173,15 @@ def mainGetMulBarSize(argv=None) -> int:
         help="number of component to be selected",
     )
     p.add_argument(
-        "-o", "--out", type=str, default="bar.reg", help="output DS9 ellipse region"
+        "-o",
+        "--out",
+        type=str,
+        default="barlength.reg",
+        help="output DS9 ellipse region",
     )
-    p.add_argument("-co", "--output", type=str, help="output csv file")
+    p.add_argument(
+        "-co", "--output", type=str, default="barlenghts.csv", help="output csv file"
+    )
     p.add_argument(
         "-p",
         "--plot",
