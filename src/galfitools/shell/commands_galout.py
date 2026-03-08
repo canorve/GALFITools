@@ -108,13 +108,41 @@ def mainGetBarSize(argv=None) -> int:
     p = argparse.ArgumentParser(
         description="getBarSize: gets the bar size from Sersic and Ferrer models"
     )
-    p.add_argument("GalfitFile")
-    p.add_argument("-d", "--dis", type=int, default=10)
-    p.add_argument("-n", "--numcomp", type=int, default=1)
-    p.add_argument("-o", "--out", type=str, default="bar.reg")
-    p.add_argument("-p", "--plot", action="store_true")
-    p.add_argument("-r", "--red", action="store_true")
-    p.add_argument("-rx", "--ranx", nargs=2, type=float)
+    p.add_argument("GalfitFile", help="GALFIT file")
+    p.add_argument(
+        "-d", "--dis", type=int, default=3, help="maximum distance among components"
+    )
+    p.add_argument(
+        "-n",
+        "--numcomp",
+        type=int,
+        default=1,
+        help="number of component to be selected",
+    )
+    p.add_argument(
+        "-o", "--out", type=str, default="bar.reg", help="output DS9 ellipse region"
+    )
+    p.add_argument("-o", "--output", type=str, help="output csv file")
+    p.add_argument(
+        "-p",
+        "--plot",
+        action="store_true",
+        help="plots a file of kappa and break radius",
+    )
+    p.add_argument(
+        "-r",
+        "--red",
+        action="store_true",
+        help="If activated, DS9 region ellipse is red",
+    )
+    p.add_argument(
+        "-rx",
+        "--ranx",
+        nargs=2,
+        type=float,
+        help="range of radius to search for barlength",
+    )
+
     a = p.parse_args(argv)
     rbar, N, theta = getBarSize(
         a.GalfitFile, a.dis, a.numcomp, a.plot, a.ranx, a.out, a.red
@@ -125,6 +153,55 @@ def mainGetBarSize(argv=None) -> int:
     print(f"The bar length is:  \n")
     print(f"  pixels   arcsec ")
     print(f"   {rbar:.2f}     {rbar*plate:.2f}  \n")
+    return 0
+
+
+def mainGetMulBarSize(argv=None) -> int:
+    printWelcome()
+    p = argparse.ArgumentParser(
+        description="getBarSize: gets the bar size from Sersic and Ferrer models"
+    )
+    p.add_argument("InputFile", help="file containing a list of file path GALFIT files")
+    p.add_argument(
+        "-d", "--dis", type=int, default=3, help="maximum distance among components"
+    )
+    p.add_argument(
+        "-n",
+        "--numcomp",
+        type=int,
+        default=1,
+        help="number of component to be selected",
+    )
+    p.add_argument(
+        "-o", "--out", type=str, default="bar.reg", help="output DS9 ellipse region"
+    )
+    p.add_argument("-co", "--output", type=str, help="output csv file")
+    p.add_argument(
+        "-p",
+        "--plot",
+        action="store_true",
+        help="plots a file of kappa and break radius",
+    )
+    p.add_argument(
+        "-r",
+        "--red",
+        action="store_true",
+        help="If activated, DS9 region ellipse is red",
+    )
+    p.add_argument(
+        "-rx",
+        "--ranx",
+        nargs=2,
+        type=float,
+        help="range of radius to search for barlength",
+    )
+    a = p.parse_args(argv)
+
+    ret = getMulBarSize(
+        a.InputFile, a.dis, a.numcomp, a.plot, a.ranx, a.out, a.red, a.output
+    )
+    print("done ")
+
     return 0
 
 
