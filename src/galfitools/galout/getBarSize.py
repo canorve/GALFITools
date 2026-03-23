@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Optional
 import csv
 import os
 import sys
@@ -31,7 +31,7 @@ BAR_SIZE_DECIMALS = 2
 # ============================================================================
 
 
-@dataclass(slots=True)
+@dataclass
 class BarResult:
     """Store the processing result for one input file."""
 
@@ -56,7 +56,7 @@ def getBarSize(
     ranx: list,
     out: str,
     red: bool,
-) -> float:
+) -> tuple[float, int, float]:
     """gets the bar size of the spiral galaxies
 
     It takes the average of Kappa radius (maximum curvature) and
@@ -182,39 +182,6 @@ def getBarSize(
     fout.close()
 
     return rbar, N, theta
-
-
-"""
-Template to process a list of file paths.
-
-This script reads a text file containing one file path per line, changes to the
-directory of each file, applies `get_bar_size()` to the file, stores the results,
-and optionally writes the collected results to an output file.
-
-Python 3.11+
-"""
-
-
-def get_bar_size(file_path: Path) -> float:
-    """
-    Compute the bar size for a given file.
-
-    Replace the body of this function with the actual implementation.
-
-    Parameters
-    ----------
-    file_path : Path
-        Path to the file to be processed.
-
-    Returns
-    -------
-    float
-        Computed bar size.
-    """
-    # Replace this placeholder with the real implementation.
-    # Example:
-    # return GetBarSize(str(file_path))
-    raise NotImplementedError("Implement `get_bar_size()` with your real logic.")
 
 
 def read_file_list(list_file: Path, encoding: str = DEFAULT_ENCODING) -> list[Path]:
