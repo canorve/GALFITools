@@ -820,6 +820,142 @@ def conver2Ferrer(galcomps: GalComps, scale, N) -> GalComps:
     return comps
 
 
+def expdisk_to_edgedisk(
+    mag_total: float,
+    rs_pix: float,
+    axis_ratio: float,
+    pa_deg: float,
+    pixscale: float,
+) -> Dict[str, float]:
+    """
+    Convert approximate GALFIT `expdisk` parameters into initial `edgedisk`
+    parameters.
+
+    This conversion is based on two assumptions:
+
+    1. The radial scale length is preserved:
+       rs_edge = rs_exp
+
+    2. The vertical scale height is approximated from the exponential disk
+       axis ratio:
+       hs ~= q * rs
+
+    The central surface brightness of the edge-on disk is then estimated by
+    conserving the total flux:
+
+        mu0 = mag_total + 2.5 * log10(2 * pi * rs * hs * pixscale^2)
+
+    where:
+    - rs and hs are in pixels
+    - pixscale is in arcsec/pixel
+    - mu0 is returned in mag/arcsec^2
+
+    Parameters
+    ----------
+    mag_total : float
+        Total magnitude of the `expdisk` model.
+    rs_pix : float
+        Exponential scale length in pixels.
+    axis_ratio : float
+        Axis ratio b/a of the `expdisk` model.
+    pa_deg : float
+        Position angle in degrees.
+    pixscale : float
+        Pixel scale in arcsec/pixel.
+
+    Returns
+    -------
+    Dict[str, float]
+        Dictionary with approximate `edgedisk` parameters:
+        - ``mu0_mag_arcsec2`` : central surface brightness [mag/arcsec^2]
+        - ``hs_pix`` : disk scale height [pixels]
+        - ``rs_pix`` : disk scale length [pixels]
+        - ``pa_deg`` : position angle [degrees]
+
+    Raises
+    ------
+    ValueError
+        If any input value is not physically valid.
+
+    Notes
+    -----
+    This is an approximation for initial guesses only. It is most useful when
+    the galaxy is close to edge-on. For moderately inclined systems, the
+    relation hs ~= q * rs is only a rough estimate.
+    """
+    if rs_pix <= 0:
+        raise ValueError("rs_pix must be > 0.")
+    if not (0 < axis_ratio <= 1):
+        raise ValueError("axis_ratio must satisfy 0 < axis_ratio <= 1.")
+    if pixscale <= 0:
+        raise ValueError("pixscale must be > 0.")
+
+    hs_pix = axis_ratio * rs_pix
+    if hs_pix <= 0:
+        raise ValueError("Computed hs_pix must be > 0.")
+
+    area_arcsec2 = 2.0 * math.pi * rs_pix * hs_pix * pixscale**2
+    mu0_mag_arcsec2 = mag_total + 2.5 * math.log10(area_arcsec2)
+
+    return {
+        "mu0_mag_arcsec2": mu0_mag_arcsec2,
+        "hs_pix": hs_pix,
+        "rs_pix": rs_pix,
+        "pa_deg": pa_deg,
+    }
+
+
+def conver2Edge(galcomps: GalComps, scale, N) -> GalComps:
+    """Converts the expdisk to edgedisk
+
+    Using the format of GALFIT with the GalComps data class,
+    it converts the parameters of the functions Sersic n = 1 ,
+    to parameters of edgedisk function.
+
+
+    Parameters
+    -----------
+    galcomps : GalComps data class defined above
+    scale : Plate Scale ''/pixel
+    N : number of component to be converted
+
+
+    Returns
+    -------
+    galcomps : GalComps data class with the functions converted to Ferrer
+              parameters
+
+    """
+
+    comps = copy.deepcopy(galcomps)
+
+    R_EXP = 1.6783469900166612  # constant for scale length convertion
+
+    masksec = (comps.NameComp == "sersic") * (comps.N == N)
+
+    mag_total = comps.Mag[masksec]
+    rs_pix = comps.Rad[masksec] / R_EXP
+    axis_ratio = comps.AxRat[masksec]
+    pa_deg = comps.PosAng[masksec]
+    pixscale = scale  # arcsec/pixel, example only
+
+    params = expdisk_to_edgedisk(
+        mag_total=mag_total,
+        rs_pix=rs_pix,
+        axis_ratio=axis_ratio,
+        pa_deg=pa_deg,
+        pixscale=pixscale,
+    )
+
+    comps.NameComp[masksec] = "edgedisk"
+    comps.Mag[masksec] = params["mu0_mag_arcsec2"]
+    comps.Rad[masksec] = params["hs_pix"]
+    comps.Exp[masksec] = params["rs_pix"]
+    comps.PosAng[masksec] = params["pa_deg"]
+
+    return comps
+
+
 def GetRadAng(R: float, q: list, pa: list, theta: float) -> float:
     """Obtains the radius along the specified angular direction.
 

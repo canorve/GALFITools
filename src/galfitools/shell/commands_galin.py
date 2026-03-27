@@ -15,6 +15,7 @@ from galfitools.galin.MaskSky import skyRem
 from galfitools.galin.xy2fits import xy2fits
 from galfitools.shell.prt import printWelcome
 from galfitools.galin.sersic2ferrer import Sersic2Ferrer
+from galfitools.galin.exp2edge import Exp2Edge
 
 
 def mainGetStar(argv=None) -> int:
@@ -436,6 +437,26 @@ def mainSersic2Ferrer(argv=None) -> int:
         args.galfile,
         args.alpha,
         args.beta,
+        args.out,
+    )
+
+    return 0
+
+
+def mainExp2Edge(argv=None) -> int:
+    printWelcome()
+    parser = argparse.ArgumentParser(
+        description="converts an exponential disk model to a edgedisk function"
+    )
+    parser.add_argument("galfile", help="GALFIT input file")
+    parser.add_argument(
+        "-o", "--out", default="edge.init", type=str, help="output GALFIT file"
+    )
+
+    args = parser.parse_args(argv)
+
+    Exp2Edge(
+        args.galfile,
         args.out,
     )
 
