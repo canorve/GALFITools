@@ -7,6 +7,8 @@ from scipy.optimize import bisect
 from scipy.special import gammainc, gammaincinv
 from dataclasses import dataclass, field
 
+from typing import Dict
+
 
 @dataclass
 class GalHead:
@@ -894,8 +896,8 @@ def expdisk_to_edgedisk(
     if hs_pix <= 0:
         raise ValueError("Computed hs_pix must be > 0.")
 
-    area_arcsec2 = 2.0 * math.pi * rs_pix * hs_pix * pixscale**2
-    mu0_mag_arcsec2 = mag_total + 2.5 * math.log10(area_arcsec2)
+    area_arcsec2 = 2.0 * np.pi * rs_pix * hs_pix * pixscale**2
+    mu0_mag_arcsec2 = mag_total + 2.5 * np.log10(area_arcsec2)
 
     return {
         "mu0_mag_arcsec2": mu0_mag_arcsec2,
