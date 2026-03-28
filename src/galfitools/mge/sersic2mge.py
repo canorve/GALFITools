@@ -6,6 +6,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from typing import List
+import os
 
 import numpy as np
 
@@ -653,19 +654,24 @@ def Sersic2mge(args) -> None:
     index = 0
 
     for index, item in enumerate(comps.N):
-
         conver2mge(
-            comps[index],
+            comps,
             args.numgauss,
             args.rmax,
             args.nsamples,
             args.minsigma,
             args.maxsigma,
-            galhead.mgzp,
+            galhead.mgzpt,
+            index,
+            fout,
         )
 
+    galPrintSky(fout, index + 1, galsky)
 
-def conver2mge(galcomps, numgauss, rmax, nsamples, minsigma, maxsigma, zp) -> None:
+
+def conver2mge(
+    galcomps, numgauss, rmax, nsamples, minsigma, maxsigma, zp, index, fout
+) -> None:
     """Documentar
 
 
@@ -675,13 +681,13 @@ def conver2mge(galcomps, numgauss, rmax, nsamples, minsigma, maxsigma, zp) -> No
 
     """
     params = SersicParameters(
-        x0=galcomps.PosX,
-        y0=galcomps.PosY,
-        magnitude=galcomps.Mag,
-        re_pix=galcomps.Rad,
-        n=galcomps.Exp,
-        axis_ratio=galcomps.AxRat,
-        pa_deg=galcomps.PosAng,
+        x0=galcomps.PosX[index],
+        y0=galcomps.PosY[index],
+        magnitude=galcomps.Mag[index],
+        re_pix=galcomps.Rad[index],
+        n=galcomps.Exp[index],
+        axis_ratio=galcomps.AxRat[index],
+        pa_deg=galcomps.PosAng[index],
         zeropoint=zp,
     )
 
@@ -710,3 +716,5 @@ def conver2mge(galcomps, numgauss, rmax, nsamples, minsigma, maxsigma, zp) -> No
     )
 
     print(galfit_text)
+
+    fout.write(galfit_text)
