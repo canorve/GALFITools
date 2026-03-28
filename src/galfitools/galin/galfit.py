@@ -761,6 +761,7 @@ def conver2Sersic(galcomps: GalComps) -> GalComps:
 
     # for gaussian functions
     if maskgas.any():
+        comps.NameComp[maskgas] = "sersic"
         comps.Exp[maskgas] = 0.5
         comps.Rad[maskgas] = comps.Rad[maskgas] / 2.354  # converting to sigma
         comps.Rad[maskgas] = (
@@ -769,10 +770,12 @@ def conver2Sersic(galcomps: GalComps) -> GalComps:
 
     # for de vaucouleurs
     if maskdev.any():
+        comps.NameComp[maskdev] = "sersic"
         comps.Exp[maskdev] = 4
 
     # for exponential disks
     if maskexp.any():
+        comps.NameComp[maskexp] = "sersic"
         comps.Exp[maskexp] = 1
         comps.Rad[maskexp] = K_EXP * comps.Rad[maskexp]  # converting to Re
 
@@ -940,7 +943,6 @@ def conver2Edge(galcomps: GalComps, scale, N) -> GalComps:
     axis_ratio = comps.AxRat[masksec]
     pa_deg = comps.PosAng[masksec]
     pixscale = scale  # arcsec/pixel, example only
-
     params = expdisk_to_edgedisk(
         mag_total=mag_total,
         rs_pix=rs_pix,

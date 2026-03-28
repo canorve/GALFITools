@@ -24,9 +24,9 @@ from galfitools.galin.galfit import (
 def Exp2Edge(
     galfitFile: str,
     fileout: str,
+    numexp: int,
 ) -> GalComps:
     """Convert a Exponential function to EdgeDisk function.
-
 
     It converts a exponential function (or Sersic with n = 1)
     to a edgedisk function
@@ -37,6 +37,8 @@ def Exp2Edge(
             name of the GALFIT file
     fileout: str
             name of the GALFIT output file
+    numexp: int
+            component number (position in input file) of the exponential function
 
     Returns
     -------
@@ -69,7 +71,7 @@ def Exp2Edge(
 
     comps = SelectGal(comps, dis, num_comp)
 
-    comps = conver2Edge(comps, galhead.scale, 2)  # converts only the 2 component
+    comps = conver2Edge(comps, galhead.scale, numexp)  # converts only the 2 component
 
     # printing output file
     fout = open(fileout, "w")

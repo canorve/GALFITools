@@ -453,12 +453,17 @@ def mainExp2Edge(argv=None) -> int:
         "-o", "--out", default="edge.init", type=str, help="output GALFIT file"
     )
 
+    parser.add_argument(
+        "-ne",
+        "--numexp",
+        type=int,
+        default=2,
+        help="component number of the exponential function in input file. Default=2",
+    )
+
     args = parser.parse_args(argv)
 
-    Exp2Edge(
-        args.galfile,
-        args.out,
-    )
+    Exp2Edge(args.galfile, args.out, args.numexp)
 
     return 0
 
