@@ -2,6 +2,7 @@ import argparse
 
 from galfitools.mge.mge2galfit import mge2gal
 from galfitools.mge.SbProf import sbProf
+from galfitools.mge.sersic2mge import Sersic2mge
 from galfitools.shell.prt import printWelcome
 
 
@@ -195,6 +196,77 @@ def mainSbProf(argv=None) -> int:
     args = parser.parse_args(argv)
 
     sbProf(args)
+
+    print("Done")
+
+    return 0
+
+
+def _build_parser_sersic2mge() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        description="Approximates a Sersic function to  mge and formats to GALFIT"
+    )
+    p.add_argument(
+        "GalfitFile", help="GALFIT file to obtain the header and components data"
+    )
+
+    p.add_argument(
+        "-ng",
+        "--numgauss",
+        default=6,
+        type=int,
+        help="number of gaussians used for approximation. Default = 6 ",
+    )
+
+    p.add_argument(
+        "-rm", "--rmax", type=float, help="radius max factor. Default = 10", default=10
+    )
+    p.add_argument(
+        "-ns",
+        "--nsamples",
+        type=int,
+        help="number of samples. Default = 800",
+        default=800,
+    )
+    p.add_argument(
+        "-mis",
+        "--minsigma",
+        type=float,
+        help="minimum sigma factor Default = 0.02",
+        default=0.02,
+    )
+    p.add_argument(
+        "-mas",
+        "--maxsigma",
+        type=float,
+        help="maximum sigma factor Default = 8",
+        default=8,
+    )
+    p.add_argument(
+        "-o", "--output", type=str, help="output GALFIT file", default="mge.init"
+    )
+
+    # n_gaussians=n_gaussians,
+    # r_max_factor=10.0,
+    # n_samples=800,
+    # min_sigma_factor=0.02,
+    # max_sigma_factor=8.0,
+
+    return p
+
+
+def mainSersic2mge(argv=None) -> int:
+    """
+    Calls the Sersic2mge function based on argument parsing.
+    This function serves as an example of an API.
+    """
+
+    printWelcome()
+
+    parser = _build_parser_sersic2mge()
+    args = parser.parse_args(argv)
+
+    Sersic2mge(args)
 
     print("Done")
 

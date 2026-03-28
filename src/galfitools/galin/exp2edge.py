@@ -25,7 +25,7 @@ def Exp2Edge(
     galfitFile: str,
     fileout: str,
 ) -> GalComps:
-    """Convert a Exponential function to EdgeDisk funciton.
+    """Convert a Exponential function to EdgeDisk function.
 
 
     It converts a exponential function (or Sersic with n = 1)
