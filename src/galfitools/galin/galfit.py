@@ -954,6 +954,8 @@ def conver2Edge(galcomps: GalComps, scale, N) -> GalComps:
     comps.Rad[masksec] = params["hs_pix"]
     comps.Exp[masksec] = params["rs_pix"]
     comps.PosAng[masksec] = params["pa_deg"]
+    comps.AxRat[masksec] = 1
+    comps.AxRatFree[masksec] = -1
 
     return comps
 
@@ -1231,7 +1233,7 @@ def galPrintComp(hdl: str, ncomp: int, idx: int, galcomps: GalComps) -> bool:
     line04 = " 4) {:.2f}  {}    #  R_e     [Pixels] \n".format(
         galcomps.Rad[idx], galcomps.RadFree[idx]
     )
-    line05 = " 5) {}     {}   #  Sersic exponent (deVauc=4, expdisk=1) \n".format(
+    line05 = " 5) {:.2f}     {}   #  Sersic exponent (deVauc=4, expdisk=1) \n".format(
         galcomps.Exp[idx], galcomps.ExpFree[idx]
     )
     line06 = " 6)  {}  {}      #  ---------------- \n".format(
