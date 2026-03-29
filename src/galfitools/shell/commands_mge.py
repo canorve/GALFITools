@@ -232,7 +232,7 @@ def _build_parser_sersic2mge() -> argparse.ArgumentParser:
         "-mis",
         "--minsigma",
         type=float,
-        help="minimum sigma factor Default = 0.02",
+        help="minimum sigma factor. Default = 0.02",
         default=0.02,
     )
     p.add_argument(

@@ -16,6 +16,7 @@ from galfitools.galin.xy2fits import xy2fits
 from galfitools.shell.prt import printWelcome
 from galfitools.galin.sersic2ferrer import Sersic2Ferrer
 from galfitools.galin.exp2edge import Exp2Edge
+from galfitools.galin.tosersic import toSersic
 
 
 def mainGetStar(argv=None) -> int:
@@ -464,6 +465,23 @@ def mainExp2Edge(argv=None) -> int:
     args = parser.parse_args(argv)
 
     Exp2Edge(args.galfile, args.out, args.numexp)
+
+    return 0
+
+
+def mainToSersic(argv=None) -> int:
+    printWelcome()
+    parser = argparse.ArgumentParser(
+        description="converts (gauss, de Vaucoulers, exponential) components to a Sersic component"
+    )
+    parser.add_argument("galfile", help="GALFIT input file")
+    parser.add_argument(
+        "-o", "--out", default="sersic.init", type=str, help="output GALFIT file"
+    )
+
+    args = parser.parse_args(argv)
+
+    toSersic(args.galfile, args.out, args.numexp)
 
     return 0
 

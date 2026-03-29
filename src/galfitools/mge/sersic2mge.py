@@ -672,11 +672,51 @@ def Sersic2mge(args) -> None:
 def conver2mge(
     galcomps, numgauss, rmax, nsamples, minsigma, maxsigma, zp, index, fout
 ) -> None:
-    """Documentar
+    """converts sersic components to mge components
 
+    It converts a  Sersic function
+    to a Multi Gaussian expansion
 
     Parameters
     ----------
+    galcomps: GalComps
+             data class containing the galfit components
+    numgauss: int
+             number of gaussian used
+    rmax: float
+            radius max factor
+
+    nsamples: int
+            number of samples
+
+    minsigma: float
+            minimum sigma factor
+
+    maxsigma: float
+            maximum sigma factor
+
+    zp: float
+        magnitude zero point
+
+    index: int
+        index position of the components in galcomps
+
+    fout: filehandler
+        file handler of the output file
+
+
+    Returns
+    -------
+    None
+
+    See Also
+    --------
+    conver2Sersic : converts gaussian, exponential de Vaucoulers
+                    to Sersic models
+
+    conver2Ferrer: convert gaussian bar to a Ferrer bar
+
+    exp2edge: converts exponential function ot edgedisk function
 
 
     """
