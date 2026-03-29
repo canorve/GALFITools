@@ -476,12 +476,16 @@ def mainToSersic(argv=None) -> int:
     )
     parser.add_argument("galfile", help="GALFIT input file")
     parser.add_argument(
+        "-f", "--nfree", action="store_true", help="keep Sersic index parameter as free"
+    )
+
+    parser.add_argument(
         "-o", "--out", default="sersic.init", type=str, help="output GALFIT file"
     )
 
     args = parser.parse_args(argv)
 
-    toSersic(args.galfile, args.out, args.numexp)
+    toSersic(args.galfile, args.out, args.nfree)
 
     return 0
 

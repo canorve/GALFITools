@@ -24,6 +24,7 @@ from galfitools.galin.galfit import (
 def toSersic(
     galfitFile: str,
     fileout: str,
+    nfree: bool,
 ) -> GalComps:
     """Convert to Sersic  components.
 
@@ -36,6 +37,10 @@ def toSersic(
             name of the GALFIT file
     fileout: str
             name of the GALFIT output file
+    nfree: Boolean
+          leaves sersic index as free to fit
+
+
     Returns
     -------
     galcomps: GalComps
@@ -72,19 +77,18 @@ def toSersic(
 
     comps.Flux = 10 ** ((-comps.Mag) / 2.5)
 
-    # comps = SelectGal(comps, dis, num_comp)
-
     # printing output file
     fout = open(fileout, "w")
-
-    # filename = galhead.outimage
-    # root, extension = os.path.splitext(filename)
-    # newname = root + "-sersic.fits"
-    # galhead.outimage = newname
 
     galPrintHeader(fout, galhead)
     index = 0
     for index, item in enumerate(comps.N):
+
+        if nfree:
+            comps.ExpFree[index] = 1
+        else:
+            comps.ExpFree[index] = 0
+
         galPrintComp(fout, index + 1, index, comps)
 
     galPrintSky(fout, index + 1, galsky)
