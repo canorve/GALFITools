@@ -731,7 +731,7 @@ def conver2mge(
         zeropoint=zp,
     )
 
-    n_gaussians = 6
+    # n_gaussians = 6
 
     components = fit_sersic_with_flux_conservation(
         params=params,
