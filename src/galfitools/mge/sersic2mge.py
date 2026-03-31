@@ -8,7 +8,9 @@ from dataclasses import dataclass
 from typing import List
 import os
 
+
 import numpy as np
+
 
 try:
     from scipy.optimize import nnls
@@ -31,6 +33,8 @@ from galfitools.galin.galfit import (
     galPrintHeader,
     galPrintSky,
 )
+
+from galfitools.mge.mge2galfit import makeConstraints
 
 
 @dataclass
@@ -634,6 +638,9 @@ def Sersic2mge(args) -> None:
     num_comp = 1  # assumes it will only convert the first galaxy
     dis = 3
 
+    # constraints file
+    consfile = galhead.constraints
+
     # convert all exp, gaussian and de vaucouleurs to Sersic format
     comps = conver2Sersic(galcomps)
 
@@ -653,8 +660,9 @@ def Sersic2mge(args) -> None:
 
     index = 0
 
+    ntot = 0
     for index, item in enumerate(comps.N):
-        conver2mge(
+        ng = conver2mge(
             comps,
             args.numgauss,
             args.rmax,
@@ -665,6 +673,10 @@ def Sersic2mge(args) -> None:
             index,
             fout,
         )
+
+        ntot = ntot + ng
+
+    makeConstraints(consfile, ntot)
 
     galPrintSky(fout, index + 1, galsky)
 
@@ -707,7 +719,8 @@ def conver2mge(
 
     Returns
     -------
-    None
+    ng: int
+       total number of gaussian used in fit
 
     See Also
     --------
@@ -747,7 +760,7 @@ def conver2mge(
     galfit_components = convert_to_galfit_gaussians(params, components)
     galfit_text = format_galfit_gaussian_block(
         galfit_components,
-        start_index=1,
+        start_index=index + 1,
         fit_position=True,
         fit_magnitude=True,
         fit_fwhm=True,
@@ -758,3 +771,7 @@ def conver2mge(
     print(galfit_text)
 
     fout.write(galfit_text)
+
+    ng = len(components)
+
+    return ng
