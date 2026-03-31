@@ -568,6 +568,7 @@ def format_galfit_gaussian_block(
                 f"10) {comp.pa_deg:.6f}      {pa_flag}      #  Position angle (PA) [deg: Up=0, Left=90]",
                 " Z) 0                      #  Skip this model in output image?  (yes=1, no=0)",
                 "",
+                "",
             ]
         )
 
@@ -672,6 +673,7 @@ def Sersic2mge(args) -> None:
             galhead.mgzpt,
             index,
             fout,
+            ntot + 1,
         )
 
         ntot = ntot + ng
@@ -682,7 +684,16 @@ def Sersic2mge(args) -> None:
 
 
 def conver2mge(
-    galcomps, numgauss, rmax, nsamples, minsigma, maxsigma, zp, index, fout
+    galcomps,
+    numgauss,
+    rmax,
+    nsamples,
+    minsigma,
+    maxsigma,
+    zp,
+    index,
+    fout,
+    numbercomp,
 ) -> None:
     """converts sersic components to mge components
 
@@ -715,6 +726,11 @@ def conver2mge(
 
     fout: filehandler
         file handler of the output file
+
+    numbercomp: int
+        number of component
+
+
 
 
     Returns
@@ -756,11 +772,10 @@ def conver2mge(
     )
 
     print_summary(params, components)
-
     galfit_components = convert_to_galfit_gaussians(params, components)
     galfit_text = format_galfit_gaussian_block(
         galfit_components,
-        start_index=index + 1,
+        start_index=numbercomp,
         fit_position=True,
         fit_magnitude=True,
         fit_fwhm=True,

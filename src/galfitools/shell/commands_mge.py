@@ -239,8 +239,8 @@ def _build_parser_sersic2mge() -> argparse.ArgumentParser:
         "-mas",
         "--maxsigma",
         type=float,
-        help="maximum sigma factor Default = 8",
-        default=8,
+        help="maximum sigma factor Default = 10",
+        default=10,
     )
     p.add_argument(
         "-o", "--output", type=str, help="output GALFIT file", default="mge.init"
