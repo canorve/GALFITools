@@ -134,7 +134,8 @@ def main_downloadDesi() -> int:
 
             # File prefix: obj1_ra..._dec..._<band>_<type>.fits
             obj_id = f"obj{i}"
-            base_prefix = f"{obj_id}_ra{ra:.6f}_dec{dec:.6f}"
+            # base_prefix = f"{obj_id}_ra{ra:.6f}_dec{dec:.6f}"
+            base_prefix = f"{objid}_ra{ra:.6f}_dec{dec:.6f}"
 
             for b in bands:
                 band_dir = obj_dir / b
