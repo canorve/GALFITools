@@ -4,7 +4,8 @@ on:
     paths:
       - paper/**
       - .github/workflows/draft-pdf.yml
-
+    paths-ignore:
+      - paper/paper.pdf
 
 
 jobs:
