@@ -474,7 +474,7 @@ class Galfit:
 
                     if tmp[0] == "1)":  # center
                         sky = float(tmp[1])
-                        skyfree = float(tmp[2])
+                        skyfree = int(tmp[2])
                     if tmp[0] == "2)":  # mag
                         dskyx = float(tmp[1])
                         dskyxfree = int(tmp[2])
@@ -958,6 +958,7 @@ def conver2Edge(galcomps: GalComps, scale, N) -> GalComps:
     comps.PosAng[masksec] = params["pa_deg"]
     comps.AxRat[masksec] = 1
     comps.AxRatFree[masksec] = -1
+    comps.ExpFree[masksec] = 1
 
     return comps
 
