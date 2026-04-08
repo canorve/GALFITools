@@ -556,13 +556,13 @@ def test_photDs9():
     path = "tests/"
     ImageFile = path + ImageFile
     RegFile = path + RegFile
-
+    plate = 1
     maskfile = "none"
 
     zeropoint = 25
     sky = 0
 
-    mag, exptime = photDs9(ImageFile, RegFile, maskfile, zeropoint, sky)
+    mag, sb, exptime = photDs9(ImageFile, RegFile, maskfile, zeropoint, plate, sky)
 
     result = 11.71
     tol = 1e-2

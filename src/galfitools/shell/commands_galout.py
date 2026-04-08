@@ -30,15 +30,23 @@ def mainPhotDs9(argv=None) -> int:
     p = argparse.ArgumentParser(
         description="computes photometry from a DS9 region file: Box, Ellipses and Polygons"
     )
-    p.add_argument("ImageFile")
-    p.add_argument("RegFile")
-    p.add_argument("-zp", "--zeropoint", type=float, default=25)
-    p.add_argument("-m", "--mask", type=str)
-    p.add_argument("-sk", "--sky", type=float, default=0)
+    p.add_argument("ImageFile", help="fits image")
+    p.add_argument("RegFile", help="DS9 region file")
+    p.add_argument(
+        "-zp", "--zeropoint", help="magnitude zero point", type=float, default=25
+    )
+    p.add_argument("-m", "--mask", help="mask image", type=str)
+    p.add_argument("-sk", "--sky", help="sky background value", type=float, default=0)
+    p.add_argument("-p", "--plate", help="plate scale", type=float, default=1)
     a = p.parse_args(argv)
-    mag, exptime = photDs9(a.ImageFile, a.RegFile, a.mask, a.zeropoint, a.sky)
-    print(f"the exposition time is is: {exptime} \n")
-    print(f"the magnitude from the ds9 region is: {mag:.2f} \n")
+    mag, sb, exptime = photDs9(
+        a.ImageFile, a.RegFile, a.mask, a.zeropoint, a.plate, a.sky
+    )
+    print(f"the exposition time is: {exptime} \n")
+    print(f"the magnitude and surface brightness are: \n")
+    print(f"  mag   mag/arcsec^2 ")
+    print(f"   {mag:.2f}     {sb:.2f}  \n")
+
     return 0
 
 

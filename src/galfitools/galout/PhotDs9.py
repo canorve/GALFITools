@@ -13,7 +13,7 @@ from galfitools.galin.std import parse_ds9_ellipse
 from matplotlib.path import Path
 
 
-def photDs9(ImageFile, RegFile, maskfile, zeropoint, sky):
+def photDs9(ImageFile, RegFile, maskfile, zeropoint, plate, sky):
     """computes the magnitude inside a DS9 region file
 
     Computes the magnitude inside the region defined by ellipse,
@@ -29,13 +29,17 @@ def photDs9(ImageFile, RegFile, maskfile, zeropoint, sky):
                name of the mask image
     zeropoint : float
                 magnitude zero point
+    plate: float
+               plate scale
     sky : float
          sky background in counts
 
     Returns
     -------
     mag : float
-          magnitude measured from region
+          magnitude measured from DS9 region
+    sb: float
+          surface brightness measured from DS9 region
     exptime : float
             exposition time from image
 
@@ -165,6 +169,7 @@ def photDs9(ImageFile, RegFile, maskfile, zeropoint, sky):
     Pol = np.array(Pol)
 
     totFlux = 0
+    Ntot = 0
 
     if (maskfile == "none") or (maskfile == "None"):
         maskfile = None
@@ -188,19 +193,21 @@ def photDs9(ImageFile, RegFile, maskfile, zeropoint, sky):
 
         if obj[idx] == "ellipse":
 
-            ellFlux = FluxEllip(
+            ellFlux, Nell = FluxEllip(
                 Image, xpos[idx], ypos[idx], rx[idx], ry[idx], angle[idx], ncol, nrow
             )
 
             totFlux = totFlux + ellFlux
+            Ntot = Ntot + Nell
 
         if obj[idx] == "box":
 
-            boxFlux = FluxBox(
+            boxFlux, Nbox = FluxBox(
                 Image, xpos[idx], ypos[idx], rx[idx], ry[idx], angle[idx], ncol, nrow
             )
 
             totFlux = totFlux + boxFlux
+            Ntot = Ntot + Nbox
 
     for idx, item in enumerate(Pol):
 
@@ -208,13 +215,18 @@ def photDs9(ImageFile, RegFile, maskfile, zeropoint, sky):
 
         if Pol[idx] == "polygon":
 
-            polFlux = FluxPolygon(Image, tupVerts[idx], ncol, nrow)
+            polFlux, Npol = FluxPolygon(Image, tupVerts[idx], ncol, nrow)
 
             totFlux = totFlux + polFlux
+            Ntot = Ntot + Npol
 
     mag = -2.5 * np.log10(totFlux / exptime) + zeropoint
 
-    return mag, exptime
+    Area = Ntot * plate**2
+
+    sb = -2.5 * np.log10((totFlux / exptime) / Area) + zeropoint
+
+    return mag, sb, exptime
 
 
 def FluxEllip(Image, xpos, ypos, rx, ry, angle, ncol, nrow):
@@ -222,9 +234,9 @@ def FluxEllip(Image, xpos, ypos, rx, ry, angle, ncol, nrow):
 
     xx, yy, Rkron, theta, e = Ds9ell2Kronell(xpos, ypos, rx, ry, angle)
     (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta, e, ncol, nrow)
-    flux = FluxKron(Image, xx, yy, Rkron, theta, e, xmin, xmax, ymin, ymax)
+    flux, N = FluxKron(Image, xx, yy, Rkron, theta, e, xmin, xmax, ymin, ymax)
 
-    return flux
+    return flux, N
 
 
 def FluxPolygon(Image, tupVerts, ncol, nrow):
@@ -241,8 +253,9 @@ def FluxPolygon(Image, tupVerts, ncol, nrow):
     mask = grid.reshape(nrow, ncol)  # now you have a mask with points inside a polygon
 
     flux = Image[mask].sum()
+    n_pix = np.count_nonzero(mask)
 
-    return flux
+    return flux, n_pix
 
 
 def FluxBox(Image, xpos, ypos, rx, ry, angle, ncol, nrow):
@@ -284,7 +297,9 @@ def FluxBox(Image, xpos, ypos, rx, ry, angle, ncol, nrow):
 
     flux = Image[mask].sum()
 
-    return flux
+    n_pix = np.count_nonzero(mask)
+
+    return flux, n_pix
 
 
 def FluxKron(imagemat, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
@@ -326,7 +341,9 @@ def FluxKron(imagemat, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     mask = dist <= dell
     flux = imagemat[ypos[mask], xpos[mask]].sum()
 
-    return flux
+    n_pix = np.count_nonzero(mask)
+
+    return flux, n_pix
 
 
 #############################################################################
