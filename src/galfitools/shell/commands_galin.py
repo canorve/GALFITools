@@ -374,6 +374,7 @@ def maingetSersic(argv=None) -> int:
     parser.add_argument(
         "-sk", "--sky", type=float, default=0, help="sky background to subtract"
     )
+    parser.add_argument("-p", "--plate", type=float, default=1, help="plate scale")
     parser.add_argument(
         "-bt",
         "--bulgetot",
@@ -411,6 +412,7 @@ def maingetSersic(argv=None) -> int:
         args.noprint,
         args.bulgetot,
         args.bards9,
+        args.plate,
         args.out,
     )
     return 0

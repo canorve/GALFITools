@@ -28,6 +28,7 @@ def getSersic(
     noprint: float,
     bulgetot: float,
     bards9: str,
+    plate: float,
     out: str,
 ) -> GalComps:
     """Obtains the initial parameters for GALFIT
@@ -70,6 +71,8 @@ def getSersic(
             initial parameters of the bulge, bar, and disk will
             be printed. The bulgetot parameter must be specified
             for this to function.
+    plate: float
+          plate scale
 
     out : str
           output GALFIT file. This is a file where the surface
@@ -85,7 +88,7 @@ def getSersic(
 
     X, Y, AxRat, PA = getPeak(image, regfile, center, maskfile)
 
-    mag, exptime = photDs9(image, regfile, maskfile, zeropoint, sky)
+    mag, sb, exptime = photDs9(image, regfile, maskfile, zeropoint, plate, sky)
 
     obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
 

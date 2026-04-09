@@ -4,9 +4,11 @@ import galfitools.shell.commands_galout as cli
 
 
 def test_mainPhotDs9(monkeypatch, capsys):
-    monkeypatch.setattr(cli, "photDs9", lambda i, r, m, zp, sk: (22.22, 300.0))
+    monkeypatch.setattr(cli, "photDs9", lambda i, r, m, zp, p, sk: (22.22, 1, 300.0))
     monkeypatch.setattr(cli, "printWelcome", lambda: None)
-    rc = cli.mainPhotDs9(["img.fits", "reg.reg", "--zeropoint", "26", "--sky", "1.5"])
+    rc = cli.mainPhotDs9(
+        ["img.fits", "reg.reg", "--zeropoint", "26", "--plate", "1", "--sky", "1.5"]
+    )
     assert rc == 0
     out = capsys.readouterr().out
     assert "exposition time" in out and "22.22" in out

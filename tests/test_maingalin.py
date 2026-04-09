@@ -195,7 +195,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
     [
         # 1) Minimal: only required args → all defaults
         (
-            ["img.fits", "ell.reg", "--out", "sersic.init"],
+            ["img.fits", "ell.reg", "--plate", "1", "--out", "sersic.init"],
             # image, regfile, center, mask, zeropoint, sky, noprint, bulgetot, bards9
             (
                 "img.fits",
@@ -207,6 +207,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 False,
                 None,
                 None,
+                1,
                 "sersic.init",
             ),
         ),
@@ -223,6 +224,8 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "-m",
                 "mask.fits",
                 "--noprint",
+                "--plate",
+                "1",
                 "--out",
                 "sersic.init",
             ],
@@ -236,6 +239,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 True,
                 None,
                 None,
+                1,
                 "sersic.init",
             ),
         ),
@@ -248,6 +252,8 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "0.35",
                 "--bards9",
                 "bar.reg",
+                "--plate",
+                "1",
                 "--out",
                 "sersic.init",
             ],
@@ -261,6 +267,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 False,
                 0.35,
                 "bar.reg",
+                1,
                 "sersic.init",
             ),
         ),
@@ -281,6 +288,8 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "0.6",
                 "-b",
                 "bar2.reg",
+                "--plate",
+                "1",
                 "--out",
                 "sersic.init",
             ],
@@ -294,6 +303,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 True,
                 0.6,
                 "bar2.reg",
+                1,
                 "sersic.init",
             ),
         ),
@@ -303,7 +313,17 @@ def test_maingetSersic(monkeypatch, argv, expected):
     seen = {}
 
     def fake_getSersic(
-        image, regfile, center, mask, zeropoint, sky, noprint, bulgetot, bards9, out
+        image,
+        regfile,
+        center,
+        mask,
+        zeropoint,
+        sky,
+        noprint,
+        bulgetot,
+        bards9,
+        plate,
+        out,
     ):
         seen["args"] = (
             image,
@@ -315,6 +335,7 @@ def test_maingetSersic(monkeypatch, argv, expected):
             noprint,
             bulgetot,
             bards9,
+            plate,
             out,
         )
 

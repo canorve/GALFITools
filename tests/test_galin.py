@@ -459,12 +459,23 @@ def test_getSersic():
     bulgetot = 0.8
     noprint = False
     bards9 = None
+    plate = 0.68
 
     out = "sersic.init"
     out = path + out
 
     getSersic(
-        image, regfile, center, maskfile, zeropoint, sky, noprint, bulgetot, bards9, out
+        image,
+        regfile,
+        center,
+        maskfile,
+        zeropoint,
+        sky,
+        noprint,
+        bulgetot,
+        bards9,
+        plate,
+        out,
     )
 
     constfile = "constraints.txt"
@@ -530,6 +541,7 @@ def test_getSersic_smoke(tmp_path, capsys):
         True,  # noprint
         None,  # bulgetot
         None,  # bards9
+        1,  # plate
         str(out_path),  # bards9
     )
 
@@ -565,6 +577,7 @@ def test_getSersic_with_mask_and_print(tmp_path, capsys):
         False,  # noprint -> allow output
         None,  # bulgetot
         None,  # bards9
+        1,  # plate
         str(out_path),
     )
     out = capsys.readouterr().out.lower()
