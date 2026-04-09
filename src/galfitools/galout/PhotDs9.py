@@ -223,8 +223,7 @@ def photDs9(ImageFile, RegFile, maskfile, zeropoint, plate, sky):
     mag = -2.5 * np.log10(totFlux / exptime) + zeropoint
 
     Area = Ntot * plate**2
-
-    sb = -2.5 * np.log10((totFlux / exptime) / Area) + zeropoint
+    sb = -2.5 * np.log10(totFlux / exptime) + 2.5 * np.log10(Area) + zeropoint
 
     return mag, sb, exptime
 
