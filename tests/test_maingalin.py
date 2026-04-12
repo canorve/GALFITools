@@ -61,7 +61,15 @@ def test_mainMaskDs9(monkeypatch):
     called = {}
 
     def fake_maskDs9(
-        MaskFile, RegFile, fill, image, border, borValue, skymean=None, skystd=None
+        MaskFile,
+        RegFile,
+        fill,
+        image,
+        border,
+        borValue,
+        skymean=None,
+        skystd=None,
+        invert=False,
     ):
         called.update(locals())
 
@@ -82,6 +90,7 @@ def test_mainMaskDs9(monkeypatch):
         "1.1",
         "--skystd",
         "0.9",
+        "--invert",
     ]
     rc = cli.mainMaskDs9(argv)
     assert rc == 0
@@ -93,6 +102,7 @@ def test_mainMaskDs9(monkeypatch):
     assert called["borValue"] == 2.0
     assert called["skymean"] == 1.1
     assert called["skystd"] == 0.9
+    assert called["invert"] is True
 
 
 def test_mainMaskSky(monkeypatch, capsys):

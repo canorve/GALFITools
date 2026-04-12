@@ -59,6 +59,9 @@ def maskDs9(
              standard deviation of the sky value to be substituted
              inside of the DS9 region
 
+    invert : bool, optional
+            if True it changes the pixels outside of the DS9 Region
+
     Returns
     -------
     None

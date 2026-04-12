@@ -189,7 +189,7 @@ def mainMaskDs9(argv=None) -> int:
         "-sd", "--skystd", type=float, default=1, help="sky std for sky patch"
     )
     parser.add_argument(
-        "-i",
+        "-inv",
         "--invert",
         action="store_true",
         help="Invert the mask (i.e. it changes the values outside the DS9 region)",
