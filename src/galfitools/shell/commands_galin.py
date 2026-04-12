@@ -188,6 +188,13 @@ def mainMaskDs9(argv=None) -> int:
     parser.add_argument(
         "-sd", "--skystd", type=float, default=1, help="sky std for sky patch"
     )
+    parser.add_argument(
+        "-i",
+        "--invert",
+        action="store_true",
+        help="Invert the mask (i.e. it changes the values outside the DS9 region)",
+    )
+
     args = parser.parse_args(argv)
 
     maskDs9(
@@ -199,6 +206,7 @@ def mainMaskDs9(argv=None) -> int:
         args.borValue,
         skymean=args.skymean,
         skystd=args.skystd,
+        invert=args.invert,
     )
     print(f"Done. Mask {args.MaskFile} created (or modified)")
     return 0

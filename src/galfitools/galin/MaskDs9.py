@@ -22,6 +22,7 @@ def maskDs9(
     borValue: int,
     skymean=None,
     skystd=None,
+    invert=False,
 ) -> None:
     """Creates masks from DS9 regions
 
@@ -221,6 +222,7 @@ def maskDs9(
                 nrow,
                 skymean=skymean,
                 skystd=skystd,
+                invert=invert,
             )
 
         if obj[idx] == "box":
@@ -237,6 +239,7 @@ def maskDs9(
                 nrow,
                 skymean=skymean,
                 skystd=skystd,
+                invert=invert,
             )
 
     for idx, item in enumerate(Pol):
@@ -246,7 +249,14 @@ def maskDs9(
         if Pol[idx] == "polygon":
 
             Image = MakePolygon(
-                Image, fill, tupVerts[idx], ncol, nrow, skymean=skymean, skystd=skystd
+                Image,
+                fill,
+                tupVerts[idx],
+                ncol,
+                nrow,
+                skymean=skymean,
+                skystd=skystd,
+                invert=invert,
             )
 
     if image:
@@ -273,7 +283,18 @@ def maskDs9(
 
 
 def MakeEllip(
-    Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow, skymean=None, skystd=None
+    Image,
+    fill,
+    xpos,
+    ypos,
+    rx,
+    ry,
+    angle,
+    ncol,
+    nrow,
+    skymean=None,
+    skystd=None,
+    invert=False,
 ):
     """Draw an ellipse in an image
 
@@ -300,6 +321,8 @@ def MakeEllip(
               mean of the sky background
     skystd : float
              standard deviation of sky
+    invert: bool
+             inverts the mask region
 
 
     Returns
@@ -328,12 +351,15 @@ def MakeEllip(
         nrow,
         skymean=skymean,
         skystd=skystd,
+        invert=invert,
     )
 
     return Image
 
 
-def MakePolygon(Image, fill, tupVerts, ncol, nrow, skymean=None, skystd=None):
+def MakePolygon(
+    Image, fill, tupVerts, ncol, nrow, skymean=None, skystd=None, invert=False
+):
     """Make a polygon in an image
 
     Parameters
@@ -351,7 +377,8 @@ def MakePolygon(Image, fill, tupVerts, ncol, nrow, skymean=None, skystd=None):
               mean of the sky background
     skystd : float
             standard deviation of sky
-
+    invert: bool
+            Changes the pixels outside of the DS9 region
 
     Returns
     -------
@@ -377,13 +404,27 @@ def MakePolygon(Image, fill, tupVerts, ncol, nrow, skymean=None, skystd=None):
 
     else:
 
-        Image[mask] = fill
+        if invert:
+            Image[mask] = fill
+        else:
+            Image[~mask] = fill
 
     return Image
 
 
 def MakeBox(
-    Image, fill, xpos, ypos, rx, ry, angle, ncol, nrow, skymean=None, skystd=None
+    Image,
+    fill,
+    xpos,
+    ypos,
+    rx,
+    ry,
+    angle,
+    ncol,
+    nrow,
+    skymean=None,
+    skystd=None,
+    invert=False,
 ):
     """Make a box in an image
 
@@ -411,7 +452,8 @@ def MakeBox(
               mean of the sky background
     skystd : float
             standard deviation of sky
-
+    invert: bool
+            inverts the region of DS9
 
 
 
@@ -463,7 +505,10 @@ def MakeBox(
 
     else:
 
-        Image[mask] = fill
+        if invert:
+            Image[mask] = fill
+        else:
+            Image[~mask] = fill
 
     return Image
 
@@ -484,6 +529,7 @@ def MakeKronv2(
     nrow,
     skymean=None,
     skystd=None,
+    invert=False,
 ):
     """This creates a ellipse in an image
 
@@ -551,8 +597,10 @@ def MakeKronv2(
         imagemat[ypos[mask], xpos[mask]] = sky[ypos[mask], xpos[mask]]
 
     else:
-
-        imagemat[ypos[mask], xpos[mask]] = idn
+        if invert:
+            imagemat[ypos[~mask], xpos[~mask]] = idn
+        else:
+            imagemat[ypos[mask], xpos[mask]] = idn
 
     return imagemat
 
