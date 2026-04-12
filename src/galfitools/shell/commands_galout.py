@@ -8,6 +8,7 @@ from galfitools.galout.getCOW import getCOW
 from galfitools.galout.getMissingLight import getMissLight
 from galfitools.galout.getN import getN
 from galfitools.galout.getBT import getBT
+from galfitools.galout.magcorr import magCorr
 from galfitools.galout.getPeak import getPeak
 from galfitools.galout.getRads import (
     getBreak,
@@ -584,4 +585,27 @@ def maingetPeak(argv=None) -> int:
     print("peak is at (x, y) = ", X, Y)
     print("axis ratio q = {:.2f} ".format(AxRat))
     print("position angle = {:.2f}".format(PA))
+    return 0
+
+
+def mainmagCorr(argv=None) -> int:
+    printWelcome()
+    parser = argparse.ArgumentParser(
+        description="corrects GALFIT file for magnitude correction and K corrections"
+    )
+    parser.add_argument("galfile", help="GALFIT input file")
+    parser.add_argument(
+        "-o", "--out", default="magcorr.gal", type=str, help="output GALFIT file"
+    )
+
+    parser.add_argument(
+        "-a", "--Aext", default=0, help="Magnitude correction for Extinction"
+    )
+
+    parser.add_argument("-k", "--Kcor", default=0, help="K correction")
+
+    args = parser.parse_args(argv)
+
+    magCorr(args.galfile, args.out, A=args.A, K=args.K)
+
     return 0
