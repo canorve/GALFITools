@@ -408,9 +408,9 @@ def MakePolygon(
     else:
 
         if invert:
-            Image[mask] = fill
-        else:
             Image[~mask] = fill
+        else:
+            Image[mask] = fill
 
     return Image
 
@@ -509,9 +509,9 @@ def MakeBox(
     else:
 
         if invert:
-            Image[mask] = fill
-        else:
             Image[~mask] = fill
+        else:
+            Image[mask] = fill
 
     return Image
 
@@ -566,6 +566,12 @@ def MakeKronv2(
     ymin = int(ymin)
     ymax = int(ymax)
 
+    if invert:
+        xmin = 1
+        ymin = 1
+        xmax = ncol - 1
+        ymax = nrow - 1
+
     q = 1 - ell
     bim = q * R
 
@@ -600,6 +606,7 @@ def MakeKronv2(
         imagemat[ypos[mask], xpos[mask]] = sky[ypos[mask], xpos[mask]]
 
     else:
+
         if invert:
             imagemat[ypos[~mask], xpos[~mask]] = idn
         else:
