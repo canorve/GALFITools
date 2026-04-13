@@ -788,4 +788,14 @@ def test_makePSF():
     if os.path.isfile(initfile):
         os.remove(initfile)
 
+    initfile = "psf_star.fits"
+    assert os.path.isfile(initfile)
+    if os.path.isfile(initfile):
+        os.remove(initfile)
+
+    initfile = "psfell.reg"
+    assert os.path.isfile(initfile)
+    if os.path.isfile(initfile):
+        os.remove(initfile)
+
     return None
