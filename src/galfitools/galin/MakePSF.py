@@ -199,9 +199,12 @@ def makePSF(
         lastfit_file, 3, 0.99, theta + 90, 1
     )
 
-    axrat = EffRadb / EffRad
+    if EffRadb < EffRad:
+        axrat = EffRadb / EffRad
+    else:
+        axrat = EffRad / EffRadb
 
-    makeDS9ellip("psfell.reg", xpeak, ypeak, EffRad, axrat, theta)
+    makeDS9ellip("psfell.reg", xpeak, ypeak, EffRad, axrat, theta + 90)
     ###
 
     # making star PSF
@@ -299,7 +302,7 @@ def makeDS9ellip(out, X, Y, rad, AxRat, theta):
 
     radminor = rad * AxRat
 
-    elline = "ellipse({:.2f}, {:.2f}, {:.2f}, {:.2f} {:.2f}) \n".format(
+    elline = "ellipse({:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}) \n".format(
         X, Y, radminor, rad, theta
     )
     fout.write(elline)

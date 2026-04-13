@@ -171,7 +171,7 @@ def maskDs9(
         if flag is True:
 
             x3 = p[4]
-            x4 = x3[:-2]
+            x4 = x3.replace(")", "").strip()
 
             v0.append(x0)
             v1.append(float(x2) - 1)
