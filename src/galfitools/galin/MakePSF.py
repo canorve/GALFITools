@@ -4,6 +4,7 @@
 import re
 import subprocess as sp
 import sys
+import shutil
 
 from galfitools.galin.galfit import (
     Galfit,
@@ -18,6 +19,9 @@ from galfitools.galin.getStar import getStar
 from galfitools.galin.std import Ds9ell2Kronellv2
 from galfitools.galin.std import GetInfoEllip
 from galfitools.mge.mge2galfit import mge2gal
+from galfitools.galout.getRads import getReComp
+
+from galfitools.galin.MaskDs9 import maskDs9
 
 
 def makePSF(
@@ -34,7 +38,7 @@ def makePSF(
     """makes PSF model
 
     It creates a PSF model image model for GALFIT.
-    It model a star from an image usign the MGE method
+    It model a star from an image using the MGE method
 
     Parameters
     ----------
@@ -187,6 +191,35 @@ def makePSF(
 
     lastfit_file = galfitLastFit(".")
 
+    # estimating radius at 99%
+
+    EffRad, totmag, meanme, me, N, theta = getReComp(lastfit_file, 3, 0.99, None, 1)
+
+    EffRadb, totmag, meanme, me, N, theta = getReComp(
+        lastfit_file, 3, 0.99, theta + 90, 1
+    )
+
+    axrat = EffRadb / EffRad
+
+    makeDS9ellip("psfell.reg", xpeak, ypeak, EffRad, axrat, theta)
+    ###
+
+    # making star PSF
+    psfout2 = "psf_star.fits"
+    shutil.copyfile(inputimage, psfout2)
+    maskDs9(
+        psfout2,
+        "psfell.reg",
+        0,
+        None,
+        False,
+        0,
+        skymean=None,
+        skystd=None,
+        invert=True,
+    )
+
+    #########
     galfit = Galfit(lastfit_file)
     head = galfit.ReadHead()
     galcomps = galfit.ReadComps()
@@ -220,8 +253,60 @@ def makePSF(
     )
 
     print("Done. PSF model file: ", psfout)
+    print("Done. PSF Star model file: ", psfout2)
 
     print("Check the image, model and residual: ", outname)
+
+
+def makeDS9ellip(out, X, Y, rad, AxRat, theta):
+    """makes DS9 region
+
+    It creates an ellipse DS9 region
+
+    Parameters
+    ----------
+    out: str
+            name of the DS9 output file
+    X, Y: float, float
+           X, Y position of the center of PSF
+    rad: float
+         radius of the axis major of ellipse
+    AxRat: float
+           Axis ratio
+    theta: float
+           angular position of the ellipse
+
+    Returns
+    -------
+    0
+
+    """
+
+    # now it creates the ellipse region file
+    fout = open(out, "w")
+
+    color = "red"
+
+    line = "# Region file format: DS9 version 4.1 \n"
+    fout.write(line)
+    linea = "global color=" + color + " dashlist=8 3 width=2 "
+    lineb = 'font="helvetica 10 normal roman" select=1 highlite=1 dash=0 '
+    linec = "fixed=0 edit=1 move=1 delete=1 include=1 source=1\n"
+    line = linea + lineb + linec
+    fout.write(line)
+    line = "physical\n"
+    fout.write(line)
+
+    radminor = rad * AxRat
+
+    elline = "ellipse({:.2f}, {:.2f}, {:.2f}, {:.2f} {:.2f}) \n".format(
+        X, Y, radminor, rad, theta
+    )
+    fout.write(elline)
+
+    fout.close()
+
+    return 0
 
 
 #############################################################################

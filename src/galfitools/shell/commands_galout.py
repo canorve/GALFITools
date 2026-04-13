@@ -310,7 +310,7 @@ def mainGetReComp(argv=None) -> int:
         description="getReComp: gets the effective radius from Sersics"
     )
     p.add_argument("GalfitFile")
-    p.add_argument("-d", "--dis", type=int, default=10)
+    p.add_argument("-d", "--dis", type=int, default=3)
     p.add_argument("-fr", "--fracrad", type=float, default=0.5)
     p.add_argument("-n", "--numcomp", type=int, default=1)
     p.add_argument("-pa", "--angle", type=float)

@@ -31,9 +31,9 @@ class GalHead:
     ymax = 1
     convx = 1
     convy = 1
-    mgzpt = 25
-    scale = 1
-    scaley = 1
+    mgzpt = 25.0
+    scale = 1.0
+    scaley = 1.0
     display = "regular"
     P = 0
 
