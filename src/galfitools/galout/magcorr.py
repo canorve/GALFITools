@@ -74,7 +74,6 @@ def magCorr(
     # convert all exp, gaussian and de vaucouleurs to Sersic format
     # comps = conver2Sersic(galcomps)
 
-    # makes corrections:
     galcomps.Mag = galcomps.Mag - A - K
 
     # printing output file

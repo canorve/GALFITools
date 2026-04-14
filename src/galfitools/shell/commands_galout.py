@@ -599,13 +599,17 @@ def mainmagCorr(argv=None) -> int:
     )
 
     parser.add_argument(
-        "-a", "--Aext", default=0, help="Magnitude correction for Extinction"
+        "-a",
+        "--Aext",
+        default=0,
+        type=float,
+        help="Magnitude correction for Extinction",
     )
 
-    parser.add_argument("-k", "--Kcor", default=0, help="K correction")
+    parser.add_argument("-k", "--Kcor", type=float, default=0, help="K correction")
 
     args = parser.parse_args(argv)
 
-    magCorr(args.galfile, args.out, A=args.A, K=args.K)
+    magCorr(args.galfile, args.out, A=args.Aext, K=args.Kcor)
 
     return 0

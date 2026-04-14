@@ -1230,7 +1230,7 @@ def galPrintComp(hdl: str, ncomp: int, idx: int, galcomps: GalComps) -> bool:
         galcomps.PosXFree[idx],
         galcomps.PosYFree[idx],
     )
-    line03 = " 3) {:.2f}  {}    #  total magnitude  \n".format(
+    line03 = " 3) {:.4f}  {}    #  total magnitude  \n".format(
         galcomps.Mag[idx], galcomps.MagFree[idx]
     )
     line04 = " 4) {:.2f}  {}    #  R_e     [Pixels] \n".format(
@@ -1248,7 +1248,7 @@ def galPrintComp(hdl: str, ncomp: int, idx: int, galcomps: GalComps) -> bool:
     line08 = (
         " 8)  0.0000       0   #  ----------------                                \n"
     )
-    line09 = " 9) {:.2f}   {}   #  axis ratio (b/a)  \n".format(
+    line09 = " 9) {:.3f}   {}   #  axis ratio (b/a)  \n".format(
         galcomps.AxRat[idx], galcomps.AxRatFree[idx]
     )
     line10 = "10) {:.2f}    {}  #  position angle (PA)   \n".format(
@@ -1298,7 +1298,7 @@ def galPrintSky(hdl: str, ncomp: int, galsky: GalSky) -> bool:
 
     line00 = "# Object number: {}                 \n".format(ncomp)
     line01 = " 0)      sky            #    Object type   \n"
-    line02 = " 1) {:.2f}   {}   # sky background        [ADU counts]  \n".format(
+    line02 = " 1) {:.3f}   {}   # sky background        [ADU counts]  \n".format(
         galsky.sky, galsky.skyfree
     )
     line03 = " 2) {:.2f}  {}    # dsky/dx (sky gradient in x) \n".format(
