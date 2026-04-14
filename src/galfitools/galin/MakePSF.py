@@ -34,6 +34,7 @@ def makePSF(
     sky: float,
     twist: bool,
     numgauss: int,
+    fracrad=0.95,
 ) -> None:
     """makes PSF model
 
@@ -191,12 +192,12 @@ def makePSF(
 
     lastfit_file = galfitLastFit(".")
 
-    # estimating radius at 99%
+    # estimating radius at % of light determined fracrad
 
-    EffRad, totmag, meanme, me, N, theta = getReComp(lastfit_file, 3, 0.99, None, 1)
+    EffRad, totmag, meanme, me, N, theta = getReComp(lastfit_file, 3, fracrad, None, 1)
 
     EffRadb, totmag, meanme, me, N, theta = getReComp(
-        lastfit_file, 3, 0.99, theta + 90, 1
+        lastfit_file, 3, fracrad, theta + 90, 1
     )
 
     if EffRadb < EffRad:

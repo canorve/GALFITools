@@ -575,6 +575,14 @@ def mainMakePSF(argv=None) -> int:
         "-ng", "--numgauss", type=int, help="number of Gaussians used for GALFIT"
     )
 
+    parser.add_argument(
+        "-fr",
+        "--fracrad",
+        type=float,
+        default=0.95,
+        help="fraction of light radius to keep light in psf_star.fits Default = 0.95",
+    )
+
     args = parser.parse_args(argv)
 
     makePSF(
@@ -587,5 +595,6 @@ def mainMakePSF(argv=None) -> int:
         args.sky,
         args.twist,
         args.numgauss,
+        args.fracrad,
     )
     return 0
