@@ -378,7 +378,7 @@ def test_mainMakePSF(monkeypatch):
     seen = {}
 
     def fake_makePSF(
-        image, Ds9regFile, center, out, sigma, imsize, sky, twist, numgauss
+        image, Ds9regFile, center, out, sigma, imsize, sky, twist, numgauss, fracrad
     ):
         seen.update(locals())
 
@@ -401,6 +401,8 @@ def test_mainMakePSF(monkeypatch):
             "--twist",
             "--numgauss",
             "5",
+            "--fracrad",
+            "0.95",
         ]
     )
     assert rc == 0
@@ -412,6 +414,7 @@ def test_mainMakePSF(monkeypatch):
     assert seen["sky"] == 0
     assert seen["twist"] is True
     assert seen["numgauss"] == 5
+    assert seen["fracrad"] == 0.95
 
 
 def test_mainMakeMask_defaults(monkeypatch, capsys):
