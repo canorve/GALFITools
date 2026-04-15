@@ -6,28 +6,28 @@ on:
       - .github/workflows/draft-pdf.yml
       - '!paper/paper.pdf'
 
+permissions:
+  contents: write
+
 jobs:
   paper:
     runs-on: ubuntu-latest
     name: Paper Draft
+
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-        with:
-          ref: ${{ github.ref_name }}
+
       - name: Build draft PDF
         uses: openjournals/openjournals-draft-action@master
         with:
           journal: joss
-          # This should be the path to the paper within your repo.
           paper-path: paper/paper.md
+
       - name: Upload
         uses: actions/upload-artifact@v6
         with:
           name: paper
-          # This is the output path where Pandoc will write the compiled
-          # PDF. Note, this should be the same directory as the input
-          # paper.md
           path: paper/paper.pdf
 
 
@@ -35,8 +35,8 @@ jobs:
         uses: EndBug/add-and-commit@v10
         with:
           message: '(auto) Paper PDF Draft'
-          # This should be the path to the paper within your repo.
           add: 'paper/paper.pdf' # 'paper/*.pdf' to commit all PDFs in the paper directory
-
+          default_author: github_actions
+          push: origin HEAD:${{ github.ref_name }}
 
 
