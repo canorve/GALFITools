@@ -1452,7 +1452,7 @@ class GetKappa:
 
 
 def getReComp(
-    galfitFile: str, dis: int, eff: float, angle: float, num_comp: int
+    galfitFile: str, dis: int, eff: float, angle: float, num_comp: int, mecorr=0
 ) -> float:
     """Obtains the effective radius from a set of Sersic functions.
 
@@ -1475,6 +1475,9 @@ def getReComp(
     num_comp: int
             Number of component from which the center of all
             components will be determined.
+    mecorr: float
+            surface brightness correction for universe expansion
+
 
     Returns
     -------
@@ -1534,6 +1537,9 @@ def getReComp(
 
     meanme = GetMe().MeanMe(totmag, EffRad * head.scale)
     me = GetMe().Me(head, comps, EffRad * head.scale, theta)
+
+    meanme = meanme - mecorr
+    me = me - mecorr
 
     # EffRad_arc = EffRad*head.scale
 

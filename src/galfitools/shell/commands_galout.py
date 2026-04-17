@@ -314,9 +314,12 @@ def mainGetReComp(argv=None) -> int:
     p.add_argument("-fr", "--fracrad", type=float, default=0.5)
     p.add_argument("-n", "--numcomp", type=int, default=1)
     p.add_argument("-pa", "--angle", type=float)
+    p.add_argument(
+        "-mc", "--mecorr", help="Surface brightness correction", type=float, default=10
+    )
     a = p.parse_args(argv)
     EffRad, totmag, meanme, me, N, theta = getReComp(
-        a.GalfitFile, a.dis, a.fracrad, a.angle, a.numcomp
+        a.GalfitFile, a.dis, a.fracrad, a.angle, a.numcomp, a.mecorr
     )
     plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
@@ -346,12 +349,21 @@ def mainGetMeRad(argv=None) -> int:
     )
     p.add_argument("GalfitFile")
     p.add_argument("-d", "--dis", type=int, default=5)
-    p.add_argument("-r", "--rad", type=float, default=10)
+    p.add_argument(
+        "-r",
+        "--rad",
+        help="radius where the surface brightness is evaluated",
+        type=float,
+        default=10,
+    )
     p.add_argument("-n", "--numcomp", type=int, default=1)
     p.add_argument("-pa", "--angle", type=float)
+    p.add_argument(
+        "-mc", "--mecorr", help="Surface brightness correction", type=float, default=10
+    )
     a = p.parse_args(argv)
     totmag, meanmerad, merad, N, theta = getMeRad(
-        a.GalfitFile, a.dis, a.rad, a.angle, a.numcomp
+        a.GalfitFile, a.dis, a.rad, a.angle, a.numcomp, a.mecorr
     )
     plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)

@@ -22,7 +22,7 @@ from scipy.special import gamma, gammainc, gammaincinv
 
 
 def getMeRad(
-    galfitFile: str, dis: int, rad: float, angle: float, num_comp: int
+    galfitFile: str, dis: int, rad: float, angle: float, num_comp: int, mecorr=0
 ) -> float:
     """Obtains the surface brightness at a given radius from a set of Sersic functions.
 
@@ -43,6 +43,10 @@ def getMeRad(
     num_comp: int
             Number of component from which the center of all
             components will be determined.
+
+    mecorr: float
+         Surface brightness correction for universe expansion
+
 
     Returns
     -------
@@ -94,6 +98,10 @@ def getMeRad(
 
     meanmerad = getMeanRad(head, comps, rad * head.scale)  # it does not work
     merad = GetMe().Me(head, comps, rad * head.scale, theta)
+
+    meanme = meanme - mecorr
+    meanmerad = meanmerad - mecorr
+    merad = merad - mecorr
 
     return totmag, meanmerad, merad, N, theta
 
