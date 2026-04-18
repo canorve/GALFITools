@@ -7,6 +7,8 @@ from scipy.optimize import bisect
 from scipy.special import gammainc, gammaincinv
 from dataclasses import dataclass, field
 
+from galfitools.galin.getStar import GetFits
+
 from typing import Dict
 
 
@@ -43,7 +45,7 @@ class GalHead:
     num = 1
     flagnum = False
     exptime = 1
-    tempmask = "tempmask.fits"
+    stampmask = "stampmask.fits"
 
 
 @dataclass
@@ -126,7 +128,6 @@ class DataImg:
     Data class to store the galaxy, model and residual images
     of the output file of GALFIT
 
-
     """
 
     img = np.array([[1, 1], [1, 1]])
@@ -138,6 +139,56 @@ class DataImg:
     imsnr = np.array([[1, 1], [1, 1]])
     imchi = np.array([[1, 1], [1, 1]])
     impsf = np.array([[1, 1], [1, 1]])
+
+
+def readDataImg(galhead, sigma=None):
+    """
+    reads galfit output cube data image
+    """
+    dataimg = DataImg()
+
+    # reading galaxy and model images from file
+    errmsg = "file {} does not exist".format(galhead.outimage)
+
+    assert os.path.isfile(galhead.outimage), errmsg
+
+    # hdu 1 => image   hdu 2 => model
+    hdu = fits.open(galhead.outimage)
+    dataimg.img = (hdu[1].data.copy()).astype(float)
+    dataimg.model = (hdu[2].data.copy()).astype(float)
+    dataimg.imres = (hdu[3].data.copy()).astype(float)
+    hdu.close()
+
+    ### reading mask image from file
+
+    if os.path.isfile(galhead.maskimage):
+        GetFits(
+            galhead.maskimage,
+            galhead.stampmask,
+            0,
+            galhead.xmin,
+            galhead.xmax,
+            galhead.ymin,
+            galhead.ymax,
+        )
+
+        errmsg = "file {} does not exist".format(galhead.stampmask)
+        assert os.path.isfile(galhead.stampmask), errmsg
+
+        hdu = fits.open(galhead.stampmask)
+        mask = hdu[0].data
+        dataimg.mask = np.array(mask, dtype=bool)
+        hdu.close()
+
+    else:
+        dataimg.mask = None
+
+    if sigma is not None:
+        hdu = fits.open(sigma)
+        dataimg.sigma = hdu[0].data
+        hdu.close()
+
+    return dataimg
 
 
 class Galfit:

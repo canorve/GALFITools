@@ -25,6 +25,8 @@ from galfitools.galout.PhotDs9 import photDs9
 from galfitools.galout.showcube import displayCube
 from galfitools.shell.prt import printWelcome
 
+from galfitools.galout.getChiNu import getChiNu
+
 
 def mainPhotDs9(argv=None) -> int:
     printWelcome()
@@ -624,4 +626,33 @@ def mainmagCorr(argv=None) -> int:
 
     magCorr(args.galfile, args.out, A=args.Aext, K=args.Kcor)
 
+    return 0
+
+
+def maingetChiNu(argv=None) -> int:
+    printWelcome()
+    parser = argparse.ArgumentParser(description="Computes the Chinu within a radius")
+    parser.add_argument("galfile", help="GALFIT input file")
+
+    parser.add_argument(
+        "-fr",
+        "--fracrad",
+        default=0.9,
+        type=float,
+        help="Fraction of light radius where the chinu will be computed. Default = 0.9",
+    )
+
+    parser.add_argument(
+        "-nc",
+        "--numcomp",
+        type=int,
+        default=1,
+        help="Number of component inside galfit file. Default=1",
+    )
+
+    args = parser.parse_args(argv)
+
+    chinu = getChiNu(args.galfile, args.numcomp, args.fracrad)
+
+    print("Chinu inside the {args.fracrad:.2f} of light radius: {chinu:.2f}")
     return 0
