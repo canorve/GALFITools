@@ -141,10 +141,14 @@ def mainSkyDs9(argv=None) -> int:
     mean, sig, ms, mstd = SkyDs9(
         args.ImageFile, args.RegFile, args.mask, args.outliers, args.mgzpt, args.scale
     )
-    print(f"mean sky: {mean:.3f} ")
-    print(f"std sky: {sig:.3f} ")
-    print(f"surface brighntess sky: {ms:.3f} mag/''^2 ")
-    print(f"error surface brighntess sky: {mstd:.3f} mag/''^2 ")
+    print(f"sky \n")
+    print(f"  mean  std ")
+    print(f"  {mean:.3f}  {sig:.3f}  \n")
+
+    print(f"surface brightness sky \n")
+    print(f"  mean mag/''^2  std  mag/''^2")
+    print(f"   {ms:.3f}     {mstd:.3f}  \n")
+
     return 0
 
 
@@ -165,10 +169,14 @@ def mainSkyRing(argv=None) -> int:
         args.mgzpt,
         args.scale,
     )
-    print(
-        f"Total sky:  mean =  {mean:.3f}; sigma = {std:.3f}; median = {median:.3f} at radius {rad:.2f}"
-    )
-    print(
-        f"Surface brighntess sky = {ms:.2f} mag/''^2; error surface brightness = {mstd:.2f}; at radius {rad:.2f}"
-    )
+
+    print(f"Sky at radius {rad:.2f} \n")
+    print(f"  mean  sigma  median ")
+    print(f"  mag  mag  mag ")
+    print(f"   {mean:.3f}   {std:.3f}   {median:.3f}  \n")
+
+    print(f"Surface brighntess sky at radius {rad:.2f} \n")
+    print(f"  mag/''^2   mag/''^2 ")
+    print(f"   {ms:.2f}   {mstd:.2f}  \n")
+
     return 0

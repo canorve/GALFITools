@@ -86,7 +86,11 @@ def mainGetBreak(argv=None) -> int:
         print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
 
     plate = Galfit(a.GalfitFile).ReadHead().scale
-    print(f'The break radius is {rbreak:.2f} pixels or {rbreak*plate:.2f} "  \n')
+
+    print(f"The break radius is:  \n")
+    print(f" pixels   arcsec ")
+    print(f" {rbreak:.2f}   {rbreak*plate:.2f}  \n")
+
     return 0
 
 
@@ -111,7 +115,11 @@ def mainGetBreak2(argv=None) -> int:
         print(f"position angle: {theta:.2f} degrees\n")
     else:
         print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
-    print(f'The break radius is {rbreak:.2f} pixels or {rbreak*plate:.2f} " \n')
+
+    print(f"The break radius is:  \n")
+    print(f" pixels   arcsec ")
+    print(f" {rbreak:.2f}   {rbreak*plate:.2f}  \n")
+
     return 0
 
 
@@ -164,6 +172,7 @@ def mainGetBarSize(argv=None) -> int:
     print(f"The bar length is:  \n")
     print(f"  pixels   arcsec ")
     print(f"   {rbar:.2f}     {rbar*plate:.2f}  \n")
+
     return 0
 
 
@@ -239,7 +248,11 @@ def mainFWHM(argv=None) -> int:
         print(f"position angle: {theta:.2f} degrees\n")
     else:
         print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
-    print(f'The FWHM is {fwhm:.2f} pixels or {fwhm*plate:.2f} " \n')
+
+    print(f"The FWHM is:  \n")
+    print(f"  pixels   arcsec ")
+    print(f"  {fwhm:.2f}   {fwhm*plate:.2f}  \n")
+
     return 0
 
 
@@ -276,7 +289,10 @@ def mainKappa(argv=None) -> int:
     else:
         print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
 
-    print(f'The Kappa radius  is {rkappa:.2f} pixels or {rkappa*plate:.2f} " \n')
+    print(f"The Kappa radius is:  \n")
+    print(f"  pixels   arcsec ")
+    print(f"   {rkappa:.2f}     {rkappa*plate:.2f}  \n")
+
     return 0
 
 
@@ -302,7 +318,10 @@ def mainKappa2(argv=None) -> int:
     else:
         print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
 
-    print(f'The kappa radius is {rkappa:.2f} pixels or {rkappa*plate:.2f} " \n')
+    print(f"The Kappa radius is:  \n")
+    print(f"  pixels   arcsec ")
+    print(f"   {rkappa:.2f}     {rkappa*plate:.2f}  \n")
+
     return 0
 
 
@@ -330,17 +349,23 @@ def mainGetReComp(argv=None) -> int:
     else:
         print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
 
-    print(f"Total Magnitude of the galaxy: {totmag:.2f} \n")
-    print(
-        f"Surface brightness at radius of {a.fracrad*100:.0f}% of light (μr): {me:.2f} mag/'' \n"
-    )
+    print(f": Total Magnitude of the galaxy: \n")
+    print(f"   mag ")
+    print(f"  {totmag:.2f}\n")
+
+    print(f": Surface brightness at radius of {a.fracrad*100:.0f}% of light (μr): \n")
+    print(f"   mag/''^2 ")
+    print(f"   {me:.2f}\n")
+
     if a.fracrad == 0.5:
-        print(
-            f"Mean Surface Brightness at effective radius (<μ>e): {meanme:.2f} mag/'' \n"
-        )
-    print(
-        f'The radius at {a.fracrad*100:.0f}% of light is {EffRad:.2f} pixels or {EffRad*plate:.2f} " \n'
-    )
+        print(f":  Mean Surface Brightness at effective radius (<μ>e)\n")
+        print(f"   mag/''^2")
+        print(f"   {meanme:.2f}  \n")
+
+    print(f"The radius at {a.fracrad*100:.0f}% of light is; \n")
+    print(f"  pixels   arcsec ")
+    print(f"   {EffRad:.2f}     {EffRad*plate:.2f}  \n")
+
     return 0
 
 
@@ -374,10 +399,22 @@ def mainGetMeRad(argv=None) -> int:
     else:
         print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
 
-    print(f"Total Magnitude of the galaxy: {totmag:.2f} \n")
-    print(f'The radius used is {a.rad:.2f} pixels or {a.rad*plate:.2f} " \n')
-    print(f"Surface brightness at this radius is (μr): {merad:.2f} mag/'' \n")
-    print(f"Mean Surface Brightness at radius (<μ>r): {meanmerad:.2f} mag/'' \n")
+    print(f"Total Magnitude:  \n")
+    print(f"  mag ")
+    print(f"  {totmag:.2f}  \n")
+
+    print(f"The radius used is:  \n")
+    print(f"  pixels   arcsec ")
+    print(f"   {a.rad:.2f}     {a.rad*plate:.2f}  \n")
+
+    print(f"Surface brightness at this radius is (μr): \n")
+    print(f"  mag/''^2 ")
+    print(f"   {merad:.2f}  \n")
+
+    print(f"Mean surface brightness at this radius is (<μ>r): \n")
+    print(f"  mag/''^2 ")
+    print(f"   {meanmerad:.2f}  \n")
+
     return 0
 
 
@@ -404,9 +441,10 @@ def maingetSlope(argv=None) -> int:
     else:
         print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
 
-    print(
-        f'The radius with slope {a.slope:.2f} is {rgam:.2f} pixels, or {rgam*plate:.2f} " \n'
-    )
+    print(f"The radius with slope {a.slope:.2f} is:  \n")
+    print(f"  pixels   arcsec ")
+    print(f"   {rgam:.2f}     {rgam*plate:.2f}  \n")
+
     return 0
 
 
@@ -432,20 +470,21 @@ def maingetN(argv=None) -> int:
     else:
         print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
 
-    print(f"Total Magnitude of the galaxy: {totmag:.2f} \n")
-    print(
-        "Sersic index with the method of Mean Surface Brightness at effective radius: {:.2f} ".format(
-            sersic
-        )
-    )
+    print(f"Total Magnitude of the galaxy: \n")
+    print(f"    mag     \n")
+    print(f"   {totmag:.2f}   \n")
+
+    print(f"Sersic index with the method of mean surface brightness at Re: \n")
+    print(f"   {sersic:.2f}     {stdser:.2f}  \n")
+
     print(
         "Sersic index with the method of fraction of light\n(evaluated at different radius)\n"
     )
-    print(
-        "Sersic index mean: {:.2f}  Standard deviation: {:.2f}  ".format(
-            meanser, stdser
-        )
-    )
+
+    print(f"Sersic index mean and standard deviation:\n")
+    print(f"  mean   std")
+    print(f"   {meanser:.2f}     {stdser:.2f}  \n")
+
     return 0
 
 
@@ -458,8 +497,13 @@ def maingetBT(argv=None) -> int:
     a = p.parse_args(argv)
     bulge_total, totmag, N = getBT(a.GalfitFile, a.dis, a.numcomp)
     print("number of model components: ", N)
-    print(f"Total Magnitude of the galaxy: {totmag:.2f} \n")
-    print(f"Bulge to total luminosity ratio: {bulge_total:.2f} \n")
+    print(f"Total Magnitude of the galaxy: \n")
+    print(f"    mag     \n")
+    print(f"   {totmag:.2f}   \n")
+
+    print(f"Bulge to total luminosity ratio: \n")
+    print(f"   {bulge_total:.2f}  \n")
+
     return 0
 
 
@@ -487,7 +531,10 @@ def mainGetBulgeRad(argv=None) -> int:
     else:
         print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
 
-    print(f'The bulge radius is {rbulge:.2f} pixels or {rbulge*plate:.2f} "  \n')
+    print(f"The bulge radius is:\n")
+    print(f"  pixels  arcsec ")
+    print(f"   {rbulge:.2f}    {rbulge*plate:.2f}  \n")
+
     return 0
 
 
@@ -507,7 +554,11 @@ def mainMissingLight(argv=None) -> int:
     )
     print("number of model components coreless model: ", N1)
     print("number of model components core model: ", N2)
-    print(f"the missing light is {magmiss:.2f} mag \n")
+
+    print(f"The missing light is:  \n")
+    print(f"  mag ")
+    print(f"   {magmiss:.2f}  \n")
+
     return 0
 
 
@@ -596,7 +647,9 @@ def maingetPeak(argv=None) -> int:
     p.add_argument("-m", "--mask", type=str)
     a = p.parse_args(argv)
     X, Y, AxRat, PA = getPeak(a.Image, a.RegFile, a.center, a.mask)
-    print("peak is at (x, y) = ", X, Y)
+    print("peak is at (x, y) = ")
+    print(f"  {X:.2f}  {Y:.2f}  \n")
+
     print("axis ratio q = {:.2f} ".format(AxRat))
     print("position angle = {:.2f}".format(PA))
     return 0
@@ -653,6 +706,7 @@ def maingetChiNu(argv=None) -> int:
     args = parser.parse_args(argv)
 
     chinu = getChiNu(args.galfile, args.numcomp, args.fracrad)
+    print(f"Chinu inside the {args.fracrad:.2f} of light radius:")
+    print(f"  {chinu:.2f}")
 
-    print("Chinu inside the {args.fracrad:.2f} of light radius: {chinu:.2f}")
     return 0
