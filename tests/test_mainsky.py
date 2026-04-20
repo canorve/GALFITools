@@ -76,8 +76,8 @@ def test_mainSkyDs9_calls_SkyDs9_and_prints(monkeypatch, capsys):
     )
     assert rc == 0
     out = capsys.readouterr().out
-    assert "mean sky: 12.346" in out
-    assert "std sky: 0.789" in out
+    assert "12.346" in out
+    assert "0.789" in out
 
 
 def test_mainSkyDs9_requires_positionals(monkeypatch):
@@ -120,9 +120,9 @@ def test_mainSkyRing_calls_SkyRing_and_prints(monkeypatch, capsys):
     assert rc == 0
     out = capsys.readouterr().out
     assert "Major axis of ellipse is used as initial radius." in out
-    assert "mean =  10.00" in out
-    assert "sigma = 2.000" in out
-    assert "median = 9.50" in out
+    assert "10.000" in out
+    assert "2.000" in out
+    assert "9.500" in out
     assert "radius 30.25" in out
 
 

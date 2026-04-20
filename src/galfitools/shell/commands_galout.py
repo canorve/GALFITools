@@ -362,7 +362,7 @@ def mainGetReComp(argv=None) -> int:
         print(f"   mag/''^2")
         print(f"   {meanme:.2f}  \n")
 
-    print(f"The radius at {a.fracrad*100:.0f}% of light is; \n")
+    print(f"The radius at {a.fracrad*100:.0f}% of light is:\n")
     print(f"  pixels   arcsec ")
     print(f"   {EffRad:.2f}     {EffRad*plate:.2f}  \n")
 

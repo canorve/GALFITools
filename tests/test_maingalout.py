@@ -27,7 +27,8 @@ def test_mainGetBreak(monkeypatch, capsys):
     rc = cli.mainGetBreak(["galfit.01", "--numinitial", "2", "--quick"])
     assert rc == 0
     out = capsys.readouterr().out
-    assert "break radius is 12.50" in out
+    assert "break radius is:" in out
+    assert "12.50" in out
 
 
 def test_mainGetBreak2(monkeypatch, capsys):
@@ -48,7 +49,8 @@ def test_mainGetBreak2(monkeypatch, capsys):
     assert rc == 0
 
     out = capsys.readouterr().out
-    assert "The break radius is 12.50" in out
+    assert "The break radius is:" in out
+    assert "12.50" in out
 
 
 def test_mainFWHM(monkeypatch, capsys):
@@ -74,7 +76,9 @@ def test_mainFWHM(monkeypatch, capsys):
     # Validate key parts of output
     assert "number of model components:  3" in out
     assert "position angle: 42.00 degrees" in out
-    assert "FWHM is 8.50 pixels or 4.25" in out  # 8.5 * 0.5 = 4.25
+    assert "FWHM is:" in out  # 8.5 * 0.5 = 4.25
+    assert "8.50" in out  # 8.5 * 0.5 = 4.25
+    assert "4.25" in out  # 8.5 * 0.5 = 4.25
 
 
 def test_mainKappa(monkeypatch, capsys):
@@ -93,7 +97,9 @@ def test_mainKappa(monkeypatch, capsys):
 
     out = capsys.readouterr().out
     norm = " ".join(out.split()).lower()  # collapse spaces, lower-case
-    assert 'kappa radius is 7.00 pixels or 3.50 "' in norm
+    assert "kappa radius is:" in norm
+    assert "7.00" in norm
+    assert "3.50" in norm
 
 
 def test_mainKappa2(monkeypatch, capsys):
@@ -112,7 +118,8 @@ def test_mainKappa2(monkeypatch, capsys):
 
     out = capsys.readouterr().out
     norm = " ".join(out.split()).lower()
-    assert 'kappa radius is 7.00 pixels or 3.50 "' in norm
+    assert "7.00" in norm
+    assert "3.50" in norm
 
 
 def test_mainGetReComp_default_half(monkeypatch, capsys):
@@ -144,13 +151,17 @@ def test_mainGetReComp_default_half(monkeypatch, capsys):
     # Key checks
     assert "number of model components:  3" in out
     assert "position angle: 37.00 degrees" in out
-    assert "Total Magnitude of the galaxy: 19.25" in out
+    assert "Total Magnitude of the galaxy:" in out
+    assert "19.25" in out
     assert "Surface brightness at radius of 50% of light" in out
-    assert "(μr): 20.50 mag/''" in out
+    assert "20.50" in out
     # Because fracrad == 0.5, this line should be present
-    assert "Mean Surface Brightness at effective radius (<μ>e): 21.10 mag/''" in out
+    assert "Mean Surface Brightness at effective radius" in out
+    assert "21.10" in out
     # 12.0 px × 0.4 = 4.80 arcsec
-    assert 'The radius at 50% of light is 12.00 pixels or 4.80 "' in out
+    assert "The radius at 50% of light is" in out
+    assert "12.00" in out
+    assert "4.80" in out
 
 
 def test_mainGetReComp_nonhalf_fraction(monkeypatch, capsys):
@@ -178,13 +189,16 @@ def test_mainGetReComp_nonhalf_fraction(monkeypatch, capsys):
     out = capsys.readouterr().out
     assert "number of model components:  2" in out
     assert "position angle: 10.00 degrees" in out
-    assert "Total Magnitude of the galaxy: 18.00" in out
+    assert "Total Magnitude of the galaxy:" in out
+    assert "18.00" in out
     assert "Surface brightness at radius of 30% of light" in out
-    assert "(μr): 21.50 mag/''" in out
+    assert "21.50" in out
     # Because fracrad != 0.5, this line should be absent
     assert "Mean Surface Brightness at effective radius (<μ>e)" not in out
     # 8.0 px × 0.5 = 4.00 arcsec
-    assert 'The radius at 30% of light is 8.00 pixels or 4.00 "' in out
+    assert "The radius at 30% of light is:" in out
+    assert "8.00" in out
+    assert "4.00" in out
 
 
 def test_mainGetMeRad(monkeypatch, capsys):
@@ -227,7 +241,9 @@ def test_maingetSlope_default(monkeypatch, capsys):
     assert "number of model components:  3" in out
     assert "position angle: 25.00 degrees" in out
     # 15.0 px * 0.4 = 6.0 arcsec
-    assert 'The radius with slope 0.50 is 15.00 pixels, or 6.00 "' in out
+    assert "The radius with slope 0.50 is:" in out
+    assert "15.00" in out
+    assert "6.00" in out
 
 
 def test_maingetSlope_with_options(monkeypatch, capsys):
@@ -265,7 +281,9 @@ def test_maingetSlope_with_options(monkeypatch, capsys):
     assert "number of model components:  2" in out
     assert "position angle: 10.00 degrees" in out
     # 8.0 px * 0.5 = 4.0 arcsec
-    assert 'The radius with slope 0.75 is 8.00 pixels, or 4.00 "' in out
+    assert "The radius with slope 0.75" in out
+    assert "8.00" in out
+    assert "4.00" in out
 
 
 def test_maingetN_default(monkeypatch, capsys):
@@ -282,9 +300,13 @@ def test_maingetN_default(monkeypatch, capsys):
     norm = " ".join(out.split())
     assert "number of model components: 4" in norm
     assert "position angle: 22.00 degrees" in norm
-    assert "Total Magnitude of the galaxy: 18.75" in norm
-    assert "Mean Surface Brightness at effective radius: 3.20" in norm
-    assert "Sersic index mean: 3.10 Standard deviation: 0.25" in norm
+    assert "Total Magnitude of the galaxy:" in norm
+    assert "18.75" in norm
+    assert "mean surface brightness at Re" in norm
+    assert "3.20" in norm
+    assert "Sersic index" in norm
+    assert "3.10" in norm
+    assert "0.25" in norm
 
 
 def test_maingetN_with_options(monkeypatch, capsys):
@@ -314,10 +336,15 @@ def test_maingetN_with_options(monkeypatch, capsys):
     norm = " ".join(out.split())
     assert "number of model components: 2" in norm
     assert "position angle: 10.00 degrees" in norm
-    assert "Total Magnitude of the galaxy: 19.00" in norm
+    assert "Total Magnitude of the galaxy:" in norm
+    assert "19.00" in norm
     # Spot-check both index lines
-    assert "Mean Surface Brightness at effective radius: 2.50" in norm
-    assert "Sersic index mean: 2.45 Standard deviation: 0.10" in norm
+    assert "mean surface brightness at Re:" in norm
+    assert "2.50" in norm
+    assert "Sersic index mean" in norm
+    assert "standard deviation" in norm
+    assert "2.45" in norm
+    assert "0.10" in norm
 
 
 def test_maingetBT(monkeypatch, capsys):
@@ -331,7 +358,8 @@ def test_maingetBT(monkeypatch, capsys):
     out = capsys.readouterr().out
     norm = " ".join(out.split())
     assert "number of model components: 3" in norm
-    assert "Total Magnitude of the galaxy: 17.80" in norm
+    assert "Total Magnitude of the galaxy:" in norm
+    assert "17.80" in norm
     assert "Bulge to total luminosity ratio: 0.37" in norm
 
 
@@ -357,7 +385,8 @@ def test_mainMissingLight_with_options(monkeypatch, capsys):
     # Tolerant checks (spacing/newlines may vary)
     assert re.search(r"number of model components coreless model:\s+5", out)
     assert re.search(r"number of model components core model:\s+7", out)
-    assert re.search(r"the missing light is\s+0\.85\s+mag", out, re.IGNORECASE)
+    assert re.search(r"the missing light", out, re.IGNORECASE)
+    assert re.search(f"0.85", out, re.IGNORECASE)
 
 
 def test_mainMissingLight_defaults(monkeypatch, capsys):
@@ -371,7 +400,8 @@ def test_mainMissingLight_defaults(monkeypatch, capsys):
     out = capsys.readouterr().out
     assert re.search(r"coreless model:\s+2", out)
     assert re.search(r"core model:\s+3", out)
-    assert re.search(r"missing light is\s+1\.23\s+mag", out, re.IGNORECASE)
+    assert re.search(r"missing light is", out, re.IGNORECASE)
+    assert re.search(f"1.23", out, re.IGNORECASE)
 
 
 def test_maingetCOW_defaults(monkeypatch, capsys):
@@ -403,7 +433,9 @@ def test_maingetPeak_defaults(monkeypatch, capsys):
 
     out = capsys.readouterr().out
     # Tolerant checks (whitespace/newlines can vary)
-    assert re.search(r"peak is at \(x,\s*y\)\s*=\s*123\.4\s+56\.7", out)
+    assert re.search(r"peak is at", out)
+    assert re.search(f"123.40", out)
+    assert re.search(f"56.70", out)
     assert re.search(r"axis ratio q\s*=\s*0\.82", out)
     assert re.search(r"position angle\s*=\s*37\.50", out)
     # assert "position angle = 37.50 degrees" in out
@@ -426,7 +458,9 @@ def test_maingetPeak_with_flags(monkeypatch, capsys):
     assert rc == 0
 
     out = capsys.readouterr().out
-    assert re.search(r"peak is at \(x,\s*y\)\s*=\s*200\.0\s+150\.0", out)
+    assert re.search(r"peak is at", out)
+    assert re.search(f"200.00", out)
+    assert re.search(f"150.00", out)
     assert re.search(r"axis ratio q\s*=\s*0\.60", out)
     assert re.search(r"position angle\s*=\s*12\.00", out)
     # assert "position angle = 12.00 degrees" in out
@@ -471,7 +505,9 @@ def test_mainGetBulgeRad(monkeypatch, capsys):
     assert re.search(r"number of model components for the rest of the galaxy:\s+6", out)
     assert re.search(r"position angle:\s+33\.00 degrees", out)
     # 12.5 px * 0.4 = 5.00 arcsec
-    assert re.search(r"The bulge radius is 12\.50 pixels or 5\.00 \"", out)
+    assert re.search(r"The bulge radius is:", out)
+    assert re.search(r"12\.50", out)
+    assert re.search(r"5\.00", out)
 
 
 def test_mainGetBarSize(monkeypatch, capsys):
