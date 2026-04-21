@@ -58,7 +58,8 @@ def getBT(
     totmag : float
             total magnitude
 
-
+    N: int
+       number of components
     """
 
     galfit = Galfit(galfitFile)
