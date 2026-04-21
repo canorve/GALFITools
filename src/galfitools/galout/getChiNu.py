@@ -5,6 +5,7 @@ import subprocess as sp
 import numpy as np
 
 from astropy.io import fits
+from pathlib import Path
 
 from galfitools.galin.MaskDs9 import maskDs9
 from galfitools.galout.getRads import getReComp
@@ -20,9 +21,9 @@ from galfitools.galin.galfit import (
 from galfitools.galin.MakePSF import makeDS9ellip
 
 
-def getChiNu(galfitfile, numcomp, fracrad):
+def getChiNu(galfile, numcomp, fracrad):
 
-    galfit = Galfit(galfitfile)
+    galfit = Galfit(galfile)
 
     galhead = galfit.ReadHead()
     galcomps = galfit.ReadComps()
@@ -39,6 +40,12 @@ def getChiNu(galfitfile, numcomp, fracrad):
     xmin = galhead.xmin
     ymin = galhead.ymin
 
+    xmax = galhead.xmax
+    ymax = galhead.ymax
+
+    # sigma image
+    sigma_im = galhead.sigimage
+
     # correcting for cube galfit image:
     xpeak = xpeak - xmin
     ypeak = ypeak - ymin
@@ -46,7 +53,7 @@ def getChiNu(galfitfile, numcomp, fracrad):
     EffRad, totmag, meanme, me, N, theta = getReComp(galfile, 3, fracrad, None, numcomp)
 
     EffRadb, totmag, meanme, me, N, theta = getReComp(
-        lastfit_file, 3, fracrad, theta + 90, 1
+        galfile, 3, fracrad, theta + 90, 1
     )
 
     if EffRadb < EffRad:
@@ -56,14 +63,45 @@ def getChiNu(galfitfile, numcomp, fracrad):
 
     makeDS9ellip("chinu.reg", xpeak, ypeak, EffRad, axrat, theta + 90)
 
-    print("calling GALFIT to create sigma")
+    file_path = Path(sigma_im)
 
-    rungal = "galfit -outsig -o3  {}".format(galfitfile)
-    errgal = sp.run(
-        [rungal], shell=True, stdout=sp.PIPE, stderr=sp.PIPE, universal_newlines=True
-    )
+    if file_path.exists():
+        print("Creating a sigma image from file ")
 
-    dataimg = readDataImg(galhead, sigma="sigma.fits")
+        output_sigma = "small_sigma.fits"
+
+        # Open the FITS file
+        with fits.open(sigma_im) as hdul:
+            data = hdul[0].data
+            header = hdul[0].header.copy()
+
+            # Cut the image
+            new_data = data[ymin - 1 : ymax, xmin - 1 : xmax]
+
+            # Update header size keywords
+            header["NAXIS1"] = new_data.shape[1]
+            header["NAXIS2"] = new_data.shape[0]
+
+            # Write the new FITS image
+            fits.writeto(output_sigma, new_data, header, overwrite=True)
+
+        dataimg = readDataImg(galhead, sigma=output_sigma)
+
+    else:
+        print("The sigma file does not exist")
+
+        print("calling GALFIT to create sigma")
+
+        rungal = "galfit -outsig -o3  {}".format(galfile)
+        errgal = sp.run(
+            [rungal],
+            shell=True,
+            stdout=sp.PIPE,
+            stderr=sp.PIPE,
+            universal_newlines=True,
+        )
+
+        dataimg = readDataImg(galhead, sigma="sigma.fits")
 
     sigflux = dataimg.sigma
     galflux = dataimg.img
@@ -75,7 +113,7 @@ def getChiNu(galfitfile, numcomp, fracrad):
 
     chisquareimg = resflux / varflux
 
-    if dataimg.mask:
+    if dataimg.mask.any():
 
         immask = dataimg.mask
         maskm = immask == True
