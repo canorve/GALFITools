@@ -416,7 +416,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def mainGetN() -> int:
+def mainbatchGetN() -> int:
     """
     Run the script.
 

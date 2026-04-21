@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-Template to process a list of GALFIT files and compute B/T quantities.
+Template to process a list of GALFIT files and compute the break radius
+using the second-derivative method.
 
 This script reads a text file containing one GALFIT file path per line,
-changes to the directory of each file, applies `get_bt()` to the file,
+changes to the directory of each file, applies getBreak2 to the file,
 stores the results, and writes them to an output CSV file.
 
 The stored path is relative to the directory where the program is launched.
@@ -13,23 +14,30 @@ Python 3.11+
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Iterable
+import argparse
 import csv
 import os
 import sys
-import argparse
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Iterable
 
-from galfitools.galout.getBT import getBT
 
+from galfitools.galout.getRads import getBreak2
 
 # ============================================================================
 # Configuration
 # ============================================================================
 
 DEFAULT_ENCODING = "utf-8"
-DEFAULT_OUTPUT_FILE = "bt_results.csv"
+DEFAULT_OUTPUT_FILE = "break2_results.csv"
+
+DEFAULT_DIS = 10.0
+DEFAULT_ANGLE: float | None = None
+DEFAULT_NUM_COMP = 1
+DEFAULT_PLOT = False
+DEFAULT_RANX: tuple[float, float] | None = None
+
 ROUND_DECIMALS = 2
 
 
@@ -39,13 +47,13 @@ ROUND_DECIMALS = 2
 
 
 @dataclass(slots=True)
-class BTResult:
+class Break2Result:
     """Store the processing result for one GALFIT file."""
 
     relative_path: str
-    bulge_total: float | None
-    totmag: float | None
+    rbreak: float | None
     n_components: int | None
+    theta: float | None
     success: bool
     message: str = ""
 
@@ -118,8 +126,14 @@ def make_relative_path(file_path: Path, base_dir: Path) -> str:
 
 
 def process_file(
-    file_path: Path, base_dir: Path, dis: float, num_comp: int
-) -> BTResult:
+    file_path: Path,
+    base_dir: Path,
+    dis: float,
+    angle: float | None,
+    num_comp: int,
+    plot: bool,
+    ranx: tuple[float, float] | None,
+) -> Break2Result:
     """
     Change to the file directory, process the file, and return the result.
 
@@ -131,22 +145,28 @@ def process_file(
         Directory from which relative paths are computed.
     dis : float
         Maximum distance among components.
+    angle : float | None
+        Position angle of the major axis of the galaxy.
     num_comp : int
-        Number of component where the center will be taken.
+        Number of component used to define the center.
+    plot : bool
+        If True, create diagnostic plots.
+    ranx : tuple[float, float] | None
+        Range for plotting and searching.
 
     Returns
     -------
-    BTResult
+    Break2Result
         Result object with rounded outputs and status information.
     """
     relative_path = make_relative_path(file_path, base_dir)
 
     if not file_path.exists():
-        return BTResult(
+        return Break2Result(
             relative_path=relative_path,
-            bulge_total=None,
-            totmag=None,
+            rbreak=None,
             n_components=None,
+            theta=None,
             success=False,
             message="File does not exist.",
         )
@@ -156,23 +176,30 @@ def process_file(
     try:
         os.chdir(file_path.parent)
 
-        bulge_total, totmag, n_components = getBT(file_path.name, dis, num_comp)
+        rbreak, n_components, theta = getBreak2(
+            galfit_file=file_path.name,
+            dis=dis,
+            angle=angle,
+            num_comp=num_comp,
+            plot=plot,
+            ranx=ranx,
+        )
 
-        return BTResult(
+        return Break2Result(
             relative_path=relative_path,
-            bulge_total=round(float(bulge_total), ROUND_DECIMALS),
-            totmag=round(float(totmag), ROUND_DECIMALS),
+            rbreak=round(float(rbreak), ROUND_DECIMALS),
             n_components=int(n_components),
+            theta=round(float(theta), ROUND_DECIMALS),
             success=True,
             message="OK",
         )
 
     except Exception as exc:
-        return BTResult(
+        return Break2Result(
             relative_path=relative_path,
-            bulge_total=None,
-            totmag=None,
+            rbreak=None,
             n_components=None,
+            theta=None,
             success=False,
             message=f"{type(exc).__name__}: {exc}",
         )
@@ -185,8 +212,11 @@ def process_files(
     file_paths: Iterable[Path],
     base_dir: Path,
     dis: float,
+    angle: float | None,
     num_comp: int,
-) -> list[BTResult]:
+    plot: bool,
+    ranx: tuple[float, float] | None,
+) -> list[Break2Result]:
     """
     Process all files in the input iterable.
 
@@ -198,29 +228,45 @@ def process_files(
         Directory from which relative paths are computed.
     dis : float
         Maximum distance among components.
+    angle : float | None
+        Position angle of the major axis of the galaxy.
     num_comp : int
-        Number of component where the center will be taken.
+        Number of component used to define the center.
+    plot : bool
+        If True, create diagnostic plots.
+    ranx : tuple[float, float] | None
+        Range for plotting and searching.
 
     Returns
     -------
-    list[BTResult]
+    list[Break2Result]
         Collected results for all files.
     """
-    results: list[BTResult] = []
+    results: list[Break2Result] = []
 
     for file_path in file_paths:
-        results.append(process_file(file_path, base_dir, dis, num_comp))
+        results.append(
+            process_file(
+                file_path=file_path,
+                base_dir=base_dir,
+                dis=dis,
+                angle=angle,
+                num_comp=num_comp,
+                plot=plot,
+                ranx=ranx,
+            )
+        )
 
     return results
 
 
-def write_results(results: Iterable[BTResult], output_file: Path) -> None:
+def write_results(results: Iterable[Break2Result], output_file: Path) -> None:
     """
     Write processing results to a CSV file.
 
     Parameters
     ----------
-    results : Iterable[BTResult]
+    results : Iterable[Break2Result]
         Results to write.
     output_file : Path
         Destination CSV file.
@@ -230,9 +276,9 @@ def write_results(results: Iterable[BTResult], output_file: Path) -> None:
         writer.writerow(
             [
                 "relative_path",
-                "bulge_total",
-                "totmag",
+                "rbreak",
                 "n_components",
+                "theta",
                 "success",
                 "message",
             ]
@@ -242,22 +288,22 @@ def write_results(results: Iterable[BTResult], output_file: Path) -> None:
             writer.writerow(
                 [
                     result.relative_path,
-                    result.bulge_total,
-                    result.totmag,
+                    result.rbreak,
                     result.n_components,
+                    result.theta,
                     result.success,
                     result.message,
                 ]
             )
 
 
-def print_summary(results: Iterable[BTResult]) -> None:
+def print_summary(results: Iterable[Break2Result]) -> None:
     """
     Print a short summary of the processing results.
 
     Parameters
     ----------
-    results : Iterable[BTResult]
+    results : Iterable[Break2Result]
         Results to summarize.
     """
     results_list = list(results)
@@ -270,19 +316,19 @@ def print_summary(results: Iterable[BTResult]) -> None:
     print(f"Failed: {failed}")
 
 
-def mainbatchGetBT() -> int:
+def build_parser() -> argparse.ArgumentParser:
     """
-    Run the script.
+    Build and return the command-line argument parser.
 
     Returns
     -------
-    int
-        Exit status code.
+    argparse.ArgumentParser
+        Configured argument parser.
     """
     parser = argparse.ArgumentParser(
         description=(
-            "Read a list of GALFIT files, compute B/T quantities for each file, "
-            "and write the results to a CSV file."
+            "Read a list of GALFIT files, compute the break radius using the "
+            "second-derivative method, and write the results to a CSV file."
         )
     )
     parser.add_argument(
@@ -291,34 +337,73 @@ def mainbatchGetBT() -> int:
         help="Text file containing one GALFIT file path per line.",
     )
     parser.add_argument(
-        "-n",
-        "--num_comp",
-        default=1,
-        type=int,
-        help="Component number used to define the center.",
-    )
-    parser.add_argument(
         "-d",
         "--dis",
         type=float,
         default=3,
-        help="Maximum distance among components.",
+        help=f"Maximum distance among components. Default: 3",
     )
-
+    parser.add_argument(
+        "-pa",
+        "--angle",
+        type=float,
+        default=None,
+        help=(
+            "Position angle of the major axis of the galaxy. "
+            "If omitted, the angle of the last component is used."
+        ),
+    )
+    parser.add_argument(
+        "-n",
+        "--num_comp",
+        type=int,
+        default=1,
+        help=f"Component number used to define the center. Default: 1",
+    )
+    parser.add_argument(
+        "-p",
+        "--plot",
+        action="store_true",
+        help="Create diagnostic plots.",
+    )
+    parser.add_argument(
+        "-r",
+        "--ranx",
+        type=float,
+        nargs=2,
+        metavar=("XMIN", "XMAX"),
+        default=None,
+        help=(
+            "Range for plotting and searching, given as two values: XMIN XMAX. "
+            "If omitted, the scientific routine uses its default range."
+        ),
+    )
     parser.add_argument(
         "-o",
         "--output",
         type=Path,
-        default=None,
-        help=f"Output CSV file. Default: {DEFAULT_OUTPUT_FILE}",
+        default="out.csv",
+        help=f"Output CSV file. Default: out.csv",
     )
 
+    return parser
+
+
+def mainbatchGetBreak() -> int:
+    """
+    Run the script.
+
+    Returns
+    -------
+    int
+        Exit status code.
+    """
+    parser = build_parser()
     args = parser.parse_args()
 
     base_dir = Path.cwd().resolve()
     list_file = args.list_file.expanduser().resolve()
-    dis = args.dis
-    num_comp = args.num_comp
+    ranx = tuple(args.ranx) if args.ranx is not None else None
     output_file = (
         args.output.expanduser().resolve()
         if args.output is not None
@@ -327,7 +412,15 @@ def mainbatchGetBT() -> int:
 
     try:
         file_paths = read_file_list(list_file)
-        results = process_files(file_paths, base_dir, dis, num_comp)
+        results = process_files(
+            file_paths=file_paths,
+            base_dir=base_dir,
+            dis=args.dis,
+            angle=args.angle,
+            num_comp=args.num_comp,
+            plot=args.plot,
+            ranx=ranx,
+        )
         write_results(results, output_file)
         print_summary(results)
         print(f"Results written to: {output_file}")
