@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Template to process a list of GALFIT files and compute surface-brightness values
-at a given radius.
+Template to process a list of GALFIT files and compute the effective radius
+or another light-fraction radius.
 
 This script reads a text file containing one GALFIT file path per line,
-changes to the directory of each file, applies `getMeRad()` to the file,
+changes to the directory of each file, applies getReComp to the file,
 stores the results, and writes them to an output CSV file.
 
 The stored path is relative to the directory where the program is launched.
@@ -22,31 +22,23 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
+from galfitools.galout.getRads import getReComp
 
-from galfitools.galout.getMeRad import getMeRad
-
-# ============================================================================
-# Configuration
-# ============================================================================
 
 DEFAULT_ENCODING = "utf-8"
-DEFAULT_OUTPUT_FILE = "me_rad_results.csv"
+DEFAULT_OUTPUT_FILE = "out.csv"
 ROUND_DECIMALS = 2
 
 
-# ============================================================================
-# Data structures
-# ============================================================================
-
-
 @dataclass(slots=True)
-class MeRadResult:
+class ReCompResult:
     """Store the processing result for one GALFIT file."""
 
     relative_path: str
+    effrad: float | None
     totmag: float | None
-    meanmerad: float | None
-    merad: float | None
+    meanme: float | None
+    me: float | None
     n_components: int | None
     theta: float | None
     success: bool
@@ -124,11 +116,11 @@ def process_file(
     file_path: Path,
     base_dir: Path,
     dis: float,
-    rad: float,
-    angle: float,
+    eff: float,
+    angle: float | None,
     num_comp: int,
     mecorr: float,
-) -> MeRadResult:
+) -> ReCompResult:
     """
     Change to the file directory, process the file, and return the result.
 
@@ -140,28 +132,29 @@ def process_file(
         Directory from which relative paths are computed.
     dis : float
         Maximum distance among components.
-    rad : float
-        Radius at which the surface brightness is computed.
-    angle : float
+    eff : float
+        Fraction of total light.
+    angle : float | None
         Position angle of the major axis of the galaxy.
     num_comp : int
-        Number of component from which the center is determined.
+        Number of component used to define the center.
     mecorr : float
         Surface-brightness correction for universe expansion.
 
     Returns
     -------
-    MeRadResult
+    ReCompResult
         Result object with rounded outputs and status information.
     """
     relative_path = make_relative_path(file_path, base_dir)
 
     if not file_path.exists():
-        return MeRadResult(
+        return ReCompResult(
             relative_path=relative_path,
+            effrad=None,
             totmag=None,
-            meanmerad=None,
-            merad=None,
+            meanme=None,
+            me=None,
             n_components=None,
             theta=None,
             success=False,
@@ -173,20 +166,21 @@ def process_file(
     try:
         os.chdir(file_path.parent)
 
-        totmag, meanmerad, merad, n_components, theta = getMeRad(
-            file_path.name,
-            dis,
-            rad,
-            angle,
-            num_comp,
-            mecorr,
+        effrad, totmag, meanme, me, n_components, theta = getReComp(
+            galfit_file=file_path.name,
+            dis=dis,
+            eff=eff,
+            angle=angle,
+            num_comp=num_comp,
+            mecorr=mecorr,
         )
 
-        return MeRadResult(
+        return ReCompResult(
             relative_path=relative_path,
+            effrad=round(float(effrad), ROUND_DECIMALS),
             totmag=round(float(totmag), ROUND_DECIMALS),
-            meanmerad=round(float(meanmerad), ROUND_DECIMALS),
-            merad=round(float(merad), ROUND_DECIMALS),
+            meanme=round(float(meanme), ROUND_DECIMALS),
+            me=round(float(me), ROUND_DECIMALS),
             n_components=int(n_components),
             theta=round(float(theta), ROUND_DECIMALS),
             success=True,
@@ -194,11 +188,12 @@ def process_file(
         )
 
     except Exception as exc:
-        return MeRadResult(
+        return ReCompResult(
             relative_path=relative_path,
+            effrad=None,
             totmag=None,
-            meanmerad=None,
-            merad=None,
+            meanme=None,
+            me=None,
             n_components=None,
             theta=None,
             success=False,
@@ -213,11 +208,11 @@ def process_files(
     file_paths: Iterable[Path],
     base_dir: Path,
     dis: float,
-    rad: float,
-    angle: float,
+    eff: float,
+    angle: float | None,
     num_comp: int,
     mecorr: float,
-) -> list[MeRadResult]:
+) -> list[ReCompResult]:
     """
     Process all files in the input iterable.
 
@@ -229,37 +224,45 @@ def process_files(
         Directory from which relative paths are computed.
     dis : float
         Maximum distance among components.
-    rad : float
-        Radius at which the surface brightness is computed.
-    angle : float
+    eff : float
+        Fraction of total light.
+    angle : float | None
         Position angle of the major axis of the galaxy.
     num_comp : int
-        Number of component from which the center is determined.
+        Number of component used to define the center.
     mecorr : float
         Surface-brightness correction for universe expansion.
 
     Returns
     -------
-    list[MeRadResult]
+    list[ReCompResult]
         Collected results for all files.
     """
-    results: list[MeRadResult] = []
+    results: list[ReCompResult] = []
 
     for file_path in file_paths:
         results.append(
-            process_file(file_path, base_dir, dis, rad, angle, num_comp, mecorr)
+            process_file(
+                file_path=file_path,
+                base_dir=base_dir,
+                dis=dis,
+                eff=eff,
+                angle=angle,
+                num_comp=num_comp,
+                mecorr=mecorr,
+            )
         )
 
     return results
 
 
-def write_results(results: Iterable[MeRadResult], output_file: Path) -> None:
+def write_results(results: Iterable[ReCompResult], output_file: Path) -> None:
     """
     Write processing results to a CSV file.
 
     Parameters
     ----------
-    results : Iterable[MeRadResult]
+    results : Iterable[ReCompResult]
         Results to write.
     output_file : Path
         Destination CSV file.
@@ -269,9 +272,10 @@ def write_results(results: Iterable[MeRadResult], output_file: Path) -> None:
         writer.writerow(
             [
                 "relative_path",
+                "effrad",
                 "totmag",
-                "meanmerad",
-                "merad",
+                "meanme",
+                "me",
                 "n_components",
                 "theta",
                 "success",
@@ -283,9 +287,10 @@ def write_results(results: Iterable[MeRadResult], output_file: Path) -> None:
             writer.writerow(
                 [
                     result.relative_path,
+                    result.effrad,
                     result.totmag,
-                    result.meanmerad,
-                    result.merad,
+                    result.meanme,
+                    result.me,
                     result.n_components,
                     result.theta,
                     result.success,
@@ -294,13 +299,13 @@ def write_results(results: Iterable[MeRadResult], output_file: Path) -> None:
             )
 
 
-def print_summary(results: Iterable[MeRadResult]) -> None:
+def print_summary(results: Iterable[ReCompResult]) -> None:
     """
     Print a short summary of the processing results.
 
     Parameters
     ----------
-    results : Iterable[MeRadResult]
+    results : Iterable[ReCompResult]
         Results to summarize.
     """
     results_list = list(results)
@@ -313,20 +318,19 @@ def print_summary(results: Iterable[MeRadResult]) -> None:
     print(f"Failed: {failed}")
 
 
-def mainbatchGetMeRad() -> int:
+def build_parser() -> argparse.ArgumentParser:
     """
-    Run the script.
+    Build and return the command-line argument parser.
 
     Returns
     -------
-    int
-        Exit status code.
+    argparse.ArgumentParser
+        Configured argument parser.
     """
     parser = argparse.ArgumentParser(
         description=(
-            "Read a list of GALFIT files, compute total magnitude and "
-            "surface-brightness quantities at a given radius, and write "
-            "the results to a CSV file."
+            "Read a list of GALFIT files, compute the effective radius or "
+            "another light-fraction radius, and write the results to a CSV file."
         )
     )
     parser.add_argument(
@@ -337,30 +341,32 @@ def mainbatchGetMeRad() -> int:
     parser.add_argument(
         "-d",
         "--dis",
-        default=3,
         type=float,
-        help="Maximum distance among components.",
+        default=3,
+        help="Maximum distance among components. Default: 3",
     )
     parser.add_argument(
-        "-r",
-        "--rad",
-        default=10,
+        "--eff",
         type=float,
-        help="Radius at which the surface brightness is computed.",
+        default=0.5,
+        help="Fraction of total light. Must be between 0 and 1. Default: 0.5",
     )
     parser.add_argument(
         "-pa",
         "--angle",
-        default=None,
         type=float,
-        help="Position angle of the major axis of the galaxy.",
+        default=None,
+        help=(
+            "Position angle of the major axis of the galaxy. "
+            "If omitted, the angle of the last component is used."
+        ),
     )
     parser.add_argument(
         "-n",
         "--num_comp",
-        default=1,
         type=int,
-        help="Component number used to define the center.",
+        default=1,
+        help="Component number used to define the center. Default: 1",
     )
     parser.add_argument(
         "--mecorr",
@@ -372,28 +378,44 @@ def mainbatchGetMeRad() -> int:
         "-o",
         "--output",
         type=Path,
-        default=None,
-        help=f"Output CSV file. Default: {DEFAULT_OUTPUT_FILE}",
+        default=Path("out.csv"),
+        help="Output CSV file. Default: out.csv",
     )
 
+    return parser
+
+
+def mainbathcGetReComp() -> int:
+    """
+    Run the script.
+
+    Returns
+    -------
+    int
+        Exit status code.
+    """
+    parser = build_parser()
     args = parser.parse_args()
 
     base_dir = Path.cwd().resolve()
     list_file = args.list_file.expanduser().resolve()
-    dis = args.dis
-    rad = args.rad
-    angle = args.angle
-    num_comp = args.num_comp
-    mecorr = args.mecorr
-    output_file = (
-        args.output.expanduser().resolve()
-        if args.output is not None
-        else (base_dir / DEFAULT_OUTPUT_FILE)
-    )
+    output_file = args.output.expanduser().resolve()
+
+    if not (0 < args.eff <= 1):
+        print("Error: --eff must be a value between 0 and 1.", file=sys.stderr)
+        return 1
 
     try:
         file_paths = read_file_list(list_file)
-        results = process_files(file_paths, base_dir, dis, rad, angle, num_comp, mecorr)
+        results = process_files(
+            file_paths=file_paths,
+            base_dir=base_dir,
+            dis=args.dis,
+            eff=args.eff,
+            angle=args.angle,
+            num_comp=args.num_comp,
+            mecorr=args.mecorr,
+        )
         write_results(results, output_file)
         print_summary(results)
         print(f"Results written to: {output_file}")
