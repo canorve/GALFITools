@@ -21,7 +21,7 @@ from galfitools.galin.galfit import (
 from galfitools.galin.MakePSF import makeDS9ellip
 
 
-def getChiNu(galfile, numcomp, fracrad):
+def getChiNu(galfile, numcomp, fracrad=0.99):
 
     galfit = Galfit(galfile)
 

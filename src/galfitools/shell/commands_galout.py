@@ -634,9 +634,9 @@ def maingetChiNu(argv=None) -> int:
     parser.add_argument(
         "-fr",
         "--fracrad",
-        default=0.9,
+        default=0.99,
         type=float,
-        help="Fraction of light radius where the chinu will be computed. Default = 0.9",
+        help="Fraction of light radius where the chinu will be computed. Default = 0.99",
     )
 
     parser.add_argument(
