@@ -177,7 +177,7 @@ def process_file(
         os.chdir(file_path.parent)
 
         rbreak, n_components, theta = getBreak2(
-            galfit_file=file_path.name,
+            galfitFile=file_path.name,
             dis=dis,
             angle=angle,
             num_comp=num_comp,

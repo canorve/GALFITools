@@ -186,7 +186,7 @@ def process_file(
         os.chdir(file_path.parent)
 
         sersic, mean_ns, std_ns, totmag, n_components, theta = getN(
-            galfit_file=file_path.name,
+            galfitFile=file_path.name,
             dis=dis,
             frac=frac,
             angle=angle,

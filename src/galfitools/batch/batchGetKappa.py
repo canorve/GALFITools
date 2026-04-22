@@ -160,7 +160,7 @@ def process_file(
         os.chdir(file_path.parent)
 
         rkappa, n_components, theta = getKappa2(
-            galfit_file=file_path.name,
+            galfitFile=file_path.name,
             dis=dis,
             angle=angle,
             num_comp=num_comp,

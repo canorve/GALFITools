@@ -10,6 +10,7 @@ import os
 import sys
 import argparse
 
+from galfitools.shell.prt import printWelcome
 from galfitools.galout.getBarSize import getBarSize
 
 from galfitools.galin.galfit import (

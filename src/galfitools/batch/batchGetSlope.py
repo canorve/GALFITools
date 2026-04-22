@@ -163,7 +163,7 @@ def process_file(
         os.chdir(file_path.parent)
 
         rgam, n_components, theta = getSlope(
-            galfit_file=file_path.name,
+            galfitFile=file_path.name,
             dis=dis,
             slope=slope,
             angle=angle,
