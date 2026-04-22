@@ -427,7 +427,7 @@ def maingetN(argv=None) -> int:
 
     print(f"Sersic index mean and standard deviation:\n")
     print(f"  mean   std")
-    print(f"   {meanser:.2f}     {stdser:.2f}  \n")
+    print(f"  {meanser:.2f}     {stdser:.2f}  \n")
 
     return 0
 
