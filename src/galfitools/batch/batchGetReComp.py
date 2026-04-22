@@ -167,7 +167,7 @@ def process_file(
         os.chdir(file_path.parent)
 
         effrad, totmag, meanme, me, n_components, theta = getReComp(
-            galfit_file=file_path.name,
+            galfitFile=file_path.name,
             dis=dis,
             eff=eff,
             angle=angle,
@@ -385,7 +385,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def mainbathcGetReComp() -> int:
+def mainbatchGetReComp() -> int:
     """
     Run the script.
 
