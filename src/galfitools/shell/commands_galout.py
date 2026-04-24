@@ -642,7 +642,7 @@ def maingetChiNu(argv=None) -> int:
     parser.add_argument(
         "-r",
         "--RegFile",
-        help="DS9 ellipse region file to use instead of fracrad",
+        help=" DS9 ellipse region file to use instead of fracrad. Must be based on the GALFIT output image cube.",
         type=str,
     )
 
