@@ -636,7 +636,14 @@ def maingetChiNu(argv=None) -> int:
         "--fracrad",
         default=0.99,
         type=float,
-        help="Fraction of light radius where the chinu will be computed. Default = 0.99",
+        help="Fraction of light radius where the chinu will be computed. Computed from Sersic functions only. Default = 0.99",
+    )
+
+    parser.add_argument(
+        "-r",
+        "--RegFile",
+        help="DS9 ellipse region file to use instead of fracrad",
+        type=str,
     )
 
     parser.add_argument(
@@ -649,7 +656,7 @@ def maingetChiNu(argv=None) -> int:
 
     args = parser.parse_args(argv)
 
-    chinu, aic, bic = getChiNu(args.galfile, args.numcomp, args.fracrad)
+    chinu, aic, bic = getChiNu(args.galfile, args.numcomp, args.fracrad, args.RegFile)
     print(f"Chinu inside the {args.fracrad:.2f} of light radius:")
     print(f"  {chinu:.2f}")
 

@@ -21,7 +21,7 @@ from galfitools.galin.galfit import (
 from galfitools.galin.MakePSF import makeDS9ellip
 
 
-def getChiNu(galfile, numcomp, fracrad=0.99):
+def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None):
     """
     getChiNu computes the Chinu square
 
@@ -135,17 +135,31 @@ def getChiNu(galfile, numcomp, fracrad=0.99):
 
     hdu.writeto("chisquare.fits", overwrite=True)
 
-    maskDs9(
-        "chisquare.fits",
-        "chinu.reg",
-        0,
-        None,
-        False,
-        0,
-        skymean=None,
-        skystd=None,
-        invert=True,
-    )
+    if ds9reg:
+        maskDs9(
+            "chisquare.fits",
+            ds9reg,
+            0,
+            None,
+            False,
+            0,
+            skymean=None,
+            skystd=None,
+            invert=True,
+        )
+
+    else:
+        maskDs9(
+            "chisquare.fits",
+            "chinu.reg",
+            0,
+            None,
+            False,
+            0,
+            skymean=None,
+            skystd=None,
+            invert=True,
+        )
 
     # Open the FITS file
     with fits.open("chisquare.fits") as hdul:
