@@ -28,8 +28,9 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None):
     computes the Chinu square inside a ellipse
     with the fraction of total light given by fracrad.
 
-    returns Chinu, Akaike information Criterion and
-    Bayesian information criterion
+    returns Chinu, Akaike information Criterion,
+    Bayesian information criterion and total
+    of free parameters
 
 
 
@@ -73,7 +74,13 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None):
     else:
         axrat = EffRad / EffRadb
 
-    makeDS9ellip("chinu.reg", xpeak, ypeak, EffRad, axrat, theta + 90)
+    chifile_path = Path("chinu.reg")
+
+    if not chifile_path.exists():
+        makeDS9ellip("chinu.reg", xpeak, ypeak, EffRad, axrat, theta + 90)
+
+    if not ds9reg:
+        makeDS9ellip("chinu.reg", xpeak, ypeak, EffRad, axrat, theta + 90)
 
     file_path = Path(sigma_im)
 
@@ -176,4 +183,4 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None):
     aic = chisquare + 2 * totfreepar  # Akaike information criterion
     bic = chisquare + totfreepar * np.log(pixcountchi)  # Bayesian information criterion
 
-    return chinu, aic, bic
+    return chinu, aic, bic, totfreepar
