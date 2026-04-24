@@ -123,9 +123,8 @@ def getSersic(
         ymax = nrow
 
     if bards9:
-
         Xbar, Ybar, AxRatbar, PAbar = getPeak(image, bards9, center, maskfile)
-        magbar, exptimebar = photDs9(image, bards9, maskfile, zeropoint, sky)
+        magbar, sb, exptimebar = photDs9(image, bards9, maskfile, zeropoint, plate, sky)
         objbar, xposbar, yposbar, rxbar, rybar, anglebar = GetInfoEllip(bards9)
 
     if bulgetot:
