@@ -22,6 +22,18 @@ from galfitools.galin.MakePSF import makeDS9ellip
 
 
 def getChiNu(galfile, numcomp, fracrad=0.99):
+    """
+    getChiNu computes the Chinu square
+
+    computes the Chinu square inside a ellipse
+    with the fraction of total light given by fracrad.
+
+    returns Chinu, Akaike information Criterion and
+    Bayesian information criterion
+
+
+
+    """
 
     galfit = Galfit(galfile)
 
@@ -147,4 +159,7 @@ def getChiNu(galfile, numcomp, fracrad=0.99):
     ndof = pixcountchi - totfreepar
     chinu = chisquare / ndof
 
-    return chinu
+    aic = chisquare + 2 * totfreepar  # Akaike information criterion
+    bic = chisquare + totfreepar * np.log(pixcountchi)  # Bayesian information criterion
+
+    return chinu, aic, bic

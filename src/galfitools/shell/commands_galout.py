@@ -649,8 +649,14 @@ def maingetChiNu(argv=None) -> int:
 
     args = parser.parse_args(argv)
 
-    chinu = getChiNu(args.galfile, args.numcomp, args.fracrad)
+    chinu, aic, bic = getChiNu(args.galfile, args.numcomp, args.fracrad)
     print(f"Chinu inside the {args.fracrad:.2f} of light radius:")
     print(f"  {chinu:.2f}")
+
+    print(f"Akaike information criterion")
+    print(f"  {aic:.2f}")
+
+    print(f"Bayesian information criterion")
+    print(f"  {bic:.2f}")
 
     return 0
