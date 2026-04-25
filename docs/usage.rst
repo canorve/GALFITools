@@ -771,6 +771,36 @@ equal
     -o OUTFILE, --fileout OUTFILE 
                           the name of the output file 
 
+
+.. _routine-fitlogTableCorrector:
+**fitlogTableCorrector** Apply mag corrections and Re unit conversion 
+   to GALFIT fitlog file produced by **fitlog2csv**.
+
+::
+
+  usage: fitlogTableCorrector [-h] [--A A] [--K K] [--pixscale PIXSCALE] [--kpc-per-arcsec KPC_PER_ARCSEC]
+                              [--re-units {pix,arcsec,kpc}] [--mag-fmt MAG_FMT] [--re-fmt RE_FMT] [--echo-original]
+                              input output
+
+  positional arguments:
+    input                 Input text file with GALFIT-style table.
+    output                Output text file.
+
+  options:
+    -h, --help            show this help message and exit
+    --A A                 Extinction correction A_lambda (mag) to subtract.
+    --K K                 K-correction (mag) to subtract.
+    --pixscale PIXSCALE   Pixel scale in arcsec/pixel (required if --re-units is arcsec or kpc).
+    --kpc-per-arcsec KPC_PER_ARCSEC
+                          Angular scale in kpc/arcsec (required if --re-units is kpc).
+    --re-units {pix,arcsec,kpc}
+                          Unit for the effective radius (column 5) in the output.
+    --mag-fmt MAG_FMT     Format for magnitude column (e.g., .2f).
+    --re-fmt RE_FMT       Format for Re column (e.g., .2f).
+    --echo-original       Also emit the original component line as a comment just above the corrected one.
+
+
+
 .. _routine-getPeak:
 **getPeak**  Obtains the center, axis ratio and angular position from DS9 region
 
@@ -807,32 +837,30 @@ equal
 
 
 
-
 .. _routine-getBarSize:
-**getBarSize** computes the barsize from a composed Sersic model: Bulge, bar and disk.
-. It assumes that bar is a gaussian (Sersic index = 0.5) and it is positioned as a 
-second component in galfit file galfit.XX
+**getBarlength** computes the barsize from a composed Sersic model: Bulge, bar and disk.
+. It assumes the bar is positioned as a second component in galfit file galfit.XX. Bar 
+can be a Ferrer model.
 
 ::
 
 
-  usage: getBarSize [-h] [-d DIS] [-n NUMCOMP] [-o OUT] [-p] [-rx RANX RANX] GalfitFile
-
-  getBarSize: gets the bar size from Sersic models: Bulge, Bar and disk. It assumes that bar is galfit
-  component 2
+  usage: getBarlength [-h] [-d DIS] [-n NUMCOMP] [-o OUT] [-p] [-r] [-rx RANX RANX] GalfitFile
+  
 
   positional arguments:
-    GalfitFile            Galfit File containing the Sersics components bulge, bar, disk
+    GalfitFile            GALFIT file
 
   options:
     -h, --help            show this help message and exit
-    -d DIS, --dis DIS     Maximum distance among components
+    -d DIS, --dis DIS     maximum distance among components
     -n NUMCOMP, --numcomp NUMCOMP
-                          Number of component where it'll obtain center of all components, default = 1
-    -o OUT, --out OUT     output DS9 ellipse region file
-    -p, --plot            makes plot of double derivatives and Kappa radius
+                          number of component to be selected
+    -o OUT, --out OUT     output DS9 ellipse region
+    -p, --plot            plots a file of kappa and break radius
+    -r, --red             If activated, DS9 region ellipse is red
     -rx RANX RANX, --ranx RANX RANX
-                          x-axis range to search for the Break and Kappa radius: xmin - xmax
+                          range of radius to search for barlength
 
 
 
@@ -885,6 +913,56 @@ second component in galfit file galfit.XX
                           measured from Y-Axis assame as GALFIT.
 
 
+.. _routine-magCorr:
+**magCorr** corrects GALFIT file for magnitude correction and K corrections
+
+::
+
+  usage: magCorr [-h] [-o OUT] [-a AEXT] [-k KCOR] galfile
+
+
+  positional arguments:
+    galfile               GALFIT input file
+
+  options:
+    -h, --help            show this help message and exit
+    -o OUT, --out OUT     output GALFIT file
+    -a AEXT, --Aext AEXT  Magnitude correction for Extinction
+    -k KCOR, --Kcor KCOR  K correction
+
+
+**getChiNu** Computes the Chinu within a radius
+
+::
+
+  usage: getChiNu [-h] [-fr FRACRAD] [-r REGFILE] [-nc NUMCOMP] galfile
+
+
+  positional arguments:
+    galfile               GALFIT input file
+
+  options:
+    -h, --help            show this help message and exit
+    -fr FRACRAD, --fracrad FRACRAD
+                          Fraction of light radius where the chinu will be computed. Computed from Sersic functions only. Default =
+                          0.99
+    -r REGFILE, --RegFile REGFILE
+                          DS9 ellipse region file to use instead of fracrad. Must be based on the GALFIT output image cube.
+    -nc NUMCOMP, --numcomp NUMCOMP
+                          Number of component inside galfit file. Default=1
+
+
+**galStats** Compute GALFIT parameter statistics from multiple parameter files.
+::
+
+  usage: galStats [-h] list_file output_csv
+
+  positional arguments:
+    list_file   Text file with the list of GALFIT parameter files, one per line.
+    output_csv  Output CSV filename.
+
+  options:
+    -h, --help  show this help message and exit
 
 -----------------
 
@@ -953,6 +1031,29 @@ Routines that use the Multi-Gaussian Expansion.
                           value for a second vertical line to add into the plot
 
 
+**sersic2mge** Approximates a Sersic function to mge and formats to GALFIT
+::
+
+  usage: sersic2mge [-h] [-ng NUMGAUSS] [-rm RMAX] [-ns NSAMPLES] [-mis MINSIGMA] [-mas MAXSIGMA] [-o OUTPUT] GalfitFile
+
+
+  positional arguments:
+    GalfitFile            GALFIT file to obtain the header and components data
+
+  options:
+    -h, --help            show this help message and exit
+    -ng NUMGAUSS, --numgauss NUMGAUSS
+                          number of gaussians used for approximation. Default = 6
+    -rm RMAX, --rmax RMAX
+                          radius max factor. Default = 10
+    -ns NSAMPLES, --nsamples NSAMPLES
+                          number of samples. Default = 800
+    -mis MINSIGMA, --minsigma MINSIGMA
+                          minimum sigma factor. Default = 0.02
+    -mas MAXSIGMA, --maxsigma MAXSIGMA
+                          maximum sigma factor Default = 10
+    -o OUTPUT, --output OUTPUT
+                          output GALFIT file
 
 -----------------
 
@@ -983,7 +1084,6 @@ adds Poisson and sky noise to the image.
 
 **Sky**
 -------------
-
 
 
 
@@ -1037,6 +1137,293 @@ around the galaxy.
   options:
     -h, --help  show this help message and exit
     -c, --center  use the center of the ellipse. Otherwise it will use the (x,y) position with the highest value of the ellipse
+
+
+
+-------------
+
+**Batch**
+-------------
+
+**Routines that process multiple GALFIT files.**
+
+These routines collect several of the tools described above 
+and apply them to GALFIT files located in different paths. 
+They require a list containing the path to each GALFIT file. 
+The output is a CSV file.
+
+
+GALFIT output files are named `galfit.XX`, where `XX` is an
+integer that increases each time the program finds a solution.
+If each directory contains GALFIT files with different numbers,
+the `ls` command used to generate a file containing the list of
+paths may not return the desired result. In that case, use the
+following CLI commands in *bash* or *zsh* to generate a list of
+the GALFIT files with the highest number in each directory:
+
+
+::
+
+  find . -type f -name 'galfit.*' | \
+  awk -F/ '
+  {
+      dir = "."
+      for (i = 2; i < NF; i++) {
+          dir = dir "/" $i
+      }
+
+      file = $NF
+      split(file, a, ".")
+      ext = a[length(a)] + 0
+
+      if (!(dir in max) || ext > max[dir]) {
+          max[dir] = ext
+          path[dir] = $0
+      }
+  }
+  END {
+      for (d in path) print path[d]
+  }' | sort > highest_galfit_files.txt
+
+This is another version:
+
+::
+
+  for d in $(find . -type f -name 'galfit.*' -printf '%h\n' | sort -u); do
+      ls "$d"/galfit.* 2>/dev/null | sort -t. -k2,2n | tail -n 1
+  done > highest_galfit_files.txt
+
+
+Of course, this is assuming that XX with the highest number
+is the best model. 
+
+
+.. _routine-batchGALFIT:
+**batchGALFIT** Batch-run GALFIT over input files listed in a text file.
+
+
+::
+
+
+  usage: batchGALFIT [-h] [-j JOBS] [--galfit-bin GALFIT_BIN] [--verbose] [--summary-csv SUMMARY_CSV] list_file
+
+
+
+  positional arguments:
+    list_file             Text file containing one GALFIT input-file path per line.
+
+  options:
+    -h, --help            show this help message and exit
+    -j JOBS, --jobs JOBS  Number of parallel workers to use (default: 1).
+    --galfit-bin GALFIT_BIN
+                          Path to GALFIT executable (default: "galfit").
+    --verbose             Print stdout/stderr for every GALFIT run.
+    --summary-csv SUMMARY_CSV
+                          Write a CSV summary report to this path.
+
+
+**batchGetBarlength** gets the bar size from Sersic and Ferrer models
+::
+
+  usage: batchGetBarlength [-h] [-d DIS] [-n NUMCOMP] [-o OUT] [-co OUTPUT] [-p] [-r] [-rx RANX RANX] InputFile
+
+
+  positional arguments:
+    InputFile             file containing a list of file path GALFIT files
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     maximum distance among components
+    -n NUMCOMP, --numcomp NUMCOMP
+                          number of component to be selected
+    -o OUT, --out OUT     output DS9 ellipse region
+    -co OUTPUT, --output OUTPUT
+                          output csv file
+    -p, --plot            plots a file of kappa and break radius
+    -r, --red             If activated, DS9 region ellipse is red
+    -rx RANX RANX, --ranx RANX RANX
+                          range of radius to search for barlength
+
+
+**batchGetBT** Read a list of GALFIT files, compute B/T quantities for each file, and write the results to a CSV file.
+::
+
+  usage: batchGetBT [-h] [-n NUM_COMP] [-d DIS] [-o OUTPUT] list_file
+
+  positional arguments:
+    list_file             Text file containing one GALFIT file path per line.
+
+  options:
+    -h, --help            show this help message and exit
+    -n NUM_COMP, --num_comp NUM_COMP
+                          Component number used to define the center.
+    -d DIS, --dis DIS     Maximum distance among components.
+    -o OUTPUT, --output OUTPUT
+                          Output CSV file. Default: bt_results.csv
+
+
+**batchGetN** Read a list of GALFIT files, estimate Sersic-index quantities for each file, and write the results to a CSV file.
+::
+
+  usage: batchGetN [-h] [-d DIS] [-f FRAC] [-pa ANGLE] [-n NUM_COMP] [-p] [--const CONST] [-o OUTPUT] list_file
+
+
+  positional arguments:
+    list_file             Text file containing one GALFIT file path per line.
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components. Default: 3
+    -f FRAC, --frac FRAC  Fraction of light. Default: .5
+    -pa ANGLE, --angle ANGLE
+                          Angle of the major axis of the galaxy. If omitted, the angle of the last component is used.
+    -n NUM_COMP, --num_comp NUM_COMP
+                          Component number used to define the center. Default: 1
+    -p, --plot            Create the Sersic-index plot.
+    --const CONST         Constant subtracted from the plot. Default: 0
+    -o OUTPUT, --output OUTPUT
+                          Output CSV file. Default: getn.csv
+
+
+**batchGetBreak** Read a list of GALFIT files, compute the break radius using the second-derivative method, and write the results to a CSV file.
+::
+
+  usage: batchGetBreak [-h] [-d DIS] [-pa ANGLE] [-n NUM_COMP] [-p] [-r XMIN XMAX] [-o OUTPUT] list_file
+
+  positional arguments:
+    list_file             Text file containing one GALFIT file path per line.
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components. Default: 3
+    -pa ANGLE, --angle ANGLE
+                          Position angle of the major axis of the galaxy. If omitted, the angle of the last component is used.
+    -n NUM_COMP, --num_comp NUM_COMP
+                          Component number used to define the center. Default: 1
+    -p, --plot            Create diagnostic plots.
+    -r XMIN XMAX, --ranx XMIN XMAX
+                          Range for plotting and searching, given as two values: XMIN XMAX. If omitted, the scientific routine uses its
+                          default range.
+    -o OUTPUT, --output OUTPUT
+                          Output CSV file. Default: out.csv
+
+**batchGetKappa** Read a list of GALFIT files, compute the kappa radius using the curvature-based method, and write the results to a CSV file.
+::
+
+  usage: batchGetKappa [-h] [-d DIS] [-pa ANGLE] [-n NUM_COMP] [-p] [-r XMIN XMAX] [-o OUTPUT] list_file
+
+
+  positional arguments:
+    list_file             Text file containing one GALFIT file path per line.
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components. Default: 3
+    -pa ANGLE, --angle ANGLE
+                          Position angle of the major axis of the galaxy. If omitted, the angle of the last component is used.
+    -n NUM_COMP, --num_comp NUM_COMP
+                          Component number used to define the center. Default: 1
+    -p, --plot            Create diagnostic plots.
+    -r XMIN XMAX, --ranx XMIN XMAX
+                          Range for plotting and searching, given as two values: XMIN XMAX. If omitted, the scientific routine uses its
+                          default range.
+    -o OUTPUT, --output OUTPUT
+                          Output CSV file. Default: out.csv
+
+
+**batchGetMeRad** Read a list of GALFIT files, compute total magnitude and surface-brightness quantities at a given radius, and write the results to a CSV file.
+::
+
+  usage: batchGetMeRad [-h] [-d DIS] [-r RAD] [-pa ANGLE] [-n NUM_COMP] [--mecorr MECORR] [-o OUTPUT] list_file
+
+
+  positional arguments:
+    list_file             Text file containing one GALFIT file path per line.
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components.
+    -r RAD, --rad RAD     Radius at which the surface brightness is computed.
+    -pa ANGLE, --angle ANGLE
+                          Position angle of the major axis of the galaxy.
+    -n NUM_COMP, --num_comp NUM_COMP
+                          Component number used to define the center.
+    --mecorr MECORR       Surface-brightness correction for universe expansion. Default: 0.0
+    -o OUTPUT, --output OUTPUT
+                          Output CSV file. Default: me_rad_results.csv
+
+**batchGetReComp** Read a list of GALFIT files, compute the effective radius or another light-fraction radius, and write the results to a CSV file.
+::
+
+  usage: batchGetReComp [-h] [-d DIS] [--eff EFF] [-pa ANGLE] [-n NUM_COMP] [--mecorr MECORR] [-o OUTPUT] list_file
+
+
+  positional arguments:
+    list_file             Text file containing one GALFIT file path per line.
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components. Default: 3
+    --eff EFF             Fraction of total light. Must be between 0 and 1. Default: 0.5
+    -pa ANGLE, --angle ANGLE
+                          Position angle of the major axis of the galaxy. If omitted, the angle of the last component is used.
+    -n NUM_COMP, --num_comp NUM_COMP
+                          Component number used to define the center. Default: 1
+    --mecorr MECORR       Surface-brightness correction for universe expansion. Default: 0.0
+    -o OUTPUT, --output OUTPUT
+                          Output CSV file. Default: out.csv
+
+**batchGetSlope** Read a list of GALFIT files, compute the slope radius, and write the results to a CSV file.
+::
+
+  usage: batchGetSlope [-h] [-d DIS] [--slope SLOPE] [-pa ANGLE] [-n NUM_COMP] [-p] [-r XMIN XMAX] [-o OUTPUT] list_file
+
+
+  positional arguments:
+    list_file             Text file containing one GALFIT file path per line.
+
+  options:
+    -h, --help            show this help message and exit
+    -d DIS, --dis DIS     Maximum distance among components. Default: 3
+    --slope SLOPE         Slope value at which the radius is determined. Default: 0.5
+    -pa ANGLE, --angle ANGLE
+                          Position angle of the major axis of the galaxy. If omitted, the angle of the last component is used.
+    -n NUM_COMP, --num_comp NUM_COMP
+                          Component number used to define the center. Default: 1
+    -p, --plot            Create diagnostic plots.
+    -r XMIN XMAX, --ranx XMIN XMAX
+                          Range for plotting and searching, given as two values: XMIN XMAX. If omitted, the scientific routine uses its
+                          default range.
+    -o OUTPUT, --output OUTPUT
+                          Output CSV file. Default: out.csv
+
+
+-------------
+
+**DESI**
+-------------
+
+Commands for DESI. 
+
+
+**downloadDesi** Download image, invvar, mask images from DESI and converts invvar to sigma image
+::
+
+  usage: downloadDesi [-h] [--outdir OUTDIR] [--layer LAYER] [--size SIZE] [--pixscale PIXSCALE] [--bands BANDS] [--subimage] csv
+
+
+  positional arguments:
+    csv                  Input CSV with at least columns: ra, dec. optional: objid
+
+  options:
+    -h, --help           show this help message and exit
+    --outdir OUTDIR      Output directory
+    --layer LAYER        Viewer layer, e.g. ls-dr10 or ls-dr9
+    --size SIZE          Cutout size in pixels (square)
+    --pixscale PIXSCALE  Arcsec/pixel for cutouts
+    --bands BANDS        Bands to download, e.g. grz
+    --subimage           If set, adds 'subimage' flag (no resampling; fixed brick grid; includes invvar).
+
 
 
 
