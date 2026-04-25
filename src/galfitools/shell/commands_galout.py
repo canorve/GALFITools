@@ -125,7 +125,7 @@ def mainGetBreak2(argv=None) -> int:
 def mainGetBarSize(argv=None) -> int:
     printWelcome()
     p = argparse.ArgumentParser(
-        description="getBarSize: gets the bar size from Sersic and Ferrer models"
+        description="getBarlength: gets the bar length from Sersic and Ferrer models. Note: 3 components only: Bulge, Bar, Disk"
     )
     p.add_argument("GalfitFile", help="GALFIT file")
     p.add_argument(
