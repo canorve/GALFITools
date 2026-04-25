@@ -68,25 +68,25 @@ def imarith(
     hdu = fits.open(ImageFile)
     dataImage = hdu[0].data
 
-    if add:
+    if add is not None:
         if image2:
             newdata = dataImage + dataImage2
         else:
             newdata = dataImage + add
 
-    if mul:
+    if mul is not None:
         if image2:  # pragma: no cover
             newdata = dataImage * dataImage2
         else:
             newdata = dataImage * mul
 
-    if div:
+    if div is not None:
         if image2:  # pragma: no cover
             newdata = dataImage / dataImage2
         else:
             newdata = dataImage / div
 
-    if sub:
+    if sub is not None:
         if image2:  # pragma: no cover
             newdata = dataImage - dataImage2
         else:
