@@ -238,21 +238,26 @@ such as Boxes, Ellipses and Polygons
 
 ::
 
-  usage: maskDs9 [-h] [-f FILL] [-i IMAGE] [-b] [-bv BORVALUE] MaskFile RegFile
+  usage: maskDs9 [-h] [-f FILL] [-i IMAGE] [-b] [-bv BORVALUE] [-sm SKYMEAN] [-sd SKYSTD] [-inv] MaskFile RegFile
 
 
   positional arguments:
-    MaskFile              the Mask image file to modify or create
-    RegFile               the DS9 region file
+    MaskFile              Mask image file to modify or create
+    RegFile               DS9 region file
 
   options:
     -h, --help            show this help message and exit
-    -f FILL, --fill FILL  the value in counts to fill into the Ds9 regions. Default = 0 (remove)
+    -f FILL, --fill FILL  value to fill DS9 regions (0=remove)
     -i IMAGE, --image IMAGE
                           image to obtain the size
-    -b, --border          Mask the borders when their value is zero
+    -b, --border          mask borders when their value is zero
     -bv BORVALUE, --borValue BORVALUE
-                          value of the border if it is different from zero
+                          border value if different from zero
+    -sm SKYMEAN, --skymean SKYMEAN
+                          sky mean for sky patch
+    -sd SKYSTD, --skystd SKYSTD
+                          sky std for sky patch
+    -inv, --invert        Invert the mask (i.e. it changes the values outside the DS9 region)
 
 
 .. _routine-maskSky:
@@ -332,21 +337,6 @@ such as Boxes, Ellipses and Polygons
 
 
 
-.. _routine-getPeak:
-**getPeak**  Obtains the center, axis ratio and angular position from DS9 region
-
-::
-
-    positional arguments:
-      Image                 image fits file
-      RegFile               DS9 ellipse region file
-
-    options:
-      -h, --help            show this help message and exit
-      -c, --center          takes center of ds9 region file
-      -m MASK, --mask MASK  the mask file
-
-
 .. _routine-imarith:
 **imarith** makes arithmetic operations on image 
 
@@ -382,8 +372,6 @@ such as Boxes, Ellipses and Polygons
               addtion if proved options for single Sersic, bulge/disk and bulge/bar/disk
 
 ::
-
-
 
   usage: getSersic [-h] [-zp ZEROPOINT] [-sk SKY] [-bt BULGETOT] [-c] [-n] [-m MASK] [-b BARDS9]
                  Image RegFile
@@ -433,6 +421,56 @@ such as Boxes, Ellipses and Polygons
     -t, --twist           uses twist option for mge
     -ng NUMGAUSS, --numgauss NUMGAUSS
                           number of gaussians that will be used for galfit.
+
+
+**sersic2ferrer** converts a Bar Sérsic function (2 component) to a Ferrer function
+::
+
+  usage: sersic2ferrer [-h] [-a] [-b] [-o OUT] galfile
+
+
+  positional arguments:
+    galfile            GALFIT input file
+
+  options:
+    -h, --help         show this help message and exit
+    -a, --alpha        keep Ferrer alpha parameter as free
+    -b, --beta         keep Ferrer beta parameter as free
+    -o OUT, --out OUT  output GALFIT file
+
+
+**exp2edge** converts an exponential disk model to a edgedisk function
+::
+
+  usage: exp2edge [-h] [-o OUT] [-ne NUMEXP] galfile
+
+
+  positional arguments:
+    galfile               GALFIT input file
+
+  options:
+    -h, --help            show this help message and exit
+    -o OUT, --out OUT     output GALFIT file
+    -ne NUMEXP, --numexp NUMEXP
+                          component number of the exponential function in input file. Default=2
+
+
+**toSersic**  converts (gauss, de Vaucoulers, exponential) components to a Sersic component
+
+::
+
+  usage: toSersic [-h] [-f] [-o OUT] galfile
+
+
+  positional arguments:
+    galfile            GALFIT input file
+
+  options:
+    -h, --help         show this help message and exit
+    -f, --nfree        keep Sersic index parameter as free
+    -o OUT, --out OUT  output GALFIT file
+
+
 
 
 ---------------------
@@ -732,6 +770,21 @@ equal
     -n NUM, --NUM NUM     the number of the fit to be extracted 
     -o OUTFILE, --fileout OUTFILE 
                           the name of the output file 
+
+.. _routine-getPeak:
+**getPeak**  Obtains the center, axis ratio and angular position from DS9 region
+
+::
+
+    positional arguments:
+      Image                 image fits file
+      RegFile               DS9 ellipse region file
+
+    options:
+      -h, --help            show this help message and exit
+      -c, --center          takes center of ds9 region file
+      -m MASK, --mask MASK  the mask file
+
 
 
 .. _routine-getBT:
