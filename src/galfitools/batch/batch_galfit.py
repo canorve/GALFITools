@@ -35,6 +35,7 @@ import csv
 import os
 import subprocess
 import sys
+import re
 import threading
 from dataclasses import dataclass
 from datetime import datetime
@@ -229,6 +230,19 @@ def run_galfit(input_file: Path, galfit_bin: str, verbose: bool = False) -> JobR
         return result
 
     success = completed.returncode == 0
+
+    if re.search("Doh!", completed.stdout):  # pragma: no cover
+        print("ERROR: GALFIT has been unable to find a solution")
+        success = False
+        completed.returncode = 1
+
+    if re.search("QUIT", completed.stdout):  # pragma: no cover
+        print("ERROR: GALFIT has unexpectedly quit.")
+        print(
+            "Probably the cause is trying to constraint a component which doesn't exist "
+        )
+        success = False
+        completed.returncode = 1
 
     if success:
         log(f"OK     | {input_file}")

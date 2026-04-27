@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Template to process a list of GALFIT files and compute the kappa radius.
+Process a list of GALFIT files and compute the kappa radius.
 
 This script reads a text file containing one GALFIT file path per line,
 changes to the directory of each file, applies `get_kappa2()` to the file,

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Template to process a list of GALFIT files and compute the effective radius
+Process a list of GALFIT files and compute the effective radius
 or another light-fraction radius.
 
 This script reads a text file containing one GALFIT file path per line,

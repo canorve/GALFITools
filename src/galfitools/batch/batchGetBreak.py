@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Template to process a list of GALFIT files and compute the break radius
+Process a list of GALFIT files and compute the break radius
 using the second-derivative method.
 
 This script reads a text file containing one GALFIT file path per line,
