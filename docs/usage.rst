@@ -1406,23 +1406,35 @@ is the best model.
 Commands for DESI. 
 
 
-**downloadDesi** Download image, invvar, mask images from DESI and converts invvar to sigma image
+**downloadDesi**  Download DESI Legacy Survey image, invvar, and PSF cutouts. 
+The invvar image is also converted to a GALFIT sigma image.
 ::
 
-  usage: downloadDesi [-h] [--outdir OUTDIR] [--layer LAYER] [--size SIZE] [--pixscale PIXSCALE] [--bands BANDS] [--subimage] csv
+
+  usage: downloadDesi [-h] [--outdir OUTDIR] [--layer LAYER] [--size SIZE] [--pixscale PIXSCALE] [--bands BANDS] [--subimage]
+                      [--timeout TIMEOUT] [--retries RETRIES] [--retry-wait RETRY_WAIT] [--stop-on-error]
+                      csv
+
 
 
   positional arguments:
-    csv                  Input CSV with at least columns: ra, dec. optional: objid
+    csv                   Input CSV with columns ra and dec. Optional: objid.
 
   options:
-    -h, --help           show this help message and exit
-    --outdir OUTDIR      Output directory
-    --layer LAYER        Viewer layer, e.g. ls-dr10 or ls-dr9
-    --size SIZE          Cutout size in pixels (square)
-    --pixscale PIXSCALE  Arcsec/pixel for cutouts
-    --bands BANDS        Bands to download, e.g. grz
-    --subimage           If set, adds 'subimage' flag (no resampling; fixed brick grid; includes invvar).
+    -h, --help            show this help message and exit
+    --outdir OUTDIR       Output directory
+    --layer LAYER         Viewer layer, e.g. ls-dr10 or ls-dr9
+    --size SIZE           Cutout size in pixels
+    --pixscale PIXSCALE   Arcsec/pixel for cutouts
+    --bands BANDS         Bands to download, e.g. grz
+    --subimage            Add the subimage flag. This uses the fixed brick grid and includes the inverse-variance image.
+    --timeout TIMEOUT     Timeout in seconds for each request.
+    --retries RETRIES     Maximum number of attempts for each FITS download.
+    --retry-wait RETRY_WAIT
+                          Initial waiting time in seconds between retries.
+    --stop-on-error       Stop the program when a download fails after all retries.
+
+
 
 
 
