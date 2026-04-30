@@ -300,8 +300,9 @@ def test_maskDs9():
 
     bor_flag = False
     borValue = 100
+    pixval = 4096
 
-    maskDs9(MaskFile, RegFile, fill, image, bor_flag, borValue)
+    maskDs9(MaskFile, RegFile, fill, image, bor_flag, borValue, pixval)
 
     assert os.path.isfile(MaskFile)
 

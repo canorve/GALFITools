@@ -218,6 +218,7 @@ def makePSF(
         None,
         False,
         0,
+        None,
         skymean=None,
         skystd=None,
         invert=True,
