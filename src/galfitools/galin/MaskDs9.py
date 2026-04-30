@@ -20,6 +20,7 @@ def maskDs9(
     image: str,
     bor_flag: bool,
     borValue: int,
+    pixval: int,
     skymean=None,
     skystd=None,
     invert=False,
@@ -52,6 +53,8 @@ def maskDs9(
                data matrix, e.g.  Hubble images
     borValue : float
                value of the border
+    pixval : int
+             mask only the pixels with this value
     skymean : None, optional
               mean of the sky value to be substituted inside of
               the DS9 region
@@ -221,6 +224,7 @@ def maskDs9(
                 rx[idx],
                 ry[idx],
                 angle[idx],
+                pixval,
                 ncol,
                 nrow,
                 skymean=skymean,
@@ -238,6 +242,7 @@ def maskDs9(
                 rx[idx],
                 ry[idx],
                 angle[idx],
+                pixval,
                 ncol,
                 nrow,
                 skymean=skymean,
@@ -255,6 +260,7 @@ def maskDs9(
                 Image,
                 fill,
                 tupVerts[idx],
+                pixval,
                 ncol,
                 nrow,
                 skymean=skymean,
@@ -293,6 +299,7 @@ def MakeEllip(
     rx,
     ry,
     angle,
+    pixval,
     ncol,
     nrow,
     skymean=None,
@@ -317,6 +324,10 @@ def MakeEllip(
 
     angle : float
             angular position of the ellipse
+
+    pixval: int
+            mask only the pixels with this value
+
 
     ncol, nrow : int, int
               size of the image
@@ -350,6 +361,7 @@ def MakeEllip(
         xmax,
         ymin,
         ymax,
+        pixval,
         ncol,
         nrow,
         skymean=skymean,
@@ -361,7 +373,7 @@ def MakeEllip(
 
 
 def MakePolygon(
-    Image, fill, tupVerts, ncol, nrow, skymean=None, skystd=None, invert=False
+    Image, fill, tupVerts, pixval, ncol, nrow, skymean=None, skystd=None, invert=False
 ):
     """Make a polygon in an image
 
@@ -373,6 +385,9 @@ def MakePolygon(
            value to be filled inside the DS9 region
     tupVerts : tuple
               vertices of the polygon
+
+    pixval: int
+            mask only the pixels with this value
 
     ncol, nrow : int, int
                 size of the image
@@ -398,7 +413,15 @@ def MakePolygon(
     p = Path(tupVerts)  # make a polygon
 
     grid = p.contains_points(points)
-    mask = grid.reshape(nrow, ncol)  # now you have a mask with points inside a polygon
+    maskpol = grid.reshape(
+        nrow, ncol
+    )  # now you have a mask with points inside a polygon
+
+    if pixval is not None:
+        mask_pixval = Image == pixval
+        mask = maskpol & mask_pixval
+    else:
+        mask = maskpol
 
     if skymean:
 
@@ -423,6 +446,7 @@ def MakeBox(
     rx,
     ry,
     angle,
+    pixval,
     ncol,
     nrow,
     skymean=None,
@@ -448,7 +472,8 @@ def MakeBox(
 
     angle : float
             angular position of the box
-
+    pixval: int
+            mask only the pixels with this value
     ncol, nrow : int, int
                 size of the image
     skymean : float
@@ -457,7 +482,6 @@ def MakeBox(
             standard deviation of sky
     invert: bool
             inverts the region of DS9
-
 
 
     Returns
@@ -499,7 +523,15 @@ def MakeBox(
 
     grid = p.contains_points(points)
 
-    mask = grid.reshape(nrow, ncol)  # now you have a mask with points inside a polygon
+    maskbox = grid.reshape(
+        nrow, ncol
+    )  # now you have a mask with points inside a polygon
+
+    if pixval is not None:
+        mask_pixval = Image == pixval
+        mask = maskbox & mask_pixval
+    else:
+        mask = maskbox
 
     if skymean:
 
@@ -528,6 +560,7 @@ def MakeKronv2(
     xmax,
     ymin,
     ymax,
+    pixval,
     ncol,
     nrow,
     skymean=None,
@@ -598,7 +631,13 @@ def MakeKronv2(
     dell = np.sqrt((xell - x) ** 2 + (yell - y) ** 2)
     dist = np.sqrt(dx**2 + dy**2)
 
-    mask = dist <= dell
+    mask_ellipse = dist <= dell
+
+    if pixval is not None:
+        mask_pixval = imagemat[ypos, xpos] == pixval
+        mask = mask_ellipse & mask_pixval
+    else:
+        mask = mask_ellipse
 
     if skymean:
 

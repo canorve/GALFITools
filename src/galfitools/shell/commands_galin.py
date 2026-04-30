@@ -189,6 +189,12 @@ def mainMaskDs9(argv=None) -> int:
         "-sd", "--skystd", type=float, default=1, help="sky std for sky patch"
     )
     parser.add_argument(
+        "-p",
+        "--pixval",
+        type=int,
+        help="mask only the pixels with this value",
+    )
+    parser.add_argument(
         "-inv",
         "--invert",
         action="store_true",
@@ -204,6 +210,7 @@ def mainMaskDs9(argv=None) -> int:
         args.image,
         args.border,
         args.borValue,
+        args.pixval,
         skymean=args.skymean,
         skystd=args.skystd,
         invert=args.invert,
