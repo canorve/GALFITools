@@ -222,7 +222,7 @@ def mainMaskDs9(argv=None) -> int:
 def mainMaskSky(argv=None) -> int:
     printWelcome()
     parser = argparse.ArgumentParser(
-        description="creates a mask using image and sky mean/sigma"
+        description="creates a mask using image and sky mean/sigma. It assumes the sky is plane along image"
     )
     parser.add_argument("ImageFile", help="original data image")
     parser.add_argument("MaskFile", help="name of the new Mask file")
@@ -240,7 +240,10 @@ def mainMaskSky(argv=None) -> int:
         help="multiplier for sigma to remove sky background",
     )
     parser.add_argument(
-        "-r", "--region", type=str, help="DS9 region to remove from mask"
+        "-r", "--region", type=str, help="DS9 regions file to remove from mask"
+    )
+    parser.add_argument(
+        "-i", "--include", type=str, help="DS9 regions file to include into mask"
     )
     parser.add_argument(
         "-b",
@@ -268,8 +271,13 @@ def mainMaskSky(argv=None) -> int:
     )
     if args.region:  # pragma: no cover
         maskDs9(
-            args.MaskFile, args.region, 0, None, False, 0
+            args.MaskFile, args.region, 0, None, False, 0, None
         )  # remove ds9 region if provided
+    if args.include:  # pragma: no cover
+        maskDs9(
+            args.MaskFile, args.include, 10, None, False, 0, None
+        )  # remove ds9 region if provided
+
     print(f"Done. Mask file {args.MaskFile} created")
     return 0
 
