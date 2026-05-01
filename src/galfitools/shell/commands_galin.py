@@ -210,7 +210,7 @@ def mainMaskDs9(argv=None) -> int:
         args.image,
         args.border,
         args.borValue,
-        args.pixval,
+        pixval=args.pixval,
         skymean=args.skymean,
         skystd=args.skystd,
         invert=args.invert,
@@ -225,7 +225,14 @@ def mainMaskSky(argv=None) -> int:
         description="creates a mask using image and sky mean/sigma. It assumes the sky is plane along image"
     )
     parser.add_argument("ImageFile", help="original data image")
-    parser.add_argument("MaskFile", help="name of the new Mask file")
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        default="mask.fits",
+        help="output of the new Mask file",
+    )
+
     parser.add_argument(
         "-sm", "--skymean", type=float, default=0, help="sky background mean"
     )
@@ -262,23 +269,23 @@ def mainMaskSky(argv=None) -> int:
 
     skyRem(
         args.ImageFile,
-        args.MaskFile,
         args.skymean,
         args.skysigma,
         args.numbersig,
-        args.borValue,
+        args.output,
         args.border,
+        args.borValue,
     )
     if args.region:  # pragma: no cover
         maskDs9(
-            args.MaskFile, args.region, 0, None, False, 0, None
+            args.output, args.region, 0, None, False, 0
         )  # remove ds9 region if provided
     if args.include:  # pragma: no cover
         maskDs9(
-            args.MaskFile, args.include, 10, None, False, 0, None
+            args.output, args.include, 10, None, False, 0
         )  # remove ds9 region if provided
 
-    print(f"Done. Mask file {args.MaskFile} created")
+    print(f"Done. Mask file {args.output} created")
     return 0
 
 

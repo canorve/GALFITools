@@ -261,30 +261,37 @@ such as Boxes, Ellipses and Polygons
 
 
 .. _routine-maskSky:
-**maskSky** creates a mask image for GALFIT using original image and sky mean and sigma
+**maskSky**  creates a mask using image and sky mean/sigma. It assumes the sky is plane along image
 
 ::
 
-  usage: maskSky [-h] [-sm SKYMEAN] [-ss SKYSIGMA] [-ns NUMBERSIG] [-b] [-bv BORVALUE]
-               ImageFile MaskFile
+  usage: maskSky [-h] [-o OUTPUT] [-sm SKYMEAN] [-ss SKYSIGMA] [-ns NUMBERSIG] [-r REGION] 
+  [-i INCLUDE] [-b] [-bv BORVALUE] ImageFile
 
 
   positional arguments:
     ImageFile             original data image
-    MaskFile              Name of the new Mask file
 
   options:
     -h, --help            show this help message and exit
+    -o OUTPUT, --output OUTPUT
+                          output of the new Mask file
     -sm SKYMEAN, --skymean SKYMEAN
-                          mean of the sky background
+                          sky background mean
     -ss SKYSIGMA, --skysigma SKYSIGMA
-                          sigma of the sky background
+                          sky background sigma
     -ns NUMBERSIG, --numbersig NUMBERSIG
-                          number of times that the sigma of the sky will be multiplied to remove the
-                          sky background
-    -b, --border          Mask the borders when their value is zero
+                          multiplier for sigma to remove sky background
+    -r REGION, --region REGION
+                          DS9 regions file to remove from mask
+    -i INCLUDE, --include INCLUDE
+                          DS9 regions file to include into mask
+    -b, --border          mask borders when their value is zero
     -bv BORVALUE, --borValue BORVALUE
-                          value of the border if it is different from zero
+                          border value if different from zero
+
+
+
 
 .. _routine-xy2fits:
 **xy2fits** code to convert ASCII x,y positions to FITS mask

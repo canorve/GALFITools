@@ -11,27 +11,27 @@ from galfitools.galin.std import GetAxis
 from galfitools.galin.std import MakeImage
 
 
-def skyRem(imageFile, maskFile, mean, sig, nsig, borValue, bor_flag=False):
+def skyRem(imageFile, mean, sig, nsig, output="mask.fits", bor_flag=False, borValue=0):
     """Creates a mask image for GALFIT by subtracting the sky background.
 
     Parameters
     ----------
     imageFile : str
                 FITS image where the data will be taken
-    maskFile : str
-               name of the new mask image
     mean : float
             mean of the sky  background
     sig : float
           standard deviation of sky
     nsig : float
           number of sky standard deviations to be removed from image
-    borValue : float
-               value of the border
+    output: str
+                output name of the new mask image
     bor_flag : False, optional
                if True, it will mask the border of the image. This is
                for those region where the image matrix is larger than the
                data matrix, e.g.  Hubble images
+    borValue : float
+               value of the border in the image
 
     Returns
     -------
@@ -47,12 +47,12 @@ def skyRem(imageFile, maskFile, mean, sig, nsig, borValue, bor_flag=False):
 
     (ncol, nrow) = GetAxis(imageFile)
 
-    if not os.path.exists(maskFile):
-        print("{} mask image does not exist, creating one ... ".format(maskFile))
+    if not os.path.exists(output):
+        print("{} mask image does not exist, creating one ... ".format(output))
     else:
-        print("overwriting {} mask image ".format(maskFile))
+        print("overwriting {} mask image ".format(output))
 
-    MakeImage(maskFile, ncol, nrow)
+    MakeImage(output, ncol, nrow)
 
     i = 0  # index of data
     # original file
@@ -60,7 +60,7 @@ def skyRem(imageFile, maskFile, mean, sig, nsig, borValue, bor_flag=False):
     dataImage = hdu[i].data
 
     # output file
-    hdu2 = fits.open(maskFile)
+    hdu2 = fits.open(output)
     maskImage = hdu2[0].data
 
     topsky = mean + sig * nsig
@@ -83,7 +83,7 @@ def skyRem(imageFile, maskFile, mean, sig, nsig, borValue, bor_flag=False):
 
     hdu2[0].data = maskImage
 
-    hdu2.writeto(maskFile, overwrite=True)
+    hdu2.writeto(output, overwrite=True)
 
     hdu.close()
     hdu2.close()

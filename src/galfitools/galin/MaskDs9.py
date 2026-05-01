@@ -20,7 +20,7 @@ def maskDs9(
     image: str,
     bor_flag: bool,
     borValue: int,
-    pixval: int,
+    pixval=None,
     skymean=None,
     skystd=None,
     invert=False,
