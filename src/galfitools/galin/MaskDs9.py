@@ -423,7 +423,7 @@ def MakePolygon(
     else:
         mask = maskpol
 
-    if skymean:
+    if skymean is not None:
 
         sky = np.random.normal(skymean, skystd, (nrow, ncol))
         Image[mask] = sky[mask]
@@ -533,7 +533,7 @@ def MakeBox(
     else:
         mask = maskbox
 
-    if skymean:
+    if skymean is not None:
 
         sky = np.random.normal(skymean, skystd, (nrow, ncol))
         Image[mask] = sky[mask]
@@ -639,7 +639,7 @@ def MakeKronv2(
     else:
         mask = mask_ellipse
 
-    if skymean:
+    if skymean is not None:
 
         sky = np.random.normal(skymean, skystd, (nrow, ncol))
         imagemat[ypos[mask], xpos[mask]] = sky[ypos[mask], xpos[mask]]
