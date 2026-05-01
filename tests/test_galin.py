@@ -362,7 +362,7 @@ def test_skyRem():
     bor_flag = False
     borValue = 100
 
-    skyRem(image, mask, sky_mean, sky_sig, nsig, borValue, bor_flag)
+    skyRem(image, sky_mean, sky_sig, nsig, mask, borValue, bor_flag)
 
     assert os.path.isfile(mask)
 

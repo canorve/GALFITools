@@ -111,7 +111,7 @@ def test_mainMaskDs9(monkeypatch):
 def test_mainMaskSky(monkeypatch, capsys):
     got = {}
 
-    def fake_skyRem(image, mask, sky_mean, sky_sig, nsig, borValue, bor_flag):
+    def fake_skyRem(image, sky_mean, sky_sig, nsig, output, bor_flag, borValue):
         got.update(locals())
 
     def fake_maskDs9(*args, **kwargs):
@@ -123,15 +123,16 @@ def test_mainMaskSky(monkeypatch, capsys):
 
     argv = [
         "img.fits",
-        "mask.fits",
         "--skymean",
         "0.5",
         "--skysigma",
         "0.2",
         "--numbersig",
         "3",
+        "--output",
+        "mask.fits",
         "--borValue",
-        "1.0",
+        "0",
         "--border",
         "--region",
         "remove.reg",
@@ -139,11 +140,11 @@ def test_mainMaskSky(monkeypatch, capsys):
     rc = cli.mainMaskSky(argv)
     assert rc == 0
     assert got["image"] == "img.fits"
-    assert got["mask"] == "mask.fits"
     assert got["sky_mean"] == 0.5
     assert got["sky_sig"] == 0.2
     assert got["nsig"] == 3.0
-    assert got["borValue"] == 1.0
+    assert got["output"] == "mask.fits"
+    assert got["borValue"] == 0
     assert got["bor_flag"] is True
     assert got.get("maskDs9_called") is True
 
