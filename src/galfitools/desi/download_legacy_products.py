@@ -182,25 +182,72 @@ def write_primary(data, header, outpath: pathlib.Path) -> None:
     hdu.writeto(outpath, overwrite=True)
 
 
-def split_cutout_invvar(hdul: fits.HDUList) -> tuple[fits.PrimaryHDU, fits.PrimaryHDU]:
-    """Return the image and inverse-variance extensions as PrimaryHDUs."""
-    img_hdu = hdul[0]
+def find_first_image_hdu(hdul: fits.HDUList) -> fits.ImageHDU | fits.PrimaryHDU:
+    """Return the first HDU that contains image data."""
+    for hdu in hdul:
+        if hdu.data is not None:
+            return hdu
 
-    inv_hdu = None
-    if len(hdul) >= 2:
-        inv_hdu = hdul[1]
-    else:
-        for hdu in hdul:
-            if hdu.name.strip().upper() in {"INVVAR", "IVAR", "WEIGHT"}:
-                inv_hdu = hdu
-                break
+    raise RuntimeError("Could not find an image HDU in the returned FITS.")
+
+
+def find_hdu_by_name_or_index(
+    hdul: fits.HDUList,
+    names: set[str],
+    fallback_index: int | None = None,
+) -> fits.ImageHDU | fits.PrimaryHDU | None:
+    """Return an HDU by extension name, with an optional index fallback."""
+    for hdu in hdul:
+        hdu_name = hdu.name.strip().upper()
+        if hdu.data is not None and hdu_name in names:
+            return hdu
+
+    if fallback_index is not None and len(hdul) > fallback_index:
+        hdu = hdul[fallback_index]
+        if hdu.data is not None:
+            return hdu
+
+    return None
+
+
+def split_cutout_products(
+    hdul: fits.HDUList,
+    require_maskbits: bool = True,
+) -> tuple[fits.PrimaryHDU, fits.PrimaryHDU, fits.PrimaryHDU | None]:
+    """Return the image, inverse-variance, and optional maskbits HDUs.
+
+    The Legacy Survey FITS cutout service may return several extensions.
+    The usual order is image, inverse variance, and maskbits when both
+    ``invvar`` and ``maskbits`` are requested. This function first searches by
+    HDU name and then falls back to the expected extension order.
+    """
+    img_hdu = find_first_image_hdu(hdul)
+    inv_hdu = find_hdu_by_name_or_index(
+        hdul,
+        names={"INVVAR", "IVAR", "WEIGHT"},
+        fallback_index=1,
+    )
+    maskbits_hdu = find_hdu_by_name_or_index(
+        hdul,
+        names={"MASKBITS", "MASK", "BITMASK"},
+        fallback_index=2,
+    )
 
     if inv_hdu is None:
         raise RuntimeError("Could not find an invvar HDU in the returned FITS.")
 
+    if require_maskbits and maskbits_hdu is None:
+        raise RuntimeError("Could not find a maskbits HDU in the returned FITS.")
+
     img = fits.PrimaryHDU(data=img_hdu.data, header=img_hdu.header)
     inv = fits.PrimaryHDU(data=inv_hdu.data, header=inv_hdu.header)
-    return img, inv
+
+    maskbits = None
+    if maskbits_hdu is not None:
+        maskbits = fits.PrimaryHDU(data=maskbits_hdu.data, header=maskbits_hdu.header)
+        maskbits.header["IMTYPE"] = "maskbits"
+
+    return img, inv, maskbits
 
 
 def convert_to_sigma(image_file: pathlib.Path) -> None:
@@ -245,7 +292,7 @@ def write_failure_log(failures: list[dict[str, str]], outdir: pathlib.Path) -> N
 def main_downloadDesi() -> int:
     ap = argparse.ArgumentParser(
         description=(
-            "Download DESI Legacy Survey image, invvar, and PSF cutouts. "
+            "Download DESI Legacy Survey image, invvar, maskbits, and PSF cutouts. "
             "The invvar image is also converted to a GALFIT sigma image."
         )
     )
@@ -266,6 +313,11 @@ def main_downloadDesi() -> int:
             "Add the subimage flag. This uses the fixed brick grid and includes "
             "the inverse-variance image."
         ),
+    )
+    ap.add_argument(
+        "--no-maskbits",
+        action="store_true",
+        help="Do not request or write the DESI maskbits cutout.",
     )
     ap.add_argument(
         "--timeout",
@@ -320,6 +372,8 @@ def main_downloadDesi() -> int:
                     "bands": band,
                     "invvar": 1,
                 }
+                if not args.no_maskbits:
+                    cut_params["maskbits"] = 1
                 if args.subimage:
                     cut_params["subimage"] = 1
 
@@ -334,12 +388,18 @@ def main_downloadDesi() -> int:
                         retry_wait=args.retry_wait,
                         label=label,
                     ) as hdul:
-                        img_hdu, inv_hdu = split_cutout_invvar(hdul)
+                        img_hdu, inv_hdu, maskbits_hdu = split_cutout_products(
+                            hdul, require_maskbits=not args.no_maskbits
+                        )
 
                     img_path = band_dir / f"{base_prefix}_{band}_img.fits"
                     inv_path = band_dir / "invvar.fits"
+                    maskbits_path = band_dir / "maskbits.fits"
+
                     img_hdu.writeto(img_path, overwrite=True)
                     inv_hdu.writeto(inv_path, overwrite=True)
+                    if maskbits_hdu is not None:
+                        maskbits_hdu.writeto(maskbits_path, overwrite=True)
                     convert_to_sigma(inv_path)
 
                 except Exception as err:
