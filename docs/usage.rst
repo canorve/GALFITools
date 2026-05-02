@@ -1443,6 +1443,37 @@ The invvar image is also converted to a GALFIT sigma image.
 
 
 
+**centralEllipse** Create a DS9 ellipse region for the central galaxy mask in a DESI maskbits FITS image.
 
+::
+
+  usage: centralEllipse [-h] [--value VALUE] [--use-bit] [--bit BIT] [--scale SCALE] [--angle-step ANGLE_STEP] [--refine]
+                        [--refine-window REFINE_WINDOW] [--refine-step REFINE_STEP] [--radial-step RADIAL_STEP]
+                        [--component-out COMPONENT_OUT] [--color COLOR]
+                        maskbits region
+
+
+  positional arguments:
+    maskbits              Input DESI maskbits FITS file.
+    region                Output DS9 ellipse region file.
+
+  options:
+    -h, --help            show this help message and exit
+    --value VALUE         Exact pixel value to use when --use-bit is not set. Default: 4096.
+    --use-bit             Use bit testing instead of exact pixel equality.
+    --bit BIT             Bit number used when --use-bit is set. Default: 12.
+    --scale SCALE         Scale factor applied to the final ellipse axes. Default: 1.0.
+    --angle-step ANGLE_STEP
+                          Coarse angular step in degrees. Default: 1.0.
+    --refine              Enable local angular refinement.
+    --refine-window REFINE_WINDOW
+                          Half-width of the refinement interval in degrees. If omitted, it is set equal to --angle-step.
+    --refine-step REFINE_STEP
+                          Fine angular step in degrees. Default: 0.1.
+    --radial-step RADIAL_STEP
+                          Radial step in pixels for ray tracing. Default: 0.2.
+    --component-out COMPONENT_OUT
+                          Optional FITS file with the selected central component mask.
+    --color COLOR         DS9 region color. Default: green.
 
 
