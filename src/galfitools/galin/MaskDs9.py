@@ -17,9 +17,9 @@ def maskDs9(
     MaskFile: str,
     RegFile: str,
     fill: float,
-    image: str,
-    bor_flag: bool,
-    borValue: int,
+    image=None,
+    bor_flag=False,
+    borValue=0,
     pixval=None,
     skymean=None,
     skystd=None,
@@ -51,7 +51,7 @@ def maskDs9(
                if True, it will mask the border of the image. This is
                for those region where the image matrix is larger than the
                data matrix, e.g.  Hubble images
-    borValue : float
+    borValue : int
                value of the border
     pixval : int
              mask only the pixels with this value

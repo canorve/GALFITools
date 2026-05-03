@@ -4,16 +4,17 @@ import os
 import sys
 
 from astropy.io import fits
+import numpy as np
 
 
 def imarith(
     ImageFile: str,
     output: str,
     image2: str,
-    add: float,
-    mul: float,
-    div: float,
-    sub: float,
+    add: float | None = None,
+    mul: float | None = None,
+    div: float | None = None,
+    sub: float | None = None,
 ) -> None:
     """
     Makes arithmetic operations on the image
@@ -67,6 +68,7 @@ def imarith(
     # original file
     hdu = fits.open(ImageFile)
     dataImage = hdu[0].data
+    newdata = np.zeros_like(dataImage)
 
     if add is not None:
         if image2:

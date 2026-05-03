@@ -536,7 +536,7 @@ def maincentralEllipse() -> None:
     )
 
     parser.add_argument(
-        "--use-bit",
+        "--use_bit",
         action="store_true",
         help="Use bit testing instead of exact pixel equality.",
     )
@@ -556,7 +556,7 @@ def maincentralEllipse() -> None:
     )
 
     parser.add_argument(
-        "--angle-step",
+        "--angle_step",
         type=float,
         default=1.0,
         help="Coarse angular step in degrees. Default: 1.0.",
@@ -569,7 +569,7 @@ def maincentralEllipse() -> None:
     )
 
     parser.add_argument(
-        "--refine-window",
+        "--refine_window",
         type=float,
         default=None,
         help=(
@@ -579,21 +579,21 @@ def maincentralEllipse() -> None:
     )
 
     parser.add_argument(
-        "--refine-step",
+        "--refine_step",
         type=float,
         default=0.1,
         help="Fine angular step in degrees. Default: 0.1.",
     )
 
     parser.add_argument(
-        "--radial-step",
+        "--radial_step",
         type=float,
         default=0.2,
         help="Radial step in pixels for ray tracing. Default: 0.2.",
     )
 
     parser.add_argument(
-        "--component-out",
+        "--component_out",
         default=None,
         help="Optional FITS file with the selected central component mask.",
     )
@@ -606,19 +606,52 @@ def maincentralEllipse() -> None:
 
     args = parser.parse_args()
 
-    if args.scale <= 0:
+    central_ellipse(
+        args.maskbits,
+        args.region,
+        args.value,
+        args.use_bit,
+        args.bit,
+        args.scale,
+        args.angle_step,
+        args.refine,
+        args.refine_window,
+        args.refine_step,
+        args.radial_step,
+        args.component_out,
+        args.color,
+    )
+
+
+def central_ellipse(
+    maskbits,
+    region,
+    value=4096,
+    use_bit=False,
+    bit=12,
+    scale=1.0,
+    angle_step=1.0,
+    refine=False,
+    refine_window=None,
+    refine_step=0.1,
+    radial_step=0.2,
+    component_out=None,
+    color="green",
+):
+
+    if scale <= 0:
         raise ValueError("--scale must be positive.")
 
-    image, header = read_first_image_hdu(args.maskbits)
+    image, header = read_first_image_hdu(maskbits)
 
     if image.ndim != 2:
         raise ValueError("The input image must be 2-dimensional.")
 
     selected_mask = build_selected_mask(
         image=image,
-        target_value=args.value,
-        use_bit=args.use_bit,
-        bit=args.bit,
+        target_value=value,
+        use_bit=use_bit,
+        bit=bit,
     )
 
     component_mask = select_central_component(selected_mask)
@@ -634,20 +667,20 @@ def maincentralEllipse() -> None:
         y0=y0_np,
         angle_start=0.0,
         angle_stop=180.0,
-        angle_step=args.angle_step,
-        radial_step=args.radial_step,
+        angle_step=angle_step,
+        radial_step=radial_step,
     )
 
-    if args.refine:
+    if refine:
         theta_major, r_major_1, r_major_2, score_major = refine_major_angle(
             component_mask=component_mask,
             x0=x0_np,
             y0=y0_np,
             theta_coarse=theta_major,
-            coarse_step=args.angle_step,
-            refine_window=args.refine_window,
-            refine_step=args.refine_step,
-            radial_step=args.radial_step,
+            coarse_step=angle_step,
+            refine_window=refine_window,
+            refine_step=refine_step,
+            radial_step=radial_step,
         )
 
     semi_major = min(r_major_1, r_major_2)
@@ -657,7 +690,7 @@ def maincentralEllipse() -> None:
         x0=x0_np,
         y0=y0_np,
         theta_deg=theta_major + 90.0,
-        step=args.radial_step,
+        step=radial_step,
     )
 
     r_minor_2 = ray_radius(
@@ -665,13 +698,13 @@ def maincentralEllipse() -> None:
         x0=x0_np,
         y0=y0_np,
         theta_deg=theta_major + 270.0,
-        step=args.radial_step,
+        step=radial_step,
     )
 
     semi_minor = min(r_minor_1, r_minor_2)
 
-    semi_major *= args.scale
-    semi_minor *= args.scale
+    semi_major *= scale
+    semi_minor *= scale
 
     # Convert ray-tracing angle to DS9 display angle.
     theta_ds9 = (-theta_major) % 180.0
@@ -682,19 +715,19 @@ def maincentralEllipse() -> None:
         theta_ds9 = (theta_ds9 + 90.0) % 180.0
 
     write_ds9_ellipse_region(
-        region_file=args.region,
+        region_file=region,
         x0_ds9=x0_ds9,
         y0_ds9=y0_ds9,
         semi_major=semi_major,
         semi_minor=semi_minor,
         theta_ds9=theta_ds9,
-        color=args.color,
+        color=color,
     )
 
-    if args.component_out is not None:
-        write_component_mask(args.component_out, component_mask, header=header)
+    if component_out is not None:
+        write_component_mask(component_out, component_mask, header=header)
 
-    print(f"Region written to: {args.region}")
+    print(f"Region written to: {region}")
     print(f"Center (NumPy)          = ({x0_np:.3f}, {y0_np:.3f})")
     print(f"Center (DS9)            = ({x0_ds9:.3f}, {y0_ds9:.3f})")
     print(f"Measured angle          = {theta_major:.3f} deg")
@@ -707,8 +740,8 @@ def maincentralEllipse() -> None:
     print(f"Final semi-major axis   = {semi_major:.3f} pix")
     print(f"Final semi-minor axis   = {semi_minor:.3f} pix")
 
-    if args.component_out is not None:
-        print(f"Component mask written to: {args.component_out}")
+    if component_out is not None:
+        print(f"Component mask written to: {component_out}")
 
 
 if __name__ == "__main__":
