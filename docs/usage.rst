@@ -1410,7 +1410,9 @@ is the best model.
 **DESI**
 -------------
 
-Commands for DESI. 
+Commands for Dark Energy Spectroscoic Instrument (DESI). All 
+the CLI commands described here (with few exceptions)
+are to be used for DESI images.   
 
 
 **downloadDesi**  Download DESI Legacy Survey image, invvar, and PSF cutouts. 
@@ -1475,5 +1477,24 @@ The invvar image is also converted to a GALFIT sigma image.
     --component-out COMPONENT_OUT
                           Optional FITS file with the selected central component mask.
     --color COLOR         DS9 region color. Default: green.
+
+
+**getSegValue** Read a SExtractor segmentation image and return 
+the value of a selected pixel. By default, the central pixel is used.
+
+::
+
+  usage: getSegValue.py [-h] [--x X] [--y Y] [--ext EXT] segmentation_file
+
+  positional arguments:
+    segmentation_file  Input SExtractor segmentation FITS image.
+
+  options:
+    -h, --help         show this help message and exit
+    --x X              Pixel x-coordinate using Python zero-based indexing. Default: image center.
+    --y Y              Pixel y-coordinate using Python zero-based indexing. Default: image center.
+    --ext EXT          FITS extension containing the segmentation image. Default: 0.
+
+
 
 
