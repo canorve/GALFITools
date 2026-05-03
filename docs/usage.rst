@@ -1497,4 +1497,41 @@ the value of a selected pixel. By default, the central pixel is used.
 
 
 
+**megaMask** Combines SExtractor segmentation fits file, mask fits file (created with maskSky),
+    and DESI maskbits fits file. It removes the central galaxy mask.
+
+::
+
+    Parameters
+    ----------
+    segmentation_file : str
+        Path to the SExtractor segmentation FITS image.
+    masksky_file: str
+        Path to the mask FITS image.
+    maskbits_file: str
+        Path to the DESI maskbits FITS image.
+    rem_masksky: bool
+       If True, removes central galaxy from masksky using DS9 ellipse maskbits region file
+       recommended if central galaxy has not been removed from this mask.
+    output: str optional
+        name of the output mask fits file. Default: megamask.fits
+
+
+**transformEllip**
+Transform DS9 ellipse regions. The new ellipse keeps the same center, rotates the
+position angle by 90 degrees, uses the old minor axis as the new major axis, and keeps
+the same axis ratio.
+
+::
+
+    usage: transform_ds9_ellipse.py [-h] input_region output_region
+
+    positional arguments:
+      input_region   Input DS9 region file.
+      output_region  Output DS9 region file.
+
+    options:
+      -h, --help     show this help message and exit
+
+
 

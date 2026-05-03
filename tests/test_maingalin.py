@@ -64,10 +64,10 @@ def test_mainMaskDs9(monkeypatch):
         MaskFile,
         RegFile,
         fill,
-        image,
-        border,
-        borValue,
-        pixval,
+        image=None,
+        bor_flag=False,
+        borValue=0,
+        pixval=None,
         skymean=None,
         skystd=None,
         invert=False,
@@ -95,13 +95,14 @@ def test_mainMaskDs9(monkeypatch):
         "0.9",
         "--invert",
     ]
+
     rc = cli.mainMaskDs9(argv)
     assert rc == 0
     assert called["MaskFile"] == "mask.fits"
     assert called["RegFile"] == "regions.reg"
     assert called["fill"] == 5
     assert called["image"] == "img.fits"
-    assert called["border"] is True
+    assert called["bor_flag"] is True
     assert called["borValue"] == 2.0
     assert called["skymean"] == 1.1
     assert called["skystd"] == 0.9
