@@ -22,9 +22,9 @@ def get_ds9_ellipse_center_from_file(region_file):
 
     Returns
     -------
-    xcen : float
+    xcen : int
         X coordinate of the ellipse center.
-    ycen : float
+    ycen : int
         Y coordinate of the ellipse center.
 
     Raises
@@ -51,6 +51,9 @@ def get_ds9_ellipse_center_from_file(region_file):
             if match is not None:
                 xcen = float(match.group(1).strip())
                 ycen = float(match.group(2).strip())
+
+                xcen = round(xcen)
+                ycen = round(ycen)
 
                 return xcen, ycen
 
