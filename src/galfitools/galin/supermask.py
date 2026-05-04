@@ -8,6 +8,53 @@ from pathlib import Path
 from galfitools.galin.MaskDs9 import maskDs9
 from galfitools.desi.get_seg_value import get_pixel_value
 from galfitools.galin.imarith import imarith
+import re
+
+
+def get_ds9_ellipse_center_from_file(region_file):
+    """
+    Return the center of the first DS9 ellipse region in a file.
+
+    Parameters
+    ----------
+    region_file : str or pathlib.Path
+        Path to the DS9 region file.
+
+    Returns
+    -------
+    xcen : float
+        X coordinate of the ellipse center.
+    ycen : float
+        Y coordinate of the ellipse center.
+
+    Raises
+    ------
+    ValueError
+        If no valid DS9 ellipse region is found in the file.
+    """
+    region_file = Path(region_file)
+
+    ellipse_re = re.compile(
+        r"ellipse\s*\(\s*"
+        r"([^,]+)\s*,\s*"  # x center
+        r"([^,]+)\s*,\s*"  # y center
+        r"([^,]+)\s*,\s*"  # first axis
+        r"([^,]+)\s*,\s*"  # second axis
+        r"([^)]+)\s*"  # angle
+        r"\)"
+    )
+
+    with region_file.open("r") as f:
+        for line in f:
+            match = ellipse_re.search(line)
+
+            if match is not None:
+                xcen = float(match.group(1).strip())
+                ycen = float(match.group(2).strip())
+
+                return xcen, ycen
+
+    raise ValueError(f"No valid DS9 ellipse region was found in {region_file}")
 
 
 def superMask(
@@ -19,7 +66,7 @@ def superMask(
 ):
     """
     Combines SExtractor segmentation fits file, mask fits file (created with maskSky),
-    and DS9 region file. It removes the central galaxy.
+    and DS9 ellipse region file. It removes the central galaxy.
 
 
     Parameters
@@ -29,7 +76,7 @@ def superMask(
     masksky_file: str
         Path to the mask FITS image.
     ds9ellipse_file: str
-        Path to the DS9 region file.
+        Path to the DS9 ellipse region file.
     rem_masksky: bool
        If True, removes central galaxy from masksky using DS9 ellipse maskbits region file
        recommended if central galaxy has not been removed from this mask.
@@ -40,15 +87,13 @@ def superMask(
     -------
     True
 
-    Note
-    -----
-    DS9 region file can be a box, ellipse or polygon. The ones
-    that are accepted by maskDs9 function
-
     """
 
+    # obtains the center of the DS9 ellipse
+    xcen, ycen = get_ds9_ellipse_center_from_file(ds9ellipse_file)
+
     # reads number of the central galaxy from SExtractor segmentation file
-    pix_value, x, y = get_pixel_value(segmentation_file)
+    pix_value, x, y = get_pixel_value(segmentation_file, x=xcen, y=ycen)
 
     # removes central galaxy from segmentation_file
     # and optional for the masksky image. It is expected that
@@ -77,7 +122,7 @@ def superMask(
 def mainsuperMask():
     parser = argparse.ArgumentParser(
         description=(
-            "Read SExtractor segmentation image, mask created by maskSky and DS9 region file "
+            "Read SExtractor segmentation image, mask created by maskSky and DS9 ellipse region file "
             "to create a super mask. It removes the central galaxy"
         )
     )
@@ -125,7 +170,7 @@ def mainsuperMask():
     ds9ellipse_file = Path(args.ds9ellipse_file)
 
     if not ds9ellipse_file.exists():
-        raise FileNotFoundError(f"File not found: {maskbits_file}")
+        raise FileNotFoundError(f"File not found: {ds9ellipse_file}")
 
     superMask(
         segmentation_file,
