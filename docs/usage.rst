@@ -478,6 +478,27 @@ such as Boxes, Ellipses and Polygons
     -o OUT, --out OUT  output GALFIT file
 
 
+**superMask** Read SExtractor segmentation image, mask created by maskSky 
+and DS9 ellipse region file to create a super mask. It removes the central galaxy
+
+::
+
+  usage: superMask [-h] [-o OUTPUT] [--rem_masksky]
+                   segmentation_file masksky_file ds9ellipse_file
+
+  positional arguments:
+    segmentation_file     Input SExtractor segmentation FITS image.
+    masksky_file          Input mask created with maskSky (or any other mask) file FITS
+                          image.
+    ds9ellipse_file       Input DS9 ellipse region file.
+
+  options:
+    -h, --help            show this help message and exit
+    -o OUTPUT, --output OUTPUT
+                          output FITS file. Default: supermask
+    --rem_masksky         remove central galaxy from masksky.
+
+
 
 
 ---------------------
@@ -1496,25 +1517,26 @@ the value of a selected pixel. By default, the central pixel is used.
     --ext EXT          FITS extension containing the segmentation image. Default: 0.
 
 
-
-**megaMask** Combines SExtractor segmentation fits file, mask fits file (created with maskSky),
-    and DESI maskbits fits file. It removes the central galaxy mask.
+**megaMask** Read SExtractor segmentation image, mask created by maskSky and DESI maskbits to create a
+mega mask. It removes the central galaxy mask.
 
 ::
 
-    Parameters
-    ----------
-    segmentation_file : str
-        Path to the SExtractor segmentation FITS image.
-    masksky_file: str
-        Path to the mask FITS image.
-    maskbits_file: str
-        Path to the DESI maskbits FITS image.
-    rem_masksky: bool
-       If True, removes central galaxy from masksky using DS9 ellipse maskbits region file
-       recommended if central galaxy has not been removed from this mask.
-    output: str optional
-        name of the output mask fits file. Default: megamask.fits
+  usage: megaMask [-h] [-o OUTPUT] [--rem_masksky]
+                  segmentation_file masksky_file maskbits_file
+
+  positional arguments:
+    segmentation_file     Input SExtractor segmentation FITS image.
+    masksky_file          Input mask created with maskSky (or any other mask) file FITS
+                          image.
+    maskbits_file         Input DESI maskbits FITS image.
+
+  options:
+    -h, --help            show this help message and exit
+    -o OUTPUT, --output OUTPUT
+                          output FITS file. Default: megamask
+    --rem_masksky         remove central galaxy from masksky.
+
 
 
 **transformEllip**
