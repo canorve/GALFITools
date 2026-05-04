@@ -5,16 +5,17 @@ import sys
 
 from astropy.io import fits
 import numpy as np
+from typing import Optional
 
 
 def imarith(
     ImageFile: str,
     output: str,
     image2: str,
-    add: float | None = None,
-    mul: float | None = None,
-    div: float | None = None,
-    sub: float | None = None,
+    add: Optional[float] = None,
+    mul: Optional[float] = None,
+    div: Optional[float] = None,
+    sub: Optional[float] = None,
 ) -> None:
     """
     Makes arithmetic operations on the image
