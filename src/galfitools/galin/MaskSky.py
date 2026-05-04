@@ -11,7 +11,7 @@ from galfitools.galin.std import GetAxis
 from galfitools.galin.std import MakeImage
 
 
-def skyRem(imageFile, mean, sig, nsig, output="mask.fits", bor_flag=False, borValue=0):
+def maskSky(imageFile, mean, sig, nsig, output="mask.fits", bor_flag=False, borValue=0):
     """Creates a mask image for GALFIT by subtracting the sky background.
 
     Parameters

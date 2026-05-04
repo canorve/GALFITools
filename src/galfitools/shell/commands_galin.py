@@ -11,7 +11,7 @@ from galfitools.galin.initgal import InitGal
 from galfitools.galin.MakeMask import makeMask
 from galfitools.galin.MakePSF import makePSF
 from galfitools.galin.MaskDs9 import maskDs9
-from galfitools.galin.MaskSky import skyRem
+from galfitools.galin.MaskSky import maskSky
 from galfitools.galin.xy2fits import xy2fits
 from galfitools.shell.prt import printWelcome
 from galfitools.galin.sersic2ferrer import Sersic2Ferrer
@@ -267,7 +267,7 @@ def mainMaskSky(argv=None) -> int:
     )
     args = parser.parse_args(argv)
 
-    skyRem(
+    maskSky(
         args.ImageFile,
         args.skymean,
         args.skysigma,

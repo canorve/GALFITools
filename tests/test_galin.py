@@ -2,13 +2,11 @@ import pytest
 import os
 
 
-import subprocess as sp
 import numpy as np
 
 from collections import Counter
 from astropy.io import fits
 
-import stat
 import re
 from pathlib import Path
 
@@ -17,7 +15,7 @@ from galfitools.galin.initgal import InitGal
 from galfitools.galin.MaskDs9 import maskDs9
 
 from galfitools.galin.MakeMask import makeMask
-from galfitools.galin.MaskSky import skyRem
+from galfitools.galin.MaskSky import maskSky
 from galfitools.galin.xy2fits import xy2fits
 
 
@@ -346,7 +344,7 @@ def test_makeMask():
     return None
 
 
-def test_skyRem():
+def test_maskSky():
 
     image = "A671.gtMakeMask.maskds9.masksky.fits"
     mask = "tempmasksky.fits"
@@ -362,7 +360,7 @@ def test_skyRem():
     bor_flag = False
     borValue = 100
 
-    skyRem(image, sky_mean, sky_sig, nsig, mask, borValue, bor_flag)
+    maskSky(image, sky_mean, sky_sig, nsig, mask, borValue, bor_flag)
 
     assert os.path.isfile(mask)
 

@@ -112,13 +112,13 @@ def test_mainMaskDs9(monkeypatch):
 def test_mainMaskSky(monkeypatch, capsys):
     got = {}
 
-    def fake_skyRem(image, sky_mean, sky_sig, nsig, output, bor_flag, borValue):
+    def fake_maskSky(image, sky_mean, sky_sig, nsig, output, bor_flag, borValue):
         got.update(locals())
 
     def fake_maskDs9(*args, **kwargs):
         got["maskDs9_called"] = True
 
-    monkeypatch.setattr(cli, "skyRem", fake_skyRem)
+    monkeypatch.setattr(cli, "maskSky", fake_maskSky)
     monkeypatch.setattr(cli, "maskDs9", fake_maskDs9)
     monkeypatch.setattr(cli, "printWelcome", lambda: None)
 
