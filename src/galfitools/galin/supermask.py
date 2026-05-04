@@ -4,24 +4,22 @@
 import argparse
 
 from pathlib import Path
-import os
 
 from galfitools.galin.MaskDs9 import maskDs9
-from galfitools.desi.central_ellipse import central_ellipse
 from galfitools.desi.get_seg_value import get_pixel_value
 from galfitools.galin.imarith import imarith
 
 
-def megaMask(
+def superMask(
     segmentation_file: str,
     masksky_file: str,
-    maskbits_file: str,
-    output="megamask.fits",
+    ds9ellipse_file: str,
+    output="supermask.fits",
     rem_masksky=False,
 ):
     """
     Combines SExtractor segmentation fits file, mask fits file (created with maskSky),
-    and DESI maskbits fits file. It removes the central galaxy mask.
+    and DS9 region file. It removes the central galaxy.
 
 
     Parameters
@@ -30,8 +28,8 @@ def megaMask(
         Path to the SExtractor segmentation FITS image.
     masksky_file: str
         Path to the mask FITS image.
-    maskbits_file: str
-        Path to the DESI maskbits FITS image.
+    ds9ellipse_file: str
+        Path to the DS9 region file.
     rem_masksky: bool
        If True, removes central galaxy from masksky using DS9 ellipse maskbits region file
        recommended if central galaxy has not been removed from this mask.
@@ -42,32 +40,23 @@ def megaMask(
     -------
     True
 
-
+    Note
+    -----
+    DS9 region file can be a box, ellipse or polygon. The ones
+    that are accepted by maskDs9 function
 
     """
 
-    # it obtains the DS9  central galaxy ellipse
-    ds9maskbits = "ellipse_maskbits.reg"
-    central_ellipse(maskbits_file, ds9maskbits, refine=True, use_bit=True)
-
-    maskbits_value = 4096  # DESI value for galaxies
     # reads number of the central galaxy from SExtractor segmentation file
     pix_value, x, y = get_pixel_value(segmentation_file)
 
-    # removes central galaxy from maskbits and segmentation_file
+    # removes central galaxy from segmentation_file
     # and optional for the masksky image. It is expected that
     # galaxy is already removed for masksky
 
     maskDs9(
-        maskbits_file,
-        ds9maskbits,
-        0,
-        pixval=maskbits_value,
-    )
-
-    maskDs9(
         segmentation_file,
-        ds9maskbits,
+        ds9ellipse_file,
         0,
         pixval=pix_value,
     )
@@ -75,34 +64,21 @@ def megaMask(
     if rem_masksky:
         maskDs9(
             masksky_file,
-            ds9maskbits,
+            ds9ellipse_file,
             0,
         )
 
-    # it proceeds to create the megamask
-
-    tempmask = "tempmask.fits"
-
-    # seg + masksky = tempmask
-    imarith(segmentation_file, tempmask, masksky_file, add=0)
-
-    # FINAL MASk: tempmask + maskbits = megamask
-    imarith(tempmask, output, maskbits_file, add=0)
-
-    # removing temporal mask
-    tempmask_file = Path(tempmask)
-
-    if tempmask_file.exists():
-        os.remove(tempmask)
+    # FINAL MASk: segmentation file + masksky = supermask
+    imarith(segmentation_file, output, masksky_file, add=0)
 
     return True
 
 
-def mainmegaMask():
+def mainsuperMask():
     parser = argparse.ArgumentParser(
         description=(
-            "Read SExtractor segmentation image, mask created by maskSky and DESI maskbits "
-            "to create a mega mask. It removes the central galaxy mask."
+            "Read SExtractor segmentation image, mask created by maskSky and DS9 region file "
+            "to create a super mask. It removes the central galaxy"
         )
     )
     parser.add_argument(
@@ -116,16 +92,16 @@ def mainmegaMask():
     )
 
     parser.add_argument(
-        "maskbits_file",
-        help="Input DESI maskbits FITS image.",
+        "ds9ellipse_file",
+        help="Input DS9 ellipse region file.",
     )
 
     parser.add_argument(
         "-o",
         "--output",
         type=str,
-        default="megamask.fits",
-        help=("output FITS file. " "Default: megamask"),
+        default="supermask.fits",
+        help=("output FITS file. " "Default: supermask"),
     )
 
     parser.add_argument(
@@ -146,21 +122,21 @@ def mainmegaMask():
     if not masksky_file.exists():
         raise FileNotFoundError(f"File not found: {masksky_file}")
 
-    maskbits_file = Path(args.maskbits_file)
+    ds9ellipse_file = Path(args.ds9ellipse_file)
 
-    if not maskbits_file.exists():
+    if not ds9ellipse_file.exists():
         raise FileNotFoundError(f"File not found: {maskbits_file}")
 
-    megaMask(
+    superMask(
         segmentation_file,
         masksky_file,
-        maskbits_file,
+        ds9ellipse_file,
         args.output,
         args.rem_masksky,
     )
 
-    print(f"mega mask created: {args.output}")
+    print(f"super mask created: {args.output}")
 
 
 if __name__ == "__main__":
-    mainmegaMask()
+    mainsuperMask()
