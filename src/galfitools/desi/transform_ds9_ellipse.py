@@ -3,7 +3,7 @@
 import argparse
 import re
 from pathlib import Path
-import os
+
 
 ELLIPSE_RE = re.compile(
     r"ellipse\s*\(\s*"
@@ -34,7 +34,10 @@ def parse_axis(value):
     """
     value = value.strip()
 
-    match = re.match(r"([+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)(.*)", value)
+    match = re.match(
+        r"([+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)(.*)",
+        value,
+    )
 
     if match is None:
         raise ValueError(f"Could not parse axis value: {value}")
@@ -48,20 +51,13 @@ def parse_axis(value):
 def parse_angle(value):
     """
     Parse a DS9 angle value in degrees.
-
-    Parameters
-    ----------
-    value : str
-        Angle value from a DS9 ellipse region.
-
-    Returns
-    -------
-    angle : float
-        Angle in degrees.
     """
     value = value.strip()
 
-    match = re.match(r"([+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)(.*)", value)
+    match = re.match(
+        r"([+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)(.*)",
+        value,
+    )
 
     if match is None:
         raise ValueError(f"Could not parse angle value: {value}")
@@ -93,16 +89,18 @@ def build_ellipse(xcen, ycen, major_axis, minor_axis, angle, unit):
     )
 
 
-def get_transformed_parameters(match):
+def get_transformed_parameters(match, axis_ratio=0.4, scale=1.0):
     """
     Compute the transformed ellipse parameters.
 
     Rules
     -----
     1. The center is unchanged.
-    2. The position angle is rotated by 90 degrees.
+    2. The first output ellipse is rotated by 90 degrees relative to the
+       input major axis.
     3. The new major axis is the old minor axis.
-    4. The axis ratio is kept fixed.
+    4. The new axis ratio is fixed by axis_ratio.
+    5. The output axes are multiplied by scale.
     """
     xcen = match.group(1).strip()
     ycen = match.group(2).strip()
@@ -116,7 +114,13 @@ def get_transformed_parameters(match):
             "The two ellipse axes have different units: " f"{unit1!r} and {unit2!r}"
         )
 
-    # Identify old major and minor semi-axes.
+    if axis_ratio <= 0 or axis_ratio > 1:
+        raise ValueError("axis_ratio must satisfy 0 < axis_ratio <= 1.")
+
+    if scale <= 0:
+        raise ValueError("scale must be larger than 0.")
+
+    # Identify the old major and minor semi-axes.
     if axis1 >= axis2:
         old_major = axis1
         old_minor = axis2
@@ -126,22 +130,26 @@ def get_transformed_parameters(match):
         old_minor = axis1
         old_major_angle = angle + 90.0
 
-    old_axis_ratio = old_minor / old_major
+    # New major axis is the old minor axis.
+    new_major = old_minor * scale
 
-    new_major = old_minor
-    new_minor = new_major * old_axis_ratio
+    # Fixed output axis ratio.
+    new_minor = axis_ratio * new_major
 
+    # First output ellipse: rotated 90 degrees from the input major axis.
     new_angle = (old_major_angle + 90.0) % 180.0
 
     return xcen, ycen, new_major, new_minor, new_angle, unit1
 
 
-def transform_ellipse(match):
+def transform_ellipse(match, axis_ratio=0.4, scale=1.0):
     """
     Transform one DS9 ellipse region.
     """
     xcen, ycen, new_major, new_minor, new_angle, unit = get_transformed_parameters(
-        match
+        match,
+        axis_ratio=axis_ratio,
+        scale=scale,
     )
 
     return build_ellipse(
@@ -154,12 +162,14 @@ def transform_ellipse(match):
     )
 
 
-def transform_ellipse_rot90(match):
+def transform_ellipse_rot90(match, axis_ratio=0.4, scale=1.0):
     """
     Transform one DS9 ellipse region and rotate it by an additional 90 degrees.
     """
     xcen, ycen, new_major, new_minor, new_angle, unit = get_transformed_parameters(
-        match
+        match,
+        axis_ratio=axis_ratio,
+        scale=scale,
     )
 
     new_angle_rot90 = (new_angle + 90.0) % 180.0
@@ -174,7 +184,13 @@ def transform_ellipse_rot90(match):
     )
 
 
-def transform_region_file(input_file, output_file, output_file_rot90):
+def transform_region_file(
+    input_file,
+    output_file,
+    output_file_rot90,
+    axis_ratio=0.4,
+    scale=1.0,
+):
     """
     Read a DS9 region file and write two transformed region files.
 
@@ -183,9 +199,13 @@ def transform_region_file(input_file, output_file, output_file_rot90):
     input_file : str
         Input DS9 region file.
     output_file : str
-        Output DS9 region file with the transformed ellipse.
+        First output DS9 region file.
     output_file_rot90 : str
-        Output DS9 region file with the transformed ellipse rotated by 90 degrees.
+        Second output DS9 region file, rotated 90 degrees from the first.
+    axis_ratio : float, optional
+        Axis ratio of the output ellipses. Default is 0.4.
+    scale : float, optional
+        Multiplicative scale factor for both output axes. Default is 1.0.
     """
     input_file = Path(input_file)
     output_file = Path(output_file)
@@ -197,8 +217,23 @@ def transform_region_file(input_file, output_file, output_file_rot90):
     with input_file.open("r") as f:
         for line in f:
             if "ellipse" in line:
-                new_line = ELLIPSE_RE.sub(transform_ellipse, line)
-                new_line_rot90 = ELLIPSE_RE.sub(transform_ellipse_rot90, line)
+                new_line = ELLIPSE_RE.sub(
+                    lambda match: transform_ellipse(
+                        match,
+                        axis_ratio=axis_ratio,
+                        scale=scale,
+                    ),
+                    line,
+                )
+
+                new_line_rot90 = ELLIPSE_RE.sub(
+                    lambda match: transform_ellipse_rot90(
+                        match,
+                        axis_ratio=axis_ratio,
+                        scale=scale,
+                    ),
+                    line,
+                )
 
                 lines_out.append(new_line)
                 lines_out_rot90.append(new_line_rot90)
@@ -216,11 +251,9 @@ def transform_region_file(input_file, output_file, output_file_rot90):
 def maintransformEllip():
     parser = argparse.ArgumentParser(
         description=(
-            "Transform DS9 ellipse regions. The new ellipse keeps the same "
-            "center, rotates the position angle by 90 degrees, uses the old "
-            "minor axis as the new major axis, and keeps the same axis ratio."
-            "It also creates a second output with the same axes "
-            "but rotated by an additional 90 degrees."
+            "Transform DS9 ellipse regions. The output ellipses use the "
+            "old minor axis as the new major axis, use a fixed axis ratio, "
+            "and can be enlarged or reduced with a scale factor."
         )
     )
 
@@ -234,16 +267,37 @@ def maintransformEllip():
         help="First output DS9 region file.",
     )
 
+    parser.add_argument(
+        "output_region_rot90",
+        help="Second output DS9 region file, rotated 90 degrees from the first.",
+    )
+
+    parser.add_argument(
+        "--axis-ratio",
+        type=float,
+        default=0.4,
+        help="Axis ratio b/a for the output ellipses. Default: 0.4.",
+    )
+
+    parser.add_argument(
+        "--scale",
+        type=float,
+        default=1.0,
+        help=(
+            "Scale factor applied to both output axes. "
+            "Use values larger than 1 to enlarge and smaller than 1 to shrink. "
+            "Default: 1.0."
+        ),
+    )
+
     args = parser.parse_args()
-
-    root, extension = os.path.splitext(args.output_region)
-
-    output_region_rot90 = root + "_rot90" + extension
 
     transform_region_file(
         args.input_region,
         args.output_region,
-        output_region_rot90,
+        args.output_region_rot90,
+        axis_ratio=args.axis_ratio,
+        scale=args.scale,
     )
 
 
