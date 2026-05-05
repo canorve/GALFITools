@@ -269,11 +269,6 @@ def maintransformEllip():
     )
 
     parser.add_argument(
-        "output_region_rot90",
-        help="Second output DS9 region file, rotated 90 degrees from the first.",
-    )
-
-    parser.add_argument(
         "--axis-ratio",
         type=float,
         default=0.4,
