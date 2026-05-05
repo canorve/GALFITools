@@ -2,6 +2,7 @@
 
 import argparse
 import re
+import os
 from pathlib import Path
 
 
@@ -292,10 +293,14 @@ def maintransformEllip():
 
     args = parser.parse_args()
 
+    root, ext = os.path.splitext(args.output_region)
+
+    output_region_rot90 = root + "_rot90" + ext
+
     transform_region_file(
         args.input_region,
         args.output_region,
-        args.output_region_rot90,
+        output_region_rot90,
         axis_ratio=args.axis_ratio,
         scale=args.scale,
     )
