@@ -430,6 +430,13 @@ def maingetSersic(argv=None) -> int:
         type=str,
         help="DS9 ellipse region containing the bar (requires --bulgetot)",
     )
+    parser.add_argument(
+        "-g",
+        "--galfit_out",
+        type=str,
+        help="name of the galfit output file (otherwise output will be name_fits_file-out.fits)",
+    )
+
     args = parser.parse_args(argv)
 
     getSersic(
@@ -444,6 +451,7 @@ def maingetSersic(argv=None) -> int:
         args.bards9,
         args.plate,
         args.out,
+        args.galfit_out,
     )
     return 0
 

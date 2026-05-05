@@ -30,6 +30,7 @@ def getSersic(
     bards9: str,
     plate: float,
     out: str,
+    galfit_out=None,
 ) -> GalComps:
     """Obtains the initial parameters for GALFIT
 
@@ -78,6 +79,11 @@ def getSersic(
           output GALFIT file. This is a file where the surface
           brightness model is formated as a GALFIT file without
           the header.
+
+    galfit_out : str
+          Name of the output GALFIT cube fits. This is the name
+          of the cube image after the fit.
+
 
     Returns
     -------
@@ -172,7 +178,10 @@ def getSersic(
 
     # header setup
     galhead.inputimage = image
-    galhead.outimage = name + "-out.fits"
+    if galfit_out is None:
+        galhead.outimage = name + "-out.fits"
+    else:
+        galhead.outimage = galfit_out
     galhead.sigimage = "sigma.fits"
     galhead.psfimage = "psf.fits"
     galhead.maskimage = maskfile
