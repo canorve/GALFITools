@@ -35,6 +35,7 @@ def mge2gal(
     freeser,
     freesky,
     numgauss,
+    sky=0,
     xypos=None,
     ellip=None,
     posang=None,
@@ -43,13 +44,12 @@ def mge2gal(
     Creates MGE initial parameters for GALFIT
 
 
-
     Creates a Multi-Gaussian Expansion (MGE) model and
     formats it into an initial parameter file for fitting by GALFIT.
 
     galfitFile : str
                  GALFIT file from which the header information
-                 and sky value will be extracted to create the MGE model.
+                 will be extracted to create the MGE model.
     regfile : str
               DS9 ellipse region file, which must enclose the galaxy to be fitted.
     center : Bool
@@ -67,8 +67,11 @@ def mge2gal(
               leaves the sersic index as a free parameter to fit
     freesky : bool
               leaves the sky parameter as a free parameter to fit
+
     numgauss : int
                maximum number of gaussians allowed to fit
+    sky : float
+            value of the sky background. Default = 0
     xypos : list, optional
             provides the (x y) position center of the object to fit
     ellip : float
@@ -92,14 +95,12 @@ def mge2gal(
     # reading options from galfit header
     galfit = Galfit(galfitFile)
     head = galfit.ReadHead()
-    galsky = galfit.ReadSky()
+    # galsky = galfit.ReadSky()
 
     image = head.inputimage
     imageout = head.outimage
     magzpt = head.mgzpt
     maskfile = head.maskimage
-
-    sky = galsky.sky
 
     scale = head.scale
     psfile = head.psfimage

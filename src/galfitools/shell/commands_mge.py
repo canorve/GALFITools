@@ -57,6 +57,14 @@ def _build_parser_mge() -> argparse.ArgumentParser:
         help="number of gaussians that will be used for galfit.",
     )
     p.add_argument(
+        "-s",
+        "--sky",
+        type=float,
+        default=0,
+        help="value of the sky background",
+    )
+
+    p.add_argument(
         "-xy",
         "--xypos",
         nargs=2,
@@ -100,6 +108,8 @@ def mainMGE(argv=None) -> int:
 
     numgauss = args.numgauss
 
+    sky = args.sky
+
     xypos = args.xypos
     ellip = args.ellip
     posang = args.posang
@@ -116,6 +126,7 @@ def mainMGE(argv=None) -> int:
         freeser,
         freesky,
         numgauss,
+        sky,
         xypos=xypos,
         ellip=ellip,
         posang=posang,
