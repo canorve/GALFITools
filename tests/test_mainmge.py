@@ -19,6 +19,7 @@ def test_mainMGE_calls_mge2gal_with_parsed_args(monkeypatch):
         freeser,
         freesky,
         numgauss,
+        sky=0,
         xypos=None,
         ellip=None,
         posang=None,
@@ -41,6 +42,8 @@ def test_mainMGE_calls_mge2gal_with_parsed_args(monkeypatch):
         "--freesky",
         "--numgauss",
         "7",
+        "--sky",
+        "0.0",
         "--xypos",
         "100",
         "120",
@@ -62,6 +65,7 @@ def test_mainMGE_calls_mge2gal_with_parsed_args(monkeypatch):
     assert called["freeser"] is True
     assert called["freesky"] is True
     assert called["numgauss"] == 7
+    assert called["sky"] == 0.0
     assert called["xypos"] == [100, 120]
     assert called["ellip"] == 0.3
     assert called["posang"] == 45

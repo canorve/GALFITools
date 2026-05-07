@@ -126,7 +126,7 @@ def mainMGE(argv=None) -> int:
         freeser,
         freesky,
         numgauss,
-        sky,
+        sky=sky,
         xypos=xypos,
         ellip=ellip,
         posang=posang,
