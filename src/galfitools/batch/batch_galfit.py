@@ -97,6 +97,13 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Write a CSV summary report to this path.",
     )
+    parser.add_argument(
+        "--imax",
+        type=int,
+        default=200,
+        help="Maximum number of iterations allowed",
+    )
+
     return parser.parse_args()
 
 
@@ -181,7 +188,9 @@ def print_streams(result: JobResult) -> None:
         print("=" * 80, flush=True)
 
 
-def run_galfit(input_file: Path, galfit_bin: str, verbose: bool = False) -> JobResult:
+def run_galfit(
+    input_file: Path, galfit_bin: str, imax: int, verbose: bool = False
+) -> JobResult:
     """
     Run GALFIT on one input file.
 
@@ -196,7 +205,7 @@ def run_galfit(input_file: Path, galfit_bin: str, verbose: bool = False) -> JobR
 
     try:
         completed = subprocess.run(
-            [galfit_bin, filename],
+            [galfit_bin, "-imax", str(imax), filename],
             cwd=str(workdir),
             capture_output=True,
             text=True,
@@ -265,14 +274,14 @@ def run_galfit(input_file: Path, galfit_bin: str, verbose: bool = False) -> JobR
 
 
 def run_serial(
-    files: Sequence[Path], galfit_bin: str, verbose: bool
+    files: Sequence[Path], galfit_bin: str, imax: int, verbose: bool
 ) -> List[JobResult]:
     """Run GALFIT sequentially."""
     results: List[JobResult] = []
 
     for index, input_file in enumerate(files, start=1):
         log(f"Progress: {index}/{len(files)}")
-        result = run_galfit(input_file, galfit_bin, verbose=verbose)
+        result = run_galfit(input_file, galfit_bin, imax, verbose=verbose)
         results.append(result)
 
     return results
@@ -281,6 +290,7 @@ def run_serial(
 def run_parallel(
     files: Sequence[Path],
     galfit_bin: str,
+    imax: int,
     jobs: int,
     verbose: bool,
 ) -> List[JobResult]:
@@ -289,7 +299,9 @@ def run_parallel(
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=jobs) as executor:
         future_to_file = {
-            executor.submit(run_galfit, input_file, galfit_bin, verbose): input_file
+            executor.submit(
+                run_galfit, input_file, galfit_bin, imax, verbose
+            ): input_file
             for input_file in files
         }
 
@@ -399,6 +411,7 @@ def batch_galfit() -> int:
     galfit_bin = args.galfit_bin
     verbose = args.verbose
     summary_csv = args.summary_csv
+    imax = args.imax
 
     if jobs < 1:
         print("Error: --jobs must be at least 1.", file=sys.stderr)
@@ -432,10 +445,12 @@ def batch_galfit() -> int:
 
     if jobs == 1:
         log("Running in sequential mode.")
-        run_results = run_serial(valid_files, galfit_bin, verbose=verbose)
+        run_results = run_serial(valid_files, galfit_bin, imax, verbose=verbose)
     else:
         log(f"Running in parallel mode with {jobs} workers.")
-        run_results = run_parallel(valid_files, galfit_bin, jobs=jobs, verbose=verbose)
+        run_results = run_parallel(
+            valid_files, galfit_bin, imax, jobs=jobs, verbose=verbose
+        )
 
     results = invalid_results + run_results
 
