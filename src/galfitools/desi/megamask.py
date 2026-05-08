@@ -18,6 +18,7 @@ def megaMask(
     maskbits_file: str,
     output="megamask.fits",
     rem_masksky=False,
+    ds9ellipse=None,
 ):
     """
     Combines SExtractor segmentation fits file, mask fits file (created with maskSky),
@@ -48,7 +49,10 @@ def megaMask(
 
     # it obtains the DS9  central galaxy ellipse
     ds9maskbits = "ellipse_maskbits.reg"
-    central_ellipse(maskbits_file, ds9maskbits, refine=True, use_bit=True)
+    if ds9ellipse is None:
+        central_ellipse(maskbits_file, ds9maskbits, refine=True, use_bit=True)
+    else:
+        ds9maskbits = ds9ellipse
 
     maskbits_value = 4096  # DESI value for galaxies
     # reads number of the central galaxy from SExtractor segmentation file
@@ -134,6 +138,14 @@ def mainmegaMask():
         help="remove central galaxy from masksky.",
     )
 
+    parser.add_argument(
+        "-d",
+        "--ds9ellipse",
+        type=str,
+        default=None,
+        help="Input DS9 ellipse region file.",
+    )
+
     args = parser.parse_args()
 
     segmentation_file = Path(args.segmentation_file)
@@ -157,6 +169,7 @@ def mainmegaMask():
         maskbits_file,
         args.output,
         args.rem_masksky,
+        ds9ellipse=args.ds9ellipse_file,
     )
 
     print(f"mega mask created: {args.output}")
