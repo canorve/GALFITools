@@ -219,6 +219,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "sersic.init",
                 "--galfit_out",
                 "output.fits",
+                "--freeser",
             ],
             # image, regfile, center, mask, zeropoint, sky, noprint, bulgetot, bards9
             (
@@ -234,6 +235,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 1,
                 "sersic.init",
                 "output.fits",
+                True,
             ),
         ),
         # 2) Typical flags: custom zeropoint/sky + center + mask + noprint
@@ -255,6 +257,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "sersic.init",
                 "--galfit_out",
                 "output.fits",
+                "--freeser",
             ],
             (
                 "img.fits",
@@ -269,6 +272,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 1,
                 "sersic.init",
                 "output.fits",
+                True,
             ),
         ),
         # 3) Bulge/Disk with a bar region: requires --bulgetot and --bards9
@@ -286,6 +290,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "sersic.init",
                 "--galfit_out",
                 "output.fits",
+                "--freeser",
             ],
             (
                 "img.fits",
@@ -300,6 +305,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 1,
                 "sersic.init",
                 "output.fits",
+                True,
             ),
         ),
         # 4) Everything at once (different values)
@@ -325,6 +331,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "sersic.init",
                 "--galfit_out",
                 "output.fits",
+                "--freeser",
             ],
             (
                 "img.fits",
@@ -339,6 +346,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 1,
                 "sersic.init",
                 "output.fits",
+                True,
             ),
         ),
     ],
@@ -359,6 +367,7 @@ def test_maingetSersic(monkeypatch, argv, expected):
         plate,
         out,
         galfit_out,
+        freeser,
     ):
         seen["args"] = (
             image,
@@ -373,6 +382,7 @@ def test_maingetSersic(monkeypatch, argv, expected):
             plate,
             out,
             galfit_out,
+            freeser,
         )
 
     monkeypatch.setattr(cli, "getSersic", fake_getSersic)
