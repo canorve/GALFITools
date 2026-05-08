@@ -61,7 +61,9 @@ def Exp2Edge(
     galcomps = galfit.ReadComps()
     galsky = galfit.ReadSky()
 
-    num_comp = 1  # it assumes the barred galaxy is the first component
+    num_comp = (
+        1  # it assumes the edge-on galaxy is the first component. Not related to numexp
+    )
     dis = 3
 
     # convert all exp, gaussian and de vaucouleurs to Sersic format
