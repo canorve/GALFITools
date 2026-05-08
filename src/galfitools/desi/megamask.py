@@ -180,7 +180,7 @@ def mainmegaMask():
         maskbits_file,
         args.output,
         args.rem_masksky,
-        ds9ellipse=args.ds9ellipse_file,
+        ds9ellipse=args.ds9ellipse,
     )
 
     print(f"mega mask created: {args.output}")
