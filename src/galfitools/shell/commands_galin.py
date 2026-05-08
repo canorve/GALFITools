@@ -437,6 +437,13 @@ def maingetSersic(argv=None) -> int:
         help="name of the galfit output file (otherwise output will be name_fits_file-out.fits)",
     )
 
+    parser.add_argument(
+        "-f",
+        "--freeser",
+        action="store_true",
+        help="keep Sersic index parameter of the second component as free",
+    )
+
     args = parser.parse_args(argv)
 
     getSersic(
@@ -452,6 +459,7 @@ def maingetSersic(argv=None) -> int:
         args.plate,
         args.out,
         args.galfit_out,
+        args.freeser,
     )
     return 0
 
