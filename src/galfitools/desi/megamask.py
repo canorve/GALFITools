@@ -5,6 +5,8 @@ import argparse
 
 from pathlib import Path
 import os
+import shutil
+
 
 from galfitools.galin.MaskDs9 import maskDs9
 from galfitools.desi.central_ellipse import central_ellipse
@@ -44,7 +46,6 @@ def megaMask(
     True
 
 
-
     """
 
     # it obtains the DS9  central galaxy ellipse
@@ -53,6 +54,9 @@ def megaMask(
         central_ellipse(maskbits_file, ds9maskbits, refine=True, use_bit=True)
     else:
         ds9maskbits = ds9ellipse
+
+    # making a copy of maskbits
+    shutil.copy(maskbits_file, "tempmaskbits.fits")
 
     maskbits_value = 4096  # DESI value for galaxies
     # reads number of the central galaxy from SExtractor segmentation file
@@ -63,7 +67,7 @@ def megaMask(
     # galaxy is already removed for masksky
 
     maskDs9(
-        maskbits_file,
+        "tempmaskbits.fits",
         ds9maskbits,
         0,
         pixval=maskbits_value,
@@ -91,13 +95,20 @@ def megaMask(
     imarith(segmentation_file, tempmask, masksky_file, add=0)
 
     # FINAL MASk: tempmask + maskbits = megamask
-    imarith(tempmask, output, maskbits_file, add=0)
+    imarith(tempmask, output, "tempmaskbits.fits", add=0)
 
     # removing temporal mask
     tempmask_file = Path(tempmask)
 
     if tempmask_file.exists():
         os.remove(tempmask)
+
+    # removing maskbits tempfile
+
+    tempmaskbits = Path("tempmaskbits.fits")
+
+    if tempmaskbits.exists():
+        os.remove("tempmaskbits.fits")
 
     return True
 
