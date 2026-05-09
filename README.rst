@@ -203,13 +203,8 @@ The codebase of GALFITools is governed by the terms of the **MIT** license.
 -----------------------
 
 If you find this code useful in your research, 
-we kindly request that you cite it as follows:
-
-Añorve, C. (2024). canorve/GALFITools: GALFITools v1.15.0 (v1.15.0). 
-Zenodo. https://doi.org/10.5281/zenodo.13994492
-
-
-cite all versions using the DOI: https://doi.org/10.5281/zenodo.8216472
+please use the “Cite this repository” option in 
+the GitHub sidebar.
 
 
 
