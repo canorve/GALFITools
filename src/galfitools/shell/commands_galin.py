@@ -441,7 +441,7 @@ def maingetSersic(argv=None) -> int:
         "-f",
         "--freeser",
         action="store_true",
-        help="keep Sersic index parameter of the second component as free",
+        help="keep Sersic index parameter of the bar component as free",
     )
 
     args = parser.parse_args(argv)

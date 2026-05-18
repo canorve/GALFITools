@@ -31,7 +31,7 @@ def getSersic(
     plate: float,
     out: str,
     galfit_out=None,
-    freeser=None,
+    freeser=False,
 ) -> GalComps:
     """Obtains the initial parameters for GALFIT
 
@@ -246,7 +246,12 @@ def getSersic(
                 print("1) {:.2f} {:.2f} 1 1   # Position x, y".format(X, Y))
                 print("3) {:.2f}    1      # Integrated magnitude ".format(magbar))
                 print("4) {:.2f}    1      # R_e (effective radius) ".format(Rebar))
-                print("5) {:.2f}    0      # Sersic index n  ".format(0.5))
+
+                if freeser is True:
+                    print("5) {:.2f}    1      # Sersic index n  ".format(0.5))
+                else:
+                    print("5) {:.2f}    0      # Sersic index n  ".format(0.5))
+
                 print("6) 0.0000   0      # ----  ")
                 print("7) 0.0000   0      # ----  ")
                 print("8) 0.0000   0      # ----  ")
@@ -260,10 +265,7 @@ def getSersic(
             print("1) {:.2f} {:.2f} 1 1   # Position x, y".format(X, Y))
             print("3) {:.2f}    1      # Integrated magnitude ".format(mag2))
             print("4) {:.2f}    1      # R_e (effective radius) ".format(Re))
-            if freeser is not None:
-                print("5) {:.2f}    1      # Sersic index n  ".format(1))
-            else:
-                print("5) {:.2f}    0      # Sersic index n  ".format(1))
+            print("5) {:.2f}    0      # Sersic index n  ".format(1))
             print("6) 0.0000   0      # ----  ")
             print("7) 0.0000   0      # ----  ")
             print("8) 0.0000   0      # ----  ")
@@ -348,7 +350,14 @@ def getSersic(
             galcomps.PosYFree = np.append(galcomps.PosYFree, 1)
             galcomps.MagFree = np.append(galcomps.MagFree, 1)
             galcomps.RadFree = np.append(galcomps.RadFree, 1)
-            galcomps.ExpFree = np.append(galcomps.ExpFree, 0)
+
+            if freeser is True:
+                galcomps.ExpFree = np.append(galcomps.ExpFree, 1)
+            else:
+                galcomps.ExpFree = np.append(galcomps.ExpFree, 0)
+
+            # galcomps.ExpFree = np.append(galcomps.ExpFree, 0)
+
             galcomps.Exp2Free = np.append(galcomps.Exp2Free, 0)
             galcomps.Exp3Free = np.append(galcomps.Exp3Free, 0)
             galcomps.AxRatFree = np.append(galcomps.AxRatFree, 1)
@@ -380,10 +389,7 @@ def getSersic(
         galcomps.MagFree = np.append(galcomps.MagFree, 1)
         galcomps.RadFree = np.append(galcomps.RadFree, 1)
 
-        if freeser is not None:
-            galcomps.ExpFree = np.append(galcomps.ExpFree, 1)
-        else:
-            galcomps.ExpFree = np.append(galcomps.ExpFree, 0)
+        galcomps.ExpFree = np.append(galcomps.ExpFree, 0)
 
         galcomps.Exp2Free = np.append(galcomps.Exp2Free, 0)
         galcomps.Exp3Free = np.append(galcomps.Exp3Free, 0)
