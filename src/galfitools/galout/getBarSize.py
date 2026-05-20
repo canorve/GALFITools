@@ -17,6 +17,7 @@ from galfitools.galin.galfit import (
     numComps,
 )
 from galfitools.galout.getRads import getBreak2, getKappa2
+from galfitools.galout.getRads import getReComp
 
 # ============================================================================
 # Core domain logic
@@ -127,7 +128,26 @@ def getBarSize(
 
     # bar size is just the average of these two radius
 
-    rbar = (rbreak + rkappa) / 2
+    # rbar = 1.5*(rbreak + rkappa) / 2
+    # rbar = (rbreak + rkappa) / 2
+    rbar = rbreak
+    # rbar = rkappa
+
+    # if rkappa < rbreak:
+    # rbar = rkappa
+    # rbar = comps.Rad[maskgal][1]*2
+    # rbar = comps.Rad[maskgal][1]*1.5
+    # rbar = comps.Rad[maskgal][1]
+
+    angle = comps.PosAng[maskgal][1]
+
+    fracrad = 0.5
+
+    EffRad, totmag, meanme, me, N, theta = getReComp(
+        galfitFile, 3, fracrad, angle, num_comp
+    )
+
+    # rbar = EffRad
 
     # now it creates the ellipse region file
     fout = open(out, "w")
