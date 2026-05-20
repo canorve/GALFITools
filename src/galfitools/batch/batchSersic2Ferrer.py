@@ -173,7 +173,7 @@ def process_file(
         output_path = file_path.parent / output_name
 
         Sersic2Ferrer(
-            galfit_file=file_path.name,
+            galfitFile=file_path.name,
             alpha=alpha,
             beta=beta,
             fileout=output_name,
