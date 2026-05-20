@@ -137,7 +137,7 @@ def getBarSize(
     # rbar = rkappa
     # rbar = comps.Rad[maskgal][1]*2
     # rbar = comps.Rad[maskgal][1]*1.5
-    # rbar = comps.Rad[maskgal][1]
+    rbar = comps.Rad[maskgal][1]
 
     angle = comps.PosAng[maskgal][1]
 
