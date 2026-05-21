@@ -129,8 +129,8 @@ def getBarSize(
     # bar size is just the average of these two radius
 
     # rbar = 1.5*(rbreak + rkappa) / 2
-    # rbar = (rbreak + rkappa) / 2
-    rbar = rbreak
+    rbar = (rbreak + rkappa) / 2
+    # rbar = rbreak
     # rbar = rkappa
 
     # if rkappa < rbreak:
