@@ -32,6 +32,8 @@ def getBarSize(
     ranx: list,
     out: str,
     red: bool,
+    scale=1.0,
+    method="break_kappa",
 ) -> tuple[float, int, float]:
     """gets the bar size of the spiral galaxies
 
@@ -63,6 +65,14 @@ def getBarSize(
          the bar.
     red : bool
             If True, draws DS9 region ellipse as red color
+
+    scale: float
+            constant to multiply the bar length. Default =1
+
+    method: str
+            indicates which method is used to measure the
+            bar length. Options include 'break_kappa', 'break'
+            'kappa','re', 'retot'. Default='break_kappa'
 
     Returns
     -------
@@ -129,25 +139,36 @@ def getBarSize(
     # bar size is just the average of these two radius
 
     # rbar = 1.5*(rbreak + rkappa) / 2
-    rbar = (rbreak + rkappa) / 2
-    # rbar = rbreak
-    # rbar = rkappa
 
-    # if rkappa < rbreak:
-    # rbar = rkappa
-    # rbar = comps.Rad[maskgal][1]*2
-    # rbar = comps.Rad[maskgal][1]*1.5
-    rbar = comps.Rad[maskgal][1]
+    options = ["break_kappa", "break", "kappa", "re", "retot"]
+    if not (method in options):
+        print("option not found. Setting to break_kappa")
+        print("options available: break_kappa, break, kappa, re, retot")
+        method = "break_kappa"
 
-    angle = comps.PosAng[maskgal][1]
+    if method == "break_kappa":
+        rbar = scale * ((rbreak + rkappa) / 2)
 
-    fracrad = 0.5
+    if method == "break":
+        rbar = scale * rbreak
 
-    EffRad, totmag, meanme, me, N, theta = getReComp(
-        galfitFile, 3, fracrad, angle, num_comp
-    )
+    if method == "kappa":
+        rbar = scale * rkappa
 
-    # rbar = EffRad
+    if method == "re":
+        rbar = scale * comps.Rad[maskgal][1]
+
+    if method == "retot":
+
+        angle = comps.PosAng[maskgal][1]
+
+        fracrad = 0.5
+
+        EffRad, totmag, meanme, me, N, theta = getReComp(
+            galfitFile, 3, fracrad, angle, num_comp
+        )
+
+        rbar = scale * EffRad
 
     # now it creates the ellipse region file
     fout = open(out, "w")

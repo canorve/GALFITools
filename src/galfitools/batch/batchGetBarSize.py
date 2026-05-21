@@ -104,7 +104,7 @@ def read_file_list(list_file: Path, encoding: str = DEFAULT_ENCODING) -> list[Pa
 
 
 def process_file(
-    file_path: Path, base_dir: Path, dis, numcomp, plot, ranx, out, red
+    file_path: Path, base_dir: Path, dis, numcomp, plot, ranx, out, red, scale, method
 ) -> BarResult:
     """
     Change to the file directory, process the file, and return the result.
@@ -142,7 +142,9 @@ def process_file(
         plate = Galfit(file_path.name).ReadHead().scale
         inputimage = Galfit(file_path.name).ReadHead().inputimage
 
-        bar, N, theta = getBarSize(file_path.name, dis, numcomp, plot, ranx, out, red)
+        bar, N, theta = getBarSize(
+            file_path.name, dis, numcomp, plot, ranx, out, red, scale, method
+        )
         bar_rounded = round(float(bar), BAR_SIZE_DECIMALS)
         bar_arcsec_rounded = round(float(bar * plate), BAR_SIZE_DECIMALS)
         return BarResult(
@@ -169,7 +171,16 @@ def process_file(
 
 
 def process_files(
-    file_paths: Iterable[Path], base_dir: Path, dis, numcomp, plot, ranx, out, red
+    file_paths: Iterable[Path],
+    base_dir: Path,
+    dis,
+    numcomp,
+    plot,
+    ranx,
+    out,
+    red,
+    scale,
+    method,
 ) -> list[BarResult]:
     """
     Process all files in the input iterable.
@@ -188,7 +199,9 @@ def process_files(
     results: list[BarResult] = []
 
     for file_path in file_paths:
-        result = process_file(file_path, base_dir, dis, numcomp, plot, ranx, out, red)
+        result = process_file(
+            file_path, base_dir, dis, numcomp, plot, ranx, out, red, scale, method
+        )
         results.append(result)
 
     return results
@@ -286,6 +299,8 @@ def getMulBarSize(
     ranx: list,
     out: str,
     red: bool,
+    scale: float,
+    method: str,
     output_file: str,
 ) -> float:
     """gets the bar length of the spiral galaxies
@@ -325,6 +340,16 @@ def getMulBarSize(
     red : bool
             If True, draws DS9 region ellipse as red color
 
+    scale: float
+            constant to multiply the bar length. Default =1
+
+    method: str
+            indicates which method is used to measure the
+            bar length. Options include 'break_kappa', 'break'
+            'kappa','re', 'retot'. Default='break_kappa'
+
+
+
     Returns
     -------
     int
@@ -344,7 +369,7 @@ def getMulBarSize(
 
         file_paths = read_file_list(list_file)
         results = process_files(
-            file_paths, base_dir, dis, numcomp, plot, ranx, out, red
+            file_paths, base_dir, dis, numcomp, plot, ranx, out, red, scale, method
         )
         write_results(results, output_file)
         print_summary(results)
@@ -401,10 +426,36 @@ def mainbatchGetBarSize(argv=None) -> int:
         type=float,
         help="range of radius to search for barlength",
     )
+
+    p.add_argument(
+        "-s",
+        "--scale",
+        type=float,
+        default=1.0,
+        help="constant to multiply the barlength. Default = 1",
+    )
+
+    p.add_argument(
+        "-m",
+        "--method",
+        type=str,
+        default="break_kappa",
+        help="method to compute barleght: break_kappa (default), break, kappa, re, retot",
+    )
+
     a = p.parse_args(argv)
 
     ret = getMulBarSize(
-        a.InputFile, a.dis, a.numcomp, a.plot, a.ranx, a.out, a.red, a.output
+        a.InputFile,
+        a.dis,
+        a.numcomp,
+        a.plot,
+        a.ranx,
+        a.out,
+        a.red,
+        a.scale,
+        a.method,
+        a.output,
     )
     print("done ")
 
