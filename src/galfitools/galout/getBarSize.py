@@ -146,6 +146,8 @@ def getBarSize(
         print("options available: break_kappa, break, kappa, re, retot")
         method = "break_kappa"
 
+    print(f"method used: {method}")
+
     if method == "break_kappa":
         rbar = scale * ((rbreak + rkappa) / 2)
 
