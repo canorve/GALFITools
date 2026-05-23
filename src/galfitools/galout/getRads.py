@@ -1860,13 +1860,13 @@ def getSlope(
     # computing the slope
     #########################
 
-    if plot:  # pragma: no cover
+    if ranx:
+        (xmin, xmax) = ranx[0], ranx[1]
+    else:
+        xmin = 0.1
+        xmax = comps.Rad[maskgal][-1] * 10
 
-        if ranx:
-            (xmin, xmax) = ranx[0], ranx[1]
-        else:
-            xmin = 0.1
-            xmax = 100
+    if plot:  # pragma: no cover
 
         R = np.arange(xmin, xmax, 0.1)
 
@@ -1903,10 +1903,10 @@ class GetSlope:
     """
 
     def FullSlopeSer(
-        self, R: float, Re: list, n: list, q: list, pa: list, theta: float
+        self, R: float, Ie: float, Re: list, n: list, q: list, pa: list, theta: float
     ) -> float:  # pragma: no cover
 
-        SlptotR = self.SlopeSer(R, Re, n, q, pa, theta)
+        SlptotR = self.SlopeSer(R, Ie, Re, n, q, pa, theta)
 
         return SlptotR.sum()
 
@@ -1916,7 +1916,9 @@ class GetSlope:
 
         gam = np.array([])
 
-        if comps.NameComp[maskgal][1] == "ferrer":
+        name_comp = comps.NameComp[maskgal]
+
+        if np.all(name_comp == "ferrer"):
 
             masksersic = comps.NameComp[maskgal] == "sersic"
             maskferrer = comps.NameComp[maskgal] == "ferrer"
