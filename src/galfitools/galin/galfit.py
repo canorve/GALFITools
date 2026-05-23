@@ -703,6 +703,7 @@ def numComps(galcomps: GalComps, name: str) -> int:
             | (galcomps.NameComp == "expdisk")
             | (galcomps.NameComp == "gaussian")
             | (galcomps.NameComp == "devauc")
+            | (galcomps.NameComp == "ferrer")
         )
 
     else:
