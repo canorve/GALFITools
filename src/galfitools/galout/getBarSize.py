@@ -16,7 +16,7 @@ from galfitools.galin.galfit import (
     conver2Sersic,
     numComps,
 )
-from galfitools.galout.getRads import getBreak2, getKappa2
+from galfitools.galout.getRads import getBreak2, getKappa2, getSlope
 from galfitools.galout.getRads import getReComp
 
 # ============================================================================
@@ -72,7 +72,7 @@ def getBarSize(
     method: str
             indicates which method is used to measure the
             bar length. Options include 'break_kappa', 'break'
-            'kappa','re', 'retot'. Default='break_kappa'
+            'kappa','re', 'all'. Default='break_kappa'
 
     Returns
     -------
@@ -132,45 +132,59 @@ def getBarSize(
 
         ranx = [xmin, xmax]
 
-    rbreak, N, theta = getBreak2(galfitFile, dis, theta, num_comp, plot, ranx)
+    rbar = 0
 
-    rkappa, N2, theta2 = getKappa2(galfitFile, dis, theta, num_comp, plot, ranx)
-
-    # bar size is just the average of these two radius
-
-    # rbar = 1.5*(rbreak + rkappa) / 2
-
-    options = ["break_kappa", "break", "kappa", "re", "retot"]
+    options = ["break_kappa", "break", "kappa", "re", "all"]
     if not (method in options):
         print("option not found. Setting to break_kappa")
-        print("options available: break_kappa, break, kappa, re, retot")
+        print("options available: break_kappa, break, kappa, re, all")
         method = "break_kappa"
 
     print(f"method used: {method}")
 
     if method == "break_kappa":
+        rbreak, N, theta = getBreak2(galfitFile, dis, theta, num_comp, plot, ranx)
+        rkappa, N2, theta2 = getKappa2(galfitFile, dis, theta, num_comp, plot, ranx)
+
         rbar = scale * ((rbreak + rkappa) / 2)
 
     if method == "break":
+
+        rbreak, N, theta = getBreak2(galfitFile, dis, theta, num_comp, plot, ranx)
         rbar = scale * rbreak
 
     if method == "kappa":
+
+        rkappa, N2, theta2 = getKappa2(galfitFile, dis, theta, num_comp, plot, ranx)
         rbar = scale * rkappa
 
     if method == "re":
         rbar = scale * comps.Rad[maskgal][1]
 
-    if method == "retot":
+        # slope = 3.12
+        # rgam, N, theta = getSlope(galfitFile, dis, slope, theta, num_comp, plot, ranx)
+        # rbar = rgam
 
-        angle = comps.PosAng[maskgal][1]
+    if method == "all":
 
-        fracrad = 0.5
+        # angle = comps.PosAng[maskgal][1]
+        # fracrad = 0.5
+        # EffRad, totmag, meanme, me, N, theta = getReComp(
+        #    galfitFile, 3, fracrad, angle, num_comp
+        # )
 
-        EffRad, totmag, meanme, me, N, theta = getReComp(
-            galfitFile, 3, fracrad, angle, num_comp
-        )
+        # rbar0 = EffRad
 
-        rbar = scale * EffRad
+        rkappa, N2, theta2 = getKappa2(galfitFile, dis, theta, num_comp, plot, ranx)
+        rbar1 = rkappa
+
+        rbreak, N, theta = getBreak2(galfitFile, dis, theta, num_comp, plot, ranx)
+        rbar2 = rbreak
+
+        rbar3 = comps.Rad[maskgal][1]
+
+        # rbar = (rbar0+rbar1 +rbar2+rbar3)/4
+        rbar = scale * (rbar1 + rbar2 + rbar3) / 3
 
     # now it creates the ellipse region file
     fout = open(out, "w")
