@@ -1935,16 +1935,18 @@ class GetSlope:
                     theta,
                 )
 
-                slp2 = self.SlopeSer(
-                    r,
-                    comps.Ie[maskgal][masksersic],  # change to beta
-                    comps.Rad[maskgal][masksersic],
-                    comps.Exp[maskgal][masksersic],
-                    comps.AxRat[maskgal][masksersic],
-                    comps.PosAng[maskgal][masksersic],
-                    theta,
-                )
-
+                if np.all(name_comp == "sersic"):
+                    slp2 = self.SlopeSer(
+                        r,
+                        comps.Ie[maskgal][masksersic],  # change to beta
+                        comps.Rad[maskgal][masksersic],
+                        comps.Exp[maskgal][masksersic],
+                        comps.AxRat[maskgal][masksersic],
+                        comps.PosAng[maskgal][masksersic],
+                        theta,
+                    )
+                else:
+                    slp2 = 0
                 gam = np.append(gam, slp1 + slp2)
 
         else:
