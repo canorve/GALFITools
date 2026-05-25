@@ -496,7 +496,7 @@ def mainGetBulgeRad(argv=None) -> int:
     if a.angle:
         print(f"position angle: {theta:.2f} degrees\n")
     else:
-        print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
+        print(f"position angle: {theta:.2f} degrees, taken from component {N2}\n")
 
     print(f"The bulge radius is:\n")
     print(f"  pixels  arcsec ")
