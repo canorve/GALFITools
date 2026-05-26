@@ -2200,11 +2200,15 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
         plt.minorticks_on()
         plt.savefig("BulgeRad.png")
 
-    # computing bulge radius
+    maskgal = comps1.Active == 1  # using active components only
+
+    a = 0.1
+    b = comps1.Rad[maskgal][-1] * 10  # hope it doesn't crash
+
     try:
-        rbulge = newton(getDiffx, 0, args=(head1, comps1, comps2, theta))
+        rbulge = bisect(getDiffx, a, b, args=(head1, comps1, comps2, theta))
     except Exception:  # pragma: no cover
-        print("solution not found for initial parameter")
+        print("solution not found in given range")
         rbulge = 0
 
     return rbulge, N1, N2, theta
@@ -2257,7 +2261,10 @@ def getDiffx(r, head1, comps1, comps2, theta):
     Ir1 = GetIr().Ir(head1, comps1, r, theta)
     Ir2 = GetIr().Ir(head1, comps2, r, theta)
 
-    Irdx = Ir1 - Ir2
+    # tol = .01
+    tol = 0.05
+
+    Irdx = Ir1 - Ir2 - tol
 
     return Irdx
 
