@@ -20,6 +20,7 @@ def megaMask(
     maskbits_file: str,
     output="megamask.fits",
     rem_masksky=False,
+    rem_mask=False,
     ds9ellipse=None,
 ):
     """
@@ -38,6 +39,9 @@ def megaMask(
     rem_masksky: bool
        If True, removes central galaxy from masksky using DS9 ellipse maskbits region file
        recommended if central galaxy has not been removed from this mask.
+    rem_mask: bool
+       If True, removes completelly the central galaxy from maskbits using DS9 ellipse maskbits region file
+       If false, removes the central galaxy for those pixels where the galaxy is labeled in maskbits
     output: str optional
         name of the output mask fits file. Default: megamask.fits
 
@@ -66,12 +70,19 @@ def megaMask(
     # and optional for the masksky image. It is expected that
     # galaxy is already removed for masksky
 
-    maskDs9(
-        "tempmaskbits.fits",
-        ds9maskbits,
-        0,
-        pixval=maskbits_value,
-    )
+    if rem_mask:
+        maskDs9(
+            "tempmaskbits.fits",
+            ds9maskbits,
+            0,
+        )
+    else:
+        maskDs9(
+            "tempmaskbits.fits",
+            ds9maskbits,
+            0,
+            pixval=maskbits_value,
+        )
 
     maskDs9(
         segmentation_file,
@@ -150,6 +161,12 @@ def mainmegaMask():
     )
 
     parser.add_argument(
+        "--rem_mask",
+        action="store_true",
+        help="remove completelly the central galaxy from maskbits. Otherwise, It will just remove those pixels where the galaxy is indicated in maskbits",
+    )
+
+    parser.add_argument(
         "-d",
         "--ds9ellipse",
         type=str,
@@ -180,6 +197,7 @@ def mainmegaMask():
         maskbits_file,
         args.output,
         args.rem_masksky,
+        args.rem_mask,
         ds9ellipse=args.ds9ellipse,
     )
 
