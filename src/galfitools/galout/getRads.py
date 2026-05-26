@@ -15,7 +15,7 @@ from galfitools.galin.galfit import (
     numComps,
 )
 from scipy.interpolate import UnivariateSpline
-from scipy.optimize import bisect, newton
+from scipy.optimize import bisect
 from scipy.special import gamma, gammainc, gammaincinv
 
 
@@ -1474,7 +1474,9 @@ def getReComp(
            it will take the angle of the last components
     num_comp: int
             Number of component from which the center of all
-            components will be determined.
+            components will be determined. If different than 1,
+            Effective radius will be computed in the angular
+            position of this component.
     mecorr: float
             surface brightness correction for universe expansion
 
@@ -1521,7 +1523,10 @@ def getReComp(
     if angle:  # pragma: no cover
         theta = angle
     else:
-        theta = galcomps.PosAng[maskgal][-1]
+        if num_comp != 1:
+            theta = galcomps.PosAng[maskgal][num_comp - 1]
+        else:
+            theta = galcomps.PosAng[maskgal][-1]
 
     # convert all exp, gaussian and de vaucouleurs to Sersic format
     comps = conver2Sersic(galcomps)

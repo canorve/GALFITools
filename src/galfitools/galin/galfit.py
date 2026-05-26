@@ -781,6 +781,42 @@ def SelectGal(galcomps: GalComps, distmax: float, n_comp: int) -> GalComps:
     return galcomps
 
 
+def SelectComp(galcomps: GalComps, n_comp: int) -> GalComps:
+    """Selects only a component for galcomps.
+
+    From the data class GalComps, it changes the flag Active to
+    True for one components indicated  in n_comp.
+
+    useful for selecting for one component
+
+    Parameters
+    ----------
+    galcomps : GalComps data class defined above
+    n_comp : int
+             the component to select to be active
+    Returns
+    -------
+    galcomps : GalComps data class with flag Active = True for
+              one component selected
+              by n_comp.
+
+
+    """
+
+    comps = copy.deepcopy(galcomps)
+    comps.Active.fill(False)
+
+    idx = np.where(comps.N == n_comp)
+
+    assert idx[0].size != 0, "component not found"
+
+    n_idx = idx[0].item(0)
+
+    comps.Active[n_idx] = True
+
+    return comps
+
+
 def conver2Sersic(galcomps: GalComps) -> GalComps:
     """Converts the exponential, gaussian or De Vaucouleurs to Sersic
 

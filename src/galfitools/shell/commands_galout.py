@@ -173,7 +173,7 @@ def mainGetBarSize(argv=None) -> int:
         "--method",
         type=str,
         default="break_kappa",
-        help="method to compute barleght: break_kappa (default), break, kappa, re, all",
+        help="method to compute barlength: break_kappa (default), break, kappa, re, disk, all",
     )
 
     a = p.parse_args(argv)
