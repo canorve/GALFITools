@@ -15,7 +15,7 @@ from galfitools.galin.galfit import (
     numComps,
 )
 from scipy.interpolate import UnivariateSpline
-from scipy.optimize import bisect, newton
+from scipy.optimize import bisect
 from scipy.special import gamma, gammainc, gammaincinv
 
 
@@ -123,11 +123,13 @@ def getBreak(
     # taking the last component position angle for the whole galaxy
 
     maskgal = comps.Active == 1
-
     if angle:  # pragma: no cover
         theta = angle
     else:
-        theta = comps.PosAng[maskgal][-1]
+        if num_comp != 1:
+            theta = comps.PosAng[maskgal][num_comp - 1]
+        else:
+            theta = comps.PosAng[maskgal][-1]
 
     N = numComps(comps, "all")
 
@@ -232,18 +234,6 @@ class GetBreak:
 
     """
 
-    """
-    def FullSlopeSer(
-        self, R: float, Re: list, n: list, q: list, pa: list, theta: float
-    ) -> float:
-        # not used here
-
-        SlptotR = self.SlopeSer(R, Re, n, q, pa, theta)
-
-        return SlptotR.sum()
-
-    """
-
     def GalBreak(
         self, R: list, comps: GalComps, theta: float
     ) -> float:  # pragma: no cover
@@ -267,26 +257,6 @@ class GetBreak:
             kappa = np.append(kappa, beta)
 
         return kappa
-
-    """
-    def funGalSlopeSer(
-        self,
-        R: float,
-        Ie: list,
-        Re: list,
-        n: list,
-        q: list,
-        pa: list,
-        theta: float,
-        slope: float,
-    ) -> float:
-        # not used here
-
-        fun = self.SlopeSer(R, Ie, Re, n, q, pa, theta) - slope
-
-        return fun
-
-    """
 
     def FindBreak(
         self, comps: GalComps, theta: float, initial_comp: int
@@ -348,40 +318,6 @@ class GetBreak:
         beta = self.BreakSer(R, Ie, Re, n, q, pa, theta)
 
         return beta
-
-    """
-    def FindSlope(self, comps: GalComps, theta: float, slope: float) -> float:
-        "return the Re of a set of Sersic functions. It uses Bisection"
-        # not used here
-
-        maskgal = comps.Active == 1  # using active components only
-
-        a = 0.1
-        b = comps.Rad[maskgal][-1] * 10  # hope it doesn't crash
-
-        try:
-            Radslp = bisect(
-                self.funGalSlopeSer,
-                a,
-                b,
-                args=(
-                    comps.Ie[maskgal],
-                    comps.Rad[maskgal],
-                    comps.Exp[maskgal],
-                    comps.AxRat[maskgal],
-                    comps.PosAng[maskgal],
-                    theta,
-                    slope,
-                ),
-            )
-
-        except Exception:
-            print("unable to solve equation in the given range. Setting Radslp to 0")
-            Radslp = 0
-
-        return Radslp
-
-    """
 
     def var_X(self, R: float, Re: list, n: list):
 
@@ -545,11 +481,13 @@ def getBreak2(
     comps = SelectGal(comps, dis, num_comp)
 
     maskgal = comps.Active == 1
-    if angle:
+    if angle:  # pragma: no cover
         theta = angle
     else:
-        # taking the last component position angle for the whole galaxy
-        theta = comps.PosAng[maskgal][-1]
+        if num_comp != 1:
+            theta = galcomps.PosAng[maskgal][num_comp - 1]
+        else:
+            theta = galcomps.PosAng[maskgal][-1]
 
     N = numComps(comps, "all")
 
@@ -688,11 +626,13 @@ def getKappa2(
     comps = SelectGal(comps, dis, num_comp)
 
     maskgal = comps.Active == 1
-    if angle:
+    if angle:  # pragma: no cover
         theta = angle
     else:
-        # taking the last component position angle for the whole galaxy
-        theta = comps.PosAng[maskgal][-1]
+        if num_comp != 1:
+            theta = comps.PosAng[maskgal][num_comp - 1]
+        else:
+            theta = comps.PosAng[maskgal][-1]
 
     N = numComps(comps, "all")
 
@@ -805,11 +745,13 @@ def getFWHM(galfitFile: str, dis: int, angle: float, num_comp: int):
     # taking the last component position angle for the whole galaxy
 
     maskgal = comps.Active == 1
-
     if angle:  # pragma: no cover
         theta = angle
     else:
-        theta = comps.PosAng[maskgal][-1]
+        if num_comp != 1:
+            theta = comps.PosAng[maskgal][num_comp - 1]
+        else:
+            theta = comps.PosAng[maskgal][-1]
 
     N = numComps(comps, "all")
 
@@ -1088,7 +1030,10 @@ def getKappa(
     if angle:  # pragma: no cover
         theta = angle
     else:
-        theta = comps.PosAng[maskgal][-1]
+        if num_comp != 1:
+            theta = comps.PosAng[maskgal][num_comp - 1]
+        else:
+            theta = comps.PosAng[maskgal][-1]
 
     N = numComps(comps, "all")
 
@@ -1195,18 +1140,6 @@ class GetKappa:
 
     BetaSer : kappa function to a determined R
 
-
-    """
-
-    """
-    def FullSlopeSer(
-        self, R: float, Re: list, n: list, q: list, pa: list, theta: float
-    ) -> float:
-        # not used here
-
-        SlptotR = self.SlopeSer(R, Re, n, q, pa, theta)
-
-        return SlptotR.sum()
 
     """
 
@@ -1329,40 +1262,6 @@ class GetKappa:
 
         return krads
 
-    """
-    def FindSlope(self, comps: GalComps, theta: float, slope: float) -> float:
-        "return the Re of a set of Sersic functions. It uses Bisection"
-        # not used here
-
-        maskgal = comps.Active == 1  # using active components only
-
-        a = 0.1
-        b = comps.Rad[maskgal][-1] * 10  # hope it doesn't crash
-
-        try:
-            Radslp = bisect(
-                self.funGalSlopeSer,
-                a,
-                b,
-                args=(
-                    comps.Ie[maskgal],
-                    comps.Rad[maskgal],
-                    comps.Exp[maskgal],
-                    comps.AxRat[maskgal],
-                    comps.PosAng[maskgal],
-                    theta,
-                    slope,
-                ),
-            )
-
-        except Exception:
-            print("solution not found in given range")
-            Radslp = 0
-
-        return Radslp
-
-    """
-
     def var_X(self, R: float, Re: list, n: list):
 
         k = gammaincinv(2 * n, 0.5)
@@ -1474,7 +1373,9 @@ def getReComp(
            it will take the angle of the last components
     num_comp: int
             Number of component from which the center of all
-            components will be determined.
+            components will be determined. If different than 1,
+            Effective radius will be computed in the angular
+            position of this component.
     mecorr: float
             surface brightness correction for universe expansion
 
@@ -1521,7 +1422,10 @@ def getReComp(
     if angle:  # pragma: no cover
         theta = angle
     else:
-        theta = galcomps.PosAng[maskgal][-1]
+        if num_comp != 1:
+            theta = galcomps.PosAng[maskgal][num_comp - 1]
+        else:
+            theta = galcomps.PosAng[maskgal][-1]
 
     # convert all exp, gaussian and de vaucouleurs to Sersic format
     comps = conver2Sersic(galcomps)
@@ -1843,11 +1747,13 @@ def getSlope(
     # taking the last component position angle for the whole galaxy
 
     maskgal = comps.Active == 1
-
     if angle:  # pragma: no cover
         theta = angle
     else:
-        theta = comps.PosAng[maskgal][-1]
+        if num_comp != 1:
+            theta = comps.PosAng[maskgal][num_comp - 1]
+        else:
+            theta = comps.PosAng[maskgal][-1]
 
     N = numComps(comps, "all")
 
@@ -1860,13 +1766,13 @@ def getSlope(
     # computing the slope
     #########################
 
-    if plot:  # pragma: no cover
+    if ranx:
+        (xmin, xmax) = ranx[0], ranx[1]
+    else:
+        xmin = 0.1
+        xmax = comps.Rad[maskgal][-1] * 10
 
-        if ranx:
-            (xmin, xmax) = ranx[0], ranx[1]
-        else:
-            xmin = 0.1
-            xmax = 100
+    if plot:  # pragma: no cover
 
         R = np.arange(xmin, xmax, 0.1)
 
@@ -1903,10 +1809,10 @@ class GetSlope:
     """
 
     def FullSlopeSer(
-        self, R: float, Re: list, n: list, q: list, pa: list, theta: float
+        self, R: float, Ie: float, Re: list, n: list, q: list, pa: list, theta: float
     ) -> float:  # pragma: no cover
 
-        SlptotR = self.SlopeSer(R, Re, n, q, pa, theta)
+        SlptotR = self.SlopeSer(R, Ie, Re, n, q, pa, theta)
 
         return SlptotR.sum()
 
@@ -1916,7 +1822,9 @@ class GetSlope:
 
         gam = np.array([])
 
-        if comps.NameComp[maskgal][1] == "ferrer":
+        name_comp = comps.NameComp[maskgal]
+
+        if np.all(name_comp == "ferrer"):
 
             masksersic = comps.NameComp[maskgal] == "sersic"
             maskferrer = comps.NameComp[maskgal] == "ferrer"
@@ -1933,16 +1841,18 @@ class GetSlope:
                     theta,
                 )
 
-                slp2 = self.SlopeSer(
-                    r,
-                    comps.Ie[maskgal][masksersic],  # change to beta
-                    comps.Rad[maskgal][masksersic],
-                    comps.Exp[maskgal][masksersic],
-                    comps.AxRat[maskgal][masksersic],
-                    comps.PosAng[maskgal][masksersic],
-                    theta,
-                )
-
+                if np.all(name_comp == "sersic"):
+                    slp2 = self.SlopeSer(
+                        r,
+                        comps.Ie[maskgal][masksersic],  # change to beta
+                        comps.Rad[maskgal][masksersic],
+                        comps.Exp[maskgal][masksersic],
+                        comps.AxRat[maskgal][masksersic],
+                        comps.PosAng[maskgal][masksersic],
+                        theta,
+                    )
+                else:
+                    slp2 = 0
                 gam = np.append(gam, slp1 + slp2)
 
         else:
@@ -2196,11 +2106,15 @@ def getBulgeRad(galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx):
         plt.minorticks_on()
         plt.savefig("BulgeRad.png")
 
-    # computing bulge radius
+    maskgal = comps1.Active == 1  # using active components only
+
+    a = 0.1
+    b = comps1.Rad[maskgal][-1] * 10  # hope it doesn't crash
+
     try:
-        rbulge = newton(getDiffx, 0, args=(head1, comps1, comps2, theta))
+        rbulge = bisect(getDiffx, a, b, args=(head1, comps1, comps2, theta))
     except Exception:  # pragma: no cover
-        print("solution not found for initial parameter")
+        print("solution not found in given range")
         rbulge = 0
 
     return rbulge, N1, N2, theta
@@ -2253,7 +2167,11 @@ def getDiffx(r, head1, comps1, comps2, theta):
     Ir1 = GetIr().Ir(head1, comps1, r, theta)
     Ir2 = GetIr().Ir(head1, comps2, r, theta)
 
-    Irdx = Ir1 - Ir2
+    # tol = .01
+    # tol = 0.05
+    tol = 0
+
+    Irdx = Ir1 - Ir2 - tol
 
     return Irdx
 

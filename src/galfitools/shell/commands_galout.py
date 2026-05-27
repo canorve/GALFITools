@@ -160,10 +160,33 @@ def mainGetBarSize(argv=None) -> int:
         type=float,
         help="range of radius to search for barlength",
     )
+    p.add_argument(
+        "-s",
+        "--scale",
+        type=float,
+        default=1.0,
+        help="constant to multiply the barlength. Default = 1",
+    )
+
+    p.add_argument(
+        "-m",
+        "--method",
+        type=str,
+        default="break_kappa",
+        help="method to compute barlength: break_kappa (default), break, kappa, re, disk, all",
+    )
 
     a = p.parse_args(argv)
     rbar, N, theta = getBarSize(
-        a.GalfitFile, a.dis, a.numcomp, a.plot, a.ranx, a.out, a.red
+        a.GalfitFile,
+        a.dis,
+        a.numcomp,
+        a.plot,
+        a.ranx,
+        a.out,
+        a.red,
+        scale=a.scale,
+        method=a.method,
     )
     plate = Galfit(a.GalfitFile).ReadHead().scale
     print("number of model components: ", N)
@@ -473,7 +496,7 @@ def mainGetBulgeRad(argv=None) -> int:
     if a.angle:
         print(f"position angle: {theta:.2f} degrees\n")
     else:
-        print(f"position angle: {theta:.2f} degrees, taken from component {N}\n")
+        print(f"position angle: {theta:.2f} degrees, taken from component {N2}\n")
 
     print(f"The bulge radius is:\n")
     print(f"  pixels  arcsec ")

@@ -300,7 +300,7 @@ def test_getBulgeRad():
         galfitFile1, galfitFile2, dis, num_comp, angle, plot, ranx
     )
 
-    result = 3.86
+    result = 116.83126964
     tol = 1e-2
 
     diffrbulge = abs(rbulge - result)
