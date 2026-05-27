@@ -137,10 +137,10 @@ def getBarSize(
 
     rbar = 0
 
-    options = ["break_kappa", "break", "kappa", "re", "all"]
+    options = ["break_kappa", "break", "kappa", "disk", "re", "all"]
     if not (method in options):
         print("option not found. Setting to break_kappa")
-        print("options available: break_kappa, break, kappa, re, all")
+        print("options available: break_kappa, break, kappa, disk, re, all")
         method = "break_kappa"
 
     print(f"method used: {method}")
@@ -256,21 +256,21 @@ def findDisk(galfitFile, dis, num_comp, angle, plot, ranx):
     head = galfit.ReadHead()
     galcomps = galfit.ReadComps()
 
-    galcomps = SelectGal(galcomps, dis, num_comp)
+    # convert all exp, gaussian and de vaucouleurs to Sersic format
+    # check this later for Ferrer
+    galcomps = conver2Sersic(galcomps)
+
+    comps = SelectGal(galcomps, dis, num_comp)
     comps2 = SelectComp(galcomps, 2)  # it assumes bar is 2 component
 
     # taking the second component position angle
 
-    maskgal = galcomps.Active == 1
+    maskgal = comps.Active == 1
 
     if angle:  # pragma: no cover
         theta = angle
     else:
-        theta = galcomps.PosAng[maskgal][1]  # bar angle
-
-    # convert all exp, gaussian and de vaucouleurs to Sersic format
-    # check this later for Ferrer
-    comps = conver2Sersic(galcomps)
+        theta = comps.PosAng[maskgal][1]  # bar angle
 
     N = numComps(comps, "all")
 
@@ -309,7 +309,7 @@ def findDisk(galfitFile, dis, num_comp, angle, plot, ranx):
         plt.ylabel("I")
         plt.grid(True)
         plt.minorticks_on()
-        plt.savefig("BulgeRad.png")
+        plt.savefig("findisk.png")
 
     maskgal = comps.Active == 1  # using active components only
 
