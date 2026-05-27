@@ -122,14 +122,14 @@ def getBreak(
 
     # taking the last component position angle for the whole galaxy
 
-    maskgal = galcomps.Active == 1
+    maskgal = comps.Active == 1
     if angle:  # pragma: no cover
         theta = angle
     else:
         if num_comp != 1:
-            theta = galcomps.PosAng[maskgal][num_comp - 1]
+            theta = comps.PosAng[maskgal][num_comp - 1]
         else:
-            theta = galcomps.PosAng[maskgal][-1]
+            theta = comps.PosAng[maskgal][-1]
 
     N = numComps(comps, "all")
 
@@ -480,7 +480,7 @@ def getBreak2(
 
     comps = SelectGal(comps, dis, num_comp)
 
-    maskgal = galcomps.Active == 1
+    maskgal = comps.Active == 1
     if angle:  # pragma: no cover
         theta = angle
     else:
@@ -625,14 +625,14 @@ def getKappa2(
 
     comps = SelectGal(comps, dis, num_comp)
 
-    maskgal = galcomps.Active == 1
+    maskgal = comps.Active == 1
     if angle:  # pragma: no cover
         theta = angle
     else:
         if num_comp != 1:
-            theta = galcomps.PosAng[maskgal][num_comp - 1]
+            theta = comps.PosAng[maskgal][num_comp - 1]
         else:
-            theta = galcomps.PosAng[maskgal][-1]
+            theta = comps.PosAng[maskgal][-1]
 
     N = numComps(comps, "all")
 
@@ -744,14 +744,14 @@ def getFWHM(galfitFile: str, dis: int, angle: float, num_comp: int):
 
     # taking the last component position angle for the whole galaxy
 
-    maskgal = galcomps.Active == 1
+    maskgal = comps.Active == 1
     if angle:  # pragma: no cover
         theta = angle
     else:
         if num_comp != 1:
-            theta = galcomps.PosAng[maskgal][num_comp - 1]
+            theta = comps.PosAng[maskgal][num_comp - 1]
         else:
-            theta = galcomps.PosAng[maskgal][-1]
+            theta = comps.PosAng[maskgal][-1]
 
     N = numComps(comps, "all")
 
@@ -1026,14 +1026,14 @@ def getKappa(
 
     # taking the last component position angle for the whole galaxy
 
-    maskgal = galcomps.Active == 1
+    maskgal = comps.Active == 1
     if angle:  # pragma: no cover
         theta = angle
     else:
         if num_comp != 1:
-            theta = galcomps.PosAng[maskgal][num_comp - 1]
+            theta = comps.PosAng[maskgal][num_comp - 1]
         else:
-            theta = galcomps.PosAng[maskgal][-1]
+            theta = comps.PosAng[maskgal][-1]
 
     N = numComps(comps, "all")
 
@@ -1746,14 +1746,14 @@ def getSlope(
 
     # taking the last component position angle for the whole galaxy
 
-    maskgal = galcomps.Active == 1
+    maskgal = comps.Active == 1
     if angle:  # pragma: no cover
         theta = angle
     else:
         if num_comp != 1:
-            theta = galcomps.PosAng[maskgal][num_comp - 1]
+            theta = comps.PosAng[maskgal][num_comp - 1]
         else:
-            theta = galcomps.PosAng[maskgal][-1]
+            theta = comps.PosAng[maskgal][-1]
 
     N = numComps(comps, "all")
 
@@ -2168,7 +2168,8 @@ def getDiffx(r, head1, comps1, comps2, theta):
     Ir2 = GetIr().Ir(head1, comps2, r, theta)
 
     # tol = .01
-    tol = 0.05
+    # tol = 0.05
+    tol = 0
 
     Irdx = Ir1 - Ir2 - tol
 

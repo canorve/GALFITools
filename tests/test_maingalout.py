@@ -512,7 +512,7 @@ def test_mainGetBulgeRad(monkeypatch, capsys):
 
 def test_mainGetBarSize(monkeypatch, capsys):
     # stub heavy functions
-    monkeypatch.setattr(cli, "getBarSize", lambda *a: (20.0, 1, 17))
+    monkeypatch.setattr(cli, "getBarSize", lambda *args, **kwargs: (20.0, 1, 17))
 
     class Head:
         scale = 1.0
@@ -522,16 +522,33 @@ def test_mainGetBarSize(monkeypatch, capsys):
     )
     monkeypatch.setattr(cli, "printWelcome", lambda: None)
 
-    # minimal valid args (no ranx, no plot)
     rc = cli.mainGetBarSize(["g.01", "-d", "5", "-n", "1", "-o", "bar.reg"])
+
     assert rc == 0
+
     out = capsys.readouterr().out
     textout = "number of model components:  1\nThe bar length is:  \n\n  pixels   arcsec \n   20.00     20.00  \n\n"
     assert textout in out
 
     # with plot flag and ranx range
     rc = cli.mainGetBarSize(
-        ["g.01", "-d", "5", "-n", "1", "-o", "bar.reg", "--plot", "-rx", "10", "100"]
+        [
+            "g.01",
+            "-d",
+            "5",
+            "-n",
+            "1",
+            "-o",
+            "bar.reg",
+            "--plot",
+            "-rx",
+            "10",
+            "100",
+            "-s",
+            "1.0",
+            "-m",
+            "re",
+        ]
     )
     assert rc == 0
 
