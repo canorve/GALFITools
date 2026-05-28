@@ -15,6 +15,7 @@ from scipy.optimize import bisect
 from galfitools.galin.galfit import (
     Galfit,
     SelectGal,
+    GetRadAng,
     SelectComp,
     conver2Sersic,
     numComps,
@@ -399,6 +400,15 @@ class GetIr:
            the surface brightnness
            per component at R
 
+    Itotfer : method called by Ir to obtain the
+              total surface brightness of ferrer model
+              set components at R
+    Ifer : method called by Itotfer to obtain
+           the surface brightnness of ferrer moodel
+           per component at R
+
+
+
 
     """
 
@@ -406,6 +416,7 @@ class GetIr:
 
         # comps.Rad = comps.Rad*head.scale
         comps.Flux = 10 ** ((head.mgzpt - comps.Mag) / 2.5)
+        comps.Io = 10 ** ((-comps.Mag) / 2.5)
 
         k = gammaincinv(2 * comps.Exp, 0.5)
 
@@ -418,17 +429,31 @@ class GetIr:
 
         comps.Ie = comps.Flux / denom
 
-        maskgal = comps.Active == 1
+        maskgalser = (comps.Active == 1) * (comps.NameComp == "sersic")
+        maskgalfer = (comps.Active == 1) * (comps.NameComp == "ferrer")
 
-        Itotr = self.Itotser(
-            R,
-            comps.Ie[maskgal],
-            comps.Rad[maskgal],
-            comps.Exp[maskgal],
-            comps.AxRat[maskgal],
-            comps.PosAng[maskgal],
-            theta,
-        )
+        if maskgalser.any():
+            Itotr = self.Itotser(
+                R,
+                comps.Ie[maskgalser],
+                comps.Rad[maskgalser],
+                comps.Exp[maskgalser],
+                comps.AxRat[maskgalser],
+                comps.PosAng[maskgalser],
+                theta,
+            )
+
+        if maskgalfer.any():
+            Itotr = self.Itotfer(
+                R,
+                comps.Io[maskgalfer],
+                comps.Rad[maskgalfer],
+                comps.Exp[maskgalfer],
+                comps.Exp2[maskgalfer],
+                comps.AxRat[maskgalfer],
+                comps.PosAng[maskgalfer],
+                theta,
+            )
 
         return Itotr
 
@@ -450,5 +475,40 @@ class GetIr:
         Rcor = GetRadAng(R, q, pa, theta)
 
         Ir = Ie * np.exp(-k * ((Rcor / Re) ** (1 / n) - 1))
+
+        return Ir
+
+    def Itotfer(
+        self,
+        R: float,
+        Io: list,
+        rad: list,
+        n: list,
+        n2: list,
+        q: list,
+        pa: list,
+        theta: float,
+    ) -> float:
+
+        ItotR = self.Ifer(R, Io, rad, n, n2, q, pa, theta)
+
+        return ItotR.sum()
+
+    def Ifer(
+        self,
+        R: float,
+        Io: list,
+        Re: list,
+        n: list,
+        n2: list,
+        q: list,
+        pa: list,
+        theta: float,
+    ) -> float:
+        """sersic flux to a determined R"""
+
+        Rcor = GetRadAng(R, q, pa, theta)
+
+        Ir = Io * (1 - (Rcor / Re) ** (2 - n2)) ** n
 
         return Ir
