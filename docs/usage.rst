@@ -992,6 +992,31 @@ can be a Ferrer model.
   options:
     -h, --help  show this help message and exit
 
+
+
+**splitComp** Split a GALFIT file into several files, one per non-sky component. 
+
+::
+
+    Parameters
+    ----------
+    galfit_file : pathlib.Path
+        Input GALFIT file.
+    output_dir : pathlib.Path or None, optional
+        Directory where the output files are written. If `None`, the files are
+        written in the same directory as `galfit_file`.
+
+    Returns
+    -------
+    list of pathlib.Path
+        Paths of the generated files.
+
+    Notes
+    -----
+    The script keeps the original GALFIT header, defined as all lines before
+    the first ``# Component number:`` block. The sky component is ignored.
+
+
 -----------------
 
 **MGE**
