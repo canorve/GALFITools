@@ -166,9 +166,9 @@ def getBarSize(
         rbar = scale * comps.Rad[maskgal][1]
 
     if method == "disk":
-        rbar = scale * comps.Rad[maskgal][1]
+        # rbar = scale * comps.Rad[maskgal][1]
 
-        rbar = findDisk(galfitFile, dis, theta, num_comp, plot, ranx)
+        rbar = findDisk(galfitFile, dis, num_comp, theta, plot, ranx)
 
     if method == "all":
 
@@ -262,7 +262,7 @@ def findDisk(galfitFile, dis, num_comp, angle, plot, ranx):
     galcomps = conver2Sersic(galcomps)
 
     comps = SelectGal(galcomps, dis, num_comp)
-    comps2 = SelectComp(galcomps, 2)  # it assumes bar is 2 component
+    comps2 = SelectComp(galcomps, 3)  # it assumes Disk is 3 component
 
     # taking the second component position angle
 
@@ -271,7 +271,9 @@ def findDisk(galfitFile, dis, num_comp, angle, plot, ranx):
     if angle:  # pragma: no cover
         theta = angle
     else:
-        theta = comps.PosAng[maskgal][1]  # bar angle
+        theta = comps.PosAng[maskgal][
+            1
+        ]  # bar angle, Radius computed in this orientation
 
     N = numComps(comps, "all")
 
@@ -416,7 +418,7 @@ class GetIr:
 
         # comps.Rad = comps.Rad*head.scale
         comps.Flux = 10 ** ((head.mgzpt - comps.Mag) / 2.5)
-        comps.Io = 10 ** ((-comps.Mag) / 2.5)
+        # comps.Io = 10 ** ((-comps.Mag) / 2.5)
 
         k = gammaincinv(2 * comps.Exp, 0.5)
 
@@ -430,21 +432,21 @@ class GetIr:
         comps.Ie = comps.Flux / denom
 
         maskgalser = (comps.Active == 1) * (comps.NameComp == "sersic")
-        maskgalfer = (comps.Active == 1) * (comps.NameComp == "ferrer")
+        # maskgalfer = (comps.Active == 1) * (comps.NameComp == "ferrer")
 
-        if maskgalser.any():
-            Itotr = self.Itotser(
-                R,
-                comps.Ie[maskgalser],
-                comps.Rad[maskgalser],
-                comps.Exp[maskgalser],
-                comps.AxRat[maskgalser],
-                comps.PosAng[maskgalser],
-                theta,
-            )
+        Itotr = self.Itotser(
+            R,
+            comps.Ie[maskgalser],
+            comps.Rad[maskgalser],
+            comps.Exp[maskgalser],
+            comps.AxRat[maskgalser],
+            comps.PosAng[maskgalser],
+            theta,
+        )
 
+        """
         if maskgalfer.any():
-            Itotr = self.Itotfer(
+            Itotrfer = self.Itotfer(
                 R,
                 comps.Io[maskgalfer],
                 comps.Rad[maskgalfer],
@@ -454,6 +456,7 @@ class GetIr:
                 comps.PosAng[maskgalfer],
                 theta,
             )
+        """
 
         return Itotr
 

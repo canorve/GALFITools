@@ -2168,8 +2168,8 @@ def getDiffx(r, head1, comps1, comps2, theta):
     Ir2 = GetIr().Ir(head1, comps2, r, theta)
 
     # tol = .01
-    # tol = 0.05
-    tol = 0
+    tol = 0.05
+    # tol = 0
 
     Irdx = Ir1 - Ir2 - tol
 
