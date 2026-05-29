@@ -376,7 +376,7 @@ def getDiffx(r, head1, comps1, comps2, theta):
     Ir2 = GetIr().Ir(head1, comps2, r, theta)
 
     # tol = .01
-    tol = 0.05
+    tol = 0.05  # must use tol constat otherwise never find solution
 
     Irdx = Ir1 - Ir2 - tol
 
@@ -410,8 +410,6 @@ class GetIr:
            per component at R
 
 
-
-
     """
 
     def Ir(self, head, comps, R, theta):
@@ -431,40 +429,55 @@ class GetIr:
 
         comps.Ie = comps.Flux / denom
 
-        maskgalser = (comps.Active == 1) * (comps.NameComp == "sersic")
-        # maskgalfer = (comps.Active == 1) * (comps.NameComp == "ferrer")
-
-        Itotr = self.Itotser(
+        maskgal = comps.Active == 1
+        Itotr = self.Itotserfer(
             R,
-            comps.Ie[maskgalser],
-            comps.Rad[maskgalser],
-            comps.Exp[maskgalser],
-            comps.AxRat[maskgalser],
-            comps.PosAng[maskgalser],
+            comps.NameComp[maskgal],
+            comps.Ie[maskgal],
+            comps.Rad[maskgal],
+            comps.Exp[maskgal],
+            comps.Exp2[maskgal],
+            comps.AxRat[maskgal],
+            comps.PosAng[maskgal],
             theta,
         )
 
-        """
-        if maskgalfer.any():
-            Itotrfer = self.Itotfer(
-                R,
-                comps.Io[maskgalfer],
-                comps.Rad[maskgalfer],
-                comps.Exp[maskgalfer],
-                comps.Exp2[maskgalfer],
-                comps.AxRat[maskgalfer],
-                comps.PosAng[maskgalfer],
-                theta,
-            )
-        """
-
         return Itotr
 
-    def Itotser(
-        self, R: float, Ie: list, rad: list, n: list, q: list, pa: list, theta: float
+    def Itotserfer(
+        self,
+        R: float,
+        NameComp: str,
+        Ie: list,
+        rad: list,
+        n: list,
+        n2: list,
+        q: list,
+        pa: list,
+        theta: float,
     ) -> float:
 
-        ItotR = self.Iser(R, Ie, rad, n, q, pa, theta)
+        maskser = NameComp == "sersic"
+        maskfer = NameComp == "ferrer"
+
+        if maskser.any():
+
+            ItotR = self.Iser(
+                R, Ie[maskser], rad[maskser], n[maskser], q[maskser], pa[maskser], theta
+            )
+
+        if maskfer.any():
+
+            ItotR = self.Ifer(
+                R,
+                Ie[maskfer],
+                rad[maskser],
+                n[maskser],
+                n2[maskser],
+                q[maskser],
+                pa[maskser],
+                theta,
+            )
 
         return ItotR.sum()
 
@@ -480,22 +493,6 @@ class GetIr:
         Ir = Ie * np.exp(-k * ((Rcor / Re) ** (1 / n) - 1))
 
         return Ir
-
-    def Itotfer(
-        self,
-        R: float,
-        Io: list,
-        rad: list,
-        n: list,
-        n2: list,
-        q: list,
-        pa: list,
-        theta: float,
-    ) -> float:
-
-        ItotR = self.Ifer(R, Io, rad, n, n2, q, pa, theta)
-
-        return ItotR.sum()
 
     def Ifer(
         self,
