@@ -4,6 +4,7 @@ from galfitools.galin.galfit import Galfit
 from galfitools.galout.fitlog2csv import log2csv
 from galfitools.galout.getBarSize import getBarSize
 from galfitools.galout.getCOW import getCOW
+from galfitools.galout.getCOWds9 import getCOWDs9
 from galfitools.galout.getMissingLight import getMissLight
 from galfitools.galout.getN import getN
 from galfitools.galout.getBT import getBT
@@ -588,6 +589,44 @@ def maingetCOW(argv=None) -> int:
 
     print(f"Total Magnitude of the galaxy: {totmag:.2f} \n")
     print("plot file: ", a.plotfile)
+    return 0
+
+
+def maingetCOWds9(argv=None) -> int:
+    printWelcome()
+    p = argparse.ArgumentParser(
+        description="computes the curve of Growth from a DS9 ellipse region file"
+    )
+    p.add_argument("ImageFile", help="fits image")
+    p.add_argument("RegFile", help="DS9 region file")
+    p.add_argument(
+        "-zp", "--zeropoint", help="magnitude zero point", type=float, default=25
+    )
+    p.add_argument("-m", "--mask", help="mask image", type=str)
+    p.add_argument("-sk", "--sky", help="sky background value", type=float, default=0)
+    p.add_argument("-st", "--step", help="increase in radius", type=float, default=0.1)
+    p.add_argument("-p", "--plate", help="plate scale", type=float, default=1)
+    p.add_argument("-dpi", "--dotsinch", type=int, default=200)
+    p.add_argument("-o", "--output", type=str, default="cowds9.png")
+    a = p.parse_args(argv)
+
+    mag, exptime = getCOWDs9(
+        a.ImageFile,
+        a.RegFile,
+        a.mask,
+        a.zeropoint,
+        a.plate,
+        a.sky,
+        step=a.step,
+        output=a.output,
+        dpival=a.dotsinch,
+    )
+
+    print(f"the exposition time is: {exptime} \n")
+    print(f"the total magnitude: \n")
+    print(f"  mag    ")
+    print(f"  {mag:.2f}  \n")
+
     return 0
 
 
