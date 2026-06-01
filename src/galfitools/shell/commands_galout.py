@@ -604,7 +604,7 @@ def maingetCOWds9(argv=None) -> int:
     )
     p.add_argument("-m", "--mask", help="mask image", type=str)
     p.add_argument("-sk", "--sky", help="sky background value", type=float, default=0)
-    p.add_argument("-st", "--step", help="increase in radius", type=float, default=0.1)
+    p.add_argument("-st", "--step", help="increase in radius", type=float, default=1)
     p.add_argument("-p", "--plate", help="plate scale", type=float, default=1)
     p.add_argument("-dpi", "--dotsinch", type=int, default=200)
     p.add_argument("-o", "--output", type=str, default="cowds9.png")

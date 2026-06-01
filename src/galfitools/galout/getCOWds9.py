@@ -213,7 +213,7 @@ def getCOWDs9(
     plt.legend(loc="lower right")
     plt.savefig(output, dpi=dpival)
 
-    return mag, exptime
+    return totmag, exptime
 
 
 def FluxEllipStep(Image, xpos, ypos, rx, ry, angle, ncol, nrow, step=1):
