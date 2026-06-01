@@ -148,7 +148,7 @@ def getCOWDs9(
 
     Pol = np.array(Pol)
 
-    totFlux = 0
+    radFlux = 0
     Ntot = 0
 
     if (maskfile == "none") or (maskfile == "None"):
@@ -185,33 +185,58 @@ def getCOWDs9(
                 step=step,
             )
 
-            totFlux = totFlux + ellFlux
+            radFlux = radFlux + ellFlux
             Ntot = Ntot + Nell
 
-    mag = -2.5 * np.log10(totFlux / exptime) + zeropoint
+    totFlux = radFlux[-1]
+
+    fractions = np.array([0.1, 0.25, 0.5, 0.8, 0.9, 0.95])
+
+    target_fluxes = fractions * totFlux
+
+    r_frac = np.interp(target_fluxes, radFlux, rad)
+
+    print("R10, R25, R50, R80, R90, R95 =", r_frac)
+
+    # half_flux = 0.5 * totFlux
+    # idx = np.argmin(np.abs(radFlux - half_flux))
+    # nearest_flux = radFlux[idx]
+    # nearest_radius = rad[idx]
+
+    mag = -2.5 * np.log10(radFlux / exptime) + zeropoint
 
     totmag = mag[-1]
 
     # begin plotting
+    fig, ax = plt.subplots(figsize=(8, 6))
 
-    plt.plot(rad, mag, color="blue", label="DS9 ellipse")
-    plt.xlabel("Rad")
-    plt.ylabel("curve of growth")
-    plt.grid(True)
-    plt.minorticks_on()
+    ax.plot(rad, mag, color="blue", label="DS9 ellipse")
+    ax.grid(True)
+    ax.minorticks_on()
 
-    xmin = 0.1
-    xmax = np.max(rad)
+    # xmin = 0.1
+    # xmax = np.max(rad)
+    ax.axhline(np.min(mag), color="black", lw=2, label="total magnitude")
+    ax.invert_yaxis()
+    ax.set_xlabel("Radius (pixels)")
+    ax.set_title("Curve of Growth ")
+    ax.set_ylabel("magnitude (< R) ")
 
-    plt.gca().invert_yaxis()
+    # ax.hlines(totmag, xmin, xmax, color="black", label="total magnitude")
 
-    plt.xlabel("Radius (pixels)")
-    plt.title("Curve of Growth ")
-    plt.ylabel("magnitude (< R) ")
+    ax.legend(loc="lower right")
+    # Optional: vertical lines at R50, R70, R90
+    for r in r_frac:
+        ax.axvline(r, ls="--", lw=1)
 
-    plt.hlines(totmag, xmin, xmax, color="black", label="total magnitude")
+    # Top x-axis
+    ax_top = ax.secondary_xaxis("top")
+    ax_top.set_xticks(r_frac)
+    ax_top.set_xticklabels(
+        [r"$R_{10}$", r"$R_{25}$", r"$R_{50}$", r"$R_{80}$", r"$R_{90}$", r"$R_{95}$"]
+    )
+    ax_top.set_xlabel("Enclosed-light radii")
 
-    plt.legend(loc="lower right")
     plt.savefig(output, dpi=dpival)
 
     return totmag, exptime
