@@ -7,6 +7,7 @@ import numpy as np
 from astropy.io import fits
 from galfitools.galin.std import GetAxis
 from galfitools.galin.std import GetSize
+from galfitools.galin.std import GetPmax
 from galfitools.galin.std import GetExpTime
 from galfitools.galin.std import Ds9ell2Kronell
 from galfitools.galin.std import parse_ds9_ellipse
@@ -224,12 +225,16 @@ def FluxEllipStep(Image, xpos, ypos, rx, ry, angle, ncol, nrow, step=1):
     Flux = np.array([])
     N = 0
 
+    mask = np.array([])  # mask is already used in Image
     R = np.arange(1, Rkron + step, step)
 
     for r in R:
 
         (xmin, xmax, ymin, ymax) = GetSize(xx, yy, r, theta, e, ncol, nrow)
-        flux, N = FluxKron(Image, xx, yy, r, theta, e, xmin, xmax, ymin, ymax)
+
+        xpeak, ypeak = GetPmax(Image, mask, xmin, xmax, ymin, ymax)
+        # flux, N = FluxKron(Image, xx, yy, r, theta, e, xmin, xmax, ymin, ymax)
+        flux, N = FluxKron(Image, xpeak, ypeak, r, theta, e, xmin, xmax, ymin, ymax)
         Flux = np.append(Flux, flux)
 
     return Flux, R, N
