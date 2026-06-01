@@ -13,6 +13,9 @@ from galfitools.galin.std import Ds9ell2Kronell
 from galfitools.galin.std import parse_ds9_ellipse
 from matplotlib.path import Path
 
+
+from galfitools.galout.getN import GetN
+
 import matplotlib.pyplot as plt
 
 
@@ -26,6 +29,7 @@ def getCOWDs9(
     step=1,
     output="cowds9.png",
     dpival=200,
+    plotn=False,
 ):
     """computes the magnitude inside a DS9 region file to contruct
         the Curve of Growth
@@ -196,7 +200,7 @@ def getCOWDs9(
 
     r_frac = np.interp(target_fluxes, radFlux, rad)
 
-    print("R10, R25, R50, R80, R90, R95 =", r_frac)
+    print(f"R50: {r_frac[2]}, R80:{r_frac[3]}, R90:{r_frac[4]} ")
 
     # half_flux = 0.5 * totFlux
     # idx = np.argmin(np.abs(radFlux - half_flux))
@@ -239,7 +243,25 @@ def getCOWDs9(
 
     plt.savefig(output, dpi=dpival)
 
-    return totmag, exptime
+    # estimating sersic indexs
+
+    EffRad = r_frac[2]
+    R = np.delete(r_frac, 2)
+    F = np.delete(fractions, 2)
+    ns = GetN().GalNs(EffRad, R, F)
+
+    # plot:
+    if plotn:
+
+        plt.clf()
+        plt.plot(F, ns)
+        plt.grid(True)
+        plt.minorticks_on()
+        plt.xlabel("Fraction of light")
+        plt.ylabel("Sersic index")
+        plt.savefig("Serind.png")
+
+    return totmag, exptime, np.mean(ns), np.std(ns)
 
 
 def FluxEllipStep(Image, xpos, ypos, rx, ry, angle, ncol, nrow, step=1):

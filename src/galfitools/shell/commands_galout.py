@@ -610,7 +610,7 @@ def maingetCOWds9(argv=None) -> int:
     p.add_argument("-o", "--output", type=str, default="cowds9.png")
     a = p.parse_args(argv)
 
-    mag, exptime = getCOWDs9(
+    mag, exptime, sern, sernstd = getCOWDs9(
         a.ImageFile,
         a.RegFile,
         a.mask,
@@ -626,6 +626,10 @@ def maingetCOWds9(argv=None) -> int:
     print(f"the total magnitude: \n")
     print(f"  mag    ")
     print(f"  {mag:.2f}  \n")
+
+    print(f"Sersic index mean;  std deviation: \n")
+    print(f"  n       std  ")
+    print(f" {sern:.2f}     {sernstd:.2f}  \n")
 
     return 0
 
