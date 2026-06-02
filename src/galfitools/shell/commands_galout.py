@@ -667,7 +667,7 @@ def maingetNds9(argv=None) -> int:
         step=a.step,
         output=a.output,
         dpival=a.dotsinch,
-        plotn=a.plotn,
+        plot=a.plot,
     )
 
     print(f"the exposition time is: {exptime} \n")

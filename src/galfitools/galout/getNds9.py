@@ -193,7 +193,7 @@ def getNDs9(
 
     totFlux = radFlux[-1]
 
-    fractionsa = np.arange(0.1, 0.5, 0.05)
+    fractionsa = np.arange(0.1, 0.55, 0.05)
     fractionsb = np.arange(0.55, 1, 0.05)
     fractions = np.concatenate(
         (fractionsa, fractionsb)
@@ -203,7 +203,7 @@ def getNDs9(
 
     r_frac = np.interp(target_fluxes, radFlux, rad)
 
-    print(f"R50: {r_frac[2]}, R80:{r_frac[3]}, R90:{r_frac[4]} ")
+    print(f"R50: {r_frac[8]}, R80:{r_frac[14]}, R90:{r_frac[16]} ")
 
     mag = -2.5 * np.log10(radFlux / exptime) + zeropoint
 
@@ -211,9 +211,9 @@ def getNDs9(
 
     # estimating sersic indexs
 
-    EffRad = r_frac[2]
-    R = np.delete(r_frac, 2)
-    F = np.delete(fractions, 2)
+    EffRad = r_frac[8]
+    R = np.delete(r_frac, 8)
+    F = np.delete(fractions, 8)
     ns = GetN().GalNs(EffRad, R, F)
 
     # plot:
