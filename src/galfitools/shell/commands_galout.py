@@ -5,7 +5,7 @@ from galfitools.galout.fitlog2csv import log2csv
 from galfitools.galout.getBarSize import getBarSize
 from galfitools.galout.getCOW import getCOW
 from galfitools.galout.getCOWds9 import getCOWDs9
-from galfitools.galout.getNds9 import getDs9
+from galfitools.galout.getNds9 import getNDs9
 from galfitools.galout.getMissingLight import getMissLight
 from galfitools.galout.getN import getN
 from galfitools.galout.getBT import getBT
