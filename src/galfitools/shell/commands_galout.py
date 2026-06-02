@@ -5,6 +5,7 @@ from galfitools.galout.fitlog2csv import log2csv
 from galfitools.galout.getBarSize import getBarSize
 from galfitools.galout.getCOW import getCOW
 from galfitools.galout.getCOWds9 import getCOWDs9
+from galfitools.galout.getNds9 import getDs9
 from galfitools.galout.getMissingLight import getMissLight
 from galfitools.galout.getN import getN
 from galfitools.galout.getBT import getBT
@@ -617,7 +618,53 @@ def maingetCOWds9(argv=None) -> int:
 
     a = p.parse_args(argv)
 
-    mag, exptime, sern, sernstd = getCOWDs9(
+    mag, exptime = getCOWDs9(
+        a.ImageFile,
+        a.RegFile,
+        a.mask,
+        a.zeropoint,
+        a.plate,
+        a.sky,
+        step=a.step,
+        output=a.output,
+        dpival=a.dotsinch,
+        plotn=a.plotn,
+    )
+
+    print(f"the exposition time is: {exptime} \n")
+    print(f"the total magnitude: \n")
+    print(f"  mag    ")
+    print(f"  {mag:.2f}  \n")
+
+    return 0
+
+
+def maingetNds9(argv=None) -> int:
+    printWelcome()
+    p = argparse.ArgumentParser(
+        description="computes the Sersic index from a DS9 ellipse region file"
+    )
+    p.add_argument("ImageFile", help="fits image")
+    p.add_argument("RegFile", help="DS9 region file")
+    p.add_argument(
+        "-zp", "--zeropoint", help="magnitude zero point", type=float, default=25
+    )
+    p.add_argument("-m", "--mask", help="mask image", type=str)
+    p.add_argument("-sk", "--sky", help="sky background value", type=float, default=0)
+    p.add_argument("-st", "--step", help="increase in radius", type=float, default=1)
+    p.add_argument("-ps", "--plate", help="plate scale", type=float, default=1)
+    p.add_argument("-dpi", "--dotsinch", type=int, default=200)
+    p.add_argument("-o", "--output", type=str, default="serds9.png")
+    p.add_argument(
+        "-p",
+        "--plot",
+        action="store_true",
+        help="plots the Sersic index vs. flux fraction radius",
+    )
+
+    a = p.parse_args(argv)
+
+    mag, exptime, sern, sernstd = getNDs9(
         a.ImageFile,
         a.RegFile,
         a.mask,
