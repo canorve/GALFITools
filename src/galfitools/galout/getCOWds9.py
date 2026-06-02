@@ -14,8 +14,6 @@ from galfitools.galin.std import parse_ds9_ellipse
 from matplotlib.path import Path
 
 
-from galfitools.galout.getN import GetN
-
 import matplotlib.pyplot as plt
 
 
@@ -29,7 +27,6 @@ def getCOWDs9(
     step=1,
     output="cowds9.png",
     dpival=200,
-    plotn=False,
 ):
     """computes the magnitude inside a DS9 region file to contruct
         the Curve of Growth
@@ -56,15 +53,16 @@ def getCOWDs9(
     step: float
          increase in radius for the magnitude integration
 
+    dpival: int
+            dots per inch for the plot default = 200
 
-    output: plot output
+    output: str
+            plot output file name
 
     Returns
     -------
     mag : float
           magnitude measured from DS9 region
-    sb: float
-          surface brightness measured from DS9 region
     exptime : float
             exposition time from image
 
@@ -202,11 +200,6 @@ def getCOWDs9(
 
     print(f"R50: {r_frac[2]}, R80:{r_frac[3]}, R90:{r_frac[4]} ")
 
-    # half_flux = 0.5 * totFlux
-    # idx = np.argmin(np.abs(radFlux - half_flux))
-    # nearest_flux = radFlux[idx]
-    # nearest_radius = rad[idx]
-
     mag = -2.5 * np.log10(radFlux / exptime) + zeropoint
 
     totmag = mag[-1]
@@ -245,23 +238,7 @@ def getCOWDs9(
 
     # estimating sersic indexs
 
-    EffRad = r_frac[2]
-    R = np.delete(r_frac, 2)
-    F = np.delete(fractions, 2)
-    ns = GetN().GalNs(EffRad, R, F)
-
-    # plot:
-    if plotn:
-
-        plt.clf()
-        plt.plot(F, ns)
-        plt.grid(True)
-        plt.minorticks_on()
-        plt.xlabel("Fraction of light")
-        plt.ylabel("Sersic index")
-        plt.savefig("Serind.png")
-
-    return totmag, exptime, np.mean(ns), np.std(ns)
+    return totmag, exptime
 
 
 def FluxEllipStep(Image, xpos, ypos, rx, ry, angle, ncol, nrow, step=1):

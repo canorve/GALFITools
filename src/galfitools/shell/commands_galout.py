@@ -609,12 +609,6 @@ def maingetCOWds9(argv=None) -> int:
     p.add_argument("-p", "--plate", help="plate scale", type=float, default=1)
     p.add_argument("-dpi", "--dotsinch", type=int, default=200)
     p.add_argument("-o", "--output", type=str, default="cowds9.png")
-    p.add_argument(
-        "-pn",
-        "--plotn",
-        action="store_true",
-        help="plots the Sersic index vs. flux fraction radius",
-    )
 
     a = p.parse_args(argv)
 
@@ -628,7 +622,6 @@ def maingetCOWds9(argv=None) -> int:
         step=a.step,
         output=a.output,
         dpival=a.dotsinch,
-        plotn=a.plotn,
     )
 
     print(f"the exposition time is: {exptime} \n")
