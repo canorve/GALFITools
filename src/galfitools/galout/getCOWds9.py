@@ -150,9 +150,6 @@ def getCOWDs9(
 
     Pol = np.array(Pol)
 
-    radFlux = 0
-    Ntot = 0
-
     if (maskfile == "none") or (maskfile == "None"):
         maskfile = None
 
@@ -169,9 +166,27 @@ def getCOWDs9(
         Image = Image * invmask
         hdu2.close()
 
+    fractions = np.array([0.1, 0.25, 0.5, 0.8, 0.9, 0.95])
+    fig, ax = plt.subplots(figsize=(8, 6))
+
+    ax.invert_yaxis()
+    radmax = 0
+    totmag = 99
+    cmap = plt.get_cmap("jet")
+    tot = len(obj)
+    rad = 0
+
+    colormax = "blue"
+
     for idx, item in enumerate(obj):
 
         # get Flux
+        radFlux = 0
+        Ntot = 0
+        if tot > 1:
+            color = cmap(idx / (tot - 1))
+        else:
+            color = cmap(0.5)
 
         if obj[idx] == "ellipse":
 
@@ -190,49 +205,52 @@ def getCOWDs9(
             radFlux = radFlux + ellFlux
             Ntot = Ntot + Nell
 
-    totFlux = radFlux[-1]
+        totFlux = radFlux[-1]
 
-    fractions = np.array([0.1, 0.25, 0.5, 0.8, 0.9, 0.95])
+        target_fluxes = fractions * totFlux
 
-    target_fluxes = fractions * totFlux
+        r_frac = np.interp(target_fluxes, radFlux, rad)
 
-    r_frac = np.interp(target_fluxes, radFlux, rad)
+        print(f"R50: {r_frac[2]}, R80:{r_frac[3]}, R90:{r_frac[4]} ")
 
-    print(f"R50: {r_frac[2]}, R80:{r_frac[3]}, R90:{r_frac[4]} ")
+        mag = -2.5 * np.log10(radFlux / exptime) + zeropoint
 
-    mag = -2.5 * np.log10(radFlux / exptime) + zeropoint
+        totmag = mag[-1]
 
-    totmag = mag[-1]
+        # begin plotting
 
-    # begin plotting
-    fig, ax = plt.subplots(figsize=(8, 6))
+        ax.plot(rad, mag, color=color, label=f"DS9 ellipse {idx+1}")
+        ax.grid(True)
+        ax.minorticks_on()
 
-    ax.plot(rad, mag, color="blue", label="DS9 ellipse")
-    ax.grid(True)
-    ax.minorticks_on()
+        # xmin = 0.1
+        # xmax = np.max(rad)
+        ax.set_xlabel("Radius (pixels)")
+        ax.set_title("Curve of Growth ")
+        ax.set_ylabel("magnitude (< R) ")
 
-    # xmin = 0.1
-    # xmax = np.max(rad)
-    ax.axhline(np.min(mag), color="black", lw=2, label="total magnitude")
-    ax.invert_yaxis()
-    ax.set_xlabel("Radius (pixels)")
-    ax.set_title("Curve of Growth ")
-    ax.set_ylabel("magnitude (< R) ")
+        # ax.hlines(totmag, xmin, xmax, color="black", label="total magnitude")
 
-    # ax.hlines(totmag, xmin, xmax, color="black", label="total magnitude")
+        # Optional: vertical lines at R50, R70, R90
+        if rad[-1] > radmax:
+            radmax = rad[-1]
+            magmax = np.min(mag)
+            r_fracmax = r_frac
+            colormax = color
 
-    ax.legend(loc="lower right")
-    # Optional: vertical lines at R50, R70, R90
-    for r in r_frac:
-        ax.axvline(r, ls="--", lw=1)
+    for r in r_fracmax:
+        ax.axvline(r, ls="--", lw=1, color=colormax)
 
+    ax.axhline(magmax, color="black", lw=2, label="total magnitude")
     # Top x-axis
     ax_top = ax.secondary_xaxis("top")
-    ax_top.set_xticks(r_frac)
+    ax_top.set_xticks(r_fracmax)
     ax_top.set_xticklabels(
         [r"$R_{10}$", r"$R_{25}$", r"$R_{50}$", r"$R_{80}$", r"$R_{90}$", r"$R_{95}$"]
     )
     ax_top.set_xlabel("Enclosed-light radii")
+
+    ax.legend(loc="lower right")
 
     plt.savefig(output, dpi=dpival)
 
