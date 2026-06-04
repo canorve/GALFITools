@@ -158,7 +158,7 @@ def ferrers_total_magnitude(
 
     r_out_arcsec = r_out * pixscale
 
-    Sigma0 = 10 ** (-mu0_mag_arcsec2 / 0.4)
+    Sigma0 = 10 ** ((-mu0_mag_arcsec2) / 2.5)
 
     lumtot = ferrer_total_luminosity(Sigma0, r_out_arcsec, alpha, beta_par)
 
@@ -205,11 +205,13 @@ def magFerrers(galfile, numferrer=2):
 
     maskgal = comps.Active == 1
 
+    numferrer = numferrer - 1  # changing to index value
+
     mu0_mag_arcsec2 = comps.Mag[maskgal][numferrer]
 
     r_out = comps.Rad[maskgal][numferrer]
     alpha = comps.Exp[maskgal][numferrer]
-    beta_par = comps.Exp[maskgal][numferrer]
+    beta_par = comps.Exp2[maskgal][numferrer]
 
     magferrers = ferrers_total_magnitude(
         mu0_mag_arcsec2, r_out, alpha, beta_par, pixscale
@@ -236,7 +238,7 @@ def mainmagFerrers(argv=None) -> int:
 
     args = parser.parse_args(argv)
 
-    mag = magFerrers(args.galfile, args.numedge)
+    mag = magFerrers(args.galfile, args.numferrer)
 
     print("magnitude of Ferrers function: ")
     print(f"  {mag:.2f}")
