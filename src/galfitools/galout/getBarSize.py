@@ -415,8 +415,10 @@ class GetIr:
     def Ir(self, head, comps, R, theta):
 
         # comps.Rad = comps.Rad*head.scale
+        scale = head.scale
         comps.Flux = 10 ** ((head.mgzpt - comps.Mag) / 2.5)
-        comps.Io = (0.262**2) * (10 ** ((head.mgzpt - comps.Mag) / 2.5))
+        comps.Io = (scale**2) * (10 ** ((head.mgzpt - comps.Mag) / 2.5))
+        # comps.Io =  (10 ** ((head.mgzpt - comps.Mag) / 2.5))
 
         k = gammaincinv(2 * comps.Exp, 0.5)
 
@@ -464,6 +466,8 @@ class GetIr:
         pa: list,
         theta: float,
     ) -> float:
+
+        ItotR = np.array([0])
 
         maskser = NameComp == "sersic"
         maskfer = NameComp == "ferrer"
@@ -513,7 +517,7 @@ class GetIr:
         pa: list,
         theta: float,
     ) -> float:
-        """ferre flux to a determined R"""
+        """ferrers flux to a determined R"""
 
         Rcor = GetRadAng(R, q, pa, theta)
 

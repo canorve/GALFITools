@@ -5,6 +5,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
+from scipy.special import beta, betainc
 from galfitools.galin.galfit import (
     GalComps,
     Galfit,
@@ -14,6 +15,7 @@ from galfitools.galin.galfit import (
     conver2Sersic,
     numComps,
 )
+from galfitools.galout.magferrer import ferrer_total_luminosity
 from scipy.interpolate import UnivariateSpline
 from scipy.optimize import bisect
 from scipy.special import gamma, gammainc, gammaincinv
@@ -1580,19 +1582,39 @@ class GetReff:
 
         comps.Flux = 10 ** ((galhead.mgzpt - comps.Mag) / 2.5)
 
-        totFlux = comps.Flux[maskgal].sum()
+        maskser = (comps.NameComp == "sersic") * (comps.Active == 1)
+        maskfer = (comps.NameComp == "ferrer") * (comps.Active == 1)
+
+        totFluxfer = 0
+        totFluxser = 0
+        if maskser.any():
+            totFluxser = comps.Flux[maskser].sum()
+
+        if maskfer.any():  # no more than one component
+
+            Sigma0 = comps.Flux[maskfer][0] * galhead.scale**2
+            r_out_arcsec = comps.Rad[maskfer][0] * galhead.scale
+            alpha = comps.Exp[maskfer][0]
+            beta_par = comps.Exp2[maskfer][0]
+            totFluxfer = ferrer_total_luminosity(Sigma0, r_out_arcsec, alpha, beta_par)
+            comps.Flux[maskfer] = comps.Flux[maskfer] * galhead.scale**2
+            comps.Rad[maskfer] = comps.Rad[maskfer] * galhead.scale
+
+        totFlux = totFluxser + totFluxfer
 
         totmag = -2.5 * np.log10(totFlux) + galhead.mgzpt
 
         a = 0.1
         b = comps.Rad[maskgal][-1] * 1000  # hope it doesn't crash
 
-        Reff = self.solveSerRe(
+        Reff = self.solveSerFerRe(
             a,
             b,
+            comps.NameComp[maskgal],
             comps.Flux[maskgal],
             comps.Rad[maskgal],
             comps.Exp[maskgal],
+            comps.Exp2[maskgal],
             comps.AxRat[maskgal],
             comps.PosAng[maskgal],
             totFlux,
@@ -1602,13 +1624,15 @@ class GetReff:
 
         return Reff, totmag
 
-    def solveSerRe(
+    def solveSerFerRe(
         self,
         a: float,
         b: float,
+        NameComp: list,
         flux: list,
         rad: list,
         n: list,
+        n2: list,
         q: list,
         pa: list,
         totFlux: float,
@@ -1619,7 +1643,10 @@ class GetReff:
 
         try:
             Re = bisect(
-                self.funReSer, a, b, args=(flux, rad, n, q, pa, totFlux, eff, theta)
+                self.funReSerFer,
+                a,
+                b,
+                args=(NameComp, flux, rad, n, n2, q, pa, totFlux, eff, theta),
             )
 
         except Exception:  # pragma: no cover
@@ -1628,12 +1655,14 @@ class GetReff:
 
         return Re
 
-    def funReSer(
+    def funReSerFer(
         self,
         R: float,
+        NameComp: str,
         flux: list,
         rad: list,
         n: list,
+        n2: list,
         q: list,
         pa: list,
         totFlux: float,
@@ -1641,18 +1670,61 @@ class GetReff:
         theta: float,
     ) -> float:
 
-        fun = self.Ftotser(R, flux, rad, n, q, pa, theta) - totFlux * eff
+        fun = (
+            self.Ftotserfer(R, NameComp, flux, rad, n, n2, q, pa, theta) - totFlux * eff
+        )
 
         return fun
 
-    def Ftotser(
-        self, R: float, flux: list, rad: list, n: list, q: list, pa: list, theta: float
+    def Ftotserfer(
+        self,
+        R: float,
+        NameComp: str,
+        flux: list,
+        rad: list,
+        n: list,
+        n2: list,
+        q: list,
+        pa: list,
+        theta: float,
     ) -> float:
         """partial sersic flux computed from zero up to R for a set of sersics"""
 
-        ftotR = self.Fser(R, flux, rad, n, q, pa, theta)
+        ftotR = np.array([0])
 
-        return ftotR.sum()
+        maskser = NameComp == "sersic"
+        maskfer = NameComp == "ferrer"
+
+        ftotRser = np.array([0])
+        ftotRfer = np.array([0])
+        if maskser.any():
+
+            ftotRser = self.Fser(
+                R,
+                flux[maskser],
+                rad[maskser],
+                n[maskser],
+                q[maskser],
+                pa[maskser],
+                theta,
+            )
+
+        if maskfer.any():
+
+            ftotRfer = self.Ffer(
+                R,
+                flux[maskfer],
+                rad[maskfer],
+                n[maskfer],
+                n2[maskfer],
+                q[maskfer],
+                pa[maskfer],
+                theta,
+            )
+
+        ftotR = ftotRser.sum() + ftotRfer.sum()
+
+        return ftotR
 
     def Fser(
         self, R: float, Flux: list, Re: list, n: list, q: list, pa: list, theta: float
@@ -1668,6 +1740,64 @@ class GetReff:
         Fr = Flux * gammainc(2 * n, X)
 
         return Fr
+
+    def Ffer(
+        self,
+        R: float,
+        Flux: list,
+        Re: list,
+        n: list,
+        n2: list,
+        q: list,
+        pa: list,
+        theta: float,
+    ) -> float:
+
+        """
+        Luminosity inside radius R for a Ferrer-like profile.
+
+        Parameters
+        ----------
+        R : float
+            Radius where the luminosity is evaluated.
+        Flux: float
+            Central surface brightness in linear flux units.
+        Re : float
+            Outer truncation radius.
+        n: float
+            Outer truncation shape parameter.
+        n2: float
+            Inner slope parameter.
+
+        Returns
+        -------
+        L : float
+            Luminosity inside radius R.
+        """
+
+        Rcor = GetRadAng(R, q, pa, theta)
+
+        beta_par = n2
+        alpha = n
+        r_out = Re
+
+        gamma = 2.0 - beta_par
+
+        if gamma <= 0:
+            raise ValueError("The parameter 2 - beta must be positive.")
+
+        R_eff = min(Rcor, r_out)
+        x = (R_eff / r_out) ** gamma
+
+        a = 2.0 / gamma
+        b = alpha + 1.0
+
+        # scipy.special.betainc gives the regularized incomplete beta function.
+        incomplete_beta = betainc(a, b, x) * beta(a, b)
+
+        L = (2.0 * np.pi * (Flux) * r_out**2 / gamma) * incomplete_beta
+
+        return L
 
 
 def getSlope(
