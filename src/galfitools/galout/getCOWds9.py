@@ -24,6 +24,7 @@ def getCOWDs9(
     zeropoint,
     plate,
     sky,
+    cmap="inferno",
     step=1,
     output="cowds9.png",
     dpival=200,
@@ -172,7 +173,7 @@ def getCOWDs9(
     ax.invert_yaxis()
     radmax = 0
     totmag = 99
-    cmap = plt.get_cmap("jet")
+    cmap = plt.get_cmap(cmap)
     tot = len(obj)
     rad = 0
 
@@ -211,7 +212,7 @@ def getCOWDs9(
 
         r_frac = np.interp(target_fluxes, radFlux, rad)
 
-        print(f"R50: {r_frac[2]}, R80:{r_frac[3]}, R90:{r_frac[4]} ")
+        print(f"R50: {r_frac[2]:.2f}, R80:{r_frac[3]:.2f}, R90:{r_frac[4]:.2f} pixels ")
 
         mag = -2.5 * np.log10(radFlux / exptime) + zeropoint
 
