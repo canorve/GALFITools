@@ -63,16 +63,21 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None):
     xpeak = xpeak - xmin
     ypeak = ypeak - ymin
 
-    EffRad, totmag, meanme, me, N, theta = getReComp(galfile, 3, fracrad, None, numcomp)
+    dis = 3  # maximum disntance among components
+
+    EffRad, totmag, meanme, me, N, theta = getReComp(
+        galfile, dis, fracrad, None, numcomp
+    )
 
     EffRadb, totmag, meanme, me, N, theta = getReComp(
-        galfile, 3, fracrad, theta + 90, 1
+        galfile, dis, fracrad, theta + 90, numcomp
     )
 
     if EffRadb < EffRad:
         axrat = EffRadb / EffRad
     else:
         axrat = EffRad / EffRadb
+        EffRad, EffRadb = EffRadb, EffRad
 
     chifile_path = Path("chinu.reg")
 
@@ -111,7 +116,7 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None):
 
         print("calling GALFIT to create sigma")
 
-        rungal = "galfit -outsig -o3  {}".format(galfile)
+        rungal = "galfit -o3  -outsig  {}".format(galfile)
         errgal = sp.run(
             [rungal],
             shell=True,
