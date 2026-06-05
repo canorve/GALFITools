@@ -1590,13 +1590,14 @@ class GetReff:
         if maskser.any():
             totFluxser = comps.Flux[maskser].sum()
 
-        if maskfer.any():  # no more than one component
+        if maskfer.any():
 
-            Sigma0 = comps.Flux[maskfer][0] * galhead.scale**2
-            r_out_arcsec = comps.Rad[maskfer][0] * galhead.scale
-            alpha = comps.Exp[maskfer][0]
-            beta_par = comps.Exp2[maskfer][0]
-            totFluxfer = ferrer_total_luminosity(Sigma0, r_out_arcsec, alpha, beta_par)
+            Sigma0 = comps.Flux[maskfer] * galhead.scale**2
+            r_out_arcsec = comps.Rad[maskfer] * galhead.scale
+            alpha = comps.Exp[maskfer]
+            beta_par = comps.Exp2[maskfer]
+            Fluxfer = ferrer_total_luminosity(Sigma0, r_out_arcsec, alpha, beta_par)
+            totFluxfer = Fluxfer.sum()
             comps.Flux[maskfer] = comps.Flux[maskfer] * galhead.scale**2
             comps.Rad[maskfer] = comps.Rad[maskfer] * galhead.scale
 
