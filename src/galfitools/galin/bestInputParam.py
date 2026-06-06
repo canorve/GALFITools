@@ -28,7 +28,7 @@ def read_galfile_list(list_file):
     return galfiles
 
 
-def run_get_chinu_for_list(list_file, numcomp, fracrad, regfile):
+def run_get_chinu_for_list(list_file, numcomp, fracrad, regfile, delete):
     """
     Apply getChiNu to each GALFIT file in the input list.
 
@@ -49,6 +49,7 @@ def run_get_chinu_for_list(list_file, numcomp, fracrad, regfile):
             numcomp,
             fracrad,
             regfile,
+            delete,
         )
 
         result = {
@@ -98,6 +99,13 @@ def parse_args():
         help="DS9 ellipse region file.",
     )
 
+    parser.add_argument(
+        "-d",
+        "--delete",
+        action="store_true",
+        help="deletes the sigma image used to compute chinu",
+    )
+
     return parser.parse_args()
 
 
@@ -113,6 +121,7 @@ def mainBestInputParam():
         args.numcomp,
         fracrad,
         args.regfile,
+        args.delete,
     )
 
     chinu_list = [item["chinu"] for item in results]

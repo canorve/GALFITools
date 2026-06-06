@@ -21,7 +21,7 @@ from galfitools.galin.galfit import (
 from galfitools.galin.MakePSF import makeDS9ellip
 
 
-def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None):
+def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None, delete=False):
     """
     getChiNu computes the Chinu square
 
@@ -197,5 +197,10 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None):
 
     aic = chisquare + 2 * totfreepar  # Akaike information criterion
     bic = chisquare + totfreepar * np.log(pixcountchi)  # Bayesian information criterion
+
+    if delete:
+
+        file_path = Path(output_sigma)
+        file_path.unlink()
 
     return chinu, aic, bic, totfreepar

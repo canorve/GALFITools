@@ -770,10 +770,17 @@ def maingetChiNu(argv=None) -> int:
         help="Number of component inside galfit file. Default=1",
     )
 
+    parser.add_argument(
+        "-d",
+        "--delete",
+        action="store_true",
+        help="deletes the sigma image used to compute chinu",
+    )
+
     args = parser.parse_args(argv)
 
     chinu, aic, bic, numparfree = getChiNu(
-        args.galfile, args.numcomp, args.fracrad, args.RegFile
+        args.galfile, args.numcomp, args.fracrad, args.RegFile, args.delete
     )
 
     print(f"Number of free parameters:")
