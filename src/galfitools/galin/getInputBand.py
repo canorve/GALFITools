@@ -17,6 +17,7 @@ from galfitools.galin.galfit import (
     conver2Ferrer,
     numComps,
     galPrintComp,
+    galPrintallComp,
     galPrintHeader,
     galPrintSky,
 )
@@ -129,13 +130,12 @@ def getInputBand(
 
     fout = open(fileout, "w")
 
+    startcomp = 1
+
     galPrintHeader(fout, head)
-    index = 0
-    for index, item in enumerate(comps.N):
 
-        galPrintComp(fout, index + 1, index, comps)
-
-    galPrintSky(fout, index + 1, galsky)
+    num = galPrintallComp(fout, startcomp, comps)
+    galPrintSky(fout, num, galsky)
 
     fout.close()
 

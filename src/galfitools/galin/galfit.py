@@ -1284,6 +1284,16 @@ def galPrintHeader(hdl: str, galhead: GalHead) -> bool:
     return True
 
 
+def galPrintallComp(hdl: str, ncomp: int, galcomps: GalComps) -> int:
+
+    index = 0
+    for index, item in enumerate(galcomps.N):
+
+        galPrintComp(hdl, ncomp, index, galcomps)
+        ncomp = ncomp + 1
+    return ncomp
+
+
 def galPrintComp(hdl: str, ncomp: int, idx: int, galcomps: GalComps) -> bool:
     """prints GALFIT component parameters to a file
 
