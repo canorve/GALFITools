@@ -203,7 +203,7 @@ def getNDs9(
 
     r_frac = np.interp(target_fluxes, radFlux, rad)
 
-    print(f"R50: {r_frac[8]}, R80:{r_frac[14]}, R90:{r_frac[16]} ")
+    print(f"R50: {r_frac[2]:.2f}, R80:{r_frac[3]:.2f}, R90:{r_frac[4]:.2f} pixels ")
 
     mag = -2.5 * np.log10(radFlux / exptime) + zeropoint
 
