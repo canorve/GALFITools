@@ -6,17 +6,8 @@ import argparse
 from galfitools.shell.prt import printWelcome
 from scipy.special import beta, betainc
 from galfitools.galin.galfit import (
-    GalComps,
     Galfit,
-    GalHead,
-    GetRadAng,
     SelectGal,
-    conver2Sersic,
-    conver2Edge,
-    numComps,
-    galPrintComp,
-    galPrintHeader,
-    galPrintSky,
 )
 
 
