@@ -43,8 +43,15 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None):
 
     galcomps = SelectGal(galcomps, 3, numcomp)
 
-    maskgal = galcomps.Active == 1
+    filename = Path(galfile)
 
+    root = filename.stem
+    extension = filename.suffix.lstrip(".")
+
+    newname = root + "-" + extension + "-sigma.fits"
+    output_sigma = newname
+
+    maskgal = galcomps.Active == 1
     # axrat = galcomps.AxRat[maskgal][1]
 
     xpeak = galcomps.PosX[maskgal][1]
@@ -92,8 +99,6 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None):
     if file_path.exists():
         print("Creating a sigma image from file ")
 
-        output_sigma = "small_sigma.fits"
-
         # Open the FITS file
         with fits.open(sigma_im) as hdul:
             data = hdul[0].data
@@ -116,16 +121,21 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None):
 
         print("calling GALFIT to create sigma")
 
-        rungal = "galfit -o3  -outsig  {}".format(galfile)
+        rungal = f"galfit -o3 -outsig {galfile}"
+
         errgal = sp.run(
-            [rungal],
+            rungal,
             shell=True,
             stdout=sp.PIPE,
             stderr=sp.PIPE,
-            universal_newlines=True,
+            text=True,
         )
 
-        dataimg = readDataImg(galhead, sigma="sigma.fits")
+        old_file = Path("sigma.fits")
+        new_file = Path(output_sigma)
+
+        old_file.rename(new_file)
+        dataimg = readDataImg(galhead, sigma=output_sigma)
 
     sigflux = dataimg.sigma
     galflux = dataimg.img
