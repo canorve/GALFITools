@@ -1587,7 +1587,9 @@ class GetReff:
 
         totFluxfer = 0
         totFluxser = 0
+
         if maskser.any():
+
             totFluxser = comps.Flux[maskser].sum()
 
         if maskfer.any():
