@@ -136,8 +136,7 @@ def mainBestInputParam():
     print(f"Nfree   = {best_result['numparfree']}")
 
     bestfile = best_result["galfile"]
-
-    return bestfile
+    print(f"{bestfile}")
 
 
 if __name__ == "__main__":
