@@ -90,7 +90,7 @@ def ferrers_magnitude(
     r_out_arcsec = r_out * pixscale
     R_arcsec = R * pixscale
 
-    Sigma0 = 10 ** (-mu0_mag_arcsec2 / 0.4)
+    Sigma0 = 10 ** (-mu0_mag_arcsec2 / 2.5)
 
     lum = ferrer_luminosity(R_arcsec, Sigma0, r_out_arcsec, alpha, beta_par)
 
