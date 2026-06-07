@@ -114,6 +114,17 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None, delete=False):
             # Write the new FITS image
             fits.writeto(output_sigma, new_data, header, overwrite=True)
 
+        print("calling GALFIT to create output image")
+        rungal = f"galfit -o2  {galfile}"
+
+        errgal = sp.run(
+            rungal,
+            shell=True,
+            stdout=sp.PIPE,
+            stderr=sp.PIPE,
+            text=True,
+        )
+
         dataimg = readDataImg(galhead, sigma=output_sigma)
 
     else:
@@ -121,7 +132,7 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None, delete=False):
 
         print("calling GALFIT to create sigma")
 
-        rungal = f"galfit -o3 -outsig {galfile}"
+        rungal = f"galfit -o2 -outsig {galfile}"
 
         errgal = sp.run(
             rungal,

@@ -88,7 +88,6 @@ def parse_args():
         "--numcomp",
         type=int,
         default=1,
-        required=True,
         help="Component Number",
     )
 
