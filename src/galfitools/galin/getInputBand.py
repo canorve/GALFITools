@@ -5,8 +5,6 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
-import scipy
-import os
 from galfitools.galin.galfit import (
     GalComps,
     Galfit,
@@ -27,8 +25,9 @@ from galfitools.galout.PhotDs9 import photDs9
 
 def getInputBand(
     galfitFile: str,
+    inputimage: str,
     ds9region: str,
-    numcomp: int,
+    numcomp=1,
     zeropoint=22.5,
     fileout="newfit.init",
 ):
@@ -55,7 +54,7 @@ def getInputBand(
              DS9 ellipse region to compute the magnitude
 
     numcomp: int
-           number of component from GALFIT file.
+           number of component from GALFIT file. default=1
 
     zeropoint: float
              zeropoint of the new band
@@ -114,7 +113,7 @@ def getInputBand(
 
     sky = galsky.sky
     RegFile = ds9region
-    ImageFile = head.inputimage
+    ImageFile = inputimage
     # zeropoint = head.mgzpt
     mask = head.maskimage
     plate = head.scale
@@ -127,6 +126,8 @@ def getInputBand(
     comps.Mag[maskgal] = -2.5 * np.log10(comps.Flux[maskgal]) + zeropoint
 
     head.mgzpt = zeropoint  # new zeropoint
+    head.inputimage = inputimage
+    head.outimage = inputimage + "-out.fits"
 
     fout = open(fileout, "w")
 
@@ -159,15 +160,23 @@ def get_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
+        "inputimage",
+        type=str,
+        help="input image of the new band",
+    )
+
+    parser.add_argument(
         "ds9region",
         type=str,
         help="DS9 region file used to compute the magnitude.",
     )
 
     parser.add_argument(
-        "numcomp",
+        "-n",
+        "--numcomp",
         type=int,
-        help="Number of the GALFIT component.",
+        default=1,
+        help="Number of the GALFIT component. Default:1",
     )
 
     parser.add_argument(
@@ -203,6 +212,7 @@ def mainGetInputBand(args=None):
 
     galcomps = getInputBand(
         args.galfitFile,
+        args.inputimage,
         args.ds9region,
         args.numcomp,
         zeropoint=args.zeropoint,
