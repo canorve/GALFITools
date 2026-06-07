@@ -51,6 +51,9 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None, delete=False):
     newname = root + "-" + extension + "-sigma.fits"
     output_sigma = newname
 
+    newname = root + "-" + extension + "-chisquare.fits"
+    output_chisqr = newname
+
     maskgal = galcomps.Active == 1
     # axrat = galcomps.AxRat[maskgal][1]
 
@@ -166,11 +169,11 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None, delete=False):
 
     hdu = fits.PrimaryHDU(chisquareimg)
 
-    hdu.writeto("chisquare.fits", overwrite=True)
+    hdu.writeto(output_chisqr, overwrite=True)
 
     if ds9reg:
         maskDs9(
-            "chisquare.fits",
+            output_chisqr,
             ds9reg,
             0,
             None,
@@ -183,7 +186,7 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None, delete=False):
 
     else:
         maskDs9(
-            "chisquare.fits",
+            output_chisqr,
             "chinu.reg",
             0,
             None,
@@ -195,7 +198,7 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None, delete=False):
         )
 
     # Open the FITS file
-    with fits.open("chisquare.fits") as hdul:
+    with fits.open(output_chisqr) as hdul:
         data = hdul[0].data  # Extract the image data
         # Calculate the total sum
         chisquare = np.sum(data)
@@ -213,5 +216,8 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None, delete=False):
 
         file_path = Path(output_sigma)
         file_path.unlink()
+
+        filechi_path = Path(output_sigma)
+        filechi_path.unlink()
 
     return chinu, aic, bic, totfreepar

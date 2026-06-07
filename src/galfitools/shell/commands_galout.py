@@ -774,7 +774,7 @@ def maingetChiNu(argv=None) -> int:
         "-d",
         "--delete",
         action="store_true",
-        help="deletes the sigma image used to compute chinu",
+        help="deletes the sigma and chisquare image used to compute chinu",
     )
 
     args = parser.parse_args(argv)
