@@ -135,6 +135,10 @@ def mainBestInputParam():
     print(f"BIC     = {best_result['bic']}")
     print(f"Nfree   = {best_result['numparfree']}")
 
+    bestfile = best_result["galfile"]
+
+    return bestfile
+
 
 if __name__ == "__main__":
     mainBestInputParam()
