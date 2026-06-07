@@ -94,7 +94,6 @@ def parse_args():
     parser.add_argument(
         "-r",
         "--regfile",
-        required=True,
         help="DS9 ellipse region file.",
     )
 
@@ -102,7 +101,7 @@ def parse_args():
         "-d",
         "--delete",
         action="store_true",
-        help="deletes the sigma image used to compute chinu",
+        help="deletes the sigma and chisquare image used to compute chinu",
     )
 
     return parser.parse_args()
