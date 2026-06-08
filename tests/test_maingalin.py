@@ -220,6 +220,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "--galfit_out",
                 "output.fits",
                 "--freeser",
+                "--consbulge",
             ],
             # image, regfile, center, mask, zeropoint, sky, noprint, bulgetot, bards9
             (
@@ -235,6 +236,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 1,
                 "sersic.init",
                 "output.fits",
+                True,
                 True,
             ),
         ),
@@ -258,6 +260,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "--galfit_out",
                 "output.fits",
                 "--freeser",
+                "--consbulge",
             ],
             (
                 "img.fits",
@@ -272,6 +275,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 1,
                 "sersic.init",
                 "output.fits",
+                True,
                 True,
             ),
         ),
@@ -291,6 +295,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "--galfit_out",
                 "output.fits",
                 "--freeser",
+                "--consbulge",
             ],
             (
                 "img.fits",
@@ -305,6 +310,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 1,
                 "sersic.init",
                 "output.fits",
+                True,
                 True,
             ),
         ),
@@ -332,6 +338,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "--galfit_out",
                 "output.fits",
                 "--freeser",
+                "--consbulge",
             ],
             (
                 "img.fits",
@@ -346,6 +353,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 1,
                 "sersic.init",
                 "output.fits",
+                True,
                 True,
             ),
         ),
@@ -368,6 +376,7 @@ def test_maingetSersic(monkeypatch, argv, expected):
         out,
         galfit_out,
         freeser,
+        consbulge,
     ):
         seen["args"] = (
             image,
@@ -383,6 +392,7 @@ def test_maingetSersic(monkeypatch, argv, expected):
             out,
             galfit_out,
             freeser,
+            consbulge,
         )
 
     monkeypatch.setattr(cli, "getSersic", fake_getSersic)
