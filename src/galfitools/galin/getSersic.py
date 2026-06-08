@@ -32,6 +32,7 @@ def getSersic(
     out: str,
     galfit_out=None,
     freeser=False,
+    consbulge=False,
 ) -> GalComps:
     """Obtains the initial parameters for GALFIT
 
@@ -88,6 +89,12 @@ def getSersic(
     freeser : bool
             keeps the Sersic index of the seccond component
             as free
+
+    consbulge: bool
+            add constraints to the bulge q > 0.6
+            and for bar q < 0.6 if bards9 is activated
+
+
 
     Returns
     -------
@@ -287,6 +294,15 @@ def getSersic(
                 fout.write(constlinex)
                 fout.write(constliney)
 
+                if consbulge:
+
+                    print("# 1    q  0.6 to 1  ")
+                    print("# 2    q  0.0 to 0.6 ")
+                    constlinebulge = " 1   q  0.6 to 1 \n"
+                    constlinebar = " 2   q  0.0 to 0.6 \n"
+                    fout.write(constlinebulge)
+                    fout.write(constlinebar)
+
             else:
 
                 print("# 1_2    x    offset ")
@@ -296,6 +312,12 @@ def getSersic(
                 constliney = " 1_2    y    offset \n"
                 fout.write(constlinex)
                 fout.write(constliney)
+
+                if consbulge:
+
+                    print("# 1    q  0.6 to 1  ")
+                    constlinebulge = " 1   q  0.6 to 1 \n"
+                    fout.write(constlinebulge)
 
             fout.close()
 

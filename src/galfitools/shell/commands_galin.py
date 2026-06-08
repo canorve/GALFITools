@@ -444,6 +444,13 @@ def maingetSersic(argv=None) -> int:
         help="keep Sersic index parameter of the bar component as free",
     )
 
+    parser.add_argument(
+        "-cb",
+        "--consbulge",
+        action="store_true",
+        help="add constraints to vary q between 0.6 to 1. Bar q from 0 to 0.6",
+    )
+
     args = parser.parse_args(argv)
 
     getSersic(
@@ -460,6 +467,7 @@ def maingetSersic(argv=None) -> int:
         args.out,
         args.galfit_out,
         args.freeser,
+        args.consbulge,
     )
     return 0
 
