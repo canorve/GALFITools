@@ -167,7 +167,7 @@ def getCOWDs9(
         Image = Image * invmask
         hdu2.close()
 
-    fractions = np.array([0.1, 0.25, 0.5, 0.8, 0.9, 0.95])
+    fractions = np.array([0.1, 0.25, 0.5, 0.8, 0.9])
     fig, ax = plt.subplots(figsize=(8, 6))
 
     ax.invert_yaxis()
@@ -178,7 +178,9 @@ def getCOWDs9(
     rad = 0
 
     colormax = "blue"
-
+    radslope = 0
+    r_fracmax = 0
+    magmax = 99
     for idx, item in enumerate(obj):
 
         # get Flux
@@ -232,22 +234,36 @@ def getCOWDs9(
 
         # ax.hlines(totmag, xmin, xmax, color="black", label="total magnitude")
 
-        # Optional: vertical lines at R50, R70, R90
+        # finding the radius to a determined slope
+        target_slope = 0.01
+
+        radius, slope_value = find_radius_at_slope(rad, mag, target_slope)
+
+        print(f"Radius = {radius}")
+        print(f"dmag/drad = {slope_value}")
+
+        # vertical lines at R50, R70, R90
         if rad[-1] > radmax:
             radmax = rad[-1]
             magmax = np.min(mag)
             r_fracmax = r_frac
             colormax = color
+            radslope = radius
 
     for r in r_fracmax:
         ax.axvline(r, ls="--", lw=1, color=colormax)
 
+    ax.axvline(radslope, ls="-", lw=1, color="blue")
+
     ax.axhline(magmax, color="black", lw=2, label="total magnitude")
     # Top x-axis
+
+    r_fracmax = np.append(r_fracmax, radslope)
+
     ax_top = ax.secondary_xaxis("top")
     ax_top.set_xticks(r_fracmax)
     ax_top.set_xticklabels(
-        [r"$R_{10}$", r"$R_{25}$", r"$R_{50}$", r"$R_{80}$", r"$R_{90}$", r"$R_{95}$"]
+        [r"$R_{10}$", r"$R_{25}$", r"$R_{50}$", r"$R_{80}$", r"$R_{90}$", "obj size"]
     )
     ax_top.set_xlabel("Enclosed-light radii")
 
@@ -388,6 +404,44 @@ def FluxKron(imagemat, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     n_pix = np.count_nonzero(mask)
 
     return flux, n_pix
+
+
+def find_radius_at_slope(rad, mag, target_slope):
+    """
+    Find the radius where d(mag)/d(rad) is equal to target_slope.
+
+    Parameters
+    ----------
+    rad : array-like
+        Radius array.
+    mag : array-like
+        Magnitude array.
+    target_slope : float
+        Desired derivative value.
+
+    Returns
+    -------
+    radius : float
+        Estimated radius where d(mag)/d(rad) = target_slope.
+    slope : float
+        Derivative value at the nearest point.
+    """
+
+    rad = np.asarray(rad)
+    mag = np.asarray(mag)
+
+    # Sort by radius, just in case the input is not ordered
+    idx_sort = np.argsort(rad)
+    rad = rad[idx_sort]
+    mag = mag[idx_sort]
+
+    # Numerical derivative dmag/drad
+    slope = np.gradient(mag, rad)
+
+    # Find the nearest value to the target slope
+    idx = np.argmin(np.abs(np.abs(slope) - target_slope))
+
+    return rad[idx], slope[idx]
 
 
 #############################################################################
