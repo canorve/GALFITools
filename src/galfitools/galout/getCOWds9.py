@@ -25,7 +25,7 @@ def getCOWDs9(
     plate,
     sky,
     cmap="inferno",
-    step=1,
+    step=2,
     output="cowds9.png",
     dpival=200,
 ):
@@ -167,7 +167,7 @@ def getCOWDs9(
         Image = Image * invmask
         hdu2.close()
 
-    fractions = np.array([0.1, 0.25, 0.5, 0.8, 0.9])
+    fractions = np.array([0.1, 0.25, 0.5, 0.8, 0.95])
     fig, ax = plt.subplots(figsize=(8, 6))
 
     ax.invert_yaxis()
@@ -214,7 +214,7 @@ def getCOWDs9(
 
         r_frac = np.interp(target_fluxes, radFlux, rad)
 
-        print(f"R50: {r_frac[2]:.2f}, R80:{r_frac[3]:.2f}, R90:{r_frac[4]:.2f} pixels ")
+        print(f"R50: {r_frac[2]:.2f}, R80:{r_frac[3]:.2f}, R95:{r_frac[4]:.2f} pixels ")
 
         mag = -2.5 * np.log10(radFlux / exptime) + zeropoint
 
@@ -235,7 +235,7 @@ def getCOWDs9(
         # ax.hlines(totmag, xmin, xmax, color="black", label="total magnitude")
 
         # finding the radius to a determined slope
-        target_slope = 0.01
+        target_slope = 0.00
 
         radius, slope_value = find_radius_at_slope(rad, mag, target_slope)
 
@@ -263,7 +263,7 @@ def getCOWDs9(
     ax_top = ax.secondary_xaxis("top")
     ax_top.set_xticks(r_fracmax)
     ax_top.set_xticklabels(
-        [r"$R_{10}$", r"$R_{25}$", r"$R_{50}$", r"$R_{80}$", r"$R_{90}$", "obj size"]
+        [r"$R_{10}$", r"$R_{25}$", r"$R_{50}$", r"$R_{80}$", r"$R_{95}$", "size"]
     )
     ax_top.set_xlabel("Enclosed-light radii")
 
@@ -276,7 +276,7 @@ def getCOWDs9(
     return totmag, exptime
 
 
-def FluxEllipStep(Image, xpos, ypos, rx, ry, angle, ncol, nrow, step=1):
+def FluxEllipStep(Image, xpos, ypos, rx, ry, angle, ncol, nrow, step=2):
     """Gets the flux from an DS9 region ellipse at diffent radius in an image"""
 
     xx, yy, Rkron, theta, e = Ds9ell2Kronell(xpos, ypos, rx, ry, angle)
