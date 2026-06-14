@@ -609,7 +609,9 @@ def maingetCOWds9(argv=None) -> int:
     p.add_argument("-cm", "--cmap", type=str, default="inferno")
     p.add_argument("-p", "--plate", help="plate scale", type=float, default=1)
     p.add_argument("-dpi", "--dotsinch", type=int, default=200)
+    p.add_argument("-s", "--slope", type=float, default=0)
     p.add_argument("-o", "--output", type=str, default="cowds9.png")
+    p.add_argument("-or", "--outreg", type=str, default="cowsize.reg")
 
     a = p.parse_args(argv)
 
@@ -623,6 +625,8 @@ def maingetCOWds9(argv=None) -> int:
         cmap=a.cmap,
         step=a.step,
         output=a.output,
+        outreg=a.outreg,
+        target_slope=a.slope,
         dpival=a.dotsinch,
     )
 

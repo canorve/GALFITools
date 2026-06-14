@@ -27,6 +27,8 @@ def getCOWDs9(
     cmap="inferno",
     step=2,
     output="cowds9.png",
+    outreg="cowsize.reg",
+    target_slope=0,
     dpival=200,
 ):
     """computes the magnitude inside a DS9 region file to contruct
@@ -57,8 +59,14 @@ def getCOWDs9(
     dpival: int
             dots per inch for the plot default = 200
 
+    target_slope: float
+            find the radius at this slope
+
     output: str
             plot output file name
+
+    outreg: str
+            ds9 ellipse region at the slope radius
 
     Returns
     -------
@@ -167,7 +175,7 @@ def getCOWDs9(
         Image = Image * invmask
         hdu2.close()
 
-    fractions = np.array([0.1, 0.25, 0.5, 0.8, 0.95])
+    fractions = np.array([0.1, 0.25, 0.5, 0.8, 0.90, 1])
     fig, ax = plt.subplots(figsize=(8, 6))
 
     ax.invert_yaxis()
@@ -181,6 +189,14 @@ def getCOWDs9(
     radslope = 0
     r_fracmax = 0
     magmax = 99
+    TotMag = 99
+
+    Xpos = 0
+    Ypos = 0
+    Rx = 0
+    Ry = 0
+    Angle = 0
+
     for idx, item in enumerate(obj):
 
         # get Flux
@@ -214,7 +230,9 @@ def getCOWDs9(
 
         r_frac = np.interp(target_fluxes, radFlux, rad)
 
-        print(f"R50: {r_frac[2]:.2f}, R80:{r_frac[3]:.2f}, R95:{r_frac[4]:.2f} pixels ")
+        print(
+            f"R50: {r_frac[2]:.2f}, R80: {r_frac[3]:.2f}, R90: {r_frac[4]:.2f} R100: {r_frac[5]:.2f} pixels "
+        )
 
         mag = -2.5 * np.log10(radFlux / exptime) + zeropoint
 
@@ -234,12 +252,9 @@ def getCOWDs9(
 
         # ax.hlines(totmag, xmin, xmax, color="black", label="total magnitude")
 
-        # finding the radius to a determined slope
-        target_slope = 0.00
-
         radius, slope_value = find_radius_at_slope(rad, mag, target_slope)
 
-        print(f"Radius = {radius}")
+        print(f"Slope Radius = {radius}")
         print(f"dmag/drad = {slope_value}")
 
         # vertical lines at R50, R70, R90
@@ -249,6 +264,26 @@ def getCOWDs9(
             r_fracmax = r_frac
             colormax = color
             radslope = radius
+            TotMag = totmag
+
+            Xpos = xpos[idx]
+            Ypos = ypos[idx]
+            Rx = rx[idx]
+            Ry = ry[idx]
+            Angle = angle[idx]
+
+    # ds9 region output
+    if Rx > Ry:
+        Q = Ry / Rx
+        Rx = radslope
+        Ry = Rx * Q
+    else:
+        Q = Rx / Ry
+        Ry = radslope
+        Rx = Ry * Q
+
+    # saving to file:
+    write_ds9_ellipse_region(outreg, Xpos, Ypos, Rx, Ry, Angle, color="blue")
 
     for r in r_fracmax:
         ax.axvline(r, ls="--", lw=1, color=colormax)
@@ -263,7 +298,15 @@ def getCOWDs9(
     ax_top = ax.secondary_xaxis("top")
     ax_top.set_xticks(r_fracmax)
     ax_top.set_xticklabels(
-        [r"$R_{10}$", r"$R_{25}$", r"$R_{50}$", r"$R_{80}$", r"$R_{95}$", "size"]
+        [
+            r"$R_{10}$",
+            r"$R_{25}$",
+            r"$R_{50}$",
+            r"$R_{80}$",
+            r"$R_{90}$",
+            r"$R_{100}$",
+            "size",
+        ]
     )
     ax_top.set_xlabel("Enclosed-light radii")
 
@@ -273,7 +316,52 @@ def getCOWDs9(
 
     # estimating sersic indexs
 
-    return totmag, exptime
+    return TotMag, exptime
+
+
+def write_ds9_ellipse_region(
+    ds9outfile: str,
+    Xpos: float,
+    Ypos: float,
+    Rx: float,
+    Ry: float,
+    Angle: float,
+    color: str = "blue",
+) -> None:
+    """
+    Write a DS9 ellipse region file.
+
+    Parameters
+    ----------
+    ds9outfile : str
+        Output DS9 region file.
+    Xpos : float
+        X position of the ellipse center.
+    Ypos : float
+        Y position of the ellipse center.
+    Rx : float
+        Semi-major axis of the ellipse in pixels.
+    Ry : float
+        Semi-minor axis of the ellipse in pixels.
+    Angle : float
+        Position angle of the ellipse in degrees.
+    color : str, optional
+        DS9 color for the ellipse. Default is "green".
+    """
+
+    with open(ds9outfile, "w", encoding="utf-8") as file:
+        file.write("# Region file format: DS9 version 4.1\n")
+        file.write(
+            "global color={} dashlist=8 3 width=1 "
+            'font="helvetica 10 normal roman" select=1 highlite=1 '
+            "dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1\n".format(color)
+        )
+        file.write("image\n")
+        file.write(
+            "ellipse({:.6f},{:.6f},{:.6f},{:.6f},{:.6f})\n".format(
+                Xpos, Ypos, Rx, Ry, Angle
+            )
+        )
 
 
 def FluxEllipStep(Image, xpos, ypos, rx, ry, angle, ncol, nrow, step=2):
