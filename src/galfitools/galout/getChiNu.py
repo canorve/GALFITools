@@ -73,7 +73,7 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None, delete=False):
     xpeak = xpeak - xmin
     ypeak = ypeak - ymin
 
-    dis = 3  # maximum disntance among components
+    dis = 3  # maximum distance among components
 
     EffRad, totmag, meanme, me, N, theta = getReComp(
         galfile, dis, fracrad, None, numcomp
@@ -217,7 +217,7 @@ def getChiNu(galfile, numcomp, fracrad=0.99, ds9reg=None, delete=False):
         file_path = Path(output_sigma)
         file_path.unlink()
 
-        filechi_path = Path(output_sigma)
+        filechi_path = Path(output_chisqr)
         filechi_path.unlink()
 
     return chinu, aic, bic, totfreepar
