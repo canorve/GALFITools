@@ -113,7 +113,7 @@ def mainBestInputParam():
     """
     args = parse_args()
 
-    fracrad = 0.99
+    fracrad = 0.98
     results, best_result = run_get_chinu_for_list(
         args.list_file,
         args.numcomp,
