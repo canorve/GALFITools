@@ -117,7 +117,9 @@ def maingetSegValue():
     print(f"Selected segmentation value: {value}")
     print(f"Equivalent DS9 position: x={x + 1}, y={y + 1}")
 
-    return value
+    print(f"{value}")
+
+    return 0
 
 
 if __name__ == "__main__":
