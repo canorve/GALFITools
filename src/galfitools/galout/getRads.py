@@ -1494,15 +1494,39 @@ class GetMe:
         comps.Ie = comps.Flux / denom
 
         maskgal = comps.Active == 1
-        Itotr = self.Itotser(
-            EffRad,
-            comps.Ie[maskgal],
-            comps.Rad[maskgal],
-            comps.Exp[maskgal],
-            comps.AxRat[maskgal],
-            comps.PosAng[maskgal],
-            theta,
-        )
+
+        masksersic = comps.NameComp[maskgal] == "sersic"
+        maskferrer = comps.NameComp[maskgal] == "ferrer"
+
+        name_comp = comps.NameComp[maskgal]
+
+        Itotr = 0
+        itotser = 0
+        itotfer = 0
+        if np.all(name_comp == "sersic"):
+            itotser = self.Itotser(
+                EffRad,
+                comps.Ie[masksersic],
+                comps.Rad[masksersic],
+                comps.Exp[masksersic],
+                comps.AxRat[masksersic],
+                comps.PosAng[masksersic],
+                theta,
+            )
+
+        if np.all(name_comp == "ferrer"):
+            itotfer = self.Itotfer(
+                EffRad,
+                comps.Flux[maskferrer],
+                comps.Rad[maskferrer],
+                comps.Exp[maskferrer],
+                comps.Exp2[maskferrer],
+                comps.AxRat[maskferrer],
+                comps.PosAng[maskferrer],
+                theta,
+            )
+
+        Itotr = itotser + itotfer
 
         me = -2.5 * np.log10(Itotr)
 
@@ -1525,6 +1549,40 @@ class GetMe:
         Rcor = GetRadAng(R, q, pa, theta)
 
         Ir = Ie * np.exp(-k * ((Rcor / Re) ** (1 / n) - 1))
+
+        return Ir
+
+    def Itotfer(
+        self,
+        R: float,
+        Ie: list,
+        rad: list,
+        n: list,
+        n2: list,
+        q: list,
+        pa: list,
+        theta: float,
+    ) -> float:
+
+        ItotR = self.Ifer(R, Ie, rad, n, n2, q, pa, theta)
+
+        return ItotR.sum()
+
+    def Ifer(
+        self,
+        R: float,
+        Io: list,
+        Re: list,
+        n: list,
+        n2: list,
+        q: list,
+        pa: list,
+        theta: float,
+    ) -> float:
+
+        Rcor = GetRadAng(R, q, pa, theta)
+
+        Ir = Io * (1 - (Rcor / Re) ** (2 - n2)) ** n
 
         return Ir
 
@@ -2118,7 +2176,7 @@ class GetSlope:
 
         Rcor = GetRadAng(R, q, pa, theta)
 
-        X = Rcor / Rout  # x = r / rout
+        X = Rcor / Rout
 
         gam = 2.0 - beta
 
