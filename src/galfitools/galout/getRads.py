@@ -1503,7 +1503,7 @@ class GetMe:
         Itotr = 0
         itotser = 0
         itotfer = 0
-        if np.all(name_comp == "sersic"):
+        if np.any(name_comp == "sersic"):
             itotser = self.Itotser(
                 EffRad,
                 comps.Ie[masksersic],
@@ -1514,7 +1514,7 @@ class GetMe:
                 theta,
             )
 
-        if np.all(name_comp == "ferrer"):
+        if np.any(name_comp == "ferrer"):
             itotfer = self.Itotfer(
                 EffRad,
                 comps.Flux[maskferrer],
@@ -1527,7 +1527,6 @@ class GetMe:
             )
 
         Itotr = itotser + itotfer
-
         me = -2.5 * np.log10(Itotr)
 
         return me
@@ -1582,7 +1581,10 @@ class GetMe:
 
         Rcor = GetRadAng(R, q, pa, theta)
 
-        Ir = Io * (1 - (Rcor / Re) ** (2 - n2)) ** n
+        if Rcor <= Re:
+            Ir = Io * (1 - (Rcor / Re) ** (2 - n2)) ** n
+        else:
+            Ir = np.zeros_like(Io)
 
         return Ir
 
