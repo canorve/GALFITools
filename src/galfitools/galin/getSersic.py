@@ -297,10 +297,13 @@ def getSersic(
                 if consbulge:
 
                     print("# 1    q  0.75 to 1  ")
+                    print("# 1    n  0.1 to 10  ")
                     print("# 2    q  0.0 to 0.5 ")
                     constlinebulge = " 1   q  0.75 to 1 \n"
+                    constlinesersic = " 1   n  0.1 to 10 \n"
                     constlinebar = " 2   q  0.0 to 0.5 \n"
                     fout.write(constlinebulge)
+                    fout.write(constlinesersic)
                     fout.write(constlinebar)
 
             else:
@@ -316,8 +319,11 @@ def getSersic(
                 if consbulge:
 
                     print("# 1    q  0.75 to 1  ")
+                    print("# 1    n  0.1 to 10  ")
                     constlinebulge = " 1   q  0.75 to 1 \n"
+                    constlinesersic = " 1   n  0.1 to 10 \n"
                     fout.write(constlinebulge)
+                    fout.write(constlinesersic)
 
             fout.close()
 
