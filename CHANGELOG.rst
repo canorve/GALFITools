@@ -184,6 +184,49 @@ This release includes many changes:
 - bugs fixed
 
 
+Version 1.36.0
+================
+
+
+GALFITools: A library for GALFIT
+
+GALFITools constitutes a collection of specialized routines to facilitate
+the utilization of GALFIT. The toolkit encompasses a spectrum of routines,
+spanning from mask creation, Point Spread Function (PSF) creation,
+Multi-gaussian expansion, sky computation, initial parameter estimation,
+to the analysis of GALFIT's output
+
+In this release:
+
+    New CLI function: getInputBand to estimate initial parameters from a fit model of other band
+
+    New CLI function: bestInputParam to estimate the best input initial conditions from a file's list of GALFIT input files
+
+    New CLI function: magFerrers to compute Ferrers' magnitude
+
+    New CLI getNds9 to estimate the Sersic index from ellipse ds9 region
+
+    new CLI function: getcowds9 to compute curve of growth from ellipse DS9 region, size estimation and fraction of light radius
+
+    new CLI function splitComp split galfit files into several components per file
+
+    new CLI function batchSersic2Ferrer to batch the Sersic2Ferrer function
+
+    getBarlength includes Ferrers model
+
+    getSersic now includes parameters constraints for bulge and bar
+
+    getMe function now includes Ferrers model
+
+    Functions that use num_comp now define the angle used to compute radii.
+
+    getRecomp now includes Ferrers model
+
+    getbarlength include multiple options to estimate barlength
+
+    Several functions were updated to improve usability and practical use.
+
+    bugs removed
 
 
 
