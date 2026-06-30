@@ -103,7 +103,7 @@ def GetSize(x, y, R, theta, ell, ncol, nrow):
     if mask.any():
         ymax = nrow - 1
 
-    return (round(xmin), round(xmax), round(ymin), round(ymax))
+    return (round(xmin), int(xmax), round(ymin), int(ymax))
 
 
 def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
