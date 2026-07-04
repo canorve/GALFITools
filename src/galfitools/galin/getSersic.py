@@ -152,10 +152,12 @@ def getSersic(
         mag2 = -2.5 * np.log10(FluxDisk)
 
         if bards9:
-            Fluxbar = 10 ** (-magbar / 2.5)  # assuming bar flux containts bulge flux
-            FluxDisk = Fluxtot - Fluxbar
-            FluxBulge = Fluxbar * 0.3  # wild guess
-            Fluxbar = Fluxbar * 0.7  # wild guess
+            # Fluxbar = 10 ** (-magbar / 2.5)  # assuming bar flux containts bulge flux
+            # FluxDisk = Fluxtot - Fluxbar
+            # FluxBulge = Fluxbar * 0.3  # wild guess
+            # Fluxbar = Fluxbar * 0.7  # wild guess
+            Fluxbar = FluxBulge * 0.7  # wild guess
+            FluxBulge = FluxBulge * 0.3  # wild guess
             mag = -2.5 * np.log10(FluxBulge)
             mag2 = -2.5 * np.log10(FluxDisk)
             magbar = -2.5 * np.log10(Fluxbar)
