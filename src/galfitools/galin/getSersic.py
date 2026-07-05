@@ -139,6 +139,11 @@ def getSersic(
     if ymax > nrow:
         ymax = nrow
 
+    if rx >= ry:
+        Re = rx / 2  # wild guess
+    else:
+        Re = ry / 2  # same
+
     if bards9:
         Xbar, Ybar, AxRatbar, PAbar = getPeak(image, bards9, center, maskfile)
         magbar, sb, exptimebar = photDs9(image, bards9, maskfile, zeropoint, plate, sky)
@@ -156,10 +161,9 @@ def getSersic(
             # FluxDisk = Fluxtot - Fluxbar
             # FluxBulge = Fluxbar * 0.3  # wild guess
             # Fluxbar = Fluxbar * 0.7  # wild guess
-            Fluxbar = FluxBulge * 0.7  # wild guess
-            FluxBulge = FluxBulge * 0.3  # wild guess
+            Fluxbar = FluxBulge * 0.65  # wild guess
+            FluxBulge = FluxBulge * 0.35  # wild guess
             mag = -2.5 * np.log10(FluxBulge)
-            mag2 = -2.5 * np.log10(FluxDisk)
             magbar = -2.5 * np.log10(Fluxbar)
 
             if rxbar >= rybar:
@@ -167,10 +171,9 @@ def getSersic(
             else:
                 Rebar = rybar / 2  # same
 
-    if rx >= ry:
-        Re = rx / 2  # wild guess
-    else:
-        Re = ry / 2  # same
+            Rebulge = Rebar * 0.3
+        else:
+            Rebulge = Re * bulgetot
 
     # wild guesses for n and Re
     n = 2
@@ -237,7 +240,7 @@ def getSersic(
             print("1) {:.2f} {:.2f} 1 1   # Position x, y".format(X, Y))
             print("3) {:.2f}   1       # Integrated magnitude ".format(mag))
             print(
-                "4) {:.2f}   1       # R_e (effective radius) ".format(Re * bulgetot)
+                "4) {:.2f}   1       # R_e (effective radius) ".format(Rebulge)
             )  # wild guess
             print("5) {:.2f}   1       # Sersic index n  ".format(n))
             print("6) 0.0000   0      # ----  ")
@@ -299,13 +302,13 @@ def getSersic(
                 if consbulge:
 
                     print("# 1    q  0.5 to 1  ")
-                    print("# 1    n  0.1 to 10  ")
+                    # print("# 1    n  0.1 to 10  ")
                     print("# 2    q  0 to 0.65 ")
                     constlinebulge = " 1   q  0.5 to 1 \n"
-                    constlinesersic = " 1   n  0.1 to 10 \n"
+                    # constlinesersic = " 1   n  0.1 to 10 \n"
                     constlinebar = " 2   q  0 to 0.65 \n"
                     fout.write(constlinebulge)
-                    fout.write(constlinesersic)
+                    # fout.write(constlinesersic)
                     fout.write(constlinebar)
 
             else:
@@ -321,11 +324,11 @@ def getSersic(
                 if consbulge:
 
                     print("# 1    q  0.5 to 1  ")
-                    print("# 1    n  0.1 to 10  ")
+                    # print("# 1    n  0.1 to 10  ")
                     constlinebulge = " 1   q  0.5 to 1 \n"
-                    constlinesersic = " 1   n  0.1 to 10 \n"
+                    # constlinesersic = " 1   n  0.1 to 10 \n"
                     fout.write(constlinebulge)
-                    fout.write(constlinesersic)
+                    # fout.write(constlinesersic)
 
             fout.close()
 
@@ -336,7 +339,7 @@ def getSersic(
         galcomps.N = np.append(galcomps.N, N)
 
         galcomps.Mag = np.append(galcomps.Mag, mag)
-        galcomps.Rad = np.append(galcomps.Rad, Re * bulgetot)
+        galcomps.Rad = np.append(galcomps.Rad, Rebulge)
         galcomps.Exp = np.append(galcomps.Exp, n)
         galcomps.Exp2 = np.append(galcomps.Exp2, 0)
         galcomps.Exp3 = np.append(galcomps.Exp3, 0)
