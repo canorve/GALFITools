@@ -161,8 +161,8 @@ def getSersic(
             # FluxDisk = Fluxtot - Fluxbar
             # FluxBulge = Fluxbar * 0.3  # wild guess
             # Fluxbar = Fluxbar * 0.7  # wild guess
-            Fluxbar = FluxBulge * 0.65  # wild guess
-            FluxBulge = FluxBulge * 0.35  # wild guess
+            Fluxbar = FluxBulge * 0.5  # wild guess
+            FluxBulge = FluxBulge * 0.5  # wild guess
             mag = -2.5 * np.log10(FluxBulge)
             magbar = -2.5 * np.log10(Fluxbar)
 
