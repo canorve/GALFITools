@@ -399,12 +399,18 @@ def maingetSersic(argv=None) -> int:
     parser.add_argument("Image", help="image FITS file")
     parser.add_argument("RegFile", help="DS9 ellipse region file")
     parser.add_argument(
-        "-zp", "--zeropoint", type=float, default=25, help="photometric zero point"
+        "-zp",
+        "--zeropoint",
+        type=float,
+        default=22.5,
+        help="photometric zero point. Default = 22.5",
     )
     parser.add_argument(
         "-sk", "--sky", type=float, default=0, help="sky background to subtract"
     )
-    parser.add_argument("-p", "--plate", type=float, default=1, help="plate scale")
+    parser.add_argument(
+        "-p", "--plate", type=float, default=0.262, help="plate scale. Default = .262"
+    )
     parser.add_argument(
         "-bt",
         "--bulgetot",
@@ -415,7 +421,7 @@ def maingetSersic(argv=None) -> int:
         "-c", "--center", action="store_true", help="take center from DS9 region file"
     )
     parser.add_argument(
-        "-n",
+        "-no",
         "--noprint",
         action="store_true",
         help="do not print Sérsic functions to stdout",
@@ -451,6 +457,22 @@ def maingetSersic(argv=None) -> int:
         help="add constraints to vary q between 0.6 to 1. Bar q from 0 to 0.6",
     )
 
+    parser.add_argument(
+        "-bbr",
+        "--bulgebarat",
+        type=float,
+        default=1,
+        help="bulge-to-bar flux ratio (divides magnitude between bulge and bar). Default=1",
+    )
+
+    parser.add_argument(
+        "-n",
+        "--nser",
+        type=float,
+        default=2,
+        help=" Sersic index initial value Default=2",
+    )
+
     args = parser.parse_args(argv)
 
     getSersic(
@@ -468,6 +490,8 @@ def maingetSersic(argv=None) -> int:
         args.galfit_out,
         args.freeser,
         args.consbulge,
+        args.nser,
+        args.bulgebarat,
     )
     return 0
 

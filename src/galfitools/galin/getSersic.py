@@ -25,7 +25,7 @@ def getSersic(
     maskfile: str,
     zeropoint: float,
     sky: float,
-    noprint: float,
+    noprint: bool,
     bulgetot: float,
     bards9: str,
     plate: float,
@@ -33,6 +33,8 @@ def getSersic(
     galfit_out=None,
     freeser=False,
     consbulge=False,
+    nser=2,
+    bulgebarat=1,
 ) -> GalComps:
     """Obtains the initial parameters for GALFIT
 
@@ -44,8 +46,10 @@ def getSersic(
     ----------
     image : float
             FITS image of the galaxy
+
     regfile : str
             DS9 ellipse region file
+
     center : bool
             If True, it uses the geometrical center of the
             DS9 ellipse. Otherwise it will use the peak pixel
@@ -56,16 +60,22 @@ def getSersic(
 
     zeropoint : float
                magnitude zero point
+
     sky : float
           Sky/background value
-    noprint : float
+
+    noprint : bool
             if False, avoids to print to STDOUT
+
+
+    nser : sersic index initial parameter. Default = 2
 
     bulgetot : float
             Estimates the bulge-to-total ratio of the galaxy to
             determine the initial parameters for the bulge/disk model.
             If set to None, it computes the initial parameters for
-            a single Sersic model.
+            a single Sersic model. Here it is assumed that bar
+            is part of the bulge (see bulgebarat below)
 
     bards9 : str
             If a DS9 ellipse region is provided (different from
@@ -74,6 +84,14 @@ def getSersic(
             initial parameters of the bulge, bar, and disk will
             be printed. The bulgetot parameter must be specified
             for this to function.
+
+    bulgebarat : str
+            If bards9 is activated, this indicated the
+            bulge/bar flux ratio. It divides the magnitude
+            that correspond to the bulge in bulgetot into
+            bulge and bar. Default = 1
+
+
     plate: float
           plate scale
 
@@ -144,6 +162,14 @@ def getSersic(
     else:
         Re = ry / 2  # same
 
+    # computing the bulge_bar_total_ratio:
+
+    barbulgerat = 1 / bulgebarat
+
+    totbulgebar = 1 + barbulgerat
+
+    bulgebartot = 1 / totbulgebar
+
     if bards9:
         Xbar, Ybar, AxRatbar, PAbar = getPeak(image, bards9, center, maskfile)
         magbar, sb, exptimebar = photDs9(image, bards9, maskfile, zeropoint, plate, sky)
@@ -159,10 +185,8 @@ def getSersic(
         if bards9:
             # Fluxbar = 10 ** (-magbar / 2.5)  # assuming bar flux containts bulge flux
             # FluxDisk = Fluxtot - Fluxbar
-            # FluxBulge = Fluxbar * 0.3  # wild guess
-            # Fluxbar = Fluxbar * 0.7  # wild guess
-            Fluxbar = FluxBulge * 0.5  # wild guess
-            FluxBulge = FluxBulge * 0.5  # wild guess
+            Fluxbar = FluxBulge * bulgebartot
+            FluxBulge = FluxBulge * bulgebartot
             mag = -2.5 * np.log10(FluxBulge)
             magbar = -2.5 * np.log10(Fluxbar)
 
@@ -171,12 +195,10 @@ def getSersic(
             else:
                 Rebar = rybar / 2  # same
 
-            Rebulge = Rebar * 0.3
+            Rebulge = Rebar * bulgebartot
         else:
             Rebulge = Re * bulgetot
 
-    # wild guesses for n and Re
-    n = 2
     skip = 0
     N = 1
 
@@ -212,8 +234,8 @@ def getSersic(
     galhead.xmax = xmax
     galhead.ymin = ymin
     galhead.ymax = ymax
-    galhead.scale = 0.262  # plate scale for DESI
-    galhead.scaley = 0.262  # plate scale for DESI
+    galhead.scale = plate
+    galhead.scaley = plate
 
     fserout = open(out, "w")
 
@@ -239,10 +261,8 @@ def getSersic(
             print("0) sersic # Component type")
             print("1) {:.2f} {:.2f} 1 1   # Position x, y".format(X, Y))
             print("3) {:.2f}   1       # Integrated magnitude ".format(mag))
-            print(
-                "4) {:.2f}   1       # R_e (effective radius) ".format(Rebulge)
-            )  # wild guess
-            print("5) {:.2f}   1       # Sersic index n  ".format(n))
+            print("4) {:.2f}   1       # R_e (effective radius) ".format(Rebulge))
+            print("5) {:.2f}   1       # Sersic index n  ".format(nser))
             print("6) 0.0000   0      # ----  ")
             print("7) 0.0000   0      # ----  ")
             print("8) 0.0000   0      # ----  ")
@@ -340,7 +360,7 @@ def getSersic(
 
         galcomps.Mag = np.append(galcomps.Mag, mag)
         galcomps.Rad = np.append(galcomps.Rad, Rebulge)
-        galcomps.Exp = np.append(galcomps.Exp, n)
+        galcomps.Exp = np.append(galcomps.Exp, nser)
         galcomps.Exp2 = np.append(galcomps.Exp2, 0)
         galcomps.Exp3 = np.append(galcomps.Exp3, 0)
         galcomps.AxRat = np.append(galcomps.AxRat, 1)
@@ -451,7 +471,7 @@ def getSersic(
             print("1) {:.2f} {:.2f} 1 1  # Position x, y".format(X, Y))
             print("3) {:.2f}    1      # Integrated magnitude ".format(mag))
             print("4) {:.2f}    1      # R_e (effective radius) ".format(Re))
-            print("5) {:.2f}    1      # Sersic index n  ".format(n))
+            print("5) {:.2f}    1      # Sersic index n  ".format(nser))
             print("6) 0.0000   0      # ----  ")
             print("7) 0.0000   0      # ----  ")
             print("8) 0.0000   0      # ----  ")
@@ -466,7 +486,7 @@ def getSersic(
 
         galcomps.Mag = np.append(galcomps.Mag, mag)
         galcomps.Rad = np.append(galcomps.Rad, Re)
-        galcomps.Exp = np.append(galcomps.Exp, n)
+        galcomps.Exp = np.append(galcomps.Exp, nser)
         galcomps.Exp2 = np.append(galcomps.Exp2, 0)
         galcomps.Exp3 = np.append(galcomps.Exp3, 0)
         galcomps.AxRat = np.append(galcomps.AxRat, AxRat)
