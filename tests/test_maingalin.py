@@ -221,6 +221,10 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "output.fits",
                 "--freeser",
                 "--consbulge",
+                "--nser",
+                "2",
+                "--bulgebarat",
+                "1",
             ],
             # image, regfile, center, mask, zeropoint, sky, noprint, bulgetot, bards9
             (
@@ -228,7 +232,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "ell.reg",
                 False,
                 None,
-                25.0,
+                22.5,
                 0.0,
                 False,
                 None,
@@ -238,6 +242,8 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "output.fits",
                 True,
                 True,
+                2,
+                1,
             ),
         ),
         # 2) Typical flags: custom zeropoint/sky + center + mask + noprint
@@ -261,6 +267,10 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "output.fits",
                 "--freeser",
                 "--consbulge",
+                "--nser",
+                "2",
+                "--bulgebarat",
+                "1",
             ],
             (
                 "img.fits",
@@ -277,6 +287,8 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "output.fits",
                 True,
                 True,
+                2,
+                1,
             ),
         ),
         # 3) Bulge/Disk with a bar region: requires --bulgetot and --bards9
@@ -296,13 +308,17 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "output.fits",
                 "--freeser",
                 "--consbulge",
+                "--nser",
+                "2",
+                "--bulgebarat",
+                "1",
             ],
             (
                 "img.fits",
                 "ell.reg",
                 False,
                 None,
-                25.0,
+                22.5,
                 0.0,
                 False,
                 0.35,
@@ -312,6 +328,8 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "output.fits",
                 True,
                 True,
+                2,
+                1,
             ),
         ),
         # 4) Everything at once (different values)
@@ -324,7 +342,7 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "-sk",
                 "0.2",
                 "-c",
-                "-n",
+                "-no",
                 "-m",
                 "m.fits",
                 "-bt",
@@ -339,6 +357,10 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "output.fits",
                 "--freeser",
                 "--consbulge",
+                "--nser",
+                "2",
+                "--bulgebarat",
+                "1",
             ],
             (
                 "img.fits",
@@ -355,6 +377,8 @@ def test_mainGetBoxSizeDs9(monkeypatch, capsys):
                 "output.fits",
                 True,
                 True,
+                2,
+                1,
             ),
         ),
     ],
@@ -377,6 +401,8 @@ def test_maingetSersic(monkeypatch, argv, expected):
         galfit_out,
         freeser,
         consbulge,
+        nser,
+        bulgebarat,
     ):
         seen["args"] = (
             image,
@@ -393,6 +419,8 @@ def test_maingetSersic(monkeypatch, argv, expected):
             galfit_out,
             freeser,
             consbulge,
+            nser,
+            bulgebarat,
         )
 
     monkeypatch.setattr(cli, "getSersic", fake_getSersic)
