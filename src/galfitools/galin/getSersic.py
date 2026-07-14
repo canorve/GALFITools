@@ -19,7 +19,7 @@ from galfitools.galin.std import Ds9ell2Kronell
 
 
 def getSersic(
-    image: float,
+    image: str,
     regfile: str,
     center: bool,
     maskfile: str,
@@ -163,11 +163,9 @@ def getSersic(
         Re = ry / 2  # same
 
     # computing the bulge_bar_total_ratio:
-
+    # from bulge bar ratio
     barbulgerat = 1 / bulgebarat
-
     totbulgebar = 1 + barbulgerat
-
     bulgebartot = 1 / totbulgebar
 
     if bards9:
@@ -183,8 +181,6 @@ def getSersic(
         mag2 = -2.5 * np.log10(FluxDisk)
 
         if bards9:
-            # Fluxbar = 10 ** (-magbar / 2.5)  # assuming bar flux containts bulge flux
-            # FluxDisk = Fluxtot - Fluxbar
             Fluxbar = FluxBulge * bulgebartot
             FluxBulge = FluxBulge * bulgebartot
             mag = -2.5 * np.log10(FluxBulge)
@@ -216,10 +212,12 @@ def getSersic(
 
     # header setup
     galhead.inputimage = image
+
     if galfit_out is None:
         galhead.outimage = name + "-out.fits"
     else:
         galhead.outimage = galfit_out
+
     galhead.sigimage = "sigma.fits"
     galhead.psfimage = "psf.fits"
     galhead.maskimage = maskfile
@@ -255,128 +253,69 @@ def getSersic(
                 + "computed by GALFIT"
             )
 
-            print("")
-
-            print("# Component number: 1")
-            print("0) sersic # Component type")
-            print("1) {:.2f} {:.2f} 1 1   # Position x, y".format(X, Y))
-            print("3) {:.2f}   1       # Integrated magnitude ".format(mag))
-            print("4) {:.2f}   1       # R_e (effective radius) ".format(Rebulge))
-            print("5) {:.2f}   1       # Sersic index n  ".format(nser))
-            print("6) 0.0000   0      # ----  ")
-            print("7) 0.0000   0      # ----  ")
-            print("8) 0.0000   0      # ----  ")
-            print("9) {:.2f}   1       # Axis Ratio (b/a)  ".format(1))
-            print("10) {:.2f}  1       # Position angle (PA)  ".format(0))
-            print("Z) {}  # Skip this model in output image?  ".format(skip))
-
-            print("")
+            printTerminal(1, X, Y, mag, Rebulge, nser, 1, 0, skip, 1)
 
             if bards9:
-                print("# Component number: 1b bar")
-                print("0) sersic # Component type")
-                print("1) {:.2f} {:.2f} 1 1   # Position x, y".format(X, Y))
-                print("3) {:.2f}    1      # Integrated magnitude ".format(magbar))
-                print("4) {:.2f}    1      # R_e (effective radius) ".format(Rebar))
 
                 if freeser is True:
-                    print("5) {:.2f}    1      # Sersic index n  ".format(0.5))
+
+                    printTerminal(2, X, Y, magbar, Rebar, 0.5, AxRatbar, PAbar, skip, 1)
+
                 else:
-                    print("5) {:.2f}    0      # Sersic index n  ".format(0.5))
 
-                print("6) 0.0000   0      # ----  ")
-                print("7) 0.0000   0      # ----  ")
-                print("8) 0.0000   0      # ----  ")
-                print("9) {:.2f}   1       # Axis Ratio (b/a)  ".format(AxRatbar))
-                print("10) {:.2f}  1       # Position angle (PA)  ".format(PAbar))
-                print("Z) {}  # Skip this model in output image?  ".format(skip))
-                print("")
+                    printTerminal(2, X, Y, magbar, Rebar, 0.5, AxRatbar, PAbar, skip, 0)
 
-            print("# Component number: 2")
-            print("0) sersic # Component type")
-            print("1) {:.2f} {:.2f} 1 1   # Position x, y".format(X, Y))
-            print("3) {:.2f}    1      # Integrated magnitude ".format(mag2))
-            print("4) {:.2f}    1      # R_e (effective radius) ".format(Re))
-            print("5) {:.2f}    0      # Sersic index n  ".format(1))
-            print("6) 0.0000   0      # ----  ")
-            print("7) 0.0000   0      # ----  ")
-            print("8) 0.0000   0      # ----  ")
-            print("9) {:.2f}    1      # Axis Ratio (b/a)  ".format(AxRat))
-            print("10) {:.2f}   1      # Position angle (PA)  ".format(PA))
-            print("Z) {}  # Skip this model in output image?  ".format(skip))
+            printTerminal(3, X, Y, mag2, Re, 1, AxRat, PA, skip, 0)
 
-            print("")
-            print("# parameter constraints file: ", fileconst)
+        print("# parameter constraints file: ", fileconst)
 
-            fout = open(fileconst, "w")
+        fout = open(fileconst, "w")
 
-            if bards9:
+        if bards9:
 
-                print("# 1_2_3    x    offset ")
-                print("# 1_2_3    y    offset ")
-                constlinex = " 1_2_3    x    offset \n"
-                constliney = " 1_2_3    y    offset \n"
-                fout.write(constlinex)
-                fout.write(constliney)
+            print("# 1_2_3    x    offset ")
+            print("# 1_2_3    y    offset ")
+            constlinex = " 1_2_3    x    offset \n"
+            constliney = " 1_2_3    y    offset \n"
+            fout.write(constlinex)
+            fout.write(constliney)
 
-                if consbulge:
+            if consbulge:
 
-                    print("# 1    q  0.5 to 1  ")
-                    # print("# 1    n  0.1 to 10  ")
-                    print("# 2    q  0 to 0.65 ")
-                    constlinebulge = " 1   q  0.5 to 1 \n"
-                    # constlinesersic = " 1   n  0.1 to 10 \n"
-                    constlinebar = " 2   q  0 to 0.65 \n"
-                    fout.write(constlinebulge)
-                    # fout.write(constlinesersic)
-                    fout.write(constlinebar)
+                print("# 1    q  0.5 to 1  ")
+                print("# 2    q  0 to 0.65 ")
+                constlinebulge = " 1   q  0.5 to 1 \n"
+                constlinebar = " 2   q  0 to 0.65 \n"
+                fout.write(constlinebulge)
+                fout.write(constlinebar)
 
-            else:
+        else:
 
-                print("# 1_2    x    offset ")
-                print("# 1_2    y    offset ")
+            print("# 1_2    x    offset ")
+            print("# 1_2    y    offset ")
 
-                constlinex = " 1_2    x    offset \n"
-                constliney = " 1_2    y    offset \n"
-                fout.write(constlinex)
-                fout.write(constliney)
+            constlinex = " 1_2    x    offset \n"
+            constliney = " 1_2    y    offset \n"
+            fout.write(constlinex)
+            fout.write(constliney)
 
-                if consbulge:
+            if consbulge:
 
-                    print("# 1    q  0.5 to 1  ")
-                    # print("# 1    n  0.1 to 10  ")
-                    constlinebulge = " 1   q  0.5 to 1 \n"
-                    # constlinesersic = " 1   n  0.1 to 10 \n"
-                    fout.write(constlinebulge)
-                    # fout.write(constlinesersic)
+                print("# 1    q  0.5 to 1  ")
+                # print("# 1    n  0.1 to 10  ")
+                constlinebulge = " 1   q  0.5 to 1 \n"
+                # constlinesersic = " 1   n  0.1 to 10 \n"
+                fout.write(constlinebulge)
+                # fout.write(constlinesersic)
 
-            fout.close()
+        fout.close()
 
         # first component: bulge
-        galcomps.PosX = np.append(galcomps.PosX, X)
-        galcomps.PosY = np.append(galcomps.PosY, Y)
-        galcomps.NameComp = np.append(galcomps.NameComp, "sersic")
-        galcomps.N = np.append(galcomps.N, N)
 
-        galcomps.Mag = np.append(galcomps.Mag, mag)
-        galcomps.Rad = np.append(galcomps.Rad, Rebulge)
-        galcomps.Exp = np.append(galcomps.Exp, nser)
-        galcomps.Exp2 = np.append(galcomps.Exp2, 0)
-        galcomps.Exp3 = np.append(galcomps.Exp3, 0)
-        galcomps.AxRat = np.append(galcomps.AxRat, 1)
-        galcomps.PosAng = np.append(galcomps.PosAng, 0)
-        galcomps.skip = np.append(galcomps.skip, skip)
+        galcomps = copy2Galcomps(
+            galcomps, N, "sersic", X, Y, mag, Rebulge, nser, 1, 0, skip, 1
+        )
 
-        # free parameters
-        galcomps.PosXFree = np.append(galcomps.PosXFree, 1)
-        galcomps.PosYFree = np.append(galcomps.PosYFree, 1)
-        galcomps.MagFree = np.append(galcomps.MagFree, 1)
-        galcomps.RadFree = np.append(galcomps.RadFree, 1)
-        galcomps.ExpFree = np.append(galcomps.ExpFree, 1)
-        galcomps.Exp2Free = np.append(galcomps.Exp2Free, 0)
-        galcomps.Exp3Free = np.append(galcomps.Exp3Free, 0)
-        galcomps.AxRatFree = np.append(galcomps.AxRatFree, 1)
-        galcomps.PosAngFree = np.append(galcomps.PosAngFree, 1)
         galPrintComp(fserout, idxcount + 1, idxcount, galcomps)
         idxcount += 1
 
@@ -384,70 +323,47 @@ def getSersic(
 
             # alternative component: bar
             N = N + 1
-            galcomps.PosX = np.append(galcomps.PosX, X)
-            galcomps.PosY = np.append(galcomps.PosY, Y)
-            galcomps.NameComp = np.append(galcomps.NameComp, "sersic")
-            galcomps.N = np.append(galcomps.N, N)
-
-            galcomps.Mag = np.append(galcomps.Mag, magbar)
-            galcomps.Rad = np.append(galcomps.Rad, Rebar)
-            galcomps.Exp = np.append(galcomps.Exp, 0.5)
-            galcomps.Exp2 = np.append(galcomps.Exp2, 0)
-            galcomps.Exp3 = np.append(galcomps.Exp3, 0)
-            galcomps.AxRat = np.append(galcomps.AxRat, AxRatbar)
-            galcomps.PosAng = np.append(galcomps.PosAng, PAbar)
-            galcomps.skip = np.append(galcomps.skip, skip)
-
-            # free parameters
-            galcomps.PosXFree = np.append(galcomps.PosXFree, 1)
-            galcomps.PosYFree = np.append(galcomps.PosYFree, 1)
-            galcomps.MagFree = np.append(galcomps.MagFree, 1)
-            galcomps.RadFree = np.append(galcomps.RadFree, 1)
 
             if freeser is True:
-                galcomps.ExpFree = np.append(galcomps.ExpFree, 1)
+                galcomps = copy2Galcomps(
+                    galcomps,
+                    N,
+                    "sersic",
+                    X,
+                    Y,
+                    magbar,
+                    Rebar,
+                    0.5,
+                    AxRatbar,
+                    PAbar,
+                    skip,
+                    1,
+                )
             else:
-                galcomps.ExpFree = np.append(galcomps.ExpFree, 0)
-
-            # galcomps.ExpFree = np.append(galcomps.ExpFree, 0)
-
-            galcomps.Exp2Free = np.append(galcomps.Exp2Free, 0)
-            galcomps.Exp3Free = np.append(galcomps.Exp3Free, 0)
-            galcomps.AxRatFree = np.append(galcomps.AxRatFree, 1)
-            galcomps.PosAngFree = np.append(galcomps.PosAngFree, 1)
+                galcomps = copy2Galcomps(
+                    galcomps,
+                    N,
+                    "sersic",
+                    X,
+                    Y,
+                    magbar,
+                    Rebar,
+                    0.5,
+                    AxRatbar,
+                    PAbar,
+                    skip,
+                    0,
+                )
 
             galPrintComp(fserout, idxcount + 1, idxcount, galcomps)
             idxcount += 1
 
         # second component: disk
         N = N + 1
-        galcomps.PosX = np.append(galcomps.PosX, X)
-        galcomps.PosY = np.append(galcomps.PosY, Y)
-        galcomps.NameComp = np.append(galcomps.NameComp, "sersic")
-        galcomps.N = np.append(galcomps.N, N)
 
-        galcomps.Mag = np.append(galcomps.Mag, mag2)
-        galcomps.Rad = np.append(galcomps.Rad, Re)
-
-        galcomps.Exp = np.append(galcomps.Exp, 1)
-        galcomps.Exp2 = np.append(galcomps.Exp2, 0)
-        galcomps.Exp3 = np.append(galcomps.Exp3, 0)
-        galcomps.AxRat = np.append(galcomps.AxRat, AxRat)
-        galcomps.PosAng = np.append(galcomps.PosAng, PA)
-        galcomps.skip = np.append(galcomps.skip, skip)
-
-        # free parameters
-        galcomps.PosXFree = np.append(galcomps.PosXFree, 1)
-        galcomps.PosYFree = np.append(galcomps.PosYFree, 1)
-        galcomps.MagFree = np.append(galcomps.MagFree, 1)
-        galcomps.RadFree = np.append(galcomps.RadFree, 1)
-
-        galcomps.ExpFree = np.append(galcomps.ExpFree, 0)
-
-        galcomps.Exp2Free = np.append(galcomps.Exp2Free, 0)
-        galcomps.Exp3Free = np.append(galcomps.Exp3Free, 0)
-        galcomps.AxRatFree = np.append(galcomps.AxRatFree, 1)
-        galcomps.PosAngFree = np.append(galcomps.PosAngFree, 1)
+        galcomps = copy2Galcomps(
+            galcomps, N, "sersic", X, Y, mag2, Re, 1, AxRat, PA, skip, 0
+        )
 
         galPrintComp(fserout, idxcount + 1, idxcount, galcomps)
         idxcount += 1
@@ -466,43 +382,20 @@ def getSersic(
             )
             print("")
 
-            print("# Component number: 1")
-            print("0) sersic # Component type")
-            print("1) {:.2f} {:.2f} 1 1  # Position x, y".format(X, Y))
-            print("3) {:.2f}    1      # Integrated magnitude ".format(mag))
-            print("4) {:.2f}    1      # R_e (effective radius) ".format(Re))
-            print("5) {:.2f}    1      # Sersic index n  ".format(nser))
-            print("6) 0.0000   0      # ----  ")
-            print("7) 0.0000   0      # ----  ")
-            print("8) 0.0000   0      # ----  ")
-            print("9) {:.2f}    1      # Axis Ratio (b/a)  ".format(AxRat))
-            print("10) {:.2f}   1      # Position angle (PA)  ".format(PA))
-            print("Z) {}  # Skip this model in output image?  ".format(skip))
+            printTerminal(1, X, Y, mag, Re, nser, AxRat, PA, skip, 1)
 
-        galcomps.PosX = np.append(galcomps.PosX, X)
-        galcomps.PosY = np.append(galcomps.PosY, Y)
-        galcomps.NameComp = np.append(galcomps.NameComp, "sersic")
-        galcomps.N = np.append(galcomps.N, N)
+        print("# parameter constraints file: ", fileconst)
 
-        galcomps.Mag = np.append(galcomps.Mag, mag)
-        galcomps.Rad = np.append(galcomps.Rad, Re)
-        galcomps.Exp = np.append(galcomps.Exp, nser)
-        galcomps.Exp2 = np.append(galcomps.Exp2, 0)
-        galcomps.Exp3 = np.append(galcomps.Exp3, 0)
-        galcomps.AxRat = np.append(galcomps.AxRat, AxRat)
-        galcomps.PosAng = np.append(galcomps.PosAng, PA)
-        galcomps.skip = np.append(galcomps.skip, skip)
+        fout = open(fileconst, "w")
 
-        # free parameters
-        galcomps.PosXFree = np.append(galcomps.PosXFree, 1)
-        galcomps.PosYFree = np.append(galcomps.PosYFree, 1)
-        galcomps.MagFree = np.append(galcomps.MagFree, 1)
-        galcomps.RadFree = np.append(galcomps.RadFree, 1)
-        galcomps.ExpFree = np.append(galcomps.ExpFree, 1)
-        galcomps.Exp2Free = np.append(galcomps.Exp2Free, 0)
-        galcomps.Exp3Free = np.append(galcomps.Exp3Free, 0)
-        galcomps.AxRatFree = np.append(galcomps.AxRatFree, 1)
-        galcomps.PosAngFree = np.append(galcomps.PosAngFree, 1)
+        constline = "  \n"
+        fout.write(constline)
+
+        fout.close()
+
+        galcomps = copy2Galcomps(
+            galcomps, N, "sersic", X, Y, mag, Re, nser, AxRat, PA, skip, 1
+        )
 
         galPrintComp(fserout, idxcount + 1, idxcount, galcomps)
         idxcount += 1
@@ -510,5 +403,57 @@ def getSersic(
     galPrintSky(fserout, idxcount + 1, galsky)
 
     fserout.close()
+
+    return galcomps
+
+
+def printTerminal(num, X, Y, mag, Re, nser, axis, pa, skip, freeser):
+    """print component to terminal"""
+
+    print("")
+
+    print("# Component number: {}".format(num))
+    print("0) sersic # Component type")
+    print("1) {:.2f} {:.2f} 1 1   # Position x, y".format(X, Y))
+    print("3) {:.2f}   1       # Integrated magnitude ".format(mag))
+    print("4) {:.2f}   1       # R_e (effective radius) ".format(Re))
+    print("5) {:.2f}   {}       # Sersic index n  ".format(nser, freeser))
+    print("6) 0.0000   0      # ----  ")
+    print("7) 0.0000   0      # ----  ")
+    print("8) 0.0000   0      # ----  ")
+    print("9) {:.2f}   1       # Axis Ratio (b/a)  ".format(axis))
+    print("10) {:.2f}  1       # Position angle (PA)  ".format(pa))
+    print("Z) {}  # Skip this model in output image?  ".format(skip))
+
+    print("")
+
+
+def copy2Galcomps(galcomps, N, comp, X, Y, mag, Re, nser, axrat, pa, skip, freeser):
+    """copy component parameter value to GalComps"""
+
+    galcomps.N = np.append(galcomps.N, N)
+    galcomps.NameComp = np.append(galcomps.NameComp, comp)
+    galcomps.PosX = np.append(galcomps.PosX, X)
+    galcomps.PosY = np.append(galcomps.PosY, Y)
+
+    galcomps.Mag = np.append(galcomps.Mag, mag)
+    galcomps.Rad = np.append(galcomps.Rad, Re)
+    galcomps.Exp = np.append(galcomps.Exp, nser)
+    galcomps.Exp2 = np.append(galcomps.Exp2, 0)
+    galcomps.Exp3 = np.append(galcomps.Exp3, 0)
+    galcomps.AxRat = np.append(galcomps.AxRat, axrat)
+    galcomps.PosAng = np.append(galcomps.PosAng, pa)
+    galcomps.skip = np.append(galcomps.skip, skip)
+
+    # free parameters
+    galcomps.PosXFree = np.append(galcomps.PosXFree, 1)
+    galcomps.PosYFree = np.append(galcomps.PosYFree, 1)
+    galcomps.MagFree = np.append(galcomps.MagFree, 1)
+    galcomps.RadFree = np.append(galcomps.RadFree, 1)
+    galcomps.ExpFree = np.append(galcomps.ExpFree, freeser)
+    galcomps.Exp2Free = np.append(galcomps.Exp2Free, 0)
+    galcomps.Exp3Free = np.append(galcomps.Exp3Free, 0)
+    galcomps.AxRatFree = np.append(galcomps.AxRatFree, 1)
+    galcomps.PosAngFree = np.append(galcomps.PosAngFree, 1)
 
     return galcomps

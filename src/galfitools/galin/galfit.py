@@ -112,9 +112,9 @@ class GalSky:
 
     """
 
-    sky = 0
-    dskyx = 0
-    dskyy = 0
+    sky = 0.0
+    dskyx = 0.0
+    dskyy = 0.0
     skip = 0
 
     skyfree = 1
