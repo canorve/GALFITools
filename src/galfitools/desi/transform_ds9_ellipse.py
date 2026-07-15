@@ -185,10 +185,33 @@ def transform_ellipse_rot90(match, axis_ratio=0.4, scale=1.0):
     )
 
 
+def transform_ellipse_rot45(match, axis_ratio=0.4, scale=1.0):
+    """
+    Transform one DS9 ellipse region and rotate it by an additional 45 degrees.
+    """
+    xcen, ycen, new_major, new_minor, new_angle, unit = get_transformed_parameters(
+        match,
+        axis_ratio=axis_ratio,
+        scale=scale,
+    )
+
+    new_angle_rot45 = (new_angle + 45.0) % 180.0
+
+    return build_ellipse(
+        xcen,
+        ycen,
+        new_major,
+        new_minor,
+        new_angle_rot45,
+        unit,
+    )
+
+
 def transform_region_file(
     input_file,
     output_file,
     output_file_rot90,
+    output_file_rot45,
     axis_ratio=0.4,
     scale=1.0,
 ):
@@ -203,6 +226,8 @@ def transform_region_file(
         First output DS9 region file.
     output_file_rot90 : str
         Second output DS9 region file, rotated 90 degrees from the first.
+    output_file_rot45 : str
+        Third output DS9 region file, rotated 45 degrees from the first.
     axis_ratio : float, optional
         Axis ratio of the output ellipses. Default is 0.4.
     scale : float, optional
@@ -211,9 +236,11 @@ def transform_region_file(
     input_file = Path(input_file)
     output_file = Path(output_file)
     output_file_rot90 = Path(output_file_rot90)
+    output_file_rot45 = Path(output_file_rot45)
 
     lines_out = []
     lines_out_rot90 = []
+    lines_out_rot45 = []
 
     with input_file.open("r") as f:
         for line in f:
@@ -236,17 +263,31 @@ def transform_region_file(
                     line,
                 )
 
+                new_line_rot45 = ELLIPSE_RE.sub(
+                    lambda match: transform_ellipse_rot45(
+                        match,
+                        axis_ratio=axis_ratio,
+                        scale=scale,
+                    ),
+                    line,
+                )
+
                 lines_out.append(new_line)
                 lines_out_rot90.append(new_line_rot90)
+                lines_out_rot45.append(new_line_rot45)
             else:
                 lines_out.append(line)
                 lines_out_rot90.append(line)
+                lines_out_rot45.append(line)
 
     with output_file.open("w") as f:
         f.writelines(lines_out)
 
     with output_file_rot90.open("w") as f:
         f.writelines(lines_out_rot90)
+
+    with output_file_rot45.open("w") as f:
+        f.writelines(lines_out_rot45)
 
 
 def maintransformEllip():
@@ -291,11 +332,13 @@ def maintransformEllip():
     root, ext = os.path.splitext(args.output_region)
 
     output_region_rot90 = root + "_rot90" + ext
+    output_region_rot45 = root + "_rot45" + ext
 
     transform_region_file(
         args.input_region,
         args.output_region,
         output_region_rot90,
+        output_region_rot45,
         axis_ratio=args.axis_ratio,
         scale=args.scale,
     )
