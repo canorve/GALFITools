@@ -1,4 +1,5 @@
 import argparse
+import csv
 from pathlib import Path
 
 # Import your real function here
@@ -98,6 +99,13 @@ def parse_args():
     )
 
     parser.add_argument(
+        "-o",
+        "--output",
+        default="results.csv",
+        help="name of the output CSV file for the Chinu result",
+    )
+
+    parser.add_argument(
         "-d",
         "--delete",
         action="store_true",
@@ -105,6 +113,40 @@ def parse_args():
     )
 
     return parser.parse_args()
+
+
+def chinus2file(results, output_file):
+    """Write GALFIT statistical results sorted by reduced chi-square."""
+
+    if not results:
+        print("No results to save.")
+        return
+
+    fieldnames = [
+        "galfile",
+        "chinu",
+        "aic",
+        "bic",
+        "numparfree",
+    ]
+
+    # Sort from the lowest to the highest chinu value
+    sorted_results = sorted(
+        results,
+        key=lambda result: float(result["chinu"]),
+    )
+
+    with open(output_file, "w", newline="", encoding="utf-8") as csv_file:
+        writer = csv.DictWriter(
+            csv_file,
+            fieldnames=fieldnames,
+            extrasaction="ignore",
+        )
+
+        writer.writeheader()
+        writer.writerows(sorted_results)
+
+    print(f"Results saved to {output_file}")
 
 
 def mainBestInputParam():
@@ -126,6 +168,9 @@ def mainBestInputParam():
 
     print("Chi_nu values:")
     print(chinu_list)
+
+    # saving to a file
+    chinus2file(results, args.output)
 
     print()
     print("Best GALFIT file:")
