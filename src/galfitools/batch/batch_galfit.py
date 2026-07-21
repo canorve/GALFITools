@@ -1,30 +1,34 @@
 #!/usr/bin/env python3
 """
-Batch-run GALFIT over a list of input files.
+Batch-run GALFIT over input files listed in a text file.
 
-Each non-empty, non-comment line in the list file must contain the path to a
-GALFIT input file, for example:
+Files located in the same directory are always executed sequentially.
+Files located in different directories may be executed concurrently.
+
+Each non-empty, non-comment line must contain the path to a GALFIT input file:
 
     /obj1/z/galfit.init
+    /obj1/z/galfit2.init
     /obj2/z/galfit.init
-    /obj3/z/galfit.init
 
 Features
 --------
 - Serial execution with --jobs 1
-- Parallel execution with --jobs N using concurrent.futures
+- Parallel execution with --jobs N
+- Files in the same directory never run simultaneously
 - Safe subprocess execution without shell=True
-- Ignores empty lines and comment lines starting with '#'
-- Checks that each input file exists
-- Continues even if some jobs fail
+- Ignores empty lines and lines beginning with '#'
+- Checks whether every input file exists
+- Continues processing after failures
 - Captures return code, stdout, and stderr
 - Optional verbose output
-- Optional CSV summary report
+- Optional CSV summary
 
 Exit status
 -----------
-- 0 if all jobs succeed
-- non-zero if any job fails or input validation fails
+- 0 if every job succeeds
+- 1 if one or more jobs fail
+- 2 for command-line or input-list errors
 """
 
 from __future__ import annotations
@@ -35,12 +39,11 @@ import csv
 import os
 import subprocess
 import sys
-import re
 import threading
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable, List, Sequence
+from typing import Iterable, Sequence
 
 
 _PRINT_LOCK = threading.Lock()
@@ -58,9 +61,30 @@ class JobResult:
     error_message: str | None = None
 
 
+@dataclass
+class ProgressTracker:
+    """Maintain a thread-safe count of completed jobs."""
+
+    total: int
+    completed: int = 0
+    lock: threading.Lock = field(
+        default_factory=threading.Lock,
+        repr=False,
+    )
+
+    def advance(self, input_file: Path) -> None:
+        """Increment and print the completed-job count."""
+        with self.lock:
+            self.completed += 1
+            completed = self.completed
+
+        log(f"Progress: {completed}/{self.total} completed | {input_file}")
+
+
 def log(message: str) -> None:
-    """Print a timestamped log message in a thread-safe way."""
+    """Print a timestamped message in a thread-safe way."""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
     with _PRINT_LOCK:
         print(f"[{timestamp}] {message}", flush=True)
 
@@ -68,64 +92,96 @@ def log(message: str) -> None:
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
-        description="Batch-run GALFIT over input files listed in a text file."
+        description=(
+            "Batch-run GALFIT over files listed in a text file. "
+            "Files in the same directory are always run sequentially."
+        )
     )
+
     parser.add_argument(
         "list_file",
         help="Text file containing one GALFIT input-file path per line.",
     )
+
     parser.add_argument(
         "-j",
         "--jobs",
         type=int,
         default=1,
-        help="Number of parallel workers to use (default: 1).",
+        help=("Maximum number of directories processed concurrently " "(default: 1)."),
     )
+
     parser.add_argument(
         "--galfit-bin",
         default="galfit",
-        help='Path to GALFIT executable (default: "galfit").',
+        help='GALFIT executable or path to it (default: "galfit").',
     )
+
     parser.add_argument(
         "--verbose",
         action="store_true",
-        help="Print stdout/stderr for every GALFIT run.",
+        help="Print stdout and stderr for every GALFIT execution.",
     )
+
     parser.add_argument(
         "--summary-csv",
         type=str,
         default=None,
-        help="Write a CSV summary report to this path.",
-    )
-    parser.add_argument(
-        "--imax",
-        type=int,
-        default=200,
-        help="Maximum number of iterations allowed",
+        help="Write a CSV execution report to the specified file.",
     )
 
     return parser.parse_args()
 
 
-def read_list_file(list_file: Path) -> List[Path]:
-    """
-    Read the list file and return the input paths.
+def expand_path(path_text: str) -> Path:
+    """Expand environment variables and the user home directory."""
+    expanded = os.path.expandvars(os.path.expanduser(path_text))
+    return Path(expanded)
 
-    Empty lines and lines starting with '#' are ignored.
-    Environment variables and '~' are expanded.
-    Relative paths are resolved against the current working directory.
+
+def normalize_executable(executable: str) -> str:
     """
-    paths: List[Path] = []
+    Normalize an executable path.
+
+    Executable names such as 'galfit' are left unchanged so they can be found
+    through PATH. Explicit relative paths such as './bin/galfit' are converted
+    to absolute paths because subprocesses run from each input directory.
+    """
+    expanded = os.path.expandvars(os.path.expanduser(executable))
+
+    contains_separator = os.sep in expanded
+
+    if os.altsep is not None:
+        contains_separator = contains_separator or os.altsep in expanded
+
+    if not contains_separator:
+        return expanded
+
+    executable_path = Path(expanded)
+
+    if not executable_path.is_absolute():
+        executable_path = Path.cwd() / executable_path
+
+    return str(executable_path.resolve())
+
+
+def read_list_file(list_file: Path) -> list[Path]:
+    """
+    Read GALFIT input paths from a text file.
+
+    Empty lines and lines beginning with '#' are ignored. Relative paths are
+    interpreted relative to the current working directory.
+    """
+    paths: list[Path] = []
 
     with list_file.open("r", encoding="utf-8") as handle:
-        for line_number, raw_line in enumerate(handle, start=1):
+        for raw_line in handle:
             line = raw_line.strip()
 
             if not line or line.startswith("#"):
                 continue
 
-            expanded = os.path.expandvars(os.path.expanduser(line))
-            path = Path(expanded)
+            path = expand_path(line)
 
             if not path.is_absolute():
                 path = Path.cwd() / path
@@ -135,47 +191,68 @@ def read_list_file(list_file: Path) -> List[Path]:
     return paths
 
 
-def validate_input_files(paths: Iterable[Path]) -> tuple[List[Path], List[JobResult]]:
+def validate_input_files(
+    paths: Iterable[Path],
+) -> tuple[list[Path], list[JobResult]]:
     """
-    Split paths into existing files and missing files.
+    Separate valid files from missing or invalid paths.
 
     Returns
     -------
     valid_files
-        Existing input files.
+        Input paths that exist and are regular files.
     invalid_results
-        Failure results for paths that do not exist.
+        Failure results corresponding to invalid paths.
     """
-    valid_files: List[Path] = []
-    invalid_results: List[JobResult] = []
+    valid_files: list[Path] = []
+    invalid_results: list[JobResult] = []
 
     for path in paths:
         if path.is_file():
             valid_files.append(path)
-        else:
-            invalid_results.append(
-                JobResult(
-                    input_file=path,
-                    success=False,
-                    returncode=-1,
-                    stdout="",
-                    stderr="",
-                    error_message="Input file does not exist or is not a regular file.",
-                )
+            continue
+
+        invalid_results.append(
+            JobResult(
+                input_file=path,
+                success=False,
+                returncode=-1,
+                stdout="",
+                stderr="",
+                error_message=("Input file does not exist or is not a regular file."),
             )
+        )
 
     return valid_files, invalid_results
 
 
+def group_files_by_directory(
+    files: Sequence[Path],
+) -> dict[Path, list[Path]]:
+    """
+    Group input files according to their resolved parent directory.
+
+    The file order within each directory follows the order in the list file.
+    """
+    groups: dict[Path, list[Path]] = {}
+
+    for input_file in files:
+        directory = input_file.parent.resolve()
+        groups.setdefault(directory, []).append(input_file)
+
+    return groups
+
+
 def print_streams(result: JobResult) -> None:
-    """Print stdout/stderr of one job in a readable block."""
+    """Print captured output for one GALFIT job."""
     with _PRINT_LOCK:
         print("=" * 80, flush=True)
-        print(f"File: {result.input_file}", flush=True)
+        print(f"File       : {result.input_file}", flush=True)
+        print(f"Success    : {result.success}", flush=True)
         print(f"Return code: {result.returncode}", flush=True)
 
         if result.error_message:
-            print(f"Error: {result.error_message}", flush=True)
+            print(f"Error      : {result.error_message}", flush=True)
 
         if result.stdout.strip():
             print("---- stdout ----", flush=True)
@@ -189,28 +266,46 @@ def print_streams(result: JobResult) -> None:
 
 
 def run_galfit(
-    input_file: Path, galfit_bin: str, imax: int, verbose: bool = False
+    input_file: Path,
+    galfit_bin: str,
+    verbose: bool = False,
 ) -> JobResult:
     """
     Run GALFIT on one input file.
 
-    GALFIT is executed from the directory that contains the input file, and the
-    input filename is passed as a basename. This is usually the safest approach
-    because GALFIT commonly writes outputs relative to the working directory.
+    GALFIT is executed from the directory containing the input file. Only the
+    input filename is passed to GALFIT:
+
+        galfit galfit.init
+
+    Parameters
+    ----------
+    input_file
+        GALFIT initial-parameters file.
+    galfit_bin
+        GALFIT executable name or absolute path.
+    verbose
+        Print captured stdout and stderr when True.
+
+    Returns
+    -------
+    JobResult
+        Execution status and captured output.
     """
-    workdir = input_file.parent
-    filename = input_file.name
+    working_directory = input_file.parent
+    input_filename = input_file.name
 
     log(f"START  | {input_file}")
 
     try:
         completed = subprocess.run(
-            [galfit_bin, "-imax", str(imax), filename],
-            cwd=str(workdir),
+            [galfit_bin, input_filename],
+            cwd=working_directory,
             capture_output=True,
             text=True,
             check=False,
         )
+
     except FileNotFoundError:
         result = JobResult(
             input_file=input_file,
@@ -220,10 +315,31 @@ def run_galfit(
             stderr="",
             error_message=f'GALFIT executable not found: "{galfit_bin}"',
         )
-        log(f"FAILED | {input_file} | GALFIT executable not found")
+
+        log(f"FAILED | {input_file} | executable not found")
+
         if verbose:
             print_streams(result)
+
         return result
+
+    except PermissionError:
+        result = JobResult(
+            input_file=input_file,
+            success=False,
+            returncode=-1,
+            stdout="",
+            stderr="",
+            error_message=(f'Permission denied when executing GALFIT: "{galfit_bin}"'),
+        )
+
+        log(f"FAILED | {input_file} | permission denied")
+
+        if verbose:
+            print_streams(result)
+
+        return result
+
     except Exception as exc:
         result = JobResult(
             input_file=input_file,
@@ -231,32 +347,17 @@ def run_galfit(
             returncode=-1,
             stdout="",
             stderr="",
-            error_message=f"Unexpected error while running GALFIT: {exc}",
+            error_message=f"Unexpected execution error: {exc}",
         )
-        log(f"FAILED | {input_file} | unexpected exception")
+
+        log(f"FAILED | {input_file} | unexpected error")
+
         if verbose:
             print_streams(result)
+
         return result
 
     success = completed.returncode == 0
-
-    if re.search("Doh!", completed.stdout):  # pragma: no cover
-        print("ERROR: GALFIT has been unable to find a solution")
-        success = False
-        completed.returncode = 1
-
-    if re.search("QUIT", completed.stdout):  # pragma: no cover
-        print("ERROR: GALFIT has unexpectedly quit.")
-        print(
-            "Probably the cause is trying to constraint a component which doesn't exist "
-        )
-        success = False
-        completed.returncode = 1
-
-    if success:
-        log(f"OK     | {input_file}")
-    else:
-        log(f"FAILED | {input_file} | return code {completed.returncode}")
 
     result = JobResult(
         input_file=input_file,
@@ -267,22 +368,80 @@ def run_galfit(
         error_message=None,
     )
 
+    if success:
+        log(f"OK     | {input_file}")
+    else:
+        log(f"FAILED | {input_file} | " f"return code {completed.returncode}")
+
     if verbose:
         print_streams(result)
 
     return result
 
 
-def run_serial(
-    files: Sequence[Path], galfit_bin: str, imax: int, verbose: bool
-) -> List[JobResult]:
-    """Run GALFIT sequentially."""
-    results: List[JobResult] = []
+def run_directory_group(
+    directory: Path,
+    files: Sequence[Path],
+    galfit_bin: str,
+    verbose: bool,
+    progress: ProgressTracker,
+) -> list[JobResult]:
+    """
+    Run all GALFIT files from one directory sequentially.
 
-    for index, input_file in enumerate(files, start=1):
-        log(f"Progress: {index}/{len(files)}")
-        result = run_galfit(input_file, galfit_bin, imax, verbose=verbose)
+    This function is submitted as one executor task. Therefore, no two input
+    files from the same directory can run simultaneously.
+    """
+    results: list[JobResult] = []
+
+    log(f"DIRECTORY START | {directory} | " f"{len(files)} input file(s)")
+
+    for input_file in files:
+        try:
+            result = run_galfit(
+                input_file=input_file,
+                galfit_bin=galfit_bin,
+                verbose=verbose,
+            )
+        except Exception as exc:
+            # Defensive fallback. run_galfit already handles expected errors.
+            result = JobResult(
+                input_file=input_file,
+                success=False,
+                returncode=-1,
+                stdout="",
+                stderr="",
+                error_message=f"Unexpected worker error: {exc}",
+            )
+
+            log(f"FAILED | {input_file} | worker error")
+
         results.append(result)
+        progress.advance(input_file)
+
+    log(f"DIRECTORY DONE  | {directory}")
+
+    return results
+
+
+def run_serial(
+    files: Sequence[Path],
+    galfit_bin: str,
+    verbose: bool,
+) -> list[JobResult]:
+    """Run every GALFIT input file sequentially."""
+    results: list[JobResult] = []
+    progress = ProgressTracker(total=len(files))
+
+    for input_file in files:
+        result = run_galfit(
+            input_file=input_file,
+            galfit_bin=galfit_bin,
+            verbose=verbose,
+        )
+
+        results.append(result)
+        progress.advance(input_file)
 
     return results
 
@@ -290,59 +449,80 @@ def run_serial(
 def run_parallel(
     files: Sequence[Path],
     galfit_bin: str,
-    imax: int,
     jobs: int,
     verbose: bool,
-) -> List[JobResult]:
-    """Run GALFIT in parallel using a thread pool."""
-    results: List[JobResult] = []
+) -> list[JobResult]:
+    """
+    Run directories concurrently while serializing files within each directory.
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=jobs) as executor:
-        future_to_file = {
+    The effective parallelism cannot exceed the number of unique directories.
+    """
+    grouped_files = group_files_by_directory(files)
+    progress = ProgressTracker(total=len(files))
+    results: list[JobResult] = []
+
+    effective_workers = min(jobs, len(grouped_files))
+
+    log(f"Found {len(grouped_files)} unique input directories.")
+    log(f"Using {effective_workers} concurrent directory worker(s).")
+
+    with concurrent.futures.ThreadPoolExecutor(
+        max_workers=effective_workers
+    ) as executor:
+        future_to_group = {
             executor.submit(
-                run_galfit, input_file, galfit_bin, imax, verbose
-            ): input_file
-            for input_file in files
+                run_directory_group,
+                directory,
+                directory_files,
+                galfit_bin,
+                verbose,
+                progress,
+            ): (directory, directory_files)
+            for directory, directory_files in grouped_files.items()
         }
 
-        completed_count = 0
-        total = len(files)
-
-        for future in concurrent.futures.as_completed(future_to_file):
-            input_file = future_to_file[future]
-            completed_count += 1
+        for future in concurrent.futures.as_completed(future_to_group):
+            directory, directory_files = future_to_group[future]
 
             try:
-                result = future.result()
+                directory_results = future.result()
             except Exception as exc:
-                result = JobResult(
-                    input_file=input_file,
-                    success=False,
-                    returncode=-1,
-                    stdout="",
-                    stderr="",
-                    error_message=f"Worker crashed unexpectedly: {exc}",
+                log(
+                    f"DIRECTORY FAILED | {directory} | "
+                    f"unexpected worker failure: {exc}"
                 )
 
-            results.append(result)
-            log(f"Progress: {completed_count}/{total}")
+                directory_results = [
+                    JobResult(
+                        input_file=input_file,
+                        success=False,
+                        returncode=-1,
+                        stdout="",
+                        stderr="",
+                        error_message=(
+                            "Directory worker failed unexpectedly: " f"{exc}"
+                        ),
+                    )
+                    for input_file in directory_files
+                ]
+
+            results.extend(directory_results)
 
     return results
 
 
 def print_failure_details(results: Iterable[JobResult]) -> None:
-    """Print detailed information only for failed jobs."""
+    """Print detailed output for failed jobs."""
     failures = [result for result in results if not result.success]
 
     if not failures:
         return
 
-    print("\nDetailed failure report:", flush=True)
+    print("\nDetailed failure report", flush=True)
     print("=" * 80, flush=True)
 
     for result in failures:
         print(f"File       : {result.input_file}", flush=True)
-        print(f"Success    : {result.success}", flush=True)
         print(f"Return code: {result.returncode}", flush=True)
 
         if result.error_message:
@@ -360,39 +540,63 @@ def print_failure_details(results: Iterable[JobResult]) -> None:
 
 
 def print_summary(results: Sequence[JobResult]) -> None:
-    """Print a final execution summary."""
+    """Print the final execution summary."""
     total = len(results)
-    successes = sum(result.success for result in results)
-    failures = total - successes
+    succeeded = sum(result.success for result in results)
+    failed = total - succeeded
 
     print("\nSummary", flush=True)
     print("=" * 80, flush=True)
-    print(f"Total jobs   : {total}", flush=True)
-    print(f"Succeeded    : {successes}", flush=True)
-    print(f"Failed       : {failures}", flush=True)
+    print(f"Total jobs: {total}", flush=True)
+    print(f"Succeeded : {succeeded}", flush=True)
+    print(f"Failed    : {failed}", flush=True)
 
-    if failures:
+    if failed:
         print("\nFailed files:", flush=True)
+
         for result in results:
-            if not result.success:
-                reason = result.error_message or f"return code {result.returncode}"
-                print(f"  - {result.input_file} ({reason})", flush=True)
+            if result.success:
+                continue
+
+            reason = result.error_message or f"return code {result.returncode}"
+
+            print(
+                f"  - {result.input_file} ({reason})",
+                flush=True,
+            )
 
 
-def write_summary_csv(results: Sequence[JobResult], csv_path: Path) -> None:
-    """Write a CSV summary report."""
+def write_summary_csv(
+    results: Sequence[JobResult],
+    csv_path: Path,
+) -> None:
+    """Write execution results to a CSV file."""
     csv_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with csv_path.open("w", encoding="utf-8", newline="") as handle:
+    with csv_path.open(
+        "w",
+        encoding="utf-8",
+        newline="",
+    ) as handle:
         writer = csv.writer(handle)
+
         writer.writerow(
-            ["input_file", "success", "returncode", "error_message", "stdout", "stderr"]
+            [
+                "input_file",
+                "directory",
+                "success",
+                "returncode",
+                "error_message",
+                "stdout",
+                "stderr",
+            ]
         )
 
         for result in results:
             writer.writerow(
                 [
                     str(result.input_file),
+                    str(result.input_file.parent),
                     int(result.success),
                     result.returncode,
                     result.error_message or "",
@@ -403,66 +607,110 @@ def write_summary_csv(results: Sequence[JobResult], csv_path: Path) -> None:
 
 
 def batch_galfit() -> int:
-    """Program entry point."""
+    """Run the command-line program."""
     args = parse_args()
 
-    list_file = Path(os.path.expandvars(os.path.expanduser(args.list_file)))
-    jobs = args.jobs
-    galfit_bin = args.galfit_bin
-    verbose = args.verbose
-    summary_csv = args.summary_csv
-    imax = args.imax
-
-    if jobs < 1:
-        print("Error: --jobs must be at least 1.", file=sys.stderr)
+    if args.jobs < 1:
+        print(
+            "Error: --jobs must be at least 1.",
+            file=sys.stderr,
+        )
         return 2
+
+    list_file = expand_path(args.list_file)
+
+    if not list_file.is_absolute():
+        list_file = Path.cwd() / list_file
 
     if not list_file.is_file():
-        print(f'Error: list file does not exist: "{list_file}"', file=sys.stderr)
+        print(
+            f'Error: list file does not exist: "{list_file}"',
+            file=sys.stderr,
+        )
         return 2
+
+    galfit_bin = normalize_executable(args.galfit_bin)
 
     log(f"Reading list file: {list_file}")
-    all_paths = read_list_file(list_file)
 
-    if not all_paths:
-        print("Error: no valid entries found in the list file.", file=sys.stderr)
+    try:
+        listed_paths = read_list_file(list_file)
+    except OSError as exc:
+        print(
+            f"Error reading list file: {exc}",
+            file=sys.stderr,
+        )
         return 2
 
-    valid_files, invalid_results = validate_input_files(all_paths)
+    if not listed_paths:
+        print(
+            "Error: no valid entries were found in the list file.",
+            file=sys.stderr,
+        )
+        return 2
 
-    if invalid_results:
-        for result in invalid_results:
-            log(f"MISSING | {result.input_file}")
+    valid_files, invalid_results = validate_input_files(listed_paths)
+
+    for result in invalid_results:
+        log(f"MISSING | {result.input_file}")
 
     if not valid_files:
-        print("Error: none of the listed GALFIT input files exist.", file=sys.stderr)
+        print(
+            "Error: none of the listed GALFIT input files exist.",
+            file=sys.stderr,
+        )
         print_summary(invalid_results)
         return 1
 
-    log(f"Found {len(valid_files)} existing input file(s).")
-    if invalid_results:
-        log(f"Found {len(invalid_results)} missing input file(s).")
+    log(f"Existing input files: {len(valid_files)}")
 
-    if jobs == 1:
+    if invalid_results:
+        log(f"Missing input files: {len(invalid_results)}")
+
+    if args.jobs == 1:
         log("Running in sequential mode.")
-        run_results = run_serial(valid_files, galfit_bin, imax, verbose=verbose)
+
+        execution_results = run_serial(
+            files=valid_files,
+            galfit_bin=galfit_bin,
+            verbose=args.verbose,
+        )
     else:
-        log(f"Running in parallel mode with {jobs} workers.")
-        run_results = run_parallel(
-            valid_files, galfit_bin, imax, jobs=jobs, verbose=verbose
+        log(f"Running in parallel mode with up to " f"{args.jobs} workers.")
+
+        execution_results = run_parallel(
+            files=valid_files,
+            galfit_bin=galfit_bin,
+            jobs=args.jobs,
+            verbose=args.verbose,
         )
 
-    results = invalid_results + run_results
+    results = invalid_results + execution_results
 
-    if not verbose:
+    if not args.verbose:
         print_failure_details(results)
 
     print_summary(results)
 
-    if summary_csv is not None:
-        csv_path = Path(os.path.expandvars(os.path.expanduser(summary_csv)))
-        write_summary_csv(results, csv_path)
-        log(f"CSV summary written to: {csv_path}")
+    if args.summary_csv is not None:
+        summary_path = expand_path(args.summary_csv)
 
-    all_success = all(result.success for result in results)
-    return 0 if all_success else 1
+        if not summary_path.is_absolute():
+            summary_path = Path.cwd() / summary_path
+
+        try:
+            write_summary_csv(results, summary_path)
+        except OSError as exc:
+            print(
+                f"Error writing CSV summary: {exc}",
+                file=sys.stderr,
+            )
+            return 1
+
+        log(f"CSV summary written to: {summary_path}")
+
+    return 0 if all(result.success for result in results) else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
