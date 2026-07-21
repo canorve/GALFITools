@@ -292,8 +292,9 @@ def write_failure_log(failures: list[dict[str, str]], outdir: pathlib.Path) -> N
 def main_downloadDesi() -> int:
     ap = argparse.ArgumentParser(
         description=(
-            "Download DESI Legacy Survey image, invvar, maskbits, and PSF cutouts. "
-            "The invvar image is also converted to a GALFIT sigma image."
+            "Download DESI Legacy Survey optical and unWISE cutouts. "
+            "Optical products include image, invvar, maskbits, sigma, and PSF. "
+            "unWISE products include W1/W2 image, invvar, and sigma images."
         )
     )
     ap.add_argument("csv", help="Input CSV with columns ra and dec. Optional: objid.")
@@ -305,7 +306,37 @@ def main_downloadDesi() -> int:
     ap.add_argument(
         "--pixscale", type=float, default=0.262, help="Arcsec/pixel for cutouts"
     )
-    ap.add_argument("--bands", default="grz", help="Bands to download, e.g. grz")
+    ap.add_argument(
+        "--bands", default="grz", help="Optical bands to download, e.g. grz"
+    )
+    ap.add_argument(
+        "--wise-bands",
+        default="12",
+        help=(
+            "unWISE bands to download: 1 for W1, 2 for W2, or 12 for both. "
+            "Use an empty string to disable unWISE downloads."
+        ),
+    )
+    ap.add_argument(
+        "--wise-layer",
+        default="unwise-neo6",
+        help="Legacy Survey viewer layer used for unWISE cutouts.",
+    )
+    ap.add_argument(
+        "--wise-pixscale",
+        type=float,
+        default=2.75,
+        help="Pixel scale of unWISE cutouts in arcsec/pixel.",
+    )
+    ap.add_argument(
+        "--wise-size",
+        type=int,
+        default=None,
+        help=(
+            "unWISE cutout size in pixels. By default, it is calculated to "
+            "cover approximately the same angular field as the optical cutout."
+        ),
+    )
     ap.add_argument(
         "--subimage",
         action="store_true",
@@ -350,6 +381,26 @@ def main_downloadDesi() -> int:
     outdir.mkdir(parents=True, exist_ok=True)
 
     bands: Iterable[str] = list(args.bands.strip())
+    wise_bands: Iterable[str] = list(args.wise_bands.strip())
+
+    invalid_wise_bands = set(wise_bands) - {"1", "2"}
+    if invalid_wise_bands:
+        raise ValueError(
+            "--wise-bands accepts only '1' and '2'. "
+            f"Invalid values: {sorted(invalid_wise_bands)}"
+        )
+
+    if args.wise_pixscale <= 0:
+        raise ValueError("--wise-pixscale must be positive.")
+
+    if args.wise_size is None:
+        optical_field_arcsec = args.size * args.pixscale
+        wise_size = max(1, int(round(optical_field_arcsec / args.wise_pixscale)))
+    else:
+        if args.wise_size <= 0:
+            raise ValueError("--wise-size must be positive.")
+        wise_size = args.wise_size
+
     failures: list[dict[str, str]] = []
 
     with configure_session() as session:
@@ -453,6 +504,71 @@ def main_downloadDesi() -> int:
                             "dec": f"{dec:.8f}",
                             "band": band,
                             "stage": "psf",
+                            "error": message,
+                        }
+                    )
+                    if args.stop_on_error:
+                        write_failure_log(failures, outdir)
+                        raise
+                    continue
+
+            # Download unWISE W1/W2 cutouts. The viewer names these bands 1 and 2.
+            # No coadd PSF or optical maskbits request is made for unWISE.
+            for wise_band in wise_bands:
+                band_name = f"w{wise_band}"
+                band_dir = obj_dir / band_name
+                band_dir.mkdir(parents=True, exist_ok=True)
+
+                wise_params = {
+                    "ra": ra,
+                    "dec": dec,
+                    "layer": args.wise_layer,
+                    "size": wise_size,
+                    "pixscale": args.wise_pixscale,
+                    "bands": wise_band,
+                    "invvar": 1,
+                }
+
+                try:
+                    label = f"unWISE cutout objid={objid} band={band_name}"
+                    with fetch_fits(
+                        session,
+                        CUTOUT_URL,
+                        wise_params,
+                        timeout=args.timeout,
+                        retries=args.retries,
+                        retry_wait=args.retry_wait,
+                        label=label,
+                    ) as hdul:
+                        img_hdu, inv_hdu, _ = split_cutout_products(
+                            hdul, require_maskbits=False
+                        )
+
+                    img_path = band_dir / f"{base_prefix}_{band_name}_img.fits"
+                    inv_path = band_dir / "invvar.fits"
+
+                    img_hdu.header["IMTYPE"] = "image"
+                    img_hdu.header["FILTER"] = band_name.upper()
+                    inv_hdu.header["IMTYPE"] = "invvar"
+                    inv_hdu.header["FILTER"] = band_name.upper()
+
+                    img_hdu.writeto(img_path, overwrite=True)
+                    inv_hdu.writeto(inv_path, overwrite=True)
+                    convert_to_sigma(inv_path)
+
+                except Exception as err:
+                    message = str(err)
+                    print(
+                        f"Error: unWISE cutout failed for objid={objid}, "
+                        f"band={band_name}: {message}"
+                    )
+                    failures.append(
+                        {
+                            "objid": objid,
+                            "ra": f"{ra:.8f}",
+                            "dec": f"{dec:.8f}",
+                            "band": band_name,
+                            "stage": "unwise-cutout",
                             "error": message,
                         }
                     )
