@@ -37,6 +37,7 @@ import argparse
 import concurrent.futures
 import csv
 import os
+import re
 import subprocess
 import sys
 import threading
@@ -135,6 +136,13 @@ def parse_args() -> argparse.Namespace:
         type=str,
         default=None,
         help="Write a CSV execution report to the specified file.",
+    )
+
+    parser.add_argument(
+        "--imax",
+        type=int,
+        default=200,
+        help="Maximum number of iterations allowed",
     )
 
     return parser.parse_args()
@@ -275,6 +283,7 @@ def print_streams(result: JobResult) -> None:
 def run_galfit(
     input_file: Path,
     galfit_bin: str,
+    imax: int,
     verbose: bool = False,
 ) -> JobResult:
     """
@@ -306,7 +315,7 @@ def run_galfit(
 
     try:
         completed = subprocess.run(
-            [galfit_bin, input_filename],
+            [galfit_bin, "-imax", str(imax), input_filename],
             cwd=working_directory,
             capture_output=True,
             text=True,
@@ -366,6 +375,24 @@ def run_galfit(
 
     success = completed.returncode == 0
 
+    if re.search("Doh!", completed.stdout):  # pragma: no cover
+        print("ERROR: GALFIT has been unable to find a solution")
+        success = False
+        completed.returncode = 1
+
+    if re.search("QUIT", completed.stdout):  # pragma: no cover
+        print("ERROR: GALFIT has unexpectedly quit.")
+        print(
+            "Probably the cause is trying to constraint a component which doesn't exist "
+        )
+        success = False
+        completed.returncode = 1
+
+    if success:
+        log(f"OK     | {input_file}")
+    else:
+        log(f"FAILED | {input_file} | " f"return code {completed.returncode}")
+
     result = JobResult(
         input_file=input_file,
         success=success,
@@ -374,11 +401,6 @@ def run_galfit(
         stderr=completed.stderr,
         error_message=None,
     )
-
-    if success:
-        log(f"OK     | {input_file}")
-    else:
-        log(f"FAILED | {input_file} | " f"return code {completed.returncode}")
 
     if verbose:
         print_streams(result)
@@ -390,6 +412,7 @@ def run_directory_group(
     directory: Path,
     files: Sequence[Path],
     galfit_bin: str,
+    imax: int,
     verbose: bool,
     progress: ProgressTracker,
 ) -> list[JobResult]:
@@ -408,6 +431,7 @@ def run_directory_group(
             result = run_galfit(
                 input_file=input_file,
                 galfit_bin=galfit_bin,
+                imax=imax,
                 verbose=verbose,
             )
         except Exception as exc:
@@ -434,6 +458,7 @@ def run_directory_group(
 def run_serial(
     files: Sequence[Path],
     galfit_bin: str,
+    imax: int,
     verbose: bool,
 ) -> list[JobResult]:
     """Run every GALFIT input file sequentially."""
@@ -444,6 +469,7 @@ def run_serial(
         result = run_galfit(
             input_file=input_file,
             galfit_bin=galfit_bin,
+            imax=imax,
             verbose=verbose,
         )
 
@@ -456,6 +482,7 @@ def run_serial(
 def run_parallel(
     files: Sequence[Path],
     galfit_bin: str,
+    imax: int,
     jobs: int,
     verbose: bool,
 ) -> list[JobResult]:
@@ -482,6 +509,7 @@ def run_parallel(
                 directory,
                 directory_files,
                 galfit_bin,
+                imax,
                 verbose,
                 progress,
             ): (directory, directory_files)
@@ -613,7 +641,7 @@ def write_summary_csv(
             )
 
 
-def mainbatchGALFIT() -> int:
+def batch_galfit() -> int:
     """Run the command-line program."""
     args = parse_args()
 
@@ -626,6 +654,7 @@ def mainbatchGALFIT() -> int:
 
     list_file = expand_path(args.list_file)
 
+    imax = args.imax
     if not list_file.is_absolute():
         list_file = Path.cwd() / list_file
 
@@ -680,6 +709,7 @@ def mainbatchGALFIT() -> int:
         execution_results = run_serial(
             files=valid_files,
             galfit_bin=galfit_bin,
+            imax=imax,
             verbose=args.verbose,
         )
     else:
@@ -688,6 +718,7 @@ def mainbatchGALFIT() -> int:
         execution_results = run_parallel(
             files=valid_files,
             galfit_bin=galfit_bin,
+            imax=imax,
             jobs=args.jobs,
             verbose=args.verbose,
         )
@@ -720,4 +751,4 @@ def mainbatchGALFIT() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(mainbatchGALFIT())
+    sys.exit(batch_galfit())
