@@ -113,13 +113,6 @@ def parse_args() -> argparse.Namespace:
     )
 
     parser.add_argument(
-        "-i",
-        "--imax",
-        type=int,
-        help=("imax value passed to galfit"),
-    )
-
-    parser.add_argument(
         "--galfit-bin",
         default="galfit",
         help='GALFIT executable or path to it (default: "galfit").',
@@ -139,6 +132,7 @@ def parse_args() -> argparse.Namespace:
     )
 
     parser.add_argument(
+        "-i",
         "--imax",
         type=int,
         default=200,
