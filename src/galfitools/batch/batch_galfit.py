@@ -139,6 +139,15 @@ def parse_args() -> argparse.Namespace:
         help="Maximum number of iterations allowed",
     )
 
+    parser.add_argument(
+        "--failed-file",
+        default="failed_fits.txt",
+        help=(
+            "Write failed GALFIT input paths to this file "
+            '(default: "failed_fits.txt").'
+        ),
+    )
+
     return parser.parse_args()
 
 
@@ -635,6 +644,35 @@ def write_summary_csv(
             )
 
 
+def write_failed_files(
+    results: Sequence[JobResult],
+    output_path: Path,
+) -> int:
+    """
+    Write failed GALFIT input paths to a text file.
+
+    The output contains one path per line and can be used directly as
+    another input list for this program.
+
+    Returns
+    -------
+    int
+        Number of failed jobs written.
+    """
+    failed_results = [result for result in results if not result.success]
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with output_path.open(
+        "w",
+        encoding="utf-8",
+    ) as handle:
+        for result in failed_results:
+            handle.write(f"{result.input_file}\n")
+
+    return len(failed_results)
+
+
 def batch_galfit() -> int:
     """Run the command-line program."""
     args = parse_args()
@@ -718,6 +756,28 @@ def batch_galfit() -> int:
         )
 
     results = invalid_results + execution_results
+
+    failed_file = expand_path(args.failed_file)
+
+    if not failed_file.is_absolute():
+        failed_file = Path.cwd() / failed_file
+
+    try:
+        failed_count = write_failed_files(
+            results,
+            failed_file,
+        )
+    except OSError as exc:
+        print(
+            f"Error writing failed-files list: {exc}",
+            file=sys.stderr,
+        )
+        return 1
+
+    if failed_count:
+        log(f"Saved {failed_count} failed input file(s) to: " f"{failed_file}")
+    else:
+        log(f"No failed fits. Created empty file: {failed_file}")
 
     if not args.verbose:
         print_failure_details(results)
