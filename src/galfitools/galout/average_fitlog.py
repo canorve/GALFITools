@@ -795,7 +795,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--run-option",
         type=int,
         choices=(0, 1, 2, 3),
-        default=2,
+        default=0,
         help="GALFIT P) value (default: 2)",
     )
 
