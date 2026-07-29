@@ -64,14 +64,23 @@ def build_selected_mask(
     return image == target_value
 
 
-def select_central_component(selected_mask: np.ndarray) -> np.ndarray:
+def select_central_component(
+    selected_mask: np.ndarray,
+    max_center_distance: float | None = None,
+) -> np.ndarray:
     """
     Select the connected component closest to the image center.
+
+    If max_center_distance is given, raise an error when the selected
+    component centroid is farther than this distance from the image center.
 
     Parameters
     ----------
     selected_mask : numpy.ndarray
         Boolean mask.
+    max_center_distance : float, optional
+        Maximum allowed distance, in pixels, between the component centroid
+        and the image center.
 
     Returns
     -------
@@ -87,13 +96,10 @@ def select_central_component(selected_mask: np.ndarray) -> np.ndarray:
     x_image_center = (nx - 1) / 2.0
     y_image_center = (ny - 1) / 2.0
 
-    center_label = labeled_mask[int(round(y_image_center)), int(round(x_image_center))]
-
-    if center_label > 0:
-        return labeled_mask == center_label
-
     best_label = None
     best_distance = np.inf
+    best_x_mean = None
+    best_y_mean = None
 
     for current_label in range(1, num_components + 1):
         y_pixels, x_pixels = np.where(labeled_mask == current_label)
@@ -103,14 +109,29 @@ def select_central_component(selected_mask: np.ndarray) -> np.ndarray:
 
         x_mean = np.mean(x_pixels)
         y_mean = np.mean(y_pixels)
-        distance = np.hypot(x_mean - x_image_center, y_mean - y_image_center)
+
+        distance = np.hypot(
+            x_mean - x_image_center,
+            y_mean - y_image_center,
+        )
 
         if distance < best_distance:
             best_distance = distance
             best_label = current_label
+            best_x_mean = x_mean
+            best_y_mean = y_mean
 
     if best_label is None:
         raise RuntimeError("Could not identify the central connected component.")
+
+    if max_center_distance is not None and best_distance > max_center_distance:
+        raise RuntimeError(
+            "The closest selected component is too far from the image center.\n"
+            f"Image center: ({x_image_center:.3f}, {y_image_center:.3f})\n"
+            f"Component centroid: ({best_x_mean:.3f}, {best_y_mean:.3f})\n"
+            f"Distance: {best_distance:.3f} pixels\n"
+            f"Maximum allowed distance: {max_center_distance:.3f} pixels"
+        )
 
     return labeled_mask == best_label
 
@@ -604,6 +625,16 @@ def maincentralEllipse() -> None:
         help="DS9 region color. Default: green.",
     )
 
+    parser.add_argument(
+        "--max-center-distance",
+        type=float,
+        default=50,
+        help=(
+            "Maximum allowed distance in pixels between the selected component "
+            "centroid and the image center. If exceeded, the program raises an error."
+        ),
+    )
+
     args = parser.parse_args()
 
     central_ellipse(
@@ -620,6 +651,7 @@ def maincentralEllipse() -> None:
         args.radial_step,
         args.component_out,
         args.color,
+        args.max_center_distance,
     )
 
 
@@ -637,6 +669,7 @@ def central_ellipse(
     radial_step=0.2,
     component_out=None,
     color="green",
+    max_center_distance=50,
 ):
 
     if scale <= 0:
@@ -654,7 +687,10 @@ def central_ellipse(
         bit=bit,
     )
 
-    component_mask = select_central_component(selected_mask)
+    component_mask = select_central_component(
+        selected_mask,
+        max_center_distance=max_center_distance,
+    )
 
     x0_np, y0_np = estimate_component_center(component_mask)
 
