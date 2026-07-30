@@ -38,6 +38,7 @@ import concurrent.futures
 import csv
 import os
 import re
+import time
 import subprocess
 import sys
 import threading
@@ -80,6 +81,20 @@ class ProgressTracker:
             completed = self.completed
 
         log(f"Progress: {completed}/{self.total} completed | {input_file}")
+
+
+def format_duration(seconds: float) -> str:
+    """Return elapsed time in a readable format."""
+    hours, remainder = divmod(seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+
+    if hours >= 1:
+        return f"{int(hours)} h {int(minutes)} min {seconds:.2f} s"
+
+    if minutes >= 1:
+        return f"{int(minutes)} min {seconds:.2f} s"
+
+    return f"{seconds:.2f} s"
 
 
 def log(message: str) -> None:
@@ -577,7 +592,10 @@ def print_failure_details(results: Iterable[JobResult]) -> None:
         print("-" * 80, flush=True)
 
 
-def print_summary(results: Sequence[JobResult]) -> None:
+def print_summary(
+    results: Sequence[JobResult],
+    elapsed_seconds: float | None = None,
+) -> None:
     """Print the final execution summary."""
     total = len(results)
     succeeded = sum(result.success for result in results)
@@ -585,23 +603,29 @@ def print_summary(results: Sequence[JobResult]) -> None:
 
     print("\nSummary", flush=True)
     print("=" * 80, flush=True)
-    print(f"Total jobs: {total}", flush=True)
-    print(f"Succeeded : {succeeded}", flush=True)
-    print(f"Failed    : {failed}", flush=True)
+    print(f"Total jobs : {total}", flush=True)
+    print(f"Succeeded  : {succeeded}", flush=True)
+    print(f"Failed     : {failed}", flush=True)
 
-    if failed:
-        print("\nFailed files:", flush=True)
+    if elapsed_seconds is not None:
+        print(
+            f"Total time : {format_duration(elapsed_seconds)}",
+            flush=True,
+        )
 
-        for result in results:
-            if result.success:
-                continue
+    # if failed:
+    #    print("\nFailed files:", flush=True)
 
-            reason = result.error_message or f"return code {result.returncode}"
+    #    for result in results:
+    #        if result.success:
+    #            continue
 
-            print(
-                f"  - {result.input_file} ({reason})",
-                flush=True,
-            )
+    #        reason = result.error_message or f"return code {result.returncode}"
+
+    #        print(
+    #            f"  - {result.input_file} ({reason})",
+    #            flush=True,
+    #        )
 
 
 def write_summary_csv(
@@ -735,6 +759,8 @@ def batch_galfit() -> int:
     if invalid_results:
         log(f"Missing input files: {len(invalid_results)}")
 
+    start_time = time.perf_counter()
+
     if args.jobs == 1:
         log("Running in sequential mode.")
 
@@ -754,6 +780,8 @@ def batch_galfit() -> int:
             jobs=args.jobs,
             verbose=args.verbose,
         )
+
+    elapsed_seconds = time.perf_counter() - start_time
 
     results = invalid_results + execution_results
 
@@ -782,7 +810,12 @@ def batch_galfit() -> int:
     if not args.verbose:
         print_failure_details(results)
 
-    print_summary(results)
+    log(f"Total execution time: {format_duration(elapsed_seconds)}")
+
+    print_summary(
+        results,
+        elapsed_seconds=elapsed_seconds,
+    )
 
     if args.summary_csv is not None:
         summary_path = expand_path(args.summary_csv)
