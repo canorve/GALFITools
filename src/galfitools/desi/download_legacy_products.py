@@ -311,7 +311,7 @@ def main_downloadDesi() -> int:
     )
     ap.add_argument(
         "--wise-bands",
-        default="12",
+        default="",
         help=(
             "unWISE bands to download: 1 for W1, 2 for W2, or 12 for both. "
             "Use an empty string to disable unWISE downloads."
