@@ -8,8 +8,11 @@ The GALFIT output file is assumed to contain, by default:
     HDU 2: GALFIT model image
 
 Sky-only pixels are selected with DS9 ``physical`` or ``image`` box regions.
-The script constructs a full-size correlated sky realization by resampling
-square blocks from those regions and adds it to the GALFIT model.
+An optional GALFIT mask image can exclude masked pixels inside those boxes;
+mask values equal to zero are accepted and nonzero or non-finite values are
+rejected. The script constructs a full-size correlated sky realization by
+resampling square blocks from the remaining valid regions and adds it to the
+GALFIT model.
 
 When ``--sigma-image`` is supplied, the sigma map is interpreted as the total
 per-pixel uncertainty. The script estimates the sky RMS from the selected sky
@@ -37,7 +40,7 @@ from astropy.io import fits
 from astropy.stats import sigma_clip
 
 
-PROGRAM_VERSION = "3.2-physical-sigma-safe"
+PROGRAM_VERSION = "3.3-physical-sigma-mask"
 DEFAULT_IMAGE_EXTENSION = 1
 DEFAULT_MODEL_EXTENSION = 2
 
@@ -589,6 +592,8 @@ def create_mock_images(
     sigma_extension: int | None = None,
     sigma_kind: str = "auto",
     sigma_max_factor: float = 100.0,
+    mask_image: Path | None = None,
+    mask_extension: int | None = None,
 ) -> list[Path]:
     """Create mock images from a GALFIT model and sampled sky noise."""
     galfit_file = galfit_file.expanduser().resolve()
@@ -640,11 +645,44 @@ def create_mock_images(
             f"{image.shape} and {model.shape}."
         )
 
-    sky_mask = read_region_mask(
+    region_mask = read_region_mask(
         region_file=region_file,
         shape=image.shape,
         header=image_header,
     )
+
+    mask_file: Path | None = None
+    used_mask_extension: int | None = None
+    excluded_by_mask = 0
+
+    if mask_image is None:
+        galfit_good_pixels = np.ones(image.shape, dtype=bool)
+    else:
+        mask_file = mask_image.expanduser().resolve()
+        mask_data, _mask_header, used_mask_extension = load_2d_fits_image(
+            mask_file,
+            mask_extension,
+        )
+
+        if mask_data.shape != image.shape:
+            raise ValueError(
+                "The GALFIT mask shape does not match the GALFIT images: "
+                f"{mask_data.shape} and {image.shape}."
+            )
+
+        # GALFIT convention: zero means usable; any nonzero value is masked.
+        # Non-finite mask values are also rejected.
+        galfit_good_pixels = np.isfinite(mask_data) & (mask_data == 0)
+        excluded_by_mask = int(np.count_nonzero(region_mask & ~galfit_good_pixels))
+
+    sky_mask = region_mask & galfit_good_pixels
+
+    if not np.any(sky_mask):
+        raise ValueError(
+            "No usable sky pixels remain after applying the GALFIT mask to "
+            "the DS9 sky regions."
+        )
+
     sky_level, sky_rms, clipped_sky_pixels = estimate_sky_level(
         image,
         sky_mask,
@@ -751,7 +789,14 @@ def create_mock_images(
             f"Using {used_block_size} pixels instead."
         )
 
-    print(f"Sky-region pixels:       {int(np.count_nonzero(sky_mask))}")
+    print(f"DS9-region pixels:       {int(np.count_nonzero(region_mask))}")
+    if mask_file is None:
+        print("GALFIT mask:             not supplied")
+    else:
+        print(f"GALFIT mask:             {mask_file}")
+        print(f"Mask HDU:                {used_mask_extension}")
+        print(f"Masked pixels in boxes:  {excluded_by_mask}")
+    print(f"Usable sky pixels:       {int(np.count_nonzero(sky_mask))}")
     print(f"Clipped sky pixels:      {clipped_sky_pixels}")
     print(f"Sigma-clipped sky level: {sky_level:.8g}")
     print(f"Sigma-clipped sky RMS:   {sky_rms:.8g}")
@@ -850,6 +895,21 @@ def create_mock_images(
         header["MODELEXT"] = (model_extension, "GALFIT model HDU")
         header["RNGSEED"] = (-1 if seed is None else seed, "Base RNG seed")
         header["SIGUSED"] = (sigma_file is not None, "Sigma/noise map used")
+        header["MSKUSED"] = (mask_file is not None, "GALFIT mask image used")
+
+        if mask_file is not None:
+            header["MSKFILE"] = (mask_file.name, "GALFIT mask filename")
+            header["MSKEXT"] = (
+                int(used_mask_extension),
+                "GALFIT mask HDU",
+            )
+            header["MSKEXCL"] = (
+                excluded_by_mask,
+                "Masked pixels excluded from DS9 sky boxes",
+            )
+            header.add_history(
+                "GALFIT mask applied to sky donors: zero=usable, nonzero=masked."
+            )
 
         if sigma_file is not None:
             header["SIGFILE"] = (sigma_file.name, "Sigma/noise map filename")
@@ -887,6 +947,8 @@ def create_mock_images(
             )
 
         header.add_history(f"Sky regions: {region_file.name}")
+        if mask_file is not None:
+            header.add_history(f"GALFIT mask: {mask_file.name}")
         header.add_history(f"Source GALFIT file: {galfit_file.name}")
 
         if save_sky:
@@ -917,8 +979,9 @@ def parse_arguments() -> argparse.Namespace:
         description=(
             "Create GALFIT mock galaxy images by adding block-resampled "
             "correlated sky noise from DS9 physical/image boxes to the "
-            "model. An optional sigma or inverse-variance image can add "
-            "only the variance not already represented by the sky blocks."
+            "model. An optional GALFIT mask excludes nonzero mask pixels "
+            "from the sky donors. An optional sigma or inverse-variance "
+            "image adds only variance not represented by the sky blocks."
         )
     )
     parser.add_argument(
@@ -1009,6 +1072,26 @@ def parse_arguments() -> argparse.Namespace:
         help="Write only mock images, not the intermediate sky images.",
     )
     parser.add_argument(
+        "-m",
+        "--mask-image",
+        type=Path,
+        default=None,
+        help=(
+            "Optional GALFIT mask image. Pixels equal to zero are usable; "
+            "nonzero or non-finite pixels are excluded from the DS9 sky "
+            "regions before estimating and resampling the background."
+        ),
+    )
+    parser.add_argument(
+        "--mask-ext",
+        type=int,
+        default=None,
+        help=(
+            "HDU containing the GALFIT mask. By default, the first 2D "
+            "image HDU is used."
+        ),
+    )
+    parser.add_argument(
         "--sigma-image",
         type=Path,
         default=None,
@@ -1052,7 +1135,7 @@ def parse_arguments() -> argparse.Namespace:
 def mainGalfitSkyMock() -> None:
     """Run the command-line program."""
     args = parse_arguments()
-    # print(f"create_galfit_sky_mocks version {PROGRAM_VERSION}")
+    # print(f"create_galfit_sky_mocks_v33 version {PROGRAM_VERSION}")
     print("DS9 parser: built-in physical/image box parser (no regions package)")
 
     try:
@@ -1073,6 +1156,8 @@ def mainGalfitSkyMock() -> None:
             sigma_extension=args.sigma_ext,
             sigma_kind=args.sigma_kind,
             sigma_max_factor=args.sigma_max_factor,
+            mask_image=args.mask_image,
+            mask_extension=args.mask_ext,
         )
     except (OSError, ValueError) as error:
         raise SystemExit(f"Error: {error}") from error
