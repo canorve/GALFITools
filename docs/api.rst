@@ -103,34 +103,7 @@ prepare the necessary files for GALFIT input
 
 
 
-**initGal** Creates GALFIT's input files with different initial parameters
-
-
-::
-
-    from galfitools.galin.initgal import InitGal
-
-
-    #GalfitFile: the galfit file galfit.XX
-
-    #optional for argparse
-
-    #number:  the number of files generated.
-    #param3:  range of values to give to the 3) model's parameter in format [min max]
-    #param4: range of values to give to the 4) model's parameter in format [min max]
-    #param5: range of values to give to the 5) model's parameter in format [min max]
-    #param6: range of values to give to the 6) model's parameter in format [min max]
-    #param7: range of values to give to the 7) model's parameter in format [min max]
-    #param8: range of values to give to the 8) model's parameter in format [min max]
-    #param9: range of values to give to the 9) model's parameter in format [min max]
-    #param10: range of values to give to the 10) model's parameter in format [min max] 
-    #numcomp: the component number which parameters will be changed
-
-
-    InitGal(GalfitFile, number, param3, param4, param5, param6, param7, param8, param9, param10, numcomp)
-
-
-      
+     
 
 
 **gtmakeMask**  creates mask file from a SExtractor's catalog 

@@ -154,38 +154,6 @@ prepare the necessary files for GALFIT input
     -so SIGOUT, --sigout SIGOUT
                           the sigma image output
 
-.. _routine-initGal:
-**initGal** Creates GALFIT's input files with different initial parameters
-
-
-::
-
-  positional arguments:
-    inFile                the galfit file galfit.XX
-
-  options:
-    -h, --help            show this help message and exit
-    -n NUMBER, --number NUMBER
-                          the number of files generated. Default = 1
-    -p3 PARAM3 PARAM3, --param3 PARAM3 PARAM3
-                          range of values to give to the 3) model's parameter in format [min max]
-    -p4 PARAM4 PARAM4, --param4 PARAM4 PARAM4
-                          range of values to give to the 4) model's parameter in format [min max]
-    -p5 PARAM5 PARAM5, --param5 PARAM5 PARAM5
-                          range of values to give to the 5) model's parameter in format [min max]
-    -p6 PARAM6 PARAM6, --param6 PARAM6 PARAM6
-                          range of values to give to the 6) model's parameter in format [min max]
-    -p7 PARAM7 PARAM7, --param7 PARAM7 PARAM7
-                          range of values to give to the 7) model's parameter in format [min max]
-    -p8 PARAM8 PARAM8, --param8 PARAM8 PARAM8
-                          range of values to give to the 8) model's parameter in format [min max]
-    -p9 PARAM9 PARAM9, --param9 PARAM9 PARAM9
-                          range of values to give to the 9) model's parameter in format [min max]
-    -p10 PARAM10 PARAM10, --param10 PARAM10 PARAM10
-                          range of values to give to the 10) model's parameter in format [min max]
-    -nc NUMCOMP, --numcomp NUMCOMP
-                          the component number which parameters will be changed
-       
 
 
 .. _routine-gtmakeMask:

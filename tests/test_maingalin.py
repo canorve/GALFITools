@@ -39,24 +39,6 @@ def test_mainGetStar(monkeypatch, capsys):
     assert "Object fits file: cut.fits" in out
 
 
-def test_mainInitGal(monkeypatch):
-    captured = {}
-
-    def fake_InitGal(GalfitFile, number, p3, p4, p5, p6, p7, p8, p9, p10, numcomp):
-        captured.update(file=GalfitFile, number=number, p3=p3, numcomp=numcomp)
-
-    monkeypatch.setattr(cli, "InitGal", fake_InitGal)
-    monkeypatch.setattr(cli, "printWelcome", lambda: None)
-
-    argv = ["galfit.01", "-n", "3", "--param3", "10", "20", "--numcomp", "2"]
-    rc = cli.mainInitGal(argv)
-    assert rc == 0
-    assert captured["file"] == "galfit.01"
-    assert captured["number"] == 3
-    assert captured["p3"] == [10.0, 20.0]
-    assert captured["numcomp"] == 2
-
-
 def test_mainMaskDs9(monkeypatch):
     called = {}
 
