@@ -7,7 +7,6 @@ from galfitools.galin.getBoxSizeDs9 import getBoxSizeDs9
 from galfitools.galin.getSersic import getSersic
 from galfitools.galin.getStar import getStar
 from galfitools.galin.imarith import imarith
-from galfitools.galin.initgal import InitGal
 from galfitools.galin.MakeMask import makeMask
 from galfitools.galin.MakePSF import makePSF
 from galfitools.galin.MaskDs9 import maskDs9
@@ -64,72 +63,6 @@ def mainGetStar(argv=None) -> int:
     print(f"Done. Object fits file: {args.out} created ")
     if args.sigma:  # pragma: no cover
         print(f"Done. sigma fits file: {args.sigout} created ")
-    return 0
-
-
-def mainInitGal(argv=None) -> int:
-    printWelcome()
-    parser = argparse.ArgumentParser(
-        description="Creates GALFIT input files with different initial parameters"
-    )
-    parser.add_argument("inFile", help="the galfit file galfit.XX")
-    parser.add_argument(
-        "-n",
-        "--number",
-        type=int,
-        default=1,
-        help="number of files generated. Default=1",
-    )
-    parser.add_argument(
-        "-p3", "--param3", nargs=2, type=float, help="values for parameter 3) [min max]"
-    )
-    parser.add_argument(
-        "-p4", "--param4", nargs=2, type=float, help="values for parameter 4) [min max]"
-    )
-    parser.add_argument(
-        "-p5", "--param5", nargs=2, type=float, help="values for parameter 5) [min max]"
-    )
-    parser.add_argument(
-        "-p6", "--param6", nargs=2, type=float, help="values for parameter 6) [min max]"
-    )
-    parser.add_argument(
-        "-p7", "--param7", nargs=2, type=float, help="values for parameter 7) [min max]"
-    )
-    parser.add_argument(
-        "-p8", "--param8", nargs=2, type=float, help="values for parameter 8) [min max]"
-    )
-    parser.add_argument(
-        "-p9", "--param9", nargs=2, type=float, help="values for parameter 9) [min max]"
-    )
-    parser.add_argument(
-        "-p10",
-        "--param10",
-        nargs=2,
-        type=float,
-        help="values for parameter 10) [min max]",
-    )
-    parser.add_argument(
-        "-nc",
-        "--numcomp",
-        type=int,
-        help="component number whose parameters will be changed",
-    )
-    args = parser.parse_args(argv)
-
-    InitGal(
-        args.inFile,
-        args.number,
-        args.param3,
-        args.param4,
-        args.param5,
-        args.param6,
-        args.param7,
-        args.param8,
-        args.param9,
-        args.param10,
-        args.numcomp,
-    )
-    print("rungalfit.sh has been created")
     return 0
 
 
