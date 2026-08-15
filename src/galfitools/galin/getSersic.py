@@ -258,9 +258,9 @@ def getSersic(
                 1,
                 "serds9.png",
                 200,
-                False,
-                False,
-                True,
+                False,  # plot
+                False,  # r80
+                True,  # r20
             )
             nser = sern
             if nser < 0.1:
@@ -409,9 +409,9 @@ def getSersic(
                 1,
                 "serds9.png",
                 200,
-                False,
-                False,
-                False,
+                False,  # plot
+                False,  # r80
+                False,  # 20
             )
             nser = sern
             if nser < 0.1:
