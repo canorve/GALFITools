@@ -660,6 +660,18 @@ def maingetNds9(argv=None) -> int:
         action="store_true",
         help="plots the Sersic index vs. flux fraction radius",
     )
+    p.add_argument(
+        "-r80",
+        "--rad80",
+        help="Formula uses 80% total light as Re ",
+        action="store_true",
+    )
+    p.add_argument(
+        "-r20",
+        "--rad20",
+        help="Formula uses 20% total light as Re ",
+        action="store_true",
+    )
 
     a = p.parse_args(argv)
 
@@ -674,6 +686,8 @@ def maingetNds9(argv=None) -> int:
         output=a.output,
         dpival=a.dotsinch,
         plot=a.plot,
+        r80=a.rad80,
+        r20=a.rad20,
     )
 
     print(f"the exposition time is: {exptime} \n")

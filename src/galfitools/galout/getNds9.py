@@ -15,6 +15,7 @@ from matplotlib.path import Path
 
 
 from galfitools.galout.getN import GetN
+from galfitools.galout.getN import GetNReFrac
 
 import matplotlib.pyplot as plt
 
@@ -30,6 +31,8 @@ def getNDs9(
     output="cowds9.png",
     dpival=200,
     plot=False,
+    r80=False,
+    r20=False,
 ):
     """computes the magnitude inside a DS9 region file to contruct
         the Curve of Growth
@@ -58,6 +61,10 @@ def getNDs9(
 
 
     output: plot output
+
+    r80: returns Sersic index computed using formula with Re=80% light
+    r20: returns Sersic index computed using formula with Re=20% light
+
 
     Returns
     -------
@@ -188,8 +195,10 @@ def getNDs9(
                 step=step,
             )
 
-            radFlux = radFlux + ellFlux
-            Ntot = Ntot + Nell
+            # radFlux = radFlux + ellFlux
+            radFlux = ellFlux
+            # Ntot = Ntot + Nell
+            Ntot = Nell
 
     totFlux = radFlux[-1]
 
@@ -203,7 +212,7 @@ def getNDs9(
 
     r_frac = np.interp(target_fluxes, radFlux, rad)
 
-    print(f"R50: {r_frac[2]:.2f}, R80:{r_frac[3]:.2f}, R90:{r_frac[4]:.2f} pixels ")
+    print(f"R50: {r_frac[8]:.2f}, R80:{r_frac[14]:.2f}, R90:{r_frac[16]:.2f} pixels ")
 
     mag = -2.5 * np.log10(radFlux / exptime) + zeropoint
 
@@ -216,17 +225,64 @@ def getNDs9(
     F = np.delete(fractions, 8)
     ns = GetN().GalNs(EffRad, R, F)
 
+    if r80:
+        # solving n with a different Sersic formula: Re = 80%
+        r_frac80 = r_frac[10:]
+        fractions80 = fractions[10:]
+
+        EffRad80 = r_frac80[4]
+        R80 = np.delete(r_frac80, 4)
+        F80 = np.delete(fractions80, 4)
+        ns80 = GetNReFrac().GalNs(EffRad80, R80, F80, 0.8)
+
+    if r20:
+        # solving n with a different Sersic formula: Re = 20%
+
+        r_frac20 = r_frac[:7]
+        fractions20 = fractions[:7]
+
+        EffRad20 = r_frac20[2]
+        R20 = np.delete(r_frac20, 2)
+        F20 = np.delete(fractions20, 2)
+        ns20 = GetNReFrac().GalNs(EffRad20, R20, F20, 0.2)
+
     # plot:
     if plot:
 
-        plt.clf()
-        plt.plot(F, ns)
-        plt.grid(True)
-        plt.minorticks_on()
-        plt.xlabel("Fraction of light ")
-        plt.ylabel("Sersic index")
-        plt.savefig(output, dpi=dpival)
-    return totmag, exptime, np.mean(ns), np.std(ns)
+        if r80:
+            plt.clf()
+            plt.plot(F80, ns80)
+            plt.grid(True)
+            plt.minorticks_on()
+            plt.xlabel("Fraction of light ")
+            plt.ylabel("Sersic index")
+            plt.savefig(output, dpi=dpival)
+
+        elif r20:
+            plt.clf()
+            plt.plot(F20, ns20)
+            plt.grid(True)
+            plt.minorticks_on()
+            plt.xlabel("Fraction of light ")
+            plt.ylabel("Sersic index")
+            plt.savefig(output, dpi=dpival)
+
+        else:
+            plt.clf()
+            plt.plot(F, ns)
+            plt.grid(True)
+            plt.minorticks_on()
+            plt.xlabel("Fraction of light ")
+            plt.ylabel("Sersic index")
+            plt.savefig(output, dpi=dpival)
+
+    if r80:
+        return totmag, exptime, np.mean(ns80), np.std(ns80)
+
+    elif r20:
+        return totmag, exptime, np.mean(ns20), np.std(ns20)
+    else:
+        return totmag, exptime, np.mean(ns), np.std(ns)
 
 
 def FluxEllipStep(Image, xpos, ypos, rx, ry, angle, ncol, nrow, step=1):

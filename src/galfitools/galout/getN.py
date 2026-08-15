@@ -316,6 +316,74 @@ class GetN:
         return result
 
 
+class GetNReFrac:
+    """Computes the Sersic index from photometric parameters
+        using an alternative formula for Sersic: A variation of
+        of the flux inside Re: if Refrac is .8 (default), Re
+        represents 80% of light not 50% anymore.
+
+
+    Methods
+    -------
+    GalNs : computes the Sersic index from effective radius and
+            other fraction of light radius.
+
+
+    """
+
+    def GalNs(self, EffRad: float, EffRadfrac: list, F: list, Refrac=0.8):
+
+        sers = np.array([])
+
+        for idx, f in enumerate(F):
+
+            n = self.ReRfrac(EffRad, EffRadfrac[idx], f, Refrac=Refrac)
+
+            sers = np.append(sers, n)
+
+        return sers
+
+    def ReRfrac(self, Re: float, Rfrac: float, frac: float, Refrac: float) -> float:
+
+        a = 0.1
+        b = 12
+
+        Sersic = self.solveSerRe(a, b, Re, Rfrac, frac, Refrac)
+
+        return Sersic
+
+    def solveSerRe(
+        self,
+        a: float,
+        b: float,
+        Re: float,
+        Rfrac: float,
+        frac: float,
+        Refrac: float,
+    ) -> float:
+        "return the sersic index. It uses Bisection"
+
+        try:
+            N = bisect(self.funReRfrac, a, b, args=(Re, Rfrac, frac, Refrac))
+        except Exception:  # pragma: no cover
+            print("unable to solve equation in the given range. Setting n to 99")
+            N = 99
+
+        return N
+
+    def funReRfrac(
+        self, n: float, Re: float, Rfrac: float, frac: float, Refrac: float
+    ) -> float:
+
+        k = gammaincinv(2 * n, Refrac)
+
+        x = k * (Rfrac / Re) ** (1 / n)
+
+        result = frac * gamma(2 * n) - gamma(2 * n) * gammainc(2 * n, x)
+
+        return result
+
+
 #############################################################################
 #  End of program  ###################################
 #     ______________________________________________________________________
