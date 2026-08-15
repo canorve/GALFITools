@@ -327,9 +327,7 @@ def load_getsersic_runner() -> Callable[..., object]:
     try:
         from galfitools.galin.getSersic import getSersic
     except ImportError as error:
-        raise RuntimeError(
-            "GALFITools is not installed or getSersic cannot be imported"
-        ) from error
+        raise RuntimeError("getSersic cannot be imported") from error
     return getSersic
 
 
