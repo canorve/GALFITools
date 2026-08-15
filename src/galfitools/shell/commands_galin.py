@@ -402,8 +402,7 @@ def maingetSersic(argv=None) -> int:
         "-n",
         "--nser",
         type=float,
-        default=2,
-        help=" Sersic index initial value Default=2",
+        help=" Sersic index initial value. If None it will be estimated",
     )
 
     args = parser.parse_args(argv)

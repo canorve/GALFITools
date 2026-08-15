@@ -11,6 +11,7 @@ from galfitools.galin.galfit import galPrintSky
 
 from galfitools.galout.getPeak import getPeak
 from galfitools.galout.PhotDs9 import photDs9
+from galfitools.galout.getNds9 import getNDs9
 
 from galfitools.galin.std import GetInfoEllip
 from galfitools.galin.std import GetAxis
@@ -68,7 +69,9 @@ def getSersic(
             if False, avoids to print to STDOUT
 
 
-    nser : sersic index initial parameter. Default = 2
+    nser : sersic index initial parameter. If None,
+            this will be computed from getNDs9
+
 
     bulgetot : float
             Estimates the bulge-to-total ratio of the galaxy to
@@ -242,6 +245,30 @@ def getSersic(
     idxcount = 0  # index for components
 
     if bulgetot:
+
+        if nser is None:
+
+            mag, exptime, sern, sernstd = getNDs9(
+                image,
+                regfile,
+                maskfile,
+                zeropoint,
+                plate,
+                sky,
+                1,
+                "serds9.png",
+                200,
+                False,
+                False,
+                True,
+            )
+            nser = sern
+            if nser < 0.1:
+                nser = 0.1
+
+            if nser > 8:
+                nser = 8
+
         if not (noprint):
             print(
                 "# The initial parameters for the Sersic component based on "
@@ -369,6 +396,28 @@ def getSersic(
         idxcount += 1
 
     else:
+
+        if nser is None:
+
+            mag, exptime, sern, sernstd = getNDs9(
+                image,
+                regfile,
+                maskfile,
+                zeropoint,
+                plate,
+                sky,
+                1,
+                "serds9.png",
+                200,
+                False,
+                False,
+                False,
+            )
+            nser = sern
+            if nser < 0.1:
+                nser = 0.1
+            if nser > 8:
+                nser = 8
 
         if not (noprint):
             print(
