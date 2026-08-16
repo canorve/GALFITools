@@ -380,7 +380,7 @@ def maingetSersic(argv=None) -> int:
         "-f",
         "--freeser",
         action="store_true",
-        help="keep Sersic index parameter of the bar component as free",
+        help="keep Sersic index parameter of the bar (or the disk in case of bulge/disk) component as free",
     )
 
     parser.add_argument(

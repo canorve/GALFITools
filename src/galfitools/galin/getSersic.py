@@ -281,18 +281,22 @@ def getSersic(
             )
 
             printTerminal(1, X, Y, mag, Rebulge, nser, 1, 0, skip, 1)
-
+            barflag = False
             if bards9:
 
                 if freeser is True:
 
                     printTerminal(2, X, Y, magbar, Rebar, 0.5, AxRatbar, PAbar, skip, 1)
+                    barflag = True
 
                 else:
 
                     printTerminal(2, X, Y, magbar, Rebar, 0.5, AxRatbar, PAbar, skip, 0)
 
-            printTerminal(3, X, Y, mag2, Re, 1, AxRat, PA, skip, 0)
+            if (freeser is True) and (barflag is False):
+                printTerminal(3, X, Y, mag2, Re, 1, AxRat, PA, skip, 1)
+            else:
+                printTerminal(3, X, Y, mag2, Re, 1, AxRat, PA, skip, 0)
 
         print("# parameter constraints file: ", fileconst)
 
@@ -366,6 +370,7 @@ def getSersic(
                     skip,
                     1,
                 )
+                freeser = False  # avoids free sersic index of disk
             else:
                 galcomps = copy2Galcomps(
                     galcomps,
@@ -388,9 +393,14 @@ def getSersic(
         # second component: disk
         N = N + 1
 
-        galcomps = copy2Galcomps(
-            galcomps, N, "sersic", X, Y, mag2, Re, 1, AxRat, PA, skip, 0
-        )
+        if freeser is True:
+            galcomps = copy2Galcomps(
+                galcomps, N, "sersic", X, Y, mag2, Re, 1, AxRat, PA, skip, 1
+            )  # for galaxies with two sersic components
+        else:
+            galcomps = copy2Galcomps(
+                galcomps, N, "sersic", X, Y, mag2, Re, 1, AxRat, PA, skip, 0
+            )
 
         galPrintComp(fserout, idxcount + 1, idxcount, galcomps)
         idxcount += 1
