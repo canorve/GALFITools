@@ -219,7 +219,7 @@ def mainGetInputBand(args=None):
         fileout=args.fileout,
     )
 
-    return galcomps
+    # return galcomps
 
 
 if __name__ == "__main__":
