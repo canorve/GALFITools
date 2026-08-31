@@ -693,12 +693,13 @@ def print_results(results: Sequence[ParameterStatistics]) -> None:
 def validate_headers(headers: Sequence[LogHeader]) -> LogHeader:
     """Verify that all fit.log entries refer to the same image and region."""
     reference = headers[0]
-    for entry_number, header in enumerate(headers[1:], start=2):
-        if header != reference:
-            raise ValueError(
-                f"Entry {entry_number} has different input/output image or "
-                "fitting-region information."
-            )
+    # removed because of sim images are different
+    # for entry_number, header in enumerate(headers[1:], start=2):
+    #    if header != reference:
+    #        raise ValueError(
+    #            f"Entry {entry_number} has different input/output image or "
+    #            "fitting-region information."
+    #        )
     return reference
 
 

@@ -4,7 +4,7 @@
 
 The GALFIT output file is assumed to contain, by default:
 
-    HDU 1: original galaxy image
+    HDU 1: original galaxy image used in the fit (cropped to H)
     HDU 2: GALFIT model image
 
 Sky-only pixels are selected with DS9 ``physical`` or ``image`` box regions.
@@ -27,6 +27,13 @@ Thus, the mock image is approximately:
 Without ``--sigma-image``, the behavior is unchanged:
 
     mock = model + correlated_sky
+
+Important alignment behavior
+----------------------------
+The GALFIT output image is often a crop of the original image defined by H).
+This script now reads FITSECT from the GALFIT output and, when needed,
+automatically crops the external mask and sigma images to the GALFIT output
+shape. DS9 ``physical`` regions are also converted using FITSECT when present.
 """
 
 from __future__ import annotations
@@ -40,7 +47,7 @@ from astropy.io import fits
 from astropy.stats import sigma_clip
 
 
-PROGRAM_VERSION = "3.3-physical-sigma-mask"
+PROGRAM_VERSION = "3.4-physical-sigma-mask-fitsect"
 DEFAULT_IMAGE_EXTENSION = 1
 DEFAULT_MODEL_EXTENSION = 2
 
@@ -62,18 +69,56 @@ def clean_extension_header(header: fits.Header) -> fits.Header:
     return output_header
 
 
+def parse_fitsect(header: fits.Header) -> tuple[int, int, int, int] | None:
+    """Parse FITSECT='[xmin:xmax,ymin:ymax]' from a GALFIT output header."""
+    fitsect = header.get("FITSECT")
+    if fitsect is None:
+        return None
+
+    text = str(fitsect).strip()
+    match = re.match(
+        r"^\[\s*(\d+)\s*:\s*(\d+)\s*,\s*(\d+)\s*:\s*(\d+)\s*\]$",
+        text,
+    )
+    if match is None:
+        raise ValueError(
+            f"Could not parse FITSECT={text!r}. Expected '[xmin:xmax,ymin:ymax]'."
+        )
+
+    xmin, xmax, ymin, ymax = map(int, match.groups())
+    if xmin > xmax or ymin > ymax:
+        raise ValueError(f"Invalid FITSECT bounds: {text!r}.")
+
+    return xmin, xmax, ymin, ymax
+
+
+def shape_from_fitsect(fitsect: tuple[int, int, int, int]) -> tuple[int, int]:
+    """Return (ny, nx) from FITSECT bounds."""
+    xmin, xmax, ymin, ymax = fitsect
+    return ymax - ymin + 1, xmax - xmin + 1
+
+
 def physical_to_image_coordinates(
     points: np.ndarray,
     header: fits.Header,
 ) -> np.ndarray:
     """Convert DS9 physical coordinates to FITS image coordinates.
 
-    DS9 physical coordinates use the IRAF LTM/LTV linear transformation:
-
-        image = LTM @ physical + LTV
+    Priority:
+    1. If FITSECT is present, use it directly because GALFIT output images are
+       usually crops of the original image defined by H).
+    2. Otherwise, fall back to the IRAF LTM/LTV linear transformation.
 
     The returned coordinates remain in the one-based FITS/DS9 convention.
     """
+    fitsect = parse_fitsect(header)
+    if fitsect is not None:
+        xmin, _xmax, ymin, _ymax = fitsect
+        transformed = points.copy().astype(float)
+        transformed[:, 0] = transformed[:, 0] - xmin + 1.0
+        transformed[:, 1] = transformed[:, 1] - ymin + 1.0
+        return transformed
+
     transform = np.array(
         [
             [
@@ -171,7 +216,6 @@ def parse_ds9_box_regions(
         if not line or line.startswith("#"):
             continue
 
-        # DS9 properties follow '#'. They are not needed for the mask.
         line = line.split("#", maxsplit=1)[0].strip()
 
         if not line or line.lower().startswith("global"):
@@ -190,25 +234,23 @@ def parse_ds9_box_regions(
                 continue
 
             match = box_pattern.match(statement)
-
             if match is None:
                 raise ValueError(
-                    f"Unsupported DS9 region at line {line_number}: "
-                    f"{statement!r}. This script accepts box regions only."
+                    f"Unsupported DS9 region at line {line_number}: {statement!r}. "
+                    "This script accepts box regions only."
                 )
 
             if current_system not in {"physical", "image"}:
                 raise ValueError(
-                    f"Unsupported coordinate system {current_system!r} at "
-                    f"line {line_number}. Use DS9 physical or image boxes."
+                    f"Unsupported coordinate system {current_system!r} at line "
+                    f"{line_number}. Use DS9 physical or image boxes."
                 )
 
             values = [value.strip() for value in match.group(2).split(",")]
-
             if len(values) != 5:
                 raise ValueError(
-                    f"Invalid DS9 box at line {line_number}: expected five "
-                    "values x, y, width, height, angle."
+                    f"Invalid DS9 box at line {line_number}: expected five values "
+                    "x, y, width, height, angle."
                 )
 
             try:
@@ -234,10 +276,7 @@ def parse_ds9_box_regions(
     return parsed_regions
 
 
-def polygon_to_mask(
-    vertices: np.ndarray,
-    shape: tuple[int, int],
-) -> np.ndarray:
+def polygon_to_mask(vertices: np.ndarray, shape: tuple[int, int]) -> np.ndarray:
     """Rasterize a convex polygon using NumPy pixel-center coordinates."""
     ny, nx = shape
     x_min = max(0, int(np.floor(np.min(vertices[:, 0]))))
@@ -256,7 +295,6 @@ def polygon_to_mask(
     )
 
     cross_products = []
-
     for index in range(len(vertices)):
         x0, y0 = vertices[index]
         x1, y1 = vertices[(index + 1) % len(vertices)]
@@ -265,8 +303,7 @@ def polygon_to_mask(
     cross_products = np.asarray(cross_products)
     tolerance = 1.0e-10
     inside = np.all(cross_products >= -tolerance, axis=0) | np.all(
-        cross_products <= tolerance,
-        axis=0,
+        cross_products <= tolerance, axis=0
     )
 
     output[y_min : y_max + 1, x_min : x_max + 1] = inside
@@ -274,9 +311,7 @@ def polygon_to_mask(
 
 
 def read_region_mask(
-    region_file: Path,
-    shape: tuple[int, int],
-    header: fits.Header,
+    region_file: Path, shape: tuple[int, int], header: fits.Header
 ) -> np.ndarray:
     """Create a Boolean mask from DS9 physical or image box regions."""
     included_mask = np.zeros(shape, dtype=bool)
@@ -289,7 +324,6 @@ def read_region_mask(
         else:
             image_vertices = vertices
 
-        # DS9/FITS pixel centers are one-based; NumPy pixel centers are zero-based.
         pixel_vertices = image_vertices - 1.0
         current_mask = polygon_to_mask(pixel_vertices, shape)
 
@@ -325,12 +359,7 @@ def estimate_sky_level(
     if sky_pixels.size == 0:
         raise ValueError("No finite sky pixels are available.")
 
-    clipped = sigma_clip(
-        sky_pixels,
-        sigma=sigma,
-        maxiters=maxiters,
-        masked=True,
-    )
+    clipped = sigma_clip(sky_pixels, sigma=sigma, maxiters=maxiters, masked=True)
     good_pixels = np.asarray(clipped.compressed(), dtype=float)
 
     if good_pixels.size < 2:
@@ -363,14 +392,12 @@ def load_2d_fits_image(
                 )
 
             hdu = hdulist[extension]
-
             if hdu.data is None:
                 raise ValueError(
                     f"HDU {extension} in {filename} contains no image data."
                 )
 
             data = np.asarray(hdu.data, dtype=float)
-
             if data.ndim != 2:
                 raise ValueError(f"HDU {extension} in {filename} is not a 2D image.")
 
@@ -379,19 +406,55 @@ def load_2d_fits_image(
         for hdu_index, hdu in enumerate(hdulist):
             if hdu.data is None:
                 continue
-
             data = np.asarray(hdu.data, dtype=float)
-
             if data.ndim == 2:
                 return data, hdu.header.copy(), hdu_index
 
     raise ValueError(f"No 2D image was found in {filename}.")
 
 
-def infer_noise_map_kind(
-    filename: Path,
-    header: fits.Header,
-) -> str:
+def align_external_image_to_galfit(
+    data: np.ndarray,
+    target_shape: tuple[int, int],
+    galfit_header: fits.Header,
+    label: str,
+) -> tuple[np.ndarray, str]:
+    """Align an external mask/sigma image with the GALFIT output shape.
+
+    Returns
+    -------
+    aligned_data, method
+        method is either 'native' if no cropping was needed or 'fitsect' if
+        FITSECT-based cropping was applied.
+    """
+    if data.shape == target_shape:
+        return data, "native"
+
+    fitsect = parse_fitsect(galfit_header)
+    if fitsect is None:
+        raise ValueError(
+            f"The {label} shape {data.shape} does not match the GALFIT shape "
+            f"{target_shape}, and FITSECT is not available for automatic cropping."
+        )
+
+    xmin, xmax, ymin, ymax = fitsect
+    if data.shape[0] < ymax or data.shape[1] < xmax:
+        raise ValueError(
+            f"The {label} shape {data.shape} is too small for FITSECT "
+            f"[{xmin}:{xmax},{ymin}:{ymax}]."
+        )
+
+    cropped = data[ymin - 1 : ymax, xmin - 1 : xmax]
+    if cropped.shape != target_shape:
+        raise ValueError(
+            f"Automatic FITSECT cropping of the {label} produced shape "
+            f"{cropped.shape}, expected {target_shape}."
+        )
+
+    return cropped, "fitsect"
+
+
+def infer_noise_map_kind(filename: Path, header: fits.Header) -> str:
     """Infer whether a noise map contains sigma or inverse variance."""
     tokens = " ".join(
         [
@@ -407,7 +470,6 @@ def infer_noise_map_kind(
 
     if any(token in tokens for token in invvar_tokens):
         return "invvar"
-
     if any(token in tokens for token in sigma_tokens):
         return "sigma"
 
@@ -419,18 +481,9 @@ def infer_noise_map_kind(
 
 
 def convert_noise_map_to_sigma(
-    data: np.ndarray,
-    kind: str,
+    data: np.ndarray, kind: str
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Convert a sigma or inverse-variance image into a sigma map.
-
-    Returns
-    -------
-    sigma_map
-        Sigma values. Invalid pixels are set to zero.
-    valid_mask
-        True where the original noise-map value was valid.
-    """
+    """Convert a sigma or inverse-variance image into a sigma map."""
     data = np.asarray(data, dtype=float)
 
     if kind == "sigma":
@@ -453,14 +506,7 @@ def compute_extra_sigma_map(
     valid_sigma: np.ndarray,
     sky_rms: float,
 ) -> tuple[np.ndarray, int, int]:
-    """Compute the non-sky sigma after subtracting sky variance.
-
-    The calculation is
-
-        sigma_extra = sqrt(max(sigma_total**2 - sky_rms**2, 0)).
-
-    Invalid sigma-map pixels receive zero extra noise.
-    """
+    """Compute the non-sky sigma after subtracting sky variance."""
     extra_sigma = np.zeros_like(total_sigma, dtype=float)
     total_variance = total_sigma[valid_sigma] ** 2
     extra_variance = total_variance - sky_rms**2
@@ -473,20 +519,14 @@ def compute_extra_sigma_map(
 
 
 def find_valid_block_origins(
-    valid_mask: np.ndarray,
-    block_size: int,
+    valid_mask: np.ndarray, block_size: int
 ) -> tuple[np.ndarray, np.ndarray]:
     """Find top-left positions of square blocks fully inside valid pixels."""
     ny, nx = valid_mask.shape
-
     if block_size > ny or block_size > nx:
         return np.array([], dtype=int), np.array([], dtype=int)
 
-    integral = np.pad(
-        valid_mask.astype(np.int32),
-        ((1, 0), (1, 0)),
-        mode="constant",
-    )
+    integral = np.pad(valid_mask.astype(np.int32), ((1, 0), (1, 0)), mode="constant")
     integral = integral.cumsum(axis=0).cumsum(axis=1)
 
     block_sums = (
@@ -500,21 +540,15 @@ def find_valid_block_origins(
 
 
 def select_block_size(
-    valid_mask: np.ndarray,
-    requested_size: int,
+    valid_mask: np.ndarray, requested_size: int
 ) -> tuple[int, np.ndarray, np.ndarray]:
     """Select the largest usable block size not exceeding the request."""
     if requested_size < 2:
         raise ValueError("The block size must be at least 2 pixels.")
 
     maximum_size = min(requested_size, *valid_mask.shape)
-
     for block_size in range(maximum_size, 1, -1):
-        y_origins, x_origins = find_valid_block_origins(
-            valid_mask,
-            block_size,
-        )
-
+        y_origins, x_origins = find_valid_block_origins(valid_mask, block_size)
         if y_origins.size > 0:
             return block_size, y_origins, x_origins
 
@@ -522,16 +556,12 @@ def select_block_size(
 
 
 def transform_square_block(
-    block: np.ndarray,
-    rotation: int,
-    reflect: bool,
+    block: np.ndarray, rotation: int, reflect: bool
 ) -> np.ndarray:
     """Apply a specified rotation and optional reflection to a square block."""
     transformed = np.rot90(block, k=rotation)
-
     if reflect:
         transformed = np.fliplr(transformed)
-
     return transformed
 
 
@@ -550,7 +580,6 @@ def create_sky_realization(
 
     for y_out in range(0, ny, block_size):
         height = min(block_size, ny - y_out)
-
         for x_out in range(0, nx, block_size):
             width = min(block_size, nx - x_out)
             choice = int(rng.integers(0, y_origins.size))
@@ -558,19 +587,16 @@ def create_sky_realization(
             x_in = int(x_origins[choice])
 
             block = noise_source[
-                y_in : y_in + block_size,
-                x_in : x_in + block_size,
+                y_in : y_in + block_size, x_in : x_in + block_size
             ].copy()
-
             if transform_blocks:
                 rotation = int(rng.integers(0, 4))
                 reflect = bool(rng.integers(0, 2))
                 block = transform_square_block(block, rotation, reflect)
 
-            sky_image[
-                y_out : y_out + height,
-                x_out : x_out + width,
-            ] = block[:height, :width]
+            sky_image[y_out : y_out + height, x_out : x_out + width] = block[
+                :height, :width
+            ]
 
     return sky_image
 
@@ -602,21 +628,17 @@ def create_mock_images(
 
     if not galfit_file.is_file():
         raise FileNotFoundError(f"GALFIT file not found: {galfit_file}")
-
     if not region_file.is_file():
         raise FileNotFoundError(f"Region file not found: {region_file}")
-
     if number < 1:
         raise ValueError("The number of mock images must be at least 1.")
 
     output_directory.mkdir(parents=True, exist_ok=True)
-
     if prefix is None:
         prefix = galfit_file.stem
 
     with fits.open(galfit_file, memmap=False) as hdulist:
         required_extension = max(image_extension, model_extension)
-
         if len(hdulist) <= required_extension:
             raise ValueError(
                 f"The GALFIT file does not contain HDU {required_extension}."
@@ -624,10 +646,8 @@ def create_mock_images(
 
         image_hdu = hdulist[image_extension]
         model_hdu = hdulist[model_extension]
-
         if image_hdu.data is None:
             raise ValueError(f"HDU {image_extension} does not contain image data.")
-
         if model_hdu.data is None:
             raise ValueError(f"HDU {model_extension} does not contain model data.")
 
@@ -638,58 +658,50 @@ def create_mock_images(
 
     if image.ndim != 2 or model.ndim != 2:
         raise ValueError("The original and model images must be two-dimensional.")
-
     if image.shape != model.shape:
         raise ValueError(
             "The original and model images have different shapes: "
             f"{image.shape} and {model.shape}."
         )
 
+    fitsect = parse_fitsect(image_header)
+    if fitsect is not None:
+        expected_shape = shape_from_fitsect(fitsect)
+        if expected_shape != image.shape:
+            raise ValueError(
+                f"FITSECT implies shape {expected_shape}, but HDU {image_extension} "
+                f"has shape {image.shape}."
+            )
+
     region_mask = read_region_mask(
-        region_file=region_file,
-        shape=image.shape,
-        header=image_header,
+        region_file=region_file, shape=image.shape, header=image_header
     )
 
     mask_file: Path | None = None
     used_mask_extension: int | None = None
     excluded_by_mask = 0
+    mask_alignment = "not-used"
 
     if mask_image is None:
         galfit_good_pixels = np.ones(image.shape, dtype=bool)
     else:
         mask_file = mask_image.expanduser().resolve()
         mask_data, _mask_header, used_mask_extension = load_2d_fits_image(
-            mask_file,
-            mask_extension,
+            mask_file, mask_extension
         )
-
-        if mask_data.shape != image.shape:
-            raise ValueError(
-                "The GALFIT mask shape does not match the GALFIT images: "
-                f"{mask_data.shape} and {image.shape}."
-            )
-
-        # GALFIT convention: zero means usable; any nonzero value is masked.
-        # Non-finite mask values are also rejected.
+        mask_data, mask_alignment = align_external_image_to_galfit(
+            mask_data, image.shape, image_header, "GALFIT mask"
+        )
         galfit_good_pixels = np.isfinite(mask_data) & (mask_data == 0)
         excluded_by_mask = int(np.count_nonzero(region_mask & ~galfit_good_pixels))
 
     sky_mask = region_mask & galfit_good_pixels
-
     if not np.any(sky_mask):
         raise ValueError(
-            "No usable sky pixels remain after applying the GALFIT mask to "
-            "the DS9 sky regions."
+            "No usable sky pixels remain after applying the GALFIT mask to the DS9 sky regions."
         )
 
-    sky_level, sky_rms, clipped_sky_pixels = estimate_sky_level(
-        image,
-        sky_mask,
-    )
-
-    # The donor field contains sky fluctuations around zero. This prevents
-    # adding the mean sky twice when the GALFIT model includes a sky component.
+    sky_level, sky_rms, clipped_sky_pixels = estimate_sky_level(image, sky_mask)
     noise_source = image - sky_level
     valid_block_mask = sky_mask & np.isfinite(noise_source)
 
@@ -703,30 +715,23 @@ def create_mock_images(
     effective_sigma_kind = sigma_kind
     median_sigma_sky = 0.0
     sigma_limit = 0.0
+    sigma_alignment = "not-used"
 
     if sigma_image is not None:
         sigma_file = sigma_image.expanduser().resolve()
         sigma_data, sigma_header, used_sigma_extension = load_2d_fits_image(
-            sigma_file,
-            sigma_extension,
+            sigma_file, sigma_extension
         )
-
-        if sigma_data.shape != image.shape:
-            raise ValueError(
-                "The sigma/noise image shape does not match the GALFIT "
-                f"images: {sigma_data.shape} and {image.shape}."
-            )
+        sigma_data, sigma_alignment = align_external_image_to_galfit(
+            sigma_data, image.shape, image_header, "sigma/noise image"
+        )
 
         effective_sigma_kind = sigma_kind
         if effective_sigma_kind == "auto":
-            effective_sigma_kind = infer_noise_map_kind(
-                sigma_file,
-                sigma_header,
-            )
+            effective_sigma_kind = infer_noise_map_kind(sigma_file, sigma_header)
 
         total_sigma, valid_sigma = convert_noise_map_to_sigma(
-            sigma_data,
-            effective_sigma_kind,
+            sigma_data, effective_sigma_kind
         )
 
         valid_sky_sigma = total_sigma[sky_mask & valid_sigma]
@@ -739,10 +744,6 @@ def create_mock_images(
         if not np.isfinite(median_sigma_sky) or median_sigma_sky <= 0:
             raise ValueError("The median sigma inside the DS9 sky boxes is invalid.")
 
-        # Tiny positive inverse-variance values can produce enormous sigma
-        # values in poorly covered pixels. They dominate DS9 scaling and can
-        # hide the model. Treat such pixels as invalid for extra-noise
-        # generation. This threshold is intentionally generous.
         if sigma_max_factor <= 1:
             raise ValueError("--sigma-max-factor must be greater than 1.")
 
@@ -752,20 +753,13 @@ def create_mock_images(
         valid_sigma[extreme_sigma] = False
         total_sigma[extreme_sigma] = 0.0
 
-        # The block-resampled sky already contributes the measured sky RMS.
-        # Add only the remaining variance from the total sigma map.
         (
             extra_sigma,
             clipped_variance_pixels,
             invalid_sigma_pixels,
         ) = compute_extra_sigma_map(
-            total_sigma=total_sigma,
-            valid_sigma=valid_sigma,
-            sky_rms=sky_rms,
+            total_sigma=total_sigma, valid_sigma=valid_sigma, sky_rms=sky_rms
         )
-
-        # Extra source-related variance should not be generated in invalid
-        # model pixels.
         extra_sigma[~np.isfinite(model)] = 0.0
 
         positive_sigma = total_sigma[total_sigma > 0]
@@ -773,29 +767,35 @@ def create_mock_images(
             median_total_sigma = float(np.median(positive_sigma))
             if median_total_sigma > 20.0 * max(sky_rms, median_sigma_sky):
                 raise ValueError(
-                    "The noise map is much larger than the measured sky "
-                    "noise. It may be an inverse-variance map being read as "
-                    "sigma. Retry with --sigma-kind invvar."
+                    "The noise map is much larger than the measured sky noise. It may "
+                    "be an inverse-variance map being read as sigma. Retry with "
+                    "--sigma-kind invvar."
                 )
 
     used_block_size, y_origins, x_origins = select_block_size(
-        valid_block_mask,
-        block_size,
+        valid_block_mask, block_size
     )
-
     if used_block_size != block_size:
         print(
-            f"Warning: requested block size {block_size} is not available. "
-            f"Using {used_block_size} pixels instead."
+            f"Warning: requested block size {block_size} is not available. Using "
+            f"{used_block_size} pixels instead."
         )
 
     print(f"DS9-region pixels:       {int(np.count_nonzero(region_mask))}")
+    if fitsect is None:
+        print("GALFIT FITSECT:          not present")
+    else:
+        xmin, xmax, ymin, ymax = fitsect
+        print(f"GALFIT FITSECT:          [{xmin}:{xmax},{ymin}:{ymax}]")
+
     if mask_file is None:
         print("GALFIT mask:             not supplied")
     else:
         print(f"GALFIT mask:             {mask_file}")
         print(f"Mask HDU:                {used_mask_extension}")
+        print(f"Mask alignment:          {mask_alignment}")
         print(f"Masked pixels in boxes:  {excluded_by_mask}")
+
     print(f"Usable sky pixels:       {int(np.count_nonzero(sky_mask))}")
     print(f"Clipped sky pixels:      {clipped_sky_pixels}")
     print(f"Sigma-clipped sky level: {sky_level:.8g}")
@@ -818,6 +818,7 @@ def create_mock_images(
 
         print(f"Sigma image:             {sigma_file}")
         print(f"Sigma HDU:               {used_sigma_extension}")
+        print(f"Sigma alignment:         {sigma_alignment}")
         print(f"Sigma input kind:        {effective_sigma_kind}")
         print(f"Median sigma in sky:     {median_sigma_sky:.8g}")
         print(f"Maximum accepted sigma:  {sigma_limit:.8g}")
@@ -826,8 +827,7 @@ def create_mock_images(
         print(f"Median extra sigma:      {median_extra:.8g}")
         print(f"Invalid sigma pixels:    {invalid_sigma_pixels}")
         print(
-            "Pixels with no extra variance: "
-            f"{clipped_variance_pixels} ({clipped_fraction:.2f}%)"
+            f"Pixels with no extra variance: {clipped_variance_pixels} ({clipped_fraction:.2f}%)"
         )
         print("Mock formula:            model + correlated sky + extra noise")
 
@@ -845,22 +845,12 @@ def create_mock_images(
             transform_blocks=transform_blocks,
         )
 
-        if keep_sky_level:
-            sky_image = sky_noise + sky_level
-        else:
-            sky_image = sky_noise
+        sky_image = sky_noise + sky_level if keep_sky_level else sky_noise
 
         if extra_sigma is None:
             extra_noise = np.zeros_like(model, dtype=float)
         else:
-            extra_noise = (
-                rng.normal(
-                    loc=0.0,
-                    scale=1.0,
-                    size=model.shape,
-                )
-                * extra_sigma
-            )
+            extra_noise = rng.normal(loc=0.0, scale=1.0, size=model.shape) * extra_sigma
 
         mock_image = model + sky_image + extra_noise
 
@@ -874,9 +864,8 @@ def create_mock_images(
                     return
                 p01, p50, p99 = np.percentile(finite, [1, 50, 99])
                 print(
-                    f"{name:24s}: min={finite.min():.6g}, "
-                    f"p01={p01:.6g}, median={p50:.6g}, "
-                    f"p99={p99:.6g}, max={finite.max():.6g}"
+                    f"{name:24s}: min={finite.min():.6g}, p01={p01:.6g}, "
+                    f"median={p50:.6g}, p99={p99:.6g}, max={finite.max():.6g}"
                 )
 
             print("First-realization diagnostics:")
@@ -896,13 +885,19 @@ def create_mock_images(
         header["RNGSEED"] = (-1 if seed is None else seed, "Base RNG seed")
         header["SIGUSED"] = (sigma_file is not None, "Sigma/noise map used")
         header["MSKUSED"] = (mask_file is not None, "GALFIT mask image used")
+        header["FITSCROP"] = (fitsect is not None, "GALFIT FITSECT available")
+
+        if fitsect is not None:
+            xmin, xmax, ymin, ymax = fitsect
+            header["FIT_XMIN"] = (xmin, "GALFIT crop xmin from FITSECT")
+            header["FIT_XMAX"] = (xmax, "GALFIT crop xmax from FITSECT")
+            header["FIT_YMIN"] = (ymin, "GALFIT crop ymin from FITSECT")
+            header["FIT_YMAX"] = (ymax, "GALFIT crop ymax from FITSECT")
 
         if mask_file is not None:
             header["MSKFILE"] = (mask_file.name, "GALFIT mask filename")
-            header["MSKEXT"] = (
-                int(used_mask_extension),
-                "GALFIT mask HDU",
-            )
+            header["MSKEXT"] = (int(used_mask_extension), "GALFIT mask HDU")
+            header["MSKALGN"] = (mask_alignment, "Mask alignment: native/fitsect")
             header["MSKEXCL"] = (
                 excluded_by_mask,
                 "Masked pixels excluded from DS9 sky boxes",
@@ -910,25 +905,18 @@ def create_mock_images(
             header.add_history(
                 "GALFIT mask applied to sky donors: zero=usable, nonzero=masked."
             )
+            if mask_alignment == "fitsect":
+                header.add_history(
+                    "GALFIT mask was cropped to the output image using FITSECT."
+                )
 
         if sigma_file is not None:
             header["SIGFILE"] = (sigma_file.name, "Sigma/noise map filename")
-            header["SIGEXT"] = (
-                int(used_sigma_extension),
-                "Sigma/noise map HDU",
-            )
-            header["SIGKIND"] = (
-                effective_sigma_kind,
-                "Input map: sigma or invvar",
-            )
-            header["SIGMAXF"] = (
-                sigma_max_factor,
-                "Maximum sigma / median sky sigma",
-            )
-            header["SIGBAD"] = (
-                extreme_sigma_pixels,
-                "Extreme sigma pixels excluded",
-            )
+            header["SIGEXT"] = (int(used_sigma_extension), "Sigma/noise map HDU")
+            header["SIGALGN"] = (sigma_alignment, "Sigma alignment: native/fitsect")
+            header["SIGKIND"] = (effective_sigma_kind, "Input map: sigma or invvar")
+            header["SIGMAXF"] = (sigma_max_factor, "Maximum sigma / median sky sigma")
+            header["SIGBAD"] = (extreme_sigma_pixels, "Extreme sigma pixels excluded")
             header["VARCLIP"] = (
                 clipped_variance_pixels,
                 "Pixels where extra variance clipped to zero",
@@ -936,16 +924,18 @@ def create_mock_images(
             header.add_history(
                 "Extra variance = max(total sigma^2 - measured sky RMS^2, 0)."
             )
+            if sigma_alignment == "fitsect":
+                header.add_history(
+                    "Sigma/noise image was cropped to the output image using FITSECT."
+                )
 
         header.add_history(
             "Mock = GALFIT model + block-resampled correlated sky noise."
         )
-
         if sigma_file is not None:
             header.add_history(
                 "Independent Gaussian extra noise was added from sigma map."
             )
-
         header.add_history(f"Sky regions: {region_file.name}")
         if mask_file is not None:
             header.add_history(f"GALFIT mask: {mask_file.name}")
@@ -953,18 +943,14 @@ def create_mock_images(
 
         if save_sky:
             sky_file = output_directory / f"{prefix}_sky_{index:04d}.fits"
-            fits.PrimaryHDU(data=sky_image, header=header.copy(),).writeto(
-                sky_file,
-                overwrite=True,
-                output_verify="fix",
+            fits.PrimaryHDU(data=sky_image, header=header.copy()).writeto(
+                sky_file, overwrite=True, output_verify="fix"
             )
             output_files.append(sky_file)
 
         mock_file = output_directory / f"{prefix}_mock_{index:04d}.fits"
-        fits.PrimaryHDU(data=mock_image, header=header,).writeto(
-            mock_file,
-            overwrite=True,
-            output_verify="fix",
+        fits.PrimaryHDU(data=mock_image, header=header).writeto(
+            mock_file, overwrite=True, output_verify="fix"
         )
         output_files.append(mock_file)
 
@@ -981,26 +967,22 @@ def parse_arguments() -> argparse.Namespace:
             "correlated sky noise from DS9 physical/image boxes to the "
             "model. An optional GALFIT mask excludes nonzero mask pixels "
             "from the sky donors. An optional sigma or inverse-variance "
-            "image adds only variance not represented by the sky blocks."
+            "image adds only variance not represented by the sky blocks. "
+            "External mask and sigma images can match either the GALFIT "
+            "output size or the original pre-crop image size; in the latter "
+            "case, they are cropped automatically using FITSECT."
         )
     )
     parser.add_argument(
-        "--version",
-        action="version",
-        version=f"%(prog)s {PROGRAM_VERSION}",
+        "--version", action="version", version=f"%(prog)s {PROGRAM_VERSION}"
     )
     parser.add_argument(
-        "galfit_file",
-        type=Path,
-        help="GALFIT output cube, such as img-out.fits.",
+        "galfit_file", type=Path, help="GALFIT output cube, such as img-out.fits."
     )
     parser.add_argument(
         "region_file",
         type=Path,
-        help=(
-            "DS9 file containing source-free sky boxes in physical or "
-            "image coordinates."
-        ),
+        help="DS9 file containing source-free sky boxes in physical or image coordinates.",
     )
     parser.add_argument(
         "-n",
@@ -1021,10 +1003,7 @@ def parse_arguments() -> argparse.Namespace:
         "--block-size",
         type=int,
         default=16,
-        help=(
-            "Square sky-bootstrap block size in pixels. It should exceed "
-            "the noise-correlation length. Default: 16."
-        ),
+        help="Square sky-bootstrap block size in pixels. Default: 16.",
     )
     parser.add_argument(
         "--image-ext",
@@ -1053,18 +1032,12 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument(
         "--keep-sky-level",
         action="store_true",
-        help=(
-            "Retain the absolute sky level in the sampled sky image. Use "
-            "only when the GALFIT model does not include the sky level."
-        ),
+        help="Retain the absolute sky level in the sampled sky image.",
     )
     parser.add_argument(
         "--transform-blocks",
         action="store_true",
-        help=(
-            "Randomly rotate and reflect sampled sky blocks. Their original "
-            "orientation is preserved by default."
-        ),
+        help="Randomly rotate and reflect sampled sky blocks.",
     )
     parser.add_argument(
         "--mock-only",
@@ -1077,65 +1050,49 @@ def parse_arguments() -> argparse.Namespace:
         type=Path,
         default=None,
         help=(
-            "Optional GALFIT mask image. Pixels equal to zero are usable; "
-            "nonzero or non-finite pixels are excluded from the DS9 sky "
-            "regions before estimating and resampling the background."
+            "Optional GALFIT mask image. It may have the same size as the "
+            "GALFIT output or the original input image; if needed, it is cropped "
+            "using FITSECT. Zero means usable; nonzero means masked."
         ),
     )
     parser.add_argument(
-        "--mask-ext",
-        type=int,
-        default=None,
-        help=(
-            "HDU containing the GALFIT mask. By default, the first 2D "
-            "image HDU is used."
-        ),
+        "--mask-ext", type=int, default=None, help="HDU containing the GALFIT mask."
     )
     parser.add_argument(
         "--sigma-image",
         type=Path,
         default=None,
         help=(
-            "Optional GALFIT sigma image or inverse-variance image. When "
-            "provided, only variance beyond the measured sky RMS is added."
+            "Optional GALFIT sigma image or inverse-variance image. It may have "
+            "the same size as the GALFIT output or the original input image; if "
+            "needed, it is cropped using FITSECT."
         ),
     )
     parser.add_argument(
         "--sigma-ext",
         type=int,
         default=None,
-        help=(
-            "HDU containing the sigma/noise map. By default, the first 2D "
-            "image HDU is used."
-        ),
+        help="HDU containing the sigma/noise map.",
     )
     parser.add_argument(
         "--sigma-kind",
         choices=("auto", "sigma", "invvar"),
         default="auto",
-        help=(
-            "Interpret --sigma-image as sigma or inverse variance. "
-            "Default: auto, inferred from filename/header."
-        ),
+        help="Interpret --sigma-image as sigma or inverse variance. Default: auto.",
     )
     parser.add_argument(
         "--sigma-max-factor",
         type=float,
         default=100.0,
-        help=(
-            "Ignore sigma values larger than this factor times the median "
-            "sigma measured inside the sky boxes. This suppresses poorly "
-            "covered pixels with tiny positive inverse variance. Default: 100."
-        ),
+        help="Ignore sigma values larger than this factor times the median sky sigma. Default: 100.",
     )
-
     return parser.parse_args()
 
 
 def mainGalfitSkyMock() -> None:
     """Run the command-line program."""
     args = parse_arguments()
-    # print(f"create_galfit_sky_mocks_v33 version {PROGRAM_VERSION}")
+    # print(f"create_galfit_sky_mocks_v34 version {PROGRAM_VERSION}")
     print("DS9 parser: built-in physical/image box parser (no regions package)")
 
     try:
