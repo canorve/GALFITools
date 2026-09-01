@@ -62,6 +62,9 @@ class ParameterStatistics:
     combined_error: float
     minimum: float
     maximum: float
+    reference_value: float | None = None
+    bias: float | None = None
+    bias_corrected_value: float | None = None
 
 
 @dataclass(frozen=True)
@@ -82,7 +85,6 @@ class ParameterLine:
     description: str
 
 
-# The indices refer to the order in which parameters appear in fit.log.
 MODEL_PARAMETER_NAMES: dict[str, tuple[str, ...]] = {
     "sersic": (
         "x",
@@ -208,7 +210,6 @@ MODEL_OUTPUT_LINES: dict[str, tuple[ParameterLine, ...]] = {
 }
 
 
-# Lines inserted because they do not appear in the compact fit.log output.
 MODEL_EXTRA_LINES: dict[str, tuple[str, ...]] = {
     "sersic": (
         " 6) 0.0000      0          # -----",
@@ -376,8 +377,6 @@ def parse_entry(
                 f"{len(fitted_tokens)} values but {len(fitted_errors)} errors."
             )
 
-        # The sky line includes two reference coordinates before its three
-        # fitted values. Keeping the last N tokens removes those coordinates.
         fitted_tokens = fitted_tokens[-len(fitted_errors) :]
         parameter_names = get_parameter_names(model_name, len(fitted_tokens))
 
@@ -416,8 +415,6 @@ def circular_mean(values: Sequence[float], period: float = 180.0) -> float:
     sine_sum = sum(math.sin(value * scale) for value in values)
     cosine_sum = sum(math.cos(value * scale) for value in values)
     mean_angle = math.atan2(sine_sum, cosine_sum) / scale
-
-    # Use the representation closest to the first fitted value.
     mean_angle += round((values[0] - mean_angle) / period) * period
     return mean_angle
 
@@ -432,10 +429,29 @@ def circular_deviation(
     return (value - mean + half_period) % period - half_period
 
 
+def validate_reference_structure(
+    reference_measurements: dict[ParameterKey, Measurement],
+    mock_measurements: dict[ParameterKey, Measurement],
+) -> None:
+    """Verify that the reference fit and mock fits use the same components."""
+    reference_keys = set(reference_measurements)
+    mock_keys = set(mock_measurements)
+
+    if reference_keys != mock_keys:
+        missing = mock_keys - reference_keys
+        additional = reference_keys - mock_keys
+        raise ValueError(
+            "The reference log has a different model structure from the mock "
+            f"fits. Missing in reference: {sorted(missing, key=str)}; "
+            f"additional in reference: {sorted(additional, key=str)}"
+        )
+
+
 def calculate_parameter_statistics(
     parsed_entries: list[dict[ParameterKey, Measurement]],
+    reference_measurements: dict[ParameterKey, Measurement] | None = None,
 ) -> list[ParameterStatistics]:
-    """Calculate mean values and propagated uncertainties."""
+    """Calculate statistics and, optionally, recovery bias."""
     if not parsed_entries:
         return []
 
@@ -452,6 +468,9 @@ def calculate_parameter_statistics(
                 f"Missing: {sorted(missing, key=str)}; "
                 f"additional: {sorted(additional, key=str)}"
             )
+
+    if reference_measurements is not None:
+        validate_reference_structure(reference_measurements, parsed_entries[0])
 
     number_of_fits = len(parsed_entries)
     results: list[ParameterStatistics] = []
@@ -496,6 +515,20 @@ def calculate_parameter_statistics(
             scatter_error_on_mean,
         )
 
+        reference_value: float | None = None
+        bias: float | None = None
+        bias_corrected_value: float | None = None
+
+        if reference_measurements is not None:
+            reference_value = reference_measurements[key].value
+
+            if key.name == "position_angle":
+                bias = circular_deviation(mean_value, reference_value)
+                bias_corrected_value = reference_value - bias
+            else:
+                bias = mean_value - reference_value
+                bias_corrected_value = reference_value - bias
+
         results.append(
             ParameterStatistics(
                 key=key,
@@ -508,13 +541,20 @@ def calculate_parameter_statistics(
                 combined_error=combined_error,
                 minimum=min(values),
                 maximum=max(values),
+                reference_value=reference_value,
+                bias=bias,
+                bias_corrected_value=bias_corrected_value,
             )
         )
 
     return results
 
 
-def write_csv(output_file: Path, results: Sequence[ParameterStatistics]) -> None:
+def write_csv(
+    output_file: Path,
+    results: Sequence[ParameterStatistics],
+    include_bias: bool,
+) -> None:
     """Write parameter statistics to CSV."""
     fieldnames = [
         "component",
@@ -532,30 +572,48 @@ def write_csv(output_file: Path, results: Sequence[ParameterStatistics]) -> None
         "maximum",
     ]
 
+    if include_bias:
+        fieldnames.extend(
+            [
+                "reference_value",
+                "bias",
+                "bias_corrected_value",
+            ]
+        )
+
     with output_file.open("w", encoding="utf-8", newline="") as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
 
         for result in results:
-            writer.writerow(
-                {
-                    "component": result.key.component,
-                    "model": result.key.model,
-                    "parameter": result.key.name,
-                    "parameter_index": result.key.index,
-                    "fit_toggle": result.toggle,
-                    "number_of_fits": result.number_of_fits,
-                    "mean": f"{result.mean:.12g}",
-                    "combined_error": f"{result.combined_error:.12g}",
-                    "formal_error_on_mean": (f"{result.formal_error_on_mean:.12g}"),
-                    "scatter_standard_deviation": (
-                        f"{result.scatter_standard_deviation:.12g}"
-                    ),
-                    "scatter_error_on_mean": (f"{result.scatter_error_on_mean:.12g}"),
-                    "minimum": f"{result.minimum:.12g}",
-                    "maximum": f"{result.maximum:.12g}",
-                }
-            )
+            row = {
+                "component": result.key.component,
+                "model": result.key.model,
+                "parameter": result.key.name,
+                "parameter_index": result.key.index,
+                "fit_toggle": result.toggle,
+                "number_of_fits": result.number_of_fits,
+                "mean": f"{result.mean:.12g}",
+                "combined_error": f"{result.combined_error:.12g}",
+                "formal_error_on_mean": f"{result.formal_error_on_mean:.12g}",
+                "scatter_standard_deviation": (
+                    f"{result.scatter_standard_deviation:.12g}"
+                ),
+                "scatter_error_on_mean": (f"{result.scatter_error_on_mean:.12g}"),
+                "minimum": f"{result.minimum:.12g}",
+                "maximum": f"{result.maximum:.12g}",
+            }
+
+            if include_bias:
+                row.update(
+                    {
+                        "reference_value": f"{result.reference_value:.12g}",
+                        "bias": f"{result.bias:.12g}",
+                        "bias_corrected_value": (f"{result.bias_corrected_value:.12g}"),
+                    }
+                )
+
+            writer.writerow(row)
 
 
 def format_parameter_value(value: float, parameter_name: str) -> str:
@@ -593,8 +651,6 @@ def write_component(
     ]
 
     for line_definition in line_definitions:
-        # Standard Sérsic files place the unused parameters 6--8 before
-        # axis ratio (9) and position angle (10).
         if line_definition.galfit_number == "9":
             lines.extend(MODEL_EXTRA_LINES.get(model, ()))
 
@@ -672,7 +728,10 @@ def write_galfit_file(
     output_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def print_results(results: Sequence[ParameterStatistics]) -> None:
+def print_results(
+    results: Sequence[ParameterStatistics],
+    include_bias: bool,
+) -> None:
     """Print a compact statistics summary."""
     current_component: tuple[int, str] | None = None
 
@@ -681,18 +740,31 @@ def print_results(results: Sequence[ParameterStatistics]) -> None:
         if component != current_component:
             current_component = component
             print(f"\nComponent {result.key.component}: {result.key.model}")
-            print("-" * 78)
+            if include_bias:
+                print("-" * 122)
+            else:
+                print("-" * 78)
 
-        print(
-            f"{result.key.name:24s} = "
-            f"{result.mean:14.7g} +/- {result.combined_error:10.4g} "
-            f"toggle={result.toggle}"
-        )
+        if include_bias:
+            print(
+                f"{result.key.name:24s} "
+                f"mean={result.mean:12.7g}  "
+                f"std={result.scatter_standard_deviation:10.4g}  "
+                f"reference={result.reference_value:12.7g}  "
+                f"bias={result.bias:+10.4g}  "
+                f"corrected={result.bias_corrected_value:12.7g}  "
+                f"toggle={result.toggle}"
+            )
+        else:
+            print(
+                f"{result.key.name:24s} = "
+                f"{result.mean:14.7g} +/- {result.combined_error:10.4g} "
+                f"toggle={result.toggle}"
+            )
 
 
 def validate_headers(headers: Sequence[LogHeader]) -> LogHeader:
-    """Verify that all fit.log entries refer to the same image and region."""
-    reference = headers[0]
+    """Return the first header; mock input/output names may differ."""
     # removed because of sim images are different
     # for entry_number, header in enumerate(headers[1:], start=2):
     #    if header != reference:
@@ -700,18 +772,55 @@ def validate_headers(headers: Sequence[LogHeader]) -> LogHeader:
     #            f"Entry {entry_number} has different input/output image or "
     #            "fitting-region information."
     #        )
-    return reference
+
+    return headers[0]
+
+
+def read_reference_measurements(
+    reference_log: Path,
+) -> tuple[dict[ParameterKey, Measurement], int, int]:
+    """Read the last GALFIT entry from a reference fit.log."""
+    if not reference_log.is_file():
+        raise ValueError(f"Reference log does not exist: {reference_log}")
+
+    reference_text = reference_log.read_text(encoding="utf-8")
+    reference_entries = split_entries(reference_text)
+
+    if not reference_entries:
+        raise ValueError(
+            f"No GALFIT entries were found in reference log: {reference_log}"
+        )
+
+    selected_entry_number = len(reference_entries)
+    measurements = parse_entry(
+        reference_entries[-1],
+        selected_entry_number,
+    )
+
+    return measurements, selected_entry_number, len(reference_entries)
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
             "Calculate mean GALFIT parameters and uncertainties from fit.log, "
-            "then write both a CSV table and a GALFIT input file."
+            "then write both a CSV table and a GALFIT input file. If a "
+            "reference log is supplied, also estimate recovery bias."
         )
     )
 
     parser.add_argument("fit_log", type=Path, help="GALFIT fit.log file")
+    parser.add_argument(
+        "--reference-log",
+        "-reference-log",
+        type=Path,
+        default=None,
+        help=(
+            "Optional fit.log for the original/reference galaxy. The last "
+            "entry is used as the injected/reference parameter set. When "
+            "omitted, bias quantities are not calculated or printed."
+        ),
+    )
     parser.add_argument(
         "-o",
         "--output",
@@ -726,7 +835,6 @@ def build_parser() -> argparse.ArgumentParser:
         help="Mean-parameter GALFIT file (default: galfit_mean.init)",
     )
 
-    # Optional overrides for values normally recovered from fit.log.
     parser.add_argument("--input-image", help="Override GALFIT A)")
     parser.add_argument("--output-image", help="Override GALFIT B)")
     parser.add_argument(
@@ -737,7 +845,6 @@ def build_parser() -> argparse.ArgumentParser:
         help="Override GALFIT H)",
     )
 
-    # Header values absent from fit.log.
     parser.add_argument(
         "--sigma-image",
         default="sigma.fits",
@@ -797,7 +904,7 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         choices=(0, 1, 2, 3),
         default=0,
-        help="GALFIT P) value (default: 2)",
+        help="GALFIT P) value (default: 0)",
     )
 
     return parser
@@ -821,9 +928,23 @@ def main_meanParamUncer() -> None:
             parse_entry(entry, entry_number)
             for entry_number, entry in enumerate(entries, start=1)
         ]
-        results = calculate_parameter_statistics(parsed_entries)
 
-        # A, B, and H are read from fit.log unless explicitly overridden.
+        reference_measurements: dict[ParameterKey, Measurement] | None = None
+        reference_entry_number: int | None = None
+        reference_entry_count: int | None = None
+
+        if args.reference_log is not None:
+            (
+                reference_measurements,
+                reference_entry_number,
+                reference_entry_count,
+            ) = read_reference_measurements(args.reference_log)
+
+        results = calculate_parameter_statistics(
+            parsed_entries,
+            reference_measurements=reference_measurements,
+        )
+
         if args.fit_region is None:
             headers = [extract_log_header(entry) for entry in entries]
             header = validate_headers(headers)
@@ -841,7 +962,8 @@ def main_meanParamUncer() -> None:
             fit_region=header.fit_region,
         )
 
-        write_csv(args.output, results)
+        include_bias = reference_measurements is not None
+        write_csv(args.output, results, include_bias=include_bias)
         write_galfit_file(
             output_file=args.galfit_output,
             results=results,
@@ -863,7 +985,18 @@ def main_meanParamUncer() -> None:
         parser.error(str(error))
 
     print(f"Entries analyzed : {len(entries)}")
-    print_results(results)
+
+    if args.reference_log is not None:
+        print(f"Reference log    : {args.reference_log}")
+        if reference_entry_count and reference_entry_count > 1:
+            print(
+                f"Reference entry  : {reference_entry_number} "
+                f"(last of {reference_entry_count})"
+            )
+        else:
+            print("Reference entry  : 1")
+
+    print_results(results, include_bias=args.reference_log is not None)
     print(f"\nCSV output       : {args.output}")
     print(f"GALFIT output    : {args.galfit_output}")
 
