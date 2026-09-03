@@ -64,7 +64,7 @@ class ParameterStatistics:
     maximum: float
     reference_value: float | None = None
     bias: float | None = None
-    bias_corrected_value: float | None = None
+    bootstrap_corrected_value: float | None = None
 
 
 @dataclass(frozen=True)
@@ -517,17 +517,17 @@ def calculate_parameter_statistics(
 
         reference_value: float | None = None
         bias: float | None = None
-        bias_corrected_value: float | None = None
+        bootstrap_corrected_value: float | None = None
 
         if reference_measurements is not None:
             reference_value = reference_measurements[key].value
 
             if key.name == "position_angle":
                 bias = circular_deviation(mean_value, reference_value)
-                bias_corrected_value = reference_value - bias
+                bootstrap_corrected_value = reference_value - bias
             else:
                 bias = mean_value - reference_value
-                bias_corrected_value = reference_value - bias
+                bootstrap_corrected_value = reference_value - bias
 
         results.append(
             ParameterStatistics(
@@ -543,7 +543,7 @@ def calculate_parameter_statistics(
                 maximum=max(values),
                 reference_value=reference_value,
                 bias=bias,
-                bias_corrected_value=bias_corrected_value,
+                bootstrap_corrected_value=bootstrap_corrected_value,
             )
         )
 
@@ -577,7 +577,7 @@ def write_csv(
             [
                 "reference_value",
                 "bias",
-                "bias_corrected_value",
+                "bootstrap_corrected_value",
             ]
         )
 
@@ -609,7 +609,9 @@ def write_csv(
                     {
                         "reference_value": f"{result.reference_value:.12g}",
                         "bias": f"{result.bias:.12g}",
-                        "bias_corrected_value": (f"{result.bias_corrected_value:.12g}"),
+                        "bootstrap_corrected_value": (
+                            f"{result.bootstrap_corrected_value:.12g}"
+                        ),
                     }
                 )
 
@@ -752,7 +754,7 @@ def print_results(
                 f"std={result.scatter_standard_deviation:10.4g}  "
                 f"reference={result.reference_value:12.7g}  "
                 f"bias={result.bias:+10.4g}  "
-                f"corrected={result.bias_corrected_value:12.7g}  "
+                f"bootstrap_corrected={result.bootstrap_corrected_value:12.7g}  "
                 f"toggle={result.toggle}"
             )
         else:
@@ -818,7 +820,9 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "Optional fit.log for the original/reference galaxy. The last "
             "entry is used as the injected/reference parameter set. When "
-            "omitted, bias quantities are not calculated or printed."
+            "omitted, bias quantities are not calculated or printed. The bootstrap "
+            "corrected value is diagnostic and is not automatically preferred "
+            "over the reference fit."
         ),
     )
     parser.add_argument(
@@ -995,6 +999,14 @@ def main_meanParamUncer() -> None:
             )
         else:
             print("Reference entry  : 1")
+        print(
+            "Bias definition   : mean(mock) - reference; "
+            "bootstrap_corrected = reference - bias"
+        )
+        print(
+            "Note              : bootstrap_corrected is diagnostic; "
+            "do not adopt it automatically."
+        )
 
     print_results(results, include_bias=args.reference_log is not None)
     print(f"\nCSV output       : {args.output}")
