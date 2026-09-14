@@ -205,7 +205,7 @@ def getBarSize(
 
     rbarminor = rbar * AxRat
 
-    elline = "ellipse({:.2f}, {:.2f}, {:.2f}, {:.2f} {:.2f}) \n".format(
+    elline = "ellipse({:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}) \n".format(
         X, Y, rbarminor, rbar, theta
     )
     fout.write(elline)
