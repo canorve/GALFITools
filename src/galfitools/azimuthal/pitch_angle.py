@@ -32,14 +32,14 @@ It also writes:
 
 Examples
 --------
-pitch_angle.py galfit.02
+pitchAngle galfit.02
 
-pitch_angle.py galfit.02 --component 2
+pitchAngle galfit.02 --component 2
 
-pitch_angle.py galfit.02 \
+pitchAngle galfit.02 \
     --median-rmin 30 --median-rmax 150
 
-pitch_angle.py galfit.02 \
+pitchAngle galfit.02 \
     --rmin 5 --rmax 220 \
     --median-rmin 30 --median-rmax 150 \
     --output-prefix ngc3627_pitch
@@ -366,8 +366,11 @@ def save_summary(
     component,
     pars,
     stats,
+    requested_stats_rmin,
+    requested_stats_rmax,
     stats_rmin,
     stats_rmax,
+    stats_range_clipped,
     plate_scale,
     reversals,
 ):
@@ -396,7 +399,19 @@ def save_summary(
         mean_scale = 0.5 * (plate_scale[0] + plate_scale[1])
         lines.append(f"Plate scale       : {mean_scale:.6g} arcsec/pix")
 
+    if stats_range_clipped:
+        lines.append(
+            f"Requested range   : {requested_stats_rmin:.6g} -- "
+            f"{requested_stats_rmax:.6g} pix"
+        )
+
     lines.append(f"Statistics range  : {stats_rmin:.6g} -- {stats_rmax:.6g} pix")
+
+    if stats_range_clipped:
+        lines.append(
+            "WARNING            : requested statistics limits were "
+            "clipped to the computed radial profile."
+        )
     lines.append(f"Samples used      : {stats['n']}")
     lines.append(f"Pitch p16         : {stats['p16']:.6f} deg")
     lines.append(f"Pitch median      : {stats['median']:.6f} deg")
@@ -682,18 +697,33 @@ def mainpitchAngle():
         dtheta_dr,
     )
 
-    stats_rmin = (
-        max(radius_min, max(0.0, r_in))
-        if args.median_rmin is None
-        else args.median_rmin
+    # The --median-rmin/--median-rmax options select the radial interval
+    # used for the statistics. They are always specified in pixels.
+    # Clip that requested interval to the radius range that was actually
+    # computed. This prevents plot/statistics limits from extending beyond
+    # the sampled pitch-angle profile.
+    requested_stats_rmin = (
+        max(0.0, r_in) if args.median_rmin is None else args.median_rmin
     )
 
-    stats_rmax = (
-        min(radius_max, r_out) if args.median_rmax is None else args.median_rmax
-    )
+    requested_stats_rmax = r_out if args.median_rmax is None else args.median_rmax
+
+    if requested_stats_rmax <= requested_stats_rmin:
+        raise SystemExit("Require median-rmin < median-rmax.")
+
+    stats_rmin = max(radius_min, requested_stats_rmin)
+    stats_rmax = min(radius_max, requested_stats_rmax)
 
     if stats_rmax <= stats_rmin:
-        raise SystemExit("Require median-rmin < median-rmax.")
+        raise SystemExit(
+            "The requested statistics interval does not overlap the "
+            "computed radial profile. Adjust --rmin/--rmax or "
+            "--median-rmin/--median-rmax."
+        )
+
+    stats_range_clipped = not np.isclose(
+        stats_rmin, requested_stats_rmin
+    ) or not np.isclose(stats_rmax, requested_stats_rmax)
 
     stats = compute_statistics(
         radius,
@@ -746,8 +776,11 @@ def mainpitchAngle():
         component,
         pars,
         stats,
+        requested_stats_rmin,
+        requested_stats_rmax,
         stats_rmin,
         stats_rmax,
+        stats_range_clipped,
         plate_scale,
         reversals,
     )
@@ -800,7 +833,20 @@ def mainpitchAngle():
     if np.isfinite(mean_scale):
         print(f"Plate scale       : {mean_scale:.6g} arcsec/pix")
 
+    if stats_range_clipped:
+        print(
+            f"Requested range   : {requested_stats_rmin:.6g} -- "
+            f"{requested_stats_rmax:.6g} pix"
+        )
+
     print(f"Statistics range  : {stats_rmin:.6g} -- " f"{stats_rmax:.6g} pix")
+
+    if stats_range_clipped:
+        print(
+            "WARNING            : requested statistics limits were "
+            "clipped to the computed radial profile. Use --rmin/--rmax "
+            "to extend the computed profile if that is intentional."
+        )
     print(f"Samples used      : {stats['n']}")
     print(f"Pitch p16         : {stats['p16']:.6f} deg")
     print(f"Pitch median      : {stats['median']:.6f} deg")
