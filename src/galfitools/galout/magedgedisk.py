@@ -63,29 +63,24 @@ def edgedisk_total_magnitude(
 
 
 def magEdge(galfile, numedge=2):
-    """Computes the magnitude of the EdgeDisk function.
-
-    It converts a exponential function (or Sersic with n = 1)
-    to a edgedisk function
+    """
+    Compute the total magnitude of a GALFIT EdgeDisk component.
 
     Parameters
     ----------
-    galfitFile: str
-            name of the GALFIT file
-    numexp: int
-            component number (position in input file) of the exponential function
-            default = 2
+    galfile : str
+        GALFIT input or output parameter file.
+    numedge : int, optional
+        GALFIT component number of the EdgeDisk component.
+        GALFIT component numbering starts at 1. Default is 2.
 
     Returns
     -------
-    magedge: magnitude of the EdgeDisk function
-
-    See Also
-    --------
-    exp2edge: Convert a Exponential function to EdgeDisk function.
-
-
+    float
+        Total magnitude of the EdgeDisk component.
     """
+
+    numedge = numedge - 1  # correcting from galfit component to python index
 
     galfit = Galfit(galfile)
 
