@@ -663,13 +663,13 @@ def maingetNds9(argv=None) -> int:
     p.add_argument(
         "-r80",
         "--rad80",
-        help="Formula uses 80% total light as Re ",
+        help="Formula uses 80%% total light as Re ",
         action="store_true",
     )
     p.add_argument(
         "-r20",
         "--rad20",
-        help="Formula uses 20% total light as Re ",
+        help="Formula uses 20%% total light as Re ",
         action="store_true",
     )
 
