@@ -2,6 +2,7 @@
 
 import os
 import os.path
+from pathlib import Path
 
 import numpy as np
 from astropy.io import fits
@@ -10,7 +11,13 @@ from galfitools.galin.std import MakeImage
 
 
 def makeMask(
-    sexfile: str, image: str, maskfile: str, scale: float, satfileout: str
+    sexfile: str,
+    image: str,
+    maskfile: str,
+    scale: float,
+    satfileout: str,
+    region_dir="kron_regions",
+    region_id=None,
 ) -> None:
     """Creates a mask file from a catalog of SExtractor
 
@@ -31,6 +38,15 @@ def makeMask(
             Scale factor by which the ellipse will be enlarged or diminished.
     satfileout: str
             DS9 region file where the saturation regions will be indicated
+
+    region_dir : str or pathlib.Path or None
+            Directory for ellipse_<catalog ID>.reg files. Created automatically.
+            Default: "kron_regions" relative to the working directory.
+            Set to None to disable region export. Existing matching files are
+            overwritten; unrelated files are retained.
+    region_id : int or None
+            Export only this catalog ID, or all masked objects if None.
+            Objects excluded by saturation checks are not exported.
 
     Returns
     -------
@@ -62,11 +78,27 @@ def makeMask(
 
     MakeImage(maskfile, NCol, NRow)
 
-    MakeMask(maskfile, sexarsort, scale, 0, satfileout)  # offset set to 0
+    MakeMask(
+        maskfile,
+        sexarsort,
+        scale,
+        0,
+        satfileout,
+        region_dir=region_dir,
+        region_id=region_id,
+    )  # offset set to 0
     MakeSatBox(maskfile, satfileout, Total + 1, NCol, NRow)  # make sat region
 
 
-def MakeMask(maskimage, catfile, scale, offset, regfile):
+def MakeMask(
+    maskimage,
+    catfile,
+    scale,
+    offset,
+    regfile,
+    region_dir="kron_regions",
+    region_id=None,
+):
     """Creates ellipse masks for every object of the SExtractor catalog
 
     Parameters
@@ -81,6 +113,15 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
             constant to be added to the ellipse size
     regfile: str
             DS9 region file containing the saturated region.
+
+    region_dir : str or pathlib.Path or None
+            Directory for ellipse_<catalog ID>.reg files. Created automatically.
+            Default: "kron_regions" relative to the working directory.
+            Set to None to disable region export. Existing matching files are
+            overwritten; unrelated files are retained.
+    region_id : int or None
+            Export only this catalog ID, or all masked objects if None.
+            Objects excluded by saturation checks are not exported.
 
     Returns
     -------
@@ -160,6 +201,9 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
                 sxsmax[idx],
                 sysmin[idx],
                 sysmax[idx],
+                region_dir=(
+                    region_dir if region_id is None or val == region_id else None
+                ),
             )
 
     print("ignoring objects where one or more pixels are saturated \n")
@@ -171,7 +215,9 @@ def MakeMask(maskimage, catfile, scale, offset, regfile):
     return True
 
 
-def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
+def MakeKron(
+    imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax, region_dir=None
+):
     """This creates a ellipse in an image
 
     This function creates an ellipse and fills the pixels inside it
@@ -188,6 +234,11 @@ def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
     ell : ellipticity of the ellipse
     xmin, xmax, ymin, ymax : int, int, int, int
             box delimitation of the ellipse
+    region_dir : str or pathlib.Path or None
+            Optional output directory for this ellipse as a DS9 image region.
+            The region describes the full ellipse before clipping and overlaps.
+            Centers are shifted by +1 to match this function's existing
+            zero-based rasterization in DS9 one-based image coordinates.
 
     Returns
     -------
@@ -203,6 +254,19 @@ def MakeKron(imagemat, idn, x, y, R, theta, ell, xmin, xmax, ymin, ymax):
 
     q = 1 - ell
     bim = q * R
+
+    if region_dir is not None:
+        output_dir = Path(region_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        region_path = output_dir / f"ellipse_{int(idn)}.reg"
+        region_path.write_text(
+            "# Region file format: DS9 version 4.1\n"
+            "global color=green width=1\n"
+            "image\n"
+            f"ellipse({x + 1:.10g},{y + 1:.10g},{R:.10g},{bim:.10g},"
+            f"{theta:.10g}) # text={{{int(idn)}}}\n",
+            encoding="utf-8",
+        )
 
     theta = theta * np.pi / 180  # Rads!!!
 
