@@ -7,7 +7,7 @@ import subprocess as sp
 import numpy as np
 from astropy.io import fits
 from galfitools.galin.std import GetAxis
-from galfitools.galin.MakeMask import ds9satbox
+from galfitools.sex.MakeMask import ds9satbox
 from galfitools.mge.mge2galfit import PrintHeader
 from galfitools.mge.mge2galfit import PrintSky
 
