@@ -16,7 +16,7 @@ from galfitools.galin.std import Ds9ell2Kronellv2
 from galfitools.galin.std import GetInfoEllip
 from galfitools.galin.std import GetPmax
 from galfitools.galin.std import GetExpTime
-from galfitools.galin.MakeMask import CheckFlag
+from galfitools.sex.MakeMask import CheckFlag
 from mgefit.mge_fit_sectors import mge_fit_sectors
 from mgefit.mge_fit_sectors_regularized import mge_fit_sectors_regularized
 from mgefit.mge_fit_sectors_twist import mge_fit_sectors_twist
