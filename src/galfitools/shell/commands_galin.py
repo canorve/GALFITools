@@ -8,7 +8,6 @@ from galfitools.galin.getSersic import getSersic
 from galfitools.galin.getStar import getStar
 from galfitools.galin.getGalaxy import getGalaxy
 from galfitools.galin.imarith import imarith
-from galfitools.galin.MakeMask import makeMask
 from galfitools.galin.MakePSF import makePSF
 from galfitools.galin.MaskDs9 import maskDs9
 from galfitools.galin.MaskSky import maskSky
@@ -117,58 +116,6 @@ def mainGetGalaxy(argv=None) -> int:
     print(f"Done. Object fits file: {args.out} created ")
     if args.sigma:  # pragma: no cover
         print(f"Done. sigma fits file: {args.sigout} created ")
-    return 0
-
-
-def mainMakeMask(argv=None) -> int:
-    printWelcome()
-    parser = argparse.ArgumentParser(
-        description="creates mask file from a SExtractor catalog"
-    )
-    parser.add_argument("Sexfile", help="SExtractor catalog file")
-    parser.add_argument("ImageFile", help="Image file")
-    parser.add_argument(
-        "-o",
-        "--maskout",
-        type=str,
-        default="masksex.fits",
-        help="output mask file name",
-    )
-    parser.add_argument(
-        "-sf", "--satds9", type=str, default="ds9sat.reg", help="ds9 saturation file"
-    )
-    parser.add_argument(
-        "-s", "--scale", type=float, default=1, help="scale factor for ellipses"
-    )
-
-    parser.add_argument(
-        "-rd",
-        "--region_dir",
-        type=str,
-        default="kron_regions",
-        help="output ellipse region ID catalog. 'None' for all ellipses",
-    )
-
-    parser.add_argument(
-        "-ri",
-        "--region_id",
-        type=int,
-        default=None,
-        help="output ellipse region ID catalog. Number for specific ID ellipse or 'None' for all ellipses",
-    )
-
-    args = parser.parse_args(argv)
-
-    makeMask(
-        args.Sexfile,
-        args.ImageFile,
-        args.maskout,
-        args.scale,
-        args.satds9,
-        args.region_dir,
-        args.region_id,
-    )
-    print("Done. Mask image created ")
     return 0
 
 
