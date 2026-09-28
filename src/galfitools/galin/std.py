@@ -113,8 +113,8 @@ def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
     ----------
     obj : str
           object name
-    xpos : float, x-center
-    ypos : float, y-center
+    xpos : int, x-center
+    ypos : int, y-center
     rx : float, major or minor axis
     ry : float, minor or major axis
     angle : float, angular position
@@ -145,6 +145,9 @@ def Ds9ell2Kronell(xpos, ypos, rx, ry, angle):
         theta = angle + 90
         xx = xpos
         yy = ypos
+
+    xx = round(xx)
+    yy = round(yy)
 
     return xx, yy, Rkron, theta, e
 

@@ -6,6 +6,7 @@ from galfitools.galin.checkGalFile import checkFile
 from galfitools.galin.getBoxSizeDs9 import getBoxSizeDs9
 from galfitools.galin.getSersic import getSersic
 from galfitools.galin.getStar import getStar
+from galfitools.galin.getGalaxy import getGalaxy
 from galfitools.galin.imarith import imarith
 from galfitools.galin.MakeMask import makeMask
 from galfitools.galin.MakePSF import makePSF
@@ -60,6 +61,59 @@ def mainGetStar(argv=None) -> int:
         args.sigma,
         args.sigout,
     )
+    print(f"Done. Object fits file: {args.out} created ")
+    if args.sigma:  # pragma: no cover
+        print(f"Done. sigma fits file: {args.sigout} created ")
+    return 0
+
+
+def mainGetGalaxy(argv=None) -> int:
+    printWelcome()
+    parser = argparse.ArgumentParser(
+        description="gets an image slice centered on the object peak"
+    )
+    parser.add_argument("image", help="the image file to obtain the slice")
+    parser.add_argument(
+        "Ds9regFile", help="the DS9 ellipse region file containing the star"
+    )
+    parser.add_argument(
+        "-s", "--sky", type=float, help="the sky background to be removed"
+    )
+    parser.add_argument(
+        "-o", "--out", type=str, help="the image output.", default="galaxy.fits"
+    )
+    parser.add_argument("-sig", "--sigma", type=str, help="introduce the sigma image")
+    parser.add_argument(
+        "-so",
+        "--sigout",
+        type=str,
+        help="the sigma image output.",
+        default="sigma.fits",
+    )
+
+    parser.add_argument(
+        "-sc",
+        "--scale",
+        default=6,
+        type=float,
+        help="factor to multiply galaxy size to enlarge image size. Default=6",
+    )
+
+    args = parser.parse_args(argv)
+
+    (x_small, y_small, xcor, ycor) = getGalaxy(
+        args.image,
+        args.regfile,
+        args.sky,
+        args.out,
+        args.sigma,
+        args.sigout,
+        args.scale,
+    )
+
+    print("new (x,y) galaxy coordinates:")
+    print(x_small, y_small)
+
     print(f"Done. Object fits file: {args.out} created ")
     if args.sigma:  # pragma: no cover
         print(f"Done. sigma fits file: {args.sigout} created ")
