@@ -13,7 +13,7 @@ from pathlib import Path
 from galfitools.galin.getStar import getStar
 from galfitools.galin.MaskDs9 import maskDs9
 
-from galfitools.galin.MakeMask import makeMask
+from galfitools.sex.MakeMask import makeMask
 from galfitools.galin.MaskSky import maskSky
 from galfitools.galin.xy2fits import xy2fits
 
