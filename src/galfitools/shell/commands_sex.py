@@ -5,6 +5,7 @@ import argparse
 from pathlib import Path
 
 from galfitools.sex.MakeMask import makeMask
+from galfitools.sex.MakeReg import makeReg
 from galfitools.sex.filter_sextractor import filter_catalog
 from galfitools.shell.prt import printWelcome
 
@@ -54,6 +55,45 @@ def mainMakeMask(argv=None) -> int:
         args.maskout,
         args.scale,
         args.satds9,
+        args.region_dir,
+        args.region_id,
+    )
+    print("Done. Mask image created ")
+    return 0
+
+
+def mainMakeReg(argv=None) -> int:
+    printWelcome()
+    parser = argparse.ArgumentParser(
+        description="creates Ds9 ellipse regions from a SExtractor catalog"
+    )
+    parser.add_argument("Sexfile", help="SExtractor catalog file")
+
+    parser.add_argument(
+        "-s", "--scale", type=float, default=1, help="scale factor for ellipses"
+    )
+
+    parser.add_argument(
+        "-rd",
+        "--region_dir",
+        type=str,
+        default="kron_regions",
+        help="output ellipse region ID catalog. 'None' for all ellipses",
+    )
+
+    parser.add_argument(
+        "-ri",
+        "--region_id",
+        type=int,
+        default=None,
+        help="output ellipse region ID catalog. Number for specific ID ellipse or 'None' for all ellipses",
+    )
+
+    args = parser.parse_args(argv)
+
+    makeReg(
+        args.Sexfile,
+        args.scale,
         args.region_dir,
         args.region_id,
     )
