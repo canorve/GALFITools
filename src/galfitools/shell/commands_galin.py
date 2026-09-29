@@ -73,10 +73,14 @@ def mainGetGalaxy(argv=None) -> int:
     )
     parser.add_argument("image", help="the image file to obtain the slice")
     parser.add_argument(
-        "Ds9regFile", help="the DS9 ellipse region file containing the star"
+        "Ds9regFile", help="the DS9 ellipse region file containing the galaxy"
     )
     parser.add_argument(
-        "-s", "--sky", type=float, help="the sky background to be removed"
+        "-s",
+        "--sky",
+        default=0,
+        type=float,
+        help="the sky background to be removed. Default=0",
     )
     parser.add_argument(
         "-o", "--out", type=str, help="the image output.", default="galaxy.fits"
@@ -102,7 +106,7 @@ def mainGetGalaxy(argv=None) -> int:
 
     (x_small, y_small, xcor, ycor) = getGalaxy(
         args.image,
-        args.regfile,
+        args.Ds9regFile,
         args.sky,
         args.out,
         args.sigma,
@@ -111,7 +115,7 @@ def mainGetGalaxy(argv=None) -> int:
     )
 
     print("new (x,y) galaxy coordinates:")
-    print(x_small, y_small)
+    print(f"({x_small:.2f}, {y_small:.2f})")
 
     print(f"Done. Object fits file: {args.out} created ")
     if args.sigma:  # pragma: no cover

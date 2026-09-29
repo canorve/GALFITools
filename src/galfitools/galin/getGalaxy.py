@@ -62,6 +62,14 @@ def getGalaxy(
     # enlarge galaxy image for this factor
     rx = rx * scale
     ry = ry * scale
+
+    # 30 is the minimum size:
+    if rx < 30:
+        rx = 30
+
+    if ry < 30:
+        ry = 30
+
     xx, yy, Rkron, theta, eps = Ds9ell2Kronellv2(xpos, ypos, rx, ry, angle)
 
     (xmin, xmax, ymin, ymax) = GetSize(xx, yy, Rkron, theta + 90, eps, ncol, nrow)
