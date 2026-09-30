@@ -97,7 +97,7 @@ def mainMakeReg(argv=None) -> int:
         args.region_dir,
         args.region_id,
     )
-    print("Done. Mask image created ")
+    print("Done. Ds9 ellipse regions created ")
     return 0
 
 

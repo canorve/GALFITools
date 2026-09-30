@@ -117,7 +117,7 @@ def MakeRegs(
     if mask.any():  # pragma: no cover
         Rkron[mask] = 1
 
-    print("Creating ellipse ds9 regs for every object \n")
+    print("Creating Ds9 ellipse region for every object \n")
 
     for idx, val in enumerate(n):
 
