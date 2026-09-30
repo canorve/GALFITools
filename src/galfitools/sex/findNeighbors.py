@@ -86,9 +86,6 @@ def CheckFlag(val, check, maxx=128):
     return flag
 
 
-######## new code for findNeighbors
-
-
 def CheckOverlap(xpos, ypos, R, theta, q, xpos2, ypos2, R2, theta2, q2):
     "Check the distance of two ellipses. returns True if they overlap"
 
