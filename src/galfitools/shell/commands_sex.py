@@ -6,6 +6,7 @@ from pathlib import Path
 
 from galfitools.sex.MakeMask import makeMask
 from galfitools.sex.MakeReg import makeReg
+from galfitools.sex.findNeighbors import findNeigh
 from galfitools.sex.filter_sextractor import filter_catalog
 from galfitools.shell.prt import printWelcome
 
@@ -140,4 +141,34 @@ def mainFilterSex(argv=None):
     print(f"Objects read: {total}; retained: {kept}; rejected: {total - kept}")
     print(f"Output: {args.output}")
 
+    return 0
+
+
+def mainFindNeigh(argv=None) -> int:
+    printWelcome()
+    parser = argparse.ArgumentParser(
+        description="creates mask file from a SExtractor catalog"
+    )
+    parser.add_argument("Sexfile", help="SExtractor catalog file")
+    parser.add_argument("Num", type=int, help="Catalog ID to find neighbors")
+    parser.add_argument(
+        "-s", "--scale", type=float, default=1, help="scale factor for ellipses"
+    )
+
+    parser.add_argument(
+        "-off",
+        "--offset",
+        type=int,
+        default=1,
+        help="offset value to be added to elliipse radius",
+    )
+
+    args = parser.parse_args(argv)
+
+    findNeigh(
+        args.Sexfile,
+        args.Num,
+        args.scale,
+        args.offset,
+    )
     return 0
