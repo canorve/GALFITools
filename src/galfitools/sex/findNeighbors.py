@@ -152,7 +152,7 @@ def CheckOverlap(xpos, ypos, R, theta, q, xpos2, ypos2, R2, theta2, q2):
     return flag
 
 
-def FindNeighbors2(catfile, n, KronScale=1, offset=0):
+def FindNeighbors2(catfile: str, n: int, KronScale=1, offset=0):
 
     #  This subroutine find neighbors for every galaxy
     #  note for myself: make a tree code of this in the future
