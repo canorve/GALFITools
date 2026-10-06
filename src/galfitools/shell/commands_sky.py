@@ -171,12 +171,13 @@ def mainSkyRing(argv=None) -> int:
     )
 
     print(f"Sky at radius {rad:.2f} \n")
-    print(f"  mean  sigma  median ")
-    print(f"  mag  mag  mag ")
-    print(f"   {mean:.3f}   {std:.3f}   {median:.3f}  \n")
+    print(f"  mean    sigma   median ")
+    print(f"  mag     mag     mag ")
+    print(f"  {mean:.2f}  {std:.2f}    {median:.2f}  \n")
 
     print(f"Surface brighntess sky at radius {rad:.2f} \n")
-    print(f"  mag/''^2   mag/''^2 ")
+    print(f"   mean       sigma")
+    print(f"   mag/''^2   mag/''^2 ")
     print(f"   {ms:.2f}   {mstd:.2f}  \n")
 
     return 0
