@@ -1425,7 +1425,8 @@ def getReComp(
         theta = angle
     else:
         if num_comp != 1:
-            theta = galcomps.PosAng[maskgal][num_comp - 1]
+            # theta = galcomps.PosAng[maskgal][num_comp] #buggy
+            theta = galcomps.PosAng[num_comp - 1]
         else:
             theta = galcomps.PosAng[maskgal][-1]
 
@@ -1495,8 +1496,8 @@ class GetMe:
 
         maskgal = comps.Active == 1
 
-        masksersic = comps.NameComp[maskgal] == "sersic"
-        maskferrer = comps.NameComp[maskgal] == "ferrer"
+        masksersic = (comps.NameComp == "sersic") * (maskgal == True)
+        maskferrer = (comps.NameComp == "ferrer") * (maskgal == True)
 
         name_comp = comps.NameComp[maskgal]
 
@@ -1504,6 +1505,7 @@ class GetMe:
         itotser = 0
         itotfer = 0
         if np.any(name_comp == "sersic"):
+
             itotser = self.Itotser(
                 EffRad,
                 comps.Ie[masksersic],
