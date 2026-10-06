@@ -22,6 +22,8 @@ def getGalaxy(
     sigma: str,
     sigout: str,
     scale=6,
+    regFile="ellipse_imout.reg",
+    idx=1,
 ):
     """extracts a piece of the image file
 
@@ -46,6 +48,14 @@ def getGalaxy(
         name of the output sigma image file
     scale: float
          enlarge the image for this factor. Default = 6
+    regFile: str
+        name of the output Ds9 region file for the new image
+
+    Output
+    ------
+        imout: new image
+        regFile: new Ds9 ellipse in the new image
+
 
     Returns
     -------
@@ -57,11 +67,11 @@ def getGalaxy(
 
     (ncol, nrow) = GetAxis(image)
 
-    obj, xpos, ypos, rx, ry, angle = GetInfoEllip(regfile)
+    obj, xpos, ypos, rxx, ryy, angle = GetInfoEllip(regfile)
 
     # enlarge galaxy image for this factor
-    rx = rx * scale
-    ry = ry * scale
+    rx = rxx * scale
+    ry = ryy * scale
 
     # 30 is the minimum size:
     if rx < 30:
@@ -86,7 +96,42 @@ def getGalaxy(
     x_small = xx - x_cor
     y_small = yy - y_cor
 
+    # writing output to DS9 File
+    writeDs9Ellipse(
+        idx,
+        x_small,
+        y_small,
+        rxx,
+        ryy,
+        angle,
+        region_file=regFile,
+    )
+
     return (x_small, y_small, x_cor, y_cor)
+
+
+def writeDs9Ellipse(objid, xpos, ypos, rx, ry, angle, region_file="ellipse.reg"):
+    """Write an ellipse to a DS9 region file.
+
+    Parameters
+    ----------
+    objid : str or int
+        Object identifier, displayed as a label.
+    xpos, ypos : float
+        Center coordinates in DS9 image pixels (1-based).
+    rx, ry : float
+        Ellipse semi-axis lengths in pixels.
+    angle : float
+        Rotation angle in degrees.
+    region_file : str or path-like, optional
+        Output filename. An existing file is overwritten.
+    """
+    with open(region_file, "w", encoding="utf-8") as output:
+        output.write("# Region file format: DS9 version 4.1\n")
+        output.write("image\n")
+        output.write(
+            f"ellipse({xpos},{ypos},{rx},{ry},{angle}) " f"# text={{{objid}}}\n"
+        )
 
 
 #############################################################################

@@ -102,6 +102,21 @@ def mainGetGalaxy(argv=None) -> int:
         help="factor to multiply galaxy size to enlarge image size. Default=6",
     )
 
+    parser.add_argument(
+        "-rg",
+        "--regFile",
+        type=str,
+        help="New Ds9 Region file for the new image",
+        default="ellipse_imout.reg",
+    )
+    parser.add_argument(
+        "-i",
+        "--idx",
+        type=str,
+        help="New obj id  for the new Ds9 Region file",
+        default=1,
+    )
+
     args = parser.parse_args(argv)
 
     (x_small, y_small, xcor, ycor) = getGalaxy(
@@ -112,6 +127,8 @@ def mainGetGalaxy(argv=None) -> int:
         args.sigma,
         args.sigout,
         args.scale,
+        args.regFile,
+        args.idx,
     )
 
     print("new (x,y) galaxy coordinates:")
