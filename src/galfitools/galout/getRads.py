@@ -1875,6 +1875,7 @@ def getSlope(
     num_comp: int,
     plot: bool,
     ranx: list,
+    plate: float,
 ) -> float:
     """Obtains the slope radius from a set of Sersic functions.
 
@@ -1900,6 +1901,12 @@ def getSlope(
             components will be determined.
     plot: bool
           if True, it will makes plot of the second derivative
+
+    plate: float
+           plate scale in arcsec/pix
+
+
+
 
     ranx: list
            Specify the range for the plot’s x-axis: xmin to xmax
@@ -1982,9 +1989,11 @@ def getSlope(
         plt.minorticks_on()
         plt.savefig("slope.png")
 
-    rgam = GetSlope().FindSlope(comps, theta, slope)
+    rgampix = GetSlope().FindSlope(comps, theta, slope)
 
-    return rgam, N, theta
+    rgam = rgampix * plate
+
+    return rgampix, rgam, N, theta
 
 
 class GetSlope:

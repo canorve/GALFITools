@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Iterable
 
 from galfitools.galout.getRads import getSlope
+from galfitools.galin.galfit import Galfit
 
 
 DEFAULT_ENCODING = "utf-8"
@@ -35,6 +36,7 @@ class SlopeResult:
 
     relative_path: str
     rgam: float | None
+    rgampix: float | None
     n_components: int | None
     theta: float | None
     success: bool
@@ -151,6 +153,7 @@ def process_file(
         return SlopeResult(
             relative_path=relative_path,
             rgam=None,
+            rgampix=None,
             n_components=None,
             theta=None,
             success=False,
@@ -162,7 +165,8 @@ def process_file(
     try:
         os.chdir(file_path.parent)
 
-        rgam, n_components, theta = getSlope(
+        plate = Galfit(file_path.name).ReadHead().scale
+        rgampix, rgam, n_components, theta = getSlope(
             galfitFile=file_path.name,
             dis=dis,
             slope=slope,
@@ -170,11 +174,13 @@ def process_file(
             num_comp=num_comp,
             plot=plot,
             ranx=ranx,
+            plate=plate,
         )
 
         return SlopeResult(
             relative_path=relative_path,
             rgam=round(float(rgam), ROUND_DECIMALS),
+            rgampix=round(float(rgampix), ROUND_DECIMALS),
             n_components=int(n_components),
             theta=round(float(theta), ROUND_DECIMALS),
             success=True,
@@ -185,6 +191,7 @@ def process_file(
         return SlopeResult(
             relative_path=relative_path,
             rgam=None,
+            rgampix=None,
             n_components=None,
             theta=None,
             success=False,
@@ -268,6 +275,7 @@ def write_results(results: Iterable[SlopeResult], output_file: Path) -> None:
             [
                 "relative_path",
                 "rgam",
+                "rgampix",
                 "n_components",
                 "theta",
                 "success",
@@ -280,6 +288,7 @@ def write_results(results: Iterable[SlopeResult], output_file: Path) -> None:
                 [
                     result.relative_path,
                     result.rgam,
+                    result.rgampix,
                     result.n_components,
                     result.theta,
                     result.success,

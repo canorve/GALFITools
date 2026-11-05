@@ -393,17 +393,34 @@ def maingetSlope(argv=None) -> int:
         description="getSlope: gets the slope radius from a set of Sersics"
     )
     p.add_argument("GalfitFile")
-    p.add_argument("-d", "--dis", type=int, default=10)
-    p.add_argument("-n", "--numcomp", type=int, default=1)
-    p.add_argument("-a", "--angle", type=float)
-    p.add_argument("-s", "--slope", type=float, default=0.5)
+    p.add_argument(
+        "-d", "--dis", help="maximum distance among components", type=int, default=10
+    )
+    p.add_argument(
+        "-n",
+        "--numcomp",
+        help="component number to identify galaxy",
+        type=int,
+        default=1,
+    )
+    p.add_argument(
+        "-a",
+        "--angle",
+        help="position angle (same as GALFIT) where the radius will be obtained ",
+        type=float,
+    )
+    p.add_argument(
+        "-s", "--slope", help="slope to find the radius", type=float, default=0.5
+    )
     p.add_argument("-p", "--plot", action="store_true")
     p.add_argument("-rx", "--ranx", nargs=2, type=float)
     a = p.parse_args(argv)
-    rgam, N, theta = getSlope(
-        a.GalfitFile, a.dis, a.slope, a.angle, a.numcomp, a.plot, a.ranx
-    )
+
     plate = Galfit(a.GalfitFile).ReadHead().scale
+
+    rgampix, rgam, N, theta = getSlope(
+        a.GalfitFile, a.dis, a.slope, a.angle, a.numcomp, a.plot, a.ranx, plate
+    )
     print("number of model components: ", N)
     if a.angle:
         print(f"position angle: {theta:.2f} degrees\n")
@@ -412,7 +429,7 @@ def maingetSlope(argv=None) -> int:
 
     print(f"The radius with slope {a.slope:.2f} is:  \n")
     print(f"  pixels   arcsec ")
-    print(f"   {rgam:.2f}     {rgam*plate:.2f}  \n")
+    print(f"   {rgampix:.2f}     {rgam:.2f}  \n")
 
     return 0
 
