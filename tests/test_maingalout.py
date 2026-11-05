@@ -221,7 +221,7 @@ def test_maingetSlope_default(monkeypatch, capsys):
     """Uses all defaults: dis=10, numcomp=1, angle=None, slope=0.5, no plot/ranx."""
     # Stub heavy computation
     # Returns: rgam, N, theta
-    monkeypatch.setattr(cli, "getSlope", lambda *a, **k: (15.0, 3, 25.0))
+    monkeypatch.setattr(cli, "getSlope", lambda *a, **k: (15.0, 6.0, 3, 25.0))
 
     # Fake Galfit.ReadHead().scale
     class Head:
@@ -248,7 +248,7 @@ def test_maingetSlope_default(monkeypatch, capsys):
 
 def test_maingetSlope_with_options(monkeypatch, capsys):
     """Explicit options: dis, numcomp, angle, slope, plot flag, and ranx."""
-    monkeypatch.setattr(cli, "getSlope", lambda *a, **k: (8.0, 2, 10.0))
+    monkeypatch.setattr(cli, "getSlope", lambda *a, **k: (8.0, 4.0, 2, 10.0))
 
     class Head:
         scale = 0.5

@@ -266,13 +266,16 @@ def test_getSlope():
 
     ranx = None
     plot = False
+    plate = 0.68
 
-    rgam, N, theta = getSlope(galfitFile, dis, slope, angle, num_comp, plot, ranx)
+    rgampix, rgam, N, theta = getSlope(
+        galfitFile, dis, slope, angle, num_comp, plot, ranx, plate
+    )
 
     result = 2.62
     tol = 1e-2
 
-    diffrgam = abs(rgam - result)
+    diffrgam = abs(rgampix - result)
 
     assert diffrgam < tol
 
