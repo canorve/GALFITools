@@ -22,10 +22,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest", "macos-latest"]
+        os: ["ubuntu-24.04", "macos-latest"]
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         exclude:
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
             python-version: "3.10"
 
     steps:
@@ -46,7 +46,7 @@ jobs:
         run: tox -e default -- -k "not  test_galfit and not test_makePSF"
 
       - name: Inspect coverage.xml
-        if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.10' }}
+        if: ${{ matrix.os == 'ubuntu-24.04' && matrix.python-version == '3.11' }}
         run: |
           ls -l coverage.xml || (echo "coverage.xml not found" && exit 1)
           head -n 5 coverage.xml
@@ -89,7 +89,7 @@ jobs:
         if: ${{ success()
               && github.event_name == 'push'
               && github.ref == 'refs/heads/master'
-              && matrix.os == 'ubuntu-latest'
+              && matrix.os == 'ubuntu-24.04'
               && matrix.python-version == '3.11' }}
         uses: codecov/codecov-action@v4
         with:
